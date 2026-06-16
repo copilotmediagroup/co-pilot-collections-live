@@ -149,3 +149,30 @@ create policy "activity_insert_authenticated"
 on activity_logs for insert
 to authenticated
 with check (true);
+
+
+-- DELETE POLICY FIX FOR CLEAR/REUPLOAD TESTING
+-- This allows the logged-in app to clear bad imports from the admin UI.
+-- Upload/download buttons are still hidden for employees in the app UI.
+
+drop policy if exists "accounts_delete_admin" on accounts;
+drop policy if exists "accounts_delete_authenticated" on accounts;
+
+create policy "accounts_delete_authenticated"
+on accounts for delete
+to authenticated
+using (true);
+
+drop policy if exists "notes_delete_authenticated" on account_notes;
+
+create policy "notes_delete_authenticated"
+on account_notes for delete
+to authenticated
+using (true);
+
+drop policy if exists "activity_delete_authenticated" on activity_logs;
+
+create policy "activity_delete_authenticated"
+on activity_logs for delete
+to authenticated
+using (true);

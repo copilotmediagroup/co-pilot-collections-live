@@ -270,15 +270,42 @@ async function importCSV(e){
 }
 function parseCSV(text){let rows=[],row=[],cell='',q=false;for(let i=0;i<text.length;i++){let ch=text[i],nx=text[i+1];if(ch=='"'&&q&&nx=='"'){cell+='"';i++}else if(ch=='"'){q=!q}else if(ch==','&&!q){row.push(cell);cell=''}else if((ch=='\n'||ch=='\r')&&!q){if(ch=='\r'&&nx=='\n')i++;row.push(cell);rows.push(row);row=[];cell=''}else cell+=ch}if(cell||row.length){row.push(cell);rows.push(row)}return rows}
 
+async function deleteAllRows(table){
+ let total=0;
+ while(true){
+   let rows=await dbFetch('/'+table+'?select=id&limit=500');
+   if(!rows || rows.length===0)break;
+   let ids=rows.map(r=>r.id).filter(Boolean);
+   if(ids.length===0)break;
+   await dbFetch('/'+table+'?id=in.('+ids.join(',')+')',{
+     method:'DELETE',
+     headers:{Prefer:'return=minimal'}
+   });
+   total+=ids.length;
+   if(ids.length<500)break;
+ }
+ return total;
+}
+
 async function clearAllAccounts(){
  if(!currentUser.isAdmin)return alert('Admin only');
  let phrase=prompt('This will delete ALL accounts, notes, and activity from this Supabase project. Type CLEAR to continue.');
  if(phrase!=='CLEAR')return;
- await dbFetch('/accounts?id=not.is.null',{method:'DELETE',headers:{Prefer:'return=minimal'}});
- accounts=[];
- currentAccountId='';
- render();
- alert('All accounts cleared. Now import the CSV again with the improved mapper.');
+
+ try{
+   let activityDeleted=await deleteAllRows('activity_logs');
+   let notesDeleted=await deleteAllRows('account_notes');
+   let accountsDeleted=await deleteAllRows('accounts');
+
+   accounts=[];
+   currentAccountId='';
+   render();
+
+   alert('Clear complete. Deleted '+accountsDeleted+' accounts, '+notesDeleted+' notes, and '+activityDeleted+' activity rows. Now re-import the CSV.');
+   await loadAccounts();
+ }catch(err){
+   alert('Clear failed: '+(err.message||err)+'\n\nFix: go to Supabase SQL Editor, run the updated database_schema_rls.sql from this ZIP, then try Clear Accounts again.');
+ }
 }
 
 function exportCSV(){if(!currentUser.isAdmin)return alert('Admin only');let headers=FIELDS,rows=[headers.join(',')].concat(accounts.map(a=>headers.map(h=>`"${String(a[h]??'').replaceAll('"','""')}"`).join(',')));download('co-pilot-accounts-export.csv',rows.join('\n'),'text/csv')}function downloadTemplate(){let headers=FIELDS,sample=['PlainGreen LLC','PlainGreen LLC','36972835','13242556','36972835','John','','Doe','John Doe','123-45-6789','01/01/1980','123 Main St','','Las Vegas','NV','89101','Employer','email@example.com','PlainGreen LLC','installment loan','','',1000,'01/01/2020','','','02/01/2020','','','0','','','702-555-1111','','','','','','New'];download('co-pilot-import-template.csv',headers.join(',')+'\n'+sample.map(v=>`"${String(v).replaceAll('"','""')}"`).join(','),'text/csv')}function download(name,text,type){let blob=new Blob([text],{type}),u=URL.createObjectURL(blob),a=document.createElement('a');a.href=u;a.download=name;a.click();URL.revokeObjectURL(u)}
