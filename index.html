@@ -68,6 +68,7 @@
       <label class="fileBtn gray adminOnly hidden">Import CSV<input type="file" accept=".csv" onchange="importCSV(event)"></label>
       <button class="purple adminOnly hidden" onclick="downloadTemplate()">Template CSV</button>
       <button class="gray adminOnly hidden" onclick="exportCSV()">Export CSV</button>
+      <button class="red adminOnly hidden" onclick="clearAllAccounts()">Clear Accounts</button>
       <button class="red" onclick="logout()">Logout</button>
       <span><span class="dot"></span> Available</span>
     </div>
@@ -180,9 +181,106 @@ document.getElementById('agentNote').addEventListener('input',()=>{let v=documen
 async function saveCurrent(){let a=getCurrent();if(!a)return;let note=document.getElementById('agentNote').value.trim();if(note){await dbFetch('/account_notes',{method:'POST',body:JSON.stringify([{account_id:a.id,note,created_by_email:currentUser.email}])});await insertActivity(a.id,'Note',note)}document.getElementById('agentNote').value='';await loadAccounts()}async function saveAndNext(){await saveCurrent();nextAccount()}function nextAccount(){let q=queue(),cur=getCurrent(),idx=q.findIndex(a=>a.id===cur?.id);if(q[idx+1])setCurrent(q[idx+1].id)}function skipAccount(){nextAccount()}function callPrimary(){let p=phones(getCurrent())[0];if(p)window.location.href='tel:'+normPhone(p)}function endCall(){document.getElementById('lastDialed').textContent='Call ended';document.getElementById('callNumber').textContent='—'}
 function val(id){return document.getElementById(id).value.trim()}function setVal(id,v){document.getElementById(id).value=v??''}function inputId(k){return{accountNumber:'accountNumberInput',status:'statusInput',ssn:'ssnInput',state:'stateInput',email:'emailInput'}[k]||k}function openModal(){document.querySelector('#modal form').reset();document.getElementById('id').value='';document.getElementById('modalTitle').textContent='Add Account';document.getElementById('modal').classList.add('open')}function closeModal(id){document.getElementById(id).classList.remove('open')}
 async function saveAccount(e){e.preventDefault();if(!currentUser.isAdmin)return alert('Admin only');let id=val('id'),acct={};FIELDS.forEach(k=>acct[k]=val(inputId(k)));acct.fullName=acct.fullName||[acct.firstName,acct.middleName,acct.lastName].filter(Boolean).join(' ');if(id)await dbFetch(`/accounts?id=eq.${id}`,{method:'PATCH',body:JSON.stringify(toRow(acct))});else await dbFetch('/accounts',{method:'POST',body:JSON.stringify([toRow(acct)])});closeModal('modal');await loadAccounts()}
-function norm(s){return String(s||'').toLowerCase().replace(/[^a-z0-9]/g,'')}const MAP={portfolio:['portfolio'],accountDescription:['accountdescription'],clientAccountNumber:['clientaccountnumber'],accountId:['accountid'],accountNumber:['accountnumber'],firstName:['firstname'],middleName:['middlename'],lastName:['lastname'],fullName:['fullname'],ssn:['ssn','socialsecuritynumber'],dob:['dob'],address:['address'],address2:['address2'],city:['city'],state:['state'],zip:['zip'],employer:['employer'],email:['email'],originalCreditor:['originalcreditor'],typeOfDebt:['typeofdebt'],originalBalance:['originalbalance'],principal:['principal','coprincipal'],currentBalance:['currentbalance','coprincipal'],openDate:['opendate'],dateAccountOpened:['dateaccountopened'],delinquencyDate:['delinquencydate'],chargeOffDate:['chargeoffdate','datechargedoff'],origLastPmtDate:['origlastpmtdate'],lastPaymentDate:['lastpaymentdate'],lastPaymentAmount:['lastpaymentamount'],bankRoutingNumber:['bankroutingnumber'],bankAccountNumber:['bankaccountnumber'],phone1:['custom11','phone','phone1'],phone2:['custom12','phone2'],phone3:['custom13','phone3'],phone4:['custom14','phone4'],phone5:['custom15','phone5'],phone6:['custom16','phone6']}
-async function importCSV(e){if(!currentUser.isAdmin)return alert('Admin only');let file=e.target.files[0];if(!file)return;let rows=parseCSV(await file.text());if(rows.length<2)return alert('CSV needs headers and rows.');let headers=rows[0].map(norm),imported=[];rows.slice(1).forEach(cells=>{if(cells.every(c=>!String(c).trim()))return;let acct={status:'New'};for(let field in MAP){let idx=headers.findIndex(h=>MAP[field].includes(h));acct[field]=idx>=0?cells[idx]:''}acct.fullName=acct.fullName||[acct.firstName,acct.middleName,acct.lastName].filter(Boolean).join(' ');acct.accountNumber=acct.accountNumber||acct.clientAccountNumber||acct.accountId;acct.portfolio=acct.portfolio||acct.accountDescription||acct.originalCreditor||file.name.replace(/\.csv$/i,'');imported.push(toRow(acct))});for(let i=0;i<imported.length;i+=500){await dbFetch('/accounts',{method:'POST',body:JSON.stringify(imported.slice(i,i+500))})}alert('Imported '+imported.length+' accounts.');e.target.value='';await loadAccounts()}
+function norm(s){return String(s||'').toLowerCase().replace(/[^a-z0-9]/g,'')}const MAP={
+ portfolio:['portfolio','portfolio name','portfolioid','pool','poolname','file','filename','batch','batchname','seller','client','clientname','placement','placementname','source','sourcefile'],
+ accountDescription:['accountdescription','description','accounttype','product','portfolio description','portfolio_desc','filedescription'],
+ clientAccountNumber:['clientaccountnumber','client account number','clientacctnumber','client acct number','clientacct','client acct','clientaccount','client account','clientref','clientreference','reference','refnumber','ref no','ref'],
+ accountId:['accountid','account id','acctid','acct id','id','sourceid','source id','originalaccountid','original account id','loanid','loan id','fileid','file id','recordid','record id','customerid','customer id','debtorid','debtor id'],
+ accountNumber:['accountnumber','account number','acctnumber','acct number','acctno','acct no','acct','account','accountno','account no','accountnum','account num','loanaccountnumber','loan account number','loan number','loannumber','debtoraccountnumber','debtor account number','consumeraccountnumber','consumer account number'],
+ firstName:['firstname','first name','fname','first','consumerfirstname','consumer first name','debtorfirstname','debtor first name','borrowerfirstname','borrower first name'],
+ middleName:['middlename','middle name','mname','middle','mi','middleinitial','middle initial'],
+ lastName:['lastname','last name','lname','last','surname','consumerlastname','consumer last name','debtorlastname','debtor last name','borrowerlastname','borrower last name'],
+ fullName:['fullname','full name','name','consumername','consumer name','customername','customer name','debtorname','debtor name','borrowername','borrower name','clientname','client name','accountname','account name','consumer','customer','debtor','borrower','defendant','defendantname','defendant name'],
+ ssn:['ssn','socialsecuritynumber','social security number','social','socsec','ss#','ss number','taxid','tax id'],
+ dob:['dob','dateofbirth','date of birth','birthdate','birth date'],
+ address:['address','address1','address 1','street','streetaddress','street address','addr1','addr 1','mailingaddress','mailing address'],
+ address2:['address2','address 2','addr2','addr 2','unit','apt','apartment','suite'],
+ city:['city','consumer city','debtor city','mailingcity'],
+ state:['state','st','consumer state','debtor state','mailingstate'],
+ zip:['zip','zipcode','zip code','postal','postalcode','postal code'],
+ employer:['employer','employername','employer name','work','placeofemployment','place of employment'],
+ email:['email','emailaddress','email address','e-mail','e mail'],
+ originalCreditor:['originalcreditor','original creditor','creditor','creditorname','creditor name','lender','lendername','lender name','merchant','merchantname','merchant name','currentcreditor','current creditor','client','clientname'],
+ typeOfDebt:['typeofdebt','type of debt','debt type','debttype','producttype','product type','loan type','loantype','account type','accounttype'],
+ originalBalance:['originalbalance','original balance','origbalance','orig balance','startingbalance','starting balance','openedbalance','opened balance','chargeoffbalance','charge off balance','co balance','cobalance'],
+ principal:['principal','principalbalance','principal balance','principalamount','principal amount','co principal','coprincipal','co_principal'],
+ currentBalance:['currentbalance','current balance','balance','accountbalance','account balance','acctbalance','acct balance','currentdue','current due','amountowed','amount owed','amountdue','amount due','totaldue','total due','totalbalance','total balance','balanceowed','balance owed','co principal','coprincipal','co_principal','principalbalance','principal balance'],
+ openDate:['opendate','open date','dateopened','date opened','openeddate','opened date'],
+ dateAccountOpened:['dateaccountopened','date account opened','accountopeneddate','account opened date'],
+ delinquencyDate:['delinquencydate','delinquency date','dateofdelinquency','date of delinquency','dofd','dlinqdate','dlqdate'],
+ chargeOffDate:['chargeoffdate','charge off date','datechargedoff','date charged off','co date','codate'],
+ origLastPmtDate:['origlastpmtdate','orig last pmt date','original last payment date','original last pmt date'],
+ lastPaymentDate:['lastpaymentdate','last payment date','lastpmtdate','last pmt date','lastpaiddate','last paid date'],
+ lastPaymentAmount:['lastpaymentamount','last payment amount','lastpmtamount','last pmt amount','lastpaidamount','last paid amount'],
+ bankRoutingNumber:['bankroutingnumber','bank routing number','routing','routingnumber','routing number','aba','abanumber','aba number'],
+ bankAccountNumber:['bankaccountnumber','bank account number','bankacctnumber','bank acct number','accountnumberbank','bank account','checkingaccount','checking account'],
+ phone1:['custom11','phone','phone1','phone 1','primaryphone','primary phone','phonenumber','phone number','homephone','home phone','mobilephone','mobile phone','cellphone','cell phone','cell','telephone','tel'],
+ phone2:['custom12','phone2','phone 2','secondaryphone','secondary phone','altphone','alt phone','alternatephone','alternate phone','workphone','work phone'],
+ phone3:['custom13','phone3','phone 3','thirdphone','third phone','phone03','phone 03'],
+ phone4:['custom14','phone4','phone 4','fourthphone','fourth phone','phone04','phone 04'],
+ phone5:['custom15','phone5','phone 5','fifthphone','fifth phone','phone05','phone 05'],
+ phone6:['custom16','phone6','phone 6','sixthphone','sixth phone','phone06','phone 06']
+}
+async function importCSV(e){
+ if(!currentUser.isAdmin)return alert('Admin only');
+ let file=e.target.files[0];
+ if(!file)return;
+ let rows=parseCSV(await file.text());
+ if(rows.length<2)return alert('CSV needs headers and rows.');
+
+ let headers=rows[0].map(norm), imported=[], skipped=0;
+ rows.slice(1).forEach(cells=>{
+   if(cells.every(c=>!String(c).trim()))return;
+   let acct={status:'New'};
+   for(let field in MAP){
+     let idx=headers.findIndex(h=>MAP[field].map(norm).includes(h));
+     acct[field]=idx>=0?cells[idx]:'';
+   }
+
+   // Safety fallbacks when portfolio files use unusual layouts.
+   acct.fullName=acct.fullName||[acct.firstName,acct.middleName,acct.lastName].filter(Boolean).join(' ');
+   acct.accountNumber=acct.accountNumber||acct.clientAccountNumber||acct.accountId;
+   acct.portfolio=acct.portfolio||acct.accountDescription||acct.originalCreditor||file.name.replace(/\.csv$/i,'');
+   acct.originalCreditor=acct.originalCreditor||acct.accountDescription||acct.portfolio;
+   acct.currentBalance=acct.currentBalance||acct.principal||acct.originalBalance;
+
+   if(!acct.fullName && !acct.accountNumber && !acct.ssn && !acct.phone1){
+     skipped++;
+   }
+   imported.push(toRow(acct));
+ });
+
+ let named=imported.filter(r=>r.full_name).length;
+ let numbered=imported.filter(r=>r.account_number).length;
+ let phoned=imported.filter(r=>r.phone1||r.phone2||r.phone3||r.phone4||r.phone5||r.phone6).length;
+
+ if(imported.length && named===0 && numbered===0){
+   alert('Import stopped: this CSV header format was not recognized for names/account numbers. Send me the header row and I will add it.');
+   e.target.value='';
+   return;
+ }
+
+ for(let i=0;i<imported.length;i+=500){
+   await dbFetch('/accounts',{method:'POST',body:JSON.stringify(imported.slice(i,i+500))});
+ }
+
+ alert('Imported '+imported.length+' accounts. Names found: '+named+'. Account numbers found: '+numbered+'. Phone rows found: '+phoned+'.');
+ e.target.value='';
+ await loadAccounts();
+}
 function parseCSV(text){let rows=[],row=[],cell='',q=false;for(let i=0;i<text.length;i++){let ch=text[i],nx=text[i+1];if(ch=='"'&&q&&nx=='"'){cell+='"';i++}else if(ch=='"'){q=!q}else if(ch==','&&!q){row.push(cell);cell=''}else if((ch=='\n'||ch=='\r')&&!q){if(ch=='\r'&&nx=='\n')i++;row.push(cell);rows.push(row);row=[];cell=''}else cell+=ch}if(cell||row.length){row.push(cell);rows.push(row)}return rows}
+
+async function clearAllAccounts(){
+ if(!currentUser.isAdmin)return alert('Admin only');
+ let phrase=prompt('This will delete ALL accounts, notes, and activity from this Supabase project. Type CLEAR to continue.');
+ if(phrase!=='CLEAR')return;
+ await dbFetch('/accounts?id=not.is.null',{method:'DELETE',headers:{Prefer:'return=minimal'}});
+ accounts=[];
+ currentAccountId='';
+ render();
+ alert('All accounts cleared. Now import the CSV again with the improved mapper.');
+}
+
 function exportCSV(){if(!currentUser.isAdmin)return alert('Admin only');let headers=FIELDS,rows=[headers.join(',')].concat(accounts.map(a=>headers.map(h=>`"${String(a[h]??'').replaceAll('"','""')}"`).join(',')));download('co-pilot-accounts-export.csv',rows.join('\n'),'text/csv')}function downloadTemplate(){let headers=FIELDS,sample=['PlainGreen LLC','PlainGreen LLC','36972835','13242556','36972835','John','','Doe','John Doe','123-45-6789','01/01/1980','123 Main St','','Las Vegas','NV','89101','Employer','email@example.com','PlainGreen LLC','installment loan','','',1000,'01/01/2020','','','02/01/2020','','','0','','','702-555-1111','','','','','','New'];download('co-pilot-import-template.csv',headers.join(',')+'\n'+sample.map(v=>`"${String(v).replaceAll('"','""')}"`).join(','),'text/csv')}function download(name,text,type){let blob=new Blob([text],{type}),u=URL.createObjectURL(blob),a=document.createElement('a');a.href=u;a.download=name;a.click();URL.revokeObjectURL(u)}
 boot();
 </script>
