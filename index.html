@@ -27,6 +27,7 @@
     .bottom{background:white;border-top:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:12px 22px;gap:10px}.rightBtns{display:flex;gap:12px}.big{min-width:160px;justify-content:center}.primaryBig{background:#1d4ed8;min-width:210px;justify-content:center}
     .modal,.loginScreen{display:none;position:fixed;inset:0;background:rgba(15,23,42,.72);align-items:center;justify-content:center;padding:20px;z-index:20}.modal.open,.loginScreen.open{display:flex}.modalbox{background:white;border-radius:16px;max-width:980px;width:100%;max-height:92vh;overflow:auto}.modalhead{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #e2e8f0;padding:16px 20px;position:sticky;top:0;background:white;z-index:2}.modalbody{padding:20px}.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:13px}.sectionTitle{grid-column:1/-1;background:#f1f5f9;padding:10px;border-radius:10px;font-weight:900;color:#334155;margin-top:8px}.full{grid-column:1/-1}.two{grid-column:span 2}
     .loginBox{background:white;width:min(560px,100%);border-radius:20px;padding:24px;box-shadow:0 30px 90px rgba(0,0,0,.35)}.loginBox h2{margin:0 0 8px}.loginBox p{color:#64748b;margin-top:0}.error{background:#fef2f2;color:#991b1b;border:1px solid #fecaca;border-radius:10px;padding:10px;margin:10px 0}.notice{background:#fffbeb;color:#92400e;border:1px solid #fde68a;border-radius:10px;padding:10px;margin:10px 0;font-size:13px}
+    .mappingGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.mapField{border:1px solid #e2e8f0;border-radius:12px;padding:12px;background:#f8fafc}.mapField small{display:block;color:#64748b;margin-top:4px}.mapActions{display:flex;gap:10px;flex-wrap:wrap;margin:12px 0}.mapSummary{background:#eff6ff;border:1px solid #bfdbfe;color:#1e3a8a;border-radius:12px;padding:12px;margin:12px 0;font-size:13px}.previewTable{width:100%;border-collapse:collapse;margin-top:12px;font-size:12px}.previewTable th,.previewTable td{border:1px solid #e2e8f0;padding:6px;text-align:left;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
     @media(max-width:1200px){.main{grid-template-columns:270px 1fr}.right{display:none}.phoneGrid,.dispoGrid{grid-template-columns:repeat(2,1fr)}}@media(max-width:850px){body{overflow:auto}.app{height:auto;display:block}.main{display:block}.sidebar,.center,.right{overflow:visible;margin-bottom:14px}.accountCard{grid-template-columns:1fr}.bottom{position:sticky;bottom:0}.grid{grid-template-columns:1fr}.two,.full{grid-column:1}}
   </style>
 </head>
@@ -119,6 +120,24 @@
   <div class="sectionTitle">Sensitive Bank Fields</div><div><label>Bank Routing Number</label><input id="bankRoutingNumber"></div><div><label>Bank Account Number</label><input id="bankAccountNumber"></div>
 </div><div style="margin-top:16px;text-align:right"><button class="green" type="submit">Save Account</button></div></form></div></div></div>
 
+
+<div id="mapModal" class="modal"><div class="modalbox"><div class="modalhead"><h2>Map CSV Headers</h2><button class="gray" onclick="closeModal('mapModal')">Close</button></div><div class="modalbody">
+  <p style="margin-top:0;color:#475569">Pick which column from your uploaded CSV should fill each account field. Use a preset, then adjust anything that looks wrong.</p>
+  <div class="mapActions">
+    <button type="button" onclick="applyMappingPreset('auto')">Auto Detect</button>
+    <button type="button" class="gray" onclick="applyMappingPreset('pdl')">Payday Loan Preset</button>
+    <button type="button" class="gray" onclick="applyMappingPreset('credit')">Credit Card Preset</button>
+    <button type="button" class="gray" onclick="applyMappingPreset('live')">Live Cash / Issuer Preset</button>
+  </div>
+  <div id="mapSummary" class="mapSummary">Upload a CSV to begin mapping.</div>
+  <div id="mappingGrid" class="mappingGrid"></div>
+  <div id="mappingPreview"></div>
+  <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:18px">
+    <button type="button" class="gray" onclick="closeModal('mapModal')">Cancel</button>
+    <button type="button" class="green" onclick="importMappedCSV()">Import Mapped CSV</button>
+  </div>
+</div></div></div>
+
 <script src="config.js"></script>
 <script>
 const ADMIN_EMAIL='afinch2678@gmail.com';
@@ -182,129 +201,149 @@ async function saveCurrent(){let a=getCurrent();if(!a)return;let note=document.g
 function val(id){return document.getElementById(id).value.trim()}function setVal(id,v){document.getElementById(id).value=v??''}function inputId(k){return{accountNumber:'accountNumberInput',status:'statusInput',ssn:'ssnInput',state:'stateInput',email:'emailInput'}[k]||k}function openModal(){document.querySelector('#modal form').reset();document.getElementById('id').value='';document.getElementById('modalTitle').textContent='Add Account';document.getElementById('modal').classList.add('open')}function closeModal(id){document.getElementById(id).classList.remove('open')}
 async function saveAccount(e){e.preventDefault();if(!currentUser.isAdmin)return alert('Admin only');let id=val('id'),acct={};FIELDS.forEach(k=>acct[k]=val(inputId(k)));acct.fullName=acct.fullName||[acct.firstName,acct.middleName,acct.lastName].filter(Boolean).join(' ');if(id)await dbFetch(`/accounts?id=eq.${id}`,{method:'PATCH',body:JSON.stringify(toRow(acct))});else await dbFetch('/accounts',{method:'POST',body:JSON.stringify([toRow(acct)])});closeModal('modal');await loadAccounts()}
 function norm(s){return String(s||'').toLowerCase().replace(/[^a-z0-9]/g,'')}const MAP={
- // Payday loan headers:
- // Account Description, Client Account Number, Account ID, FirstName, LastName, SSN, Address, City, State, Zip, DOB, Employer,
- // Open Date, Delinquency Date, Charge Off Date, OrigLastPmtDate, Last Payment Date, Last Payment Amount, COPrincipal,
- // BankRoutingNumber, BankAccountNumber, Email
-
- // Credit card headers:
- // account_number, original_creditor, first_name, middle_name, last_name, ssn, dob, address, address2, city, state, zip,
- // email, home_phone, cell_phone, phones, original_balance, current_balance, charge_off_date, account_open_date
+ // Exact headers now supported:
+ // BorrowerName, IssuerAccountNumber, AccountOpenDate, CODATE, IssuerLPDate,
+ // PFName, PMiddle, PLName, PSSN SIN, PBirthdate,
+ // OrigAddress1, OrigAddress2, OrigCity, OrigState, OrigZipPostal,
+ // OrigProduct, AccountType, CurBalance, DelinquencyDate, PEmail,
+ // OrigPhone, 1stPhone, 2ndPhone, 3rdPhone, 4thPhone, 5thPhone, 6thPhone
 
  portfolio:['portfolio','portfolio name','portfolioid','pool','poolname','file','filename','batch','batchname','seller','client','clientname','placement','placementname','source','sourcefile'],
- accountDescription:['accountdescription','account description','description','accounttype','account type','product','portfolio description','portfolio_desc','filedescription'],
+ accountDescription:['accountdescription','account description','description','accounttype','account type','product','origproduct','orig product','portfolio description','portfolio_desc','filedescription'],
  clientAccountNumber:['clientaccountnumber','client account number','clientacctnumber','client acct number','clientacct','client acct','clientaccount','client account','clientref','clientreference','reference','refnumber','ref no','ref'],
  accountId:['accountid','account id','acctid','acct id','id','sourceid','source id','originalaccountid','original account id','loanid','loan id','fileid','file id','recordid','record id','customerid','customer id','debtorid','debtor id'],
- accountNumber:['account_number','accountnumber','account number','acctnumber','acct number','acctno','acct no','acct','account','accountno','account no','accountnum','account num','loanaccountnumber','loan account number','loan number','loannumber','debtoraccountnumber','debtor account number','consumeraccountnumber','consumer account number'],
- firstName:['firstname','first name','first_name','fname','first','consumerfirstname','consumer first name','debtorfirstname','debtor first name','borrowerfirstname','borrower first name'],
- middleName:['middlename','middle name','middle_name','mname','middle','mi','middleinitial','middle initial'],
- lastName:['lastname','last name','last_name','lname','last','surname','consumerlastname','consumer last name','debtorlastname','debtor last name','borrowerlastname','borrower last name'],
- fullName:['fullname','full name','full_name','name','consumername','consumer name','customername','customer name','debtorname','debtor name','borrowername','borrower name','clientname','client name','accountname','account name','consumer','customer','debtor','borrower','defendant','defendantname','defendant name'],
- ssn:['ssn','socialsecuritynumber','social security number','social','socsec','ss#','ss number','taxid','tax id'],
- dob:['dob','dateofbirth','date of birth','birthdate','birth date'],
- address:['address','address1','address 1','street','streetaddress','street address','addr1','addr 1','mailingaddress','mailing address'],
- address2:['address2','address 2','addr2','addr 2','unit','apt','apartment','suite'],
- city:['city','consumer city','debtor city','mailingcity'],
- state:['state','st','consumer state','debtor state','mailingstate'],
- zip:['zip','zipcode','zip code','postal','postalcode','postal code'],
+ accountNumber:['issueraccountnumber','issuer account number','account_number','accountnumber','account number','acctnumber','acct number','acctno','acct no','acct','account','accountno','account no','accountnum','account num','loanaccountnumber','loan account number','loan number','loannumber','debtoraccountnumber','debtor account number','consumeraccountnumber','consumer account number'],
+ firstName:['pfname','p fname','firstname','first name','first_name','fname','first','consumerfirstname','consumer first name','debtorfirstname','debtor first name','borrowerfirstname','borrower first name'],
+ middleName:['pmiddle','p middle','middlename','middle name','middle_name','mname','middle','mi','middleinitial','middle initial'],
+ lastName:['plname','p lname','plastname','p last name','lastname','last name','last_name','lname','last','surname','consumerlastname','consumer last name','debtorlastname','debtor last name','borrowerlastname','borrower last name'],
+ fullName:['borrowername','borrower name','fullname','full name','full_name','name','consumername','consumer name','customername','customer name','debtorname','debtor name','borrower','clientname','client name','accountname','account name','consumer','customer','debtor','defendant','defendantname','defendant name'],
+ ssn:['pssnsin','pssn sin','pssn','ssn','socialsecuritynumber','social security number','social','socsec','ss#','ss number','taxid','tax id'],
+ dob:['pbirthdate','p birthdate','dob','dateofbirth','date of birth','birthdate','birth date'],
+ address:['origaddress1','orig address1','orig address 1','address','address1','address 1','street','streetaddress','street address','addr1','addr 1','mailingaddress','mailing address'],
+ address2:['origaddress2','orig address2','orig address 2','address2','address 2','addr2','addr 2','unit','apt','apartment','suite'],
+ city:['origcity','orig city','city','consumer city','debtor city','mailingcity'],
+ state:['origstate','orig state','state','st','consumer state','debtor state','mailingstate'],
+ zip:['origzippostal','orig zip postal','origzip','orig zip','zipcode','zip code','zip','postal','postalcode','postal code'],
  employer:['employer','employername','employer name','work','placeofemployment','place of employment'],
- email:['email','emailaddress','email address','e-mail','e mail'],
+ email:['pemail','p email','email','emailaddress','email address','e-mail','e mail'],
  originalCreditor:['original_creditor','originalcreditor','original creditor','creditor','creditorname','creditor name','lender','lendername','lender name','merchant','merchantname','merchant name','currentcreditor','current creditor','client','clientname'],
- typeOfDebt:['typeofdebt','type of debt','debt type','debttype','producttype','product type','loan type','loantype','account type','accounttype'],
+ typeOfDebt:['accounttype','account type','origproduct','orig product','typeofdebt','type of debt','debt type','debttype','producttype','product type','loan type','loantype'],
  originalBalance:['original_balance','originalbalance','original balance','origbalance','orig balance','startingbalance','starting balance','openedbalance','opened balance','chargeoffbalance','charge off balance','co balance','cobalance'],
  principal:['coprincipal','co principal','co_principal','principal','principalbalance','principal balance','principalamount','principal amount'],
- currentBalance:['current_balance','currentbalance','current balance','balance','accountbalance','account balance','acctbalance','acct balance','currentdue','current due','amountowed','amount owed','amountdue','amount due','totaldue','total due','totalbalance','total balance','balanceowed','balance owed','coprincipal','co principal','co_principal','principalbalance','principal balance'],
- openDate:['opendate','open date','dateopened','date opened','openeddate','opened date','account_open_date','accountopendate','account open date'],
- dateAccountOpened:['dateaccountopened','date account opened','accountopeneddate','account opened date','account_open_date','accountopendate','account open date'],
+ currentBalance:['curbalance','cur balance','current_balance','currentbalance','current balance','balance','accountbalance','account balance','acctbalance','acct balance','currentdue','current due','amountowed','amount owed','amountdue','amount due','totaldue','total due','totalbalance','total balance','balanceowed','balance owed','coprincipal','co principal','co_principal','principalbalance','principal balance'],
+ openDate:['accountopendate','account open date','opendate','open date','dateopened','date opened','openeddate','opened date','account_open_date'],
+ dateAccountOpened:['accountopendate','account open date','dateaccountopened','date account opened','accountopeneddate','account opened date','account_open_date'],
  delinquencyDate:['delinquencydate','delinquency date','dateofdelinquency','date of delinquency','dofd','dlinqdate','dlqdate'],
- chargeOffDate:['charge_off_date','chargeoffdate','charge off date','datechargedoff','date charged off','co date','codate'],
- origLastPmtDate:['origlastpmtdate','orig last pmt date','original last payment date','original last pmt date'],
+ chargeOffDate:['codate','co date','charge_off_date','chargeoffdate','charge off date','datechargedoff','date charged off'],
+ origLastPmtDate:['issuerlpdate','issuer lp date','origlastpmtdate','orig last pmt date','original last payment date','original last pmt date'],
  lastPaymentDate:['lastpaymentdate','last payment date','lastpmtdate','last pmt date','lastpaiddate','last paid date'],
  lastPaymentAmount:['lastpaymentamount','last payment amount','lastpmtamount','last pmt amount','lastpaidamount','last paid amount'],
  bankRoutingNumber:['bankroutingnumber','bank routing number','routing','routingnumber','routing number','aba','abanumber','aba number'],
  bankAccountNumber:['bankaccountnumber','bank account number','bankacctnumber','bank acct number','accountnumberbank','bank account','checkingaccount','checking account'],
- phone1:['home_phone','homephone','home phone','phone1','phone 1','primaryphone','primary phone','phonenumber','phone number','phone','telephone','tel'],
- phone2:['cell_phone','cellphone','cell phone','cell','mobilephone','mobile phone','mobile','phone2','phone 2','secondaryphone','secondary phone'],
- phone3:['phones','phone_numbers','phonenumbers','phone numbers','allphones','all phones','altphone','alt phone','alternatephone','alternate phone','workphone','work phone','custom11','phone3','phone 3'],
- phone4:['custom12','phone4','phone 4','fourthphone','fourth phone','phone04','phone 04'],
- phone5:['custom13','phone5','phone 5','fifthphone','fifth phone','phone05','phone 05'],
- phone6:['custom14','phone6','phone 6','sixthphone','sixth phone','phone06','phone 06']
+ phone1:['origphone','orig phone','1stphone','1st phone','firstphone','first phone','home_phone','homephone','home phone','phone1','phone 1','primaryphone','primary phone','phonenumber','phone number','phone','telephone','tel'],
+ phone2:['2ndphone','2nd phone','secondphone','second phone','cell_phone','cellphone','cell phone','cell','mobilephone','mobile phone','mobile','phone2','phone 2','secondaryphone','secondary phone'],
+ phone3:['3rdphone','3rd phone','thirdphone','third phone','phones','phone_numbers','phonenumbers','phone numbers','allphones','all phones','altphone','alt phone','alternatephone','alternate phone','workphone','work phone','custom11','phone3','phone 3'],
+ phone4:['4thphone','4th phone','fourthphone','fourth phone','custom12','phone4','phone 4','phone04','phone 04'],
+ phone5:['5thphone','5th phone','fifthphone','fifth phone','custom13','phone5','phone 5','phone05','phone 05'],
+ phone6:['6thphone','6th phone','sixthphone','sixth phone','custom14','phone6','phone 6','phone06','phone 06']
 }
+let pendingImport={fileName:'',headers:[],rows:[]};
+const MANUAL_FIELDS=[
+ ['portfolio','Portfolio / File Name'],['accountDescription','Account Description'],['originalCreditor','Original Creditor'],['accountNumber','Account Number'],['clientAccountNumber','Client Account Number'],['accountId','Account ID'],['typeOfDebt','Type of Debt'],
+ ['fullName','Full Name'],['firstName','First Name'],['middleName','Middle Name'],['lastName','Last Name'],['ssn','SSN'],['dob','DOB'],['address','Address'],['address2','Address 2'],['city','City'],['state','State'],['zip','Zip'],['employer','Employer'],['email','Email'],
+ ['phone1','Phone 1'],['phone2','Phone 2'],['phone3','Phone 3 / Phones Column'],['phone4','Phone 4'],['phone5','Phone 5'],['phone6','Phone 6'],
+ ['originalBalance','Original Balance'],['principal','Principal / COPrincipal'],['currentBalance','Current Balance'],['openDate','Open Date'],['dateAccountOpened','Date Account Opened'],['delinquencyDate','Delinquency Date'],['chargeOffDate','Charge Off Date'],['origLastPmtDate','Original Last Payment Date'],['lastPaymentDate','Last Payment Date'],['lastPaymentAmount','Last Payment Amount'],['bankRoutingNumber','Bank Routing Number'],['bankAccountNumber','Bank Account Number']
+];
+const PRESETS={
+ pdl:{accountDescription:'Account Description',clientAccountNumber:'Client Account Number',accountId:'Account ID',firstName:'FirstName',lastName:'LastName',ssn:'SSN',address:'Address',city:'City',state:'State',zip:'Zip',dob:'DOB',employer:'Employer',openDate:'Open Date',delinquencyDate:'Delinquency Date',chargeOffDate:'Charge Off Date',origLastPmtDate:'OrigLastPmtDate',lastPaymentDate:'Last Payment Date',lastPaymentAmount:'Last Payment Amount',principal:'COPrincipal',currentBalance:'COPrincipal',bankRoutingNumber:'BankRoutingNumber',bankAccountNumber:'BankAccountNumber',email:'Email'},
+ credit:{accountNumber:'account_number',originalCreditor:'original_creditor',firstName:'first_name',middleName:'middle_name',lastName:'last_name',ssn:'ssn',dob:'dob',address:'address',address2:'address2',city:'city',state:'state',zip:'zip',email:'email',phone1:'home_phone',phone2:'cell_phone',phone3:'phones',originalBalance:'original_balance',currentBalance:'current_balance',chargeOffDate:'charge_off_date',openDate:'account_open_date',dateAccountOpened:'account_open_date'},
+ live:{fullName:'BorrowerName',accountNumber:'IssuerAccountNumber',openDate:'AccountOpenDate',dateAccountOpened:'AccountOpenDate',chargeOffDate:'CODATE',origLastPmtDate:'IssuerLPDate',firstName:'PFName',middleName:'PMiddle',lastName:'PLName',ssn:'PSSN SIN',dob:'PBirthdate',address:'OrigAddress1',address2:'OrigAddress2',city:'OrigCity',state:'OrigState',zip:'OrigZipPostal',accountDescription:'OrigProduct',typeOfDebt:'AccountType',currentBalance:'CurBalance',delinquencyDate:'DelinquencyDate',email:'PEmail',phone1:'OrigPhone',phone2:'1stPhone',phone3:'2ndPhone',phone4:'3rdPhone',phone5:'4thPhone',phone6:'5thPhone'}
+};
 async function importCSV(e){
  if(!currentUser.isAdmin)return alert('Admin only');
  let file=e.target.files[0];
  if(!file)return;
  let rows=parseCSV(await file.text());
- if(rows.length<2)return alert('CSV needs headers and rows.');
-
- let headers=rows[0].map(norm), imported=[], skipped=0;
- let headerText=rows[0].join(' | ');
-
- rows.slice(1).forEach(cells=>{
-   if(cells.every(c=>!String(c).trim()))return;
-   let acct={status:'New'};
-
-   for(let field in MAP){
-     let idx=headers.findIndex(h=>MAP[field].map(norm).includes(h));
-     acct[field]=idx>=0?String(cells[idx]||'').trim():'';
-   }
-
-   // If credit-card file has one "phones" column with multiple numbers, split it across phone slots.
-   let phonesIdx=headers.findIndex(h=>['phones','phonenumbers','phone_numbers','phonenumbersall','allphones'].includes(h));
-   if(phonesIdx>=0 && cells[phonesIdx]){
-     let found=extractPhones(String(cells[phonesIdx]));
-     ['phone1','phone2','phone3','phone4','phone5','phone6'].forEach((slot,i)=>{
-       if(!acct[slot] && found[i]) acct[slot]=found[i];
-     });
-   }
-
-   // Payday files usually have FirstName + LastName, credit-card files may have first_name/middle_name/last_name.
-   acct.fullName=acct.fullName||[acct.firstName,acct.middleName,acct.lastName].filter(Boolean).join(' ');
-
-   // Payday account number preference: Client Account Number, then Account ID.
-   // Credit-card account number preference: account_number.
-   acct.accountNumber=acct.accountNumber||acct.clientAccountNumber||acct.accountId;
-
-   // Portfolio/Creditor fallback.
-   acct.portfolio=acct.portfolio||acct.accountDescription||acct.originalCreditor||file.name.replace(/\.csv$/i,'');
-   acct.originalCreditor=acct.originalCreditor||acct.accountDescription||acct.portfolio;
-
-   // Balance fallback.
-   acct.currentBalance=acct.currentBalance||acct.principal||acct.originalBalance;
-
-   // Put payday Account Description into debt type if no type value exists.
-   if(!acct.typeOfDebt && acct.accountDescription) acct.typeOfDebt=acct.accountDescription;
-
-   if(!acct.fullName && !acct.accountNumber && !acct.ssn && !acct.phone1){
-     skipped++;
-   }
-   imported.push(toRow(acct));
- });
-
- let named=imported.filter(r=>r.full_name).length;
- let numbered=imported.filter(r=>r.account_number).length;
- let ssned=imported.filter(r=>r.ssn).length;
- let emailed=imported.filter(r=>r.email).length;
- let phoned=imported.filter(r=>r.phone1||r.phone2||r.phone3||r.phone4||r.phone5||r.phone6).length;
-
- if(imported.length && named===0 && numbered===0){
-   alert('Import stopped: the CSV headers were still not recognized. Header row seen by app:\\n\\n'+headerText);
-   e.target.value='';
-   return;
- }
-
- for(let i=0;i<imported.length;i+=500){
-   await dbFetch('/accounts',{method:'POST',body:JSON.stringify(imported.slice(i,i+500))});
- }
-
- alert('Imported '+imported.length+' accounts. Names found: '+named+'. Account numbers found: '+numbered+'. SSNs found: '+ssned+'. Emails found: '+emailed+'. Phone rows found: '+phoned+'. Skipped blank rows: '+skipped+'.');
  e.target.value='';
+ if(rows.length<2)return alert('CSV needs headers and rows.');
+ pendingImport={fileName:file.name,headers:rows[0].map(h=>String(h||'').trim()),rows:rows.slice(1)};
+ renderMappingModal();
+ document.getElementById('mapModal').classList.add('open');
+ applyMappingPreset('auto');
+}
+function renderMappingModal(){
+ let headers=pendingImport.headers;
+ let opts='<option value="">-- Do not import --</option>'+headers.map((h,i)=>`<option value="${i}">${esc(h)}</option>`).join('');
+ document.getElementById('mapSummary').innerHTML=`<b>File:</b> ${esc(pendingImport.fileName)} &nbsp; <b>Rows:</b> ${pendingImport.rows.length} &nbsp; <b>Headers:</b> ${headers.length}`;
+ document.getElementById('mappingGrid').innerHTML=MANUAL_FIELDS.map(([field,label])=>`<div class="mapField"><label>${esc(label)}</label><select id="map_${field}">${opts}</select><small>${esc(field)}</small></div>`).join('');
+ document.querySelectorAll('#mappingGrid select').forEach(s=>s.onchange=renderMappingPreview);
+ renderMappingPreview();
+}
+function setMap(field,headerName){
+ let sel=document.getElementById('map_'+field); if(!sel)return;
+ let idx=pendingImport.headers.findIndex(h=>norm(h)===norm(headerName));
+ if(idx>=0)sel.value=String(idx);
+}
+function applyMappingPreset(type){
+ if(!pendingImport.headers.length)return;
+ MANUAL_FIELDS.forEach(([field])=>{let el=document.getElementById('map_'+field);if(el)el.value='';});
+ if(type==='auto'){
+   for(let field in MAP){
+     let idx=pendingImport.headers.map(norm).findIndex(h=>MAP[field].map(norm).includes(h));
+     let sel=document.getElementById('map_'+field); if(sel && idx>=0)sel.value=String(idx);
+   }
+ }else{
+   let preset=PRESETS[type]||{};
+   Object.entries(preset).forEach(([field,header])=>setMap(field,header));
+ }
+ document.querySelectorAll('#mappingGrid select').forEach(s=>s.onchange=renderMappingPreview);
+ renderMappingPreview();
+}
+function getMappedAccount(cells){
+ let acct={status:'New'};
+ MANUAL_FIELDS.forEach(([field])=>{
+   let sel=document.getElementById('map_'+field);
+   if(sel && sel.value!=='') acct[field]=String(cells[Number(sel.value)]||'').trim();
+   else acct[field]='';
+ });
+ if(acct.phone3){
+   let found=extractPhones(acct.phone3);
+   if(found.length>1){
+     ['phone1','phone2','phone3','phone4','phone5','phone6'].forEach((slot,i)=>{if(!acct[slot]&&found[i])acct[slot]=found[i];});
+   }
+ }
+ acct.fullName=acct.fullName||[acct.firstName,acct.middleName,acct.lastName].filter(Boolean).join(' ');
+ acct.accountNumber=acct.accountNumber||acct.clientAccountNumber||acct.accountId;
+ acct.portfolio=acct.portfolio||acct.accountDescription||acct.originalCreditor||pendingImport.fileName.replace(/\.csv$/i,'');
+ acct.originalCreditor=acct.originalCreditor||acct.accountDescription||acct.portfolio;
+ acct.currentBalance=acct.currentBalance||acct.principal||acct.originalBalance;
+ if(!acct.typeOfDebt && acct.accountDescription) acct.typeOfDebt=acct.accountDescription;
+ return acct;
+}
+function renderMappingPreview(){
+ if(!pendingImport.rows.length)return;
+ let acct=getMappedAccount(pendingImport.rows.find(r=>r.some(c=>String(c).trim()))||pendingImport.rows[0]);
+ document.getElementById('mappingPreview').innerHTML=`<div class="mapSummary"><b>Preview first mapped row:</b> Name: ${esc(acct.fullName||'—')} | Account #: ${esc(acct.accountNumber||'—')} | SSN: ${esc(acct.ssn||'—')} | Balance: ${esc(acct.currentBalance||acct.principal||acct.originalBalance||'—')} | Phone: ${esc(acct.phone1||acct.phone2||acct.phone3||'—')}</div>`;
+}
+async function importMappedCSV(){
+ if(!currentUser.isAdmin)return alert('Admin only');
+ let mapped=[], skipped=0;
+ pendingImport.rows.forEach(cells=>{
+   if(cells.every(c=>!String(c).trim()))return;
+   let acct=getMappedAccount(cells);
+   if(!acct.fullName && !acct.accountNumber && !acct.ssn && !acct.phone1){skipped++;return;}
+   mapped.push(toRow(acct));
+ });
+ if(!mapped.length)return alert('No rows were mapped. Choose at least name, account number, SSN, or phone.');
+ let named=mapped.filter(r=>r.full_name).length, numbered=mapped.filter(r=>r.account_number).length, ssned=mapped.filter(r=>r.ssn).length, emailed=mapped.filter(r=>r.email).length, phoned=mapped.filter(r=>r.phone1||r.phone2||r.phone3||r.phone4||r.phone5||r.phone6).length;
+ for(let i=0;i<mapped.length;i+=500){await dbFetch('/accounts',{method:'POST',body:JSON.stringify(mapped.slice(i,i+500))});}
+ closeModal('mapModal');
+ alert('Imported '+mapped.length+' accounts. Names found: '+named+'. Account numbers found: '+numbered+'. SSNs found: '+ssned+'. Emails found: '+emailed+'. Phone rows found: '+phoned+'. Skipped blank/unmapped rows: '+skipped+'.');
  await loadAccounts();
 }
-
 function extractPhones(text){
  let matches=String(text||'').match(/(?:\+?1[\s.-]?)?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}/g)||[];
- return [...new Set(matches.map(p=>p.replace(/\\D/g,'').replace(/^1(?=\\d{10}$)/,'')))].slice(0,6);
+ return [...new Set(matches.map(p=>p.replace(/\D/g,'').replace(/^1(?=\d{10}$)/,'')))].slice(0,6);
 }
 function parseCSV(text){let rows=[],row=[],cell='',q=false;for(let i=0;i<text.length;i++){let ch=text[i],nx=text[i+1];if(ch=='"'&&q&&nx=='"'){cell+='"';i++}else if(ch=='"'){q=!q}else if(ch==','&&!q){row.push(cell);cell=''}else if((ch=='\n'||ch=='\r')&&!q){if(ch=='\r'&&nx=='\n')i++;row.push(cell);rows.push(row);row=[];cell=''}else cell+=ch}if(cell||row.length){row.push(cell);rows.push(row)}return rows}
 
