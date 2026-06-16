@@ -227,6 +227,13 @@ header.topbar{height:66px;background:linear-gradient(90deg,#05225f,#07379a,#0b45
 @media(max-width:1550px){.planMetrics{grid-template-columns:repeat(3,1fr)!important}.planScheduleMini{grid-template-columns:repeat(3,1fr)!important}.paymentPreviewLine{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:1000px){.planMetrics,.planScheduleMini,.paymentPreviewLine{grid-template-columns:1fr!important}}
 
+
+/* STRICT PAYMENT PLAN BALANCE LOGIC */
+.planHardLimit{background:#fee2e2;border:1px solid #fecaca;color:#991b1b;border-radius:12px;padding:10px;font-size:12px;font-weight:900;margin:10px 0}
+.planMathLine{background:#eff6ff;border:1px solid #bfdbfe;color:#1e3a8a;border-radius:12px;padding:10px;font-size:12px;font-weight:900;margin:10px 0}
+.paymentPreviewValue.danger{color:#dc2626}
+.paymentPreviewValue.good{color:#166534}
+
 </style>
 </head>
 <body>
@@ -268,7 +275,7 @@ header.topbar{height:66px;background:linear-gradient(90deg,#05225f,#07379a,#0b45
 
 <div class="app">
   <header class="topbar">
-    <div class="brand"><div class="logo">b</div><div><h1>Co Pilot Collections Manager</h1><p class="sub">DYNAMIC PAYMENT PLAN FIX — balances, dates, frequency, and payment amounts update live.</p></div></div>
+    <div class="brand"><div class="logo">b</div><div><h1>Co Pilot Collections Manager</h1><p class="sub">STRICT PAYMENT PLAN FIX — cannot exceed balance; count/amount auto-calculate.</p></div></div>
     <div class="headerSearch"><span class="mag">⌕</span><input id="globalSearch" placeholder="Search accounts..." oninput="document.getElementById('search').value=this.value;onQueueFilterChange()"><span class="hotkey">⌘ K</span></div>
     <div class="topActions">
       <label class="fileBtn gray adminOnly hidden">⇩ Import CSV<input type="file" accept=".csv" onchange="importCSV(event)"></label>
@@ -413,12 +420,12 @@ header.topbar{height:66px;background:linear-gradient(90deg,#05225f,#07379a,#0b45
     </div>
 
     <div class="payGrid">
-      <div><label>Plan Total</label><input id="planTotal" type="number" step="0.01" min="0" oninput="updatePlanRemainingPreview()"></div>
-      <div><label>Payment Today</label><input id="planToday" type="number" step="0.01" min="0" value="0" oninput="updatePlanRemainingPreview()"></div>
-      <div><label>Start Date</label><input id="planStartDate" type="date" onchange="generatePlanSchedule()"></div>
-      <div><label>Frequency</label><select id="planFrequency" onchange="generatePlanSchedule()"><option>One Time</option><option>Weekly</option><option>Biweekly</option><option selected>Monthly</option><option>Custom</option></select></div>
-      <div><label># of Future Payments</label><input id="planCount" type="number" min="1" value="1" oninput="generatePlanSchedule()"></div>
-      <div><label>Amount Each</label><input id="planEach" type="number" step="0.01" min="0" oninput="generatePlanSchedule()"></div>
+      <div><label>Plan Total</label><input id="planTotal" type="number" step="0.01" min="0" oninput="recalcPlanFromInputs('total')"></div>
+      <div><label>Payment Today</label><input id="planToday" type="number" step="0.01" min="0" value="0" oninput="recalcPlanFromInputs('today')"></div>
+      <div><label>Start Date</label><input id="planStartDate" type="date" onchange="recalcPlanFromInputs('date')"></div>
+      <div><label>Frequency</label><select id="planFrequency" onchange="recalcPlanFromInputs('frequency')"><option>One Time</option><option>Weekly</option><option>Biweekly</option><option selected>Monthly</option><option>Custom</option></select></div>
+      <div><label># of Future Payments</label><input id="planCount" type="number" min="1" value="1" oninput="recalcPlanFromInputs('count')"></div>
+      <div><label>Amount Each</label><input id="planEach" type="number" step="0.01" min="0" oninput="recalcPlanFromInputs('amount')"></div>
       <div><label>Plan Status</label><select id="planStatus"><option>Active</option><option>Completed</option><option>Broken</option><option>Cancelled</option></select></div>
       <div><label>Remaining Balance</label><input id="planRemaining" readonly></div>
       <div style="grid-column:1/-1"><label>Plan Notes</label><textarea id="planNotes" placeholder="Example: Debtor promised $100 today and $150 every month on the 15th."></textarea></div>
@@ -848,75 +855,155 @@ async function openPaymentPlan(){
    document.getElementById('planCount').value='1';
    document.getElementById('planEach').value=bal.toFixed(2);
    paymentScheduleDraft=[];
-   generatePlanSchedule();
+   recalcPlanFromInputs('count');
  }
  renderPlanSchedule();
+ updatePlanRemainingPreview();
+}
+function planCap(){
+ let bal=accountBalance(getCurrent());
+ return Math.max(0, Number(bal.toFixed(2)));
+}
+function setInputNumber(id,val){
+ let el=document.getElementById(id);
+ if(el)el.value=Number(Math.max(0,val)).toFixed(2);
+}
+function clampPlanInputs(){
+ let cap=planCap();
+ let totalEl=document.getElementById('planTotal'), todayEl=document.getElementById('planToday');
+ let total=moneyNum(totalEl?.value);
+ if(!total || total<=0) total=cap;
+ if(total>cap) total=cap;
+ if(total<0) total=0;
+ if(totalEl) totalEl.value=Number(total).toFixed(2);
+ let today=moneyNum(todayEl?.value);
+ if(today>total) today=total;
+ if(today<0) today=0;
+ if(todayEl) todayEl.value=Number(today).toFixed(2);
+ return {cap,total,today,remaining:Number(Math.max(0,total-today).toFixed(2))};
+}
+function splitAmounts(total,count,preferredEach=0){
+ total=Number(Math.max(0,total).toFixed(2));
+ count=Math.max(1,parseInt(count||1,10));
+ let amounts=[];
+ if(total<=0)return amounts;
+ let each=moneyNum(preferredEach);
+ if(!each || each<=0) each=total/count;
+ if(each>total) each=total;
+ let running=0;
+ for(let i=0;i<count;i++){
+   let left=Number((total-running).toFixed(2));
+   if(left<=0)break;
+   let amt=i===count-1?left:Math.min(Number(each.toFixed(2)),left);
+   amounts.push(Number(amt.toFixed(2)));
+   running=Number((running+amt).toFixed(2));
+ }
+ return amounts;
+}
+function dateForIndex(start,freq,i){
+ let due=start||todayISO();
+ if(freq==='Weekly')due=addDaysISO(start,7*i);
+ else if(freq==='Biweekly')due=addDaysISO(start,14*i);
+ else if(freq==='Monthly')due=addMonthsISO(start,i);
+ else if(freq==='One Time')due=start;
+ return due;
+}
+function recalcPlanFromInputs(source='count'){
+ let {cap,total,today,remaining}=clampPlanInputs();
+ let countEl=document.getElementById('planCount'), eachEl=document.getElementById('planEach'), freqEl=document.getElementById('planFrequency'), startEl=document.getElementById('planStartDate');
+ let freq=freqEl?.value||'Monthly';
+ let start=startEl?.value||todayISO();
+ let count=Math.max(1,parseInt(countEl?.value||'1',10));
+ let each=moneyNum(eachEl?.value);
+ if(freq==='One Time')count=1;
+
+ if(source==='amount'){
+   if(each<=0) each=remaining;
+   if(each>remaining) each=remaining;
+   count=remaining>0?Math.ceil(remaining/each):1;
+ }else{
+   each=remaining>0?remaining/count:0;
+ }
+
+ if(countEl)countEl.value=count;
+ if(eachEl)eachEl.value=Number(each||0).toFixed(2);
+
+ let amounts=splitAmounts(remaining,count,each);
+ paymentScheduleDraft=amounts.map((amt,i)=>({
+   dueDate:dateForIndex(start,freq,i),
+   amountDue:amt,
+   amountPaid:0,
+   paidDate:'',
+   status:'Scheduled'
+ }));
+ renderPlanSchedule(false);
  updatePlanRemainingPreview();
 }
 function updatePlanRemainingPreview(){
  let a=getCurrent();
- let acctBal=accountBalance(a);
- let total=moneyNum(document.getElementById('planTotal')?.value || acctBal);
- let paidToday=moneyNum(document.getElementById('planToday')?.value);
+ let {cap,total,today,remaining}=clampPlanInputs();
  let draftPaid=paymentScheduleDraft.reduce((s,p)=>s+moneyNum(p.amountPaid),0);
  let futureScheduled=paymentScheduleDraft.reduce((s,p)=>s+moneyNum(p.amountDue),0);
- let remaining=Math.max(0,total-paidToday-draftPaid);
- let remainingInput=document.getElementById('planRemaining'); if(remainingInput)remainingInput.value=remaining.toFixed(2);
- let previewAccount=document.getElementById('previewAccountBalance'); if(previewAccount)previewAccount.textContent=money(acctBal);
- let previewToday=document.getElementById('previewPaidToday'); if(previewToday)previewToday.textContent=money(paidToday);
- let previewNew=document.getElementById('previewNewBalance'); if(previewNew)previewNew.textContent=money(Math.max(0,total-paidToday-draftPaid));
- let previewFuture=document.getElementById('previewFutureScheduled'); if(previewFuture)previewFuture.textContent=money(futureScheduled);
- let warn=document.getElementById('planBalanceWarn');
- if(!warn){
-   let grid=document.querySelector('#paymentPlanModal .paymentPreviewLine');
-   if(grid){grid.insertAdjacentHTML('afterend','<div id="planBalanceWarn" class="planBalanceWarn hidden"></div>');warn=document.getElementById('planBalanceWarn')}
+ let newBal=Number(Math.max(0,total-today-draftPaid).toFixed(2));
+
+ let remainingInput=document.getElementById('planRemaining'); if(remainingInput)remainingInput.value=newBal.toFixed(2);
+ let previewAccount=document.getElementById('previewAccountBalance'); if(previewAccount)previewAccount.textContent=money(cap);
+ let previewToday=document.getElementById('previewPaidToday'); if(previewToday)previewToday.textContent=money(today);
+ let previewNew=document.getElementById('previewNewBalance'); if(previewNew){previewNew.textContent=money(newBal); previewNew.className='paymentPreviewValue '+(newBal<=cap?'good':'danger');}
+ let previewFuture=document.getElementById('previewFutureScheduled'); if(previewFuture){previewFuture.textContent=money(futureScheduled); previewFuture.className='paymentPreviewValue '+(futureScheduled<=remaining+0.01?'good':'danger');}
+
+ let math=document.getElementById('planMathLine');
+ if(math){
+   let count=paymentScheduleDraft.length||0;
+   let each=count?regularPaymentAmount({payments:paymentScheduleDraft}):0;
+   math.textContent=`Balance limit: ${money(cap)}. Payment today: ${money(today)}. Future plan amount: ${money(remaining)} ÷ ${count||1} payment(s) = ${each?money(each):money(0)} each${count>1?' with final payment adjusted if needed':''}.`;
  }
- if(warn){
-   if(total>acctBal+0.01){warn.textContent='Plan total is higher than this account balance. Lower the plan total or verify this is intentional before saving.';warn.classList.remove('hidden')}
-   else warn.classList.add('hidden');
+ let hard=document.getElementById('planHardLimit');
+ if(hard){
+   if(total>cap+0.01 || today>total+0.01 || futureScheduled>remaining+0.01){
+     hard.textContent='Blocked: payment plan total, payment today, and scheduled payments cannot exceed the account balance.';
+     hard.classList.remove('hidden');
+   }else hard.classList.add('hidden');
  }
 }
 function generatePlanSchedule(){
- let total=moneyNum(document.getElementById('planTotal').value);
- let todayPay=moneyNum(document.getElementById('planToday').value);
- let count=Math.max(1,parseInt(document.getElementById('planCount').value||'1',10));
- let freq=document.getElementById('planFrequency').value;
- let start=document.getElementById('planStartDate').value||todayISO();
- let remaining=Math.max(0,total-todayPay);
- let each=moneyNum(document.getElementById('planEach').value);
- if(!each)each=remaining/count;
- paymentScheduleDraft=[];
- let scheduleCount=freq==='One Time'?1:count;
- let running=0;
- for(let i=0;i<scheduleCount;i++){
-   let due=start;
-   if(freq==='Weekly')due=addDaysISO(start,7*i);
-   else if(freq==='Biweekly')due=addDaysISO(start,14*i);
-   else if(freq==='Monthly')due=addMonthsISO(start,i);
-   else if(freq==='One Time')due=start;
-   let amt=Number(each.toFixed(2));
-   if(i===scheduleCount-1){
-     let finalAmt=Number((remaining-running).toFixed(2));
-     if(finalAmt>0)amt=finalAmt;
-   }
-   running+=amt;
-   paymentScheduleDraft.push({dueDate:due,amountDue:amt,amountPaid:0,paidDate:'',status:'Scheduled'});
- }
- renderPlanSchedule();
- updatePlanRemainingPreview();
+ recalcPlanFromInputs('count');
 }
 function addCustomPlanRow(){
- paymentScheduleDraft.push({dueDate:todayISO(),amountDue:0,amountPaid:0,paidDate:'',status:'Scheduled'});
+ let {remaining}=clampPlanInputs();
+ let scheduled=paymentScheduleDraft.reduce((s,p)=>s+moneyNum(p.amountDue),0);
+ let left=Number(Math.max(0,remaining-scheduled).toFixed(2));
+ if(left<=0)return alert('No remaining balance is available for another payment date. Lower existing scheduled payments first.');
+ paymentScheduleDraft.push({dueDate:todayISO(),amountDue:left,amountPaid:0,paidDate:'',status:'Scheduled'});
  renderPlanSchedule();
  updatePlanRemainingPreview();
 }
-function renderPlanSchedule(){
+function sanitizeDraftAmounts(){
+ let {remaining}=clampPlanInputs();
+ let running=0;
+ paymentScheduleDraft.forEach((p,i)=>{
+   let maxLeft=Number(Math.max(0,remaining-running).toFixed(2));
+   let due=moneyNum(p.amountDue);
+   if(due>maxLeft)due=maxLeft;
+   p.amountDue=Number(due.toFixed(2));
+   let paid=moneyNum(p.amountPaid);
+   if(paid>p.amountDue)paid=p.amountDue;
+   p.amountPaid=Number(paid.toFixed(2));
+   if(p.amountPaid>=p.amountDue && p.amountDue>0)p.status='Paid';
+   else if(p.amountPaid>0)p.status='Partial';
+   else if(p.status==='Paid')p.status='Scheduled';
+   running=Number((running+p.amountDue).toFixed(2));
+ });
+ paymentScheduleDraft=paymentScheduleDraft.filter(p=>moneyNum(p.amountDue)>0 || moneyNum(p.amountPaid)>0);
+}
+function renderPlanSchedule(doSanitize=true){
+ if(doSanitize)sanitizeDraftAmounts();
  let body=document.getElementById('planScheduleBody');if(!body)return;
  body.innerHTML=paymentScheduleDraft.map((p,i)=>`<tr>
    <td>${i+1}</td>
    <td><input type="date" value="${esc(p.dueDate||'')}" onchange="paymentScheduleDraft[${i}].dueDate=this.value"></td>
-   <td><input type="number" step="0.01" value="${moneyNum(p.amountDue).toFixed(2)}" onchange="paymentScheduleDraft[${i}].amountDue=moneyNum(this.value);updatePlanRemainingPreview()"></td>
-   <td><input type="number" step="0.01" value="${moneyNum(p.amountPaid).toFixed(2)}" onchange="paymentScheduleDraft[${i}].amountPaid=moneyNum(this.value);paymentScheduleDraft[${i}].status=moneyNum(this.value)>=moneyNum(paymentScheduleDraft[${i}].amountDue)?'Paid':moneyNum(this.value)>0?'Partial':'Scheduled';if(moneyNum(this.value)>0&&!paymentScheduleDraft[${i}].paidDate)paymentScheduleDraft[${i}].paidDate=todayISO();renderPlanSchedule();updatePlanRemainingPreview()"></td>
+   <td><input type="number" step="0.01" value="${moneyNum(p.amountDue).toFixed(2)}" onchange="paymentScheduleDraft[${i}].amountDue=moneyNum(this.value);renderPlanSchedule();updatePlanRemainingPreview()"></td>
+   <td><input type="number" step="0.01" value="${moneyNum(p.amountPaid).toFixed(2)}" onchange="paymentScheduleDraft[${i}].amountPaid=moneyNum(this.value);if(moneyNum(this.value)>0&&!paymentScheduleDraft[${i}].paidDate)paymentScheduleDraft[${i}].paidDate=todayISO();renderPlanSchedule();updatePlanRemainingPreview()"></td>
    <td><input type="date" value="${esc(p.paidDate||'')}" onchange="paymentScheduleDraft[${i}].paidDate=this.value"></td>
    <td><select onchange="paymentScheduleDraft[${i}].status=this.value;renderPlanSchedule()"><option ${p.status==='Scheduled'?'selected':''}>Scheduled</option><option ${p.status==='Partial'?'selected':''}>Partial</option><option ${p.status==='Paid'?'selected':''}>Paid</option><option ${p.status==='Missed'?'selected':''}>Missed</option><option ${p.status==='Cancelled'?'selected':''}>Cancelled</option></select></td>
    <td><button class="green payButtonMini" onclick="markPlanPaymentPaid(${i})">Paid</button> <button class="red payButtonMini" onclick="removePlanRow(${i})">Remove</button></td>
@@ -934,15 +1021,16 @@ function removePlanRow(i){paymentScheduleDraft.splice(i,1);renderPlanSchedule();
 async function savePaymentPlan(){
  let a=getCurrent();if(!a)return alert('No account selected.');
  if(!paymentScheduleDraft.length)return alert('Generate or add at least one payment date.');
+ sanitizeDraftAmounts();
  let acctBal=accountBalance(a);
  let total=moneyNum(document.getElementById('planTotal').value);
  if(total<=0)return alert('Plan total must be greater than zero.');
- if(total>acctBal+0.01){
-   let ok=confirm('Plan total '+money(total)+' is higher than this account balance '+money(acctBal)+'. Continue anyway?');
-   if(!ok)return;
- }
+ if(total>acctBal+0.01)return alert('Not allowed: plan total cannot exceed the current account balance of '+money(acctBal)+'.');
  let paidToday=moneyNum(document.getElementById('planToday').value);
- if(paidToday>total)return alert('Payment today cannot be greater than the plan total.');
+ if(paidToday>total+0.01)return alert('Payment today cannot be greater than the plan total.');
+ let remainingAfterToday=Number(Math.max(0,total-paidToday).toFixed(2));
+ let scheduledDue=paymentScheduleDraft.reduce((s,p)=>s+moneyNum(p.amountDue),0);
+ if(scheduledDue>remainingAfterToday+0.01)return alert('Not allowed: scheduled future payments '+money(scheduledDue)+' exceed remaining balance after today '+money(remainingAfterToday)+'.');
  let status=document.getElementById('planStatus').value||'Active';
  let frequency=document.getElementById('planFrequency').value||'Custom';
  let notes=document.getElementById('planNotes').value.trim();
@@ -968,8 +1056,8 @@ async function savePaymentPlan(){
    }])});
  }
  let acctPatch={current_balance:remaining,status:status==='Active'?'Promise to Pay':a.status,disposition:'Promise to Pay',updated_at:new Date().toISOString()};
- let updatedAccountRows=await dbFetch(`/accounts?id=eq.${a.id}`,{method:'PATCH',body:JSON.stringify(acctPatch)});
- await insertActivity(a.id,'Payment Plan','Payment plan saved: total '+money(total)+', paid '+money(paidTotal)+', remaining '+money(remaining)+', frequency '+frequency);
+ await dbFetch(`/accounts?id=eq.${a.id}`,{method:'PATCH',body:JSON.stringify(acctPatch)});
+ await insertActivity(a.id,'Payment Plan','Payment plan saved: total '+money(total)+', payment today '+money(paidToday)+', paid total '+money(paidTotal)+', remaining '+money(remaining)+', frequency '+frequency);
  closeModal('paymentPlanModal');
  delete paymentPlanCache[a.id];
  await loadAccounts();
