@@ -130,11 +130,25 @@ const DISPOS=['No Answer','Left Voicemail','Promise to Pay','Disputed','Bad Numb
 const FIELDS=['portfolio','accountDescription','clientAccountNumber','accountId','accountNumber','firstName','middleName','lastName','fullName','ssn','dob','address','address2','city','state','zip','employer','email','originalCreditor','typeOfDebt','originalBalance','principal','currentBalance','openDate','dateAccountOpened','delinquencyDate','chargeOffDate','origLastPmtDate','lastPaymentDate','lastPaymentAmount','bankRoutingNumber','bankAccountNumber','phone1','phone2','phone3','phone4','phone5','phone6','status'];
 const map={portfolio:'portfolio',accountDescription:'account_description',clientAccountNumber:'client_account_number',accountId:'source_account_id',accountNumber:'account_number',firstName:'first_name',middleName:'middle_name',lastName:'last_name',fullName:'full_name',ssn:'ssn',dob:'dob',address:'address',address2:'address2',city:'city',state:'state',zip:'zip',employer:'employer',email:'email',originalCreditor:'original_creditor',typeOfDebt:'type_of_debt',originalBalance:'original_balance',principal:'principal',currentBalance:'current_balance',openDate:'open_date',dateAccountOpened:'date_account_opened',delinquencyDate:'delinquency_date',chargeOffDate:'charge_off_date',origLastPmtDate:'orig_last_pmt_date',lastPaymentDate:'last_payment_date',lastPaymentAmount:'last_payment_amount',bankRoutingNumber:'bank_routing_number',bankAccountNumber:'bank_account_number',phone1:'phone1',phone2:'phone2',phone3:'phone3',phone4:'phone4',phone5:'phone5',phone6:'phone6',status:'status',disposition:'disposition',lastContactNumber:'last_contact_number'};
 const reverse=Object.fromEntries(Object.entries(map).map(([k,v])=>[v,k]));
-function url(){return (localStorage.getItem(URL_KEY)||'').replace(/\/$/,'')}
-function pubKey(){return localStorage.getItem(PUB_KEY)||''}
+function cfg(){return window.CO_PILOT_SUPABASE_CONFIG||{}}
+function url(){return String(cfg().url||localStorage.getItem(URL_KEY)||'').replace(/\/$/,'')}
+function pubKey(){return String(cfg().publishableKey||localStorage.getItem(PUB_KEY)||'')}
 function token(){return localStorage.getItem(TOKEN_KEY)||''}
-function saveConnection(){localStorage.setItem(URL_KEY,val('supabaseUrl'));localStorage.setItem(PUB_KEY,val('supabaseKey'));alert('Connection saved. Now sign up or log in.')}
-function fillConnection(){setVal('supabaseUrl',localStorage.getItem(URL_KEY)||'https://bwvufgzbkaymffwxuuzr.supabase.co');setVal('supabaseKey',localStorage.getItem(PUB_KEY)||'')}
+function connectionIsReady(){
+  return Boolean(url() && pubKey() && !pubKey().includes('PASTE_YOUR') && pubKey().startsWith('sb_publishable_'));
+}
+function showConnectionNotice(){
+  let el=document.getElementById('connectionNotice');
+  if(!el)return;
+  if(connectionIsReady()){
+    el.classList.add('hidden');
+  }else{
+    el.textContent='System setup needed: config.js is missing the Supabase publishable key.';
+    el.classList.remove('hidden');
+  }
+}
+function saveConnection(){alert('Connection setup is already handled in config.js.')}
+function fillConnection(){showConnectionNotice()}
 async function authFetch(path,body){if(!connectionIsReady())throw new Error('System connection is not configured. Admin must update config.js with the Supabase Project URL and Publishable Key.');let res=await fetch(url()+path,{method:'POST',headers:{apikey:pubKey(),'Content-Type':'application/json'},body:JSON.stringify(body)});let data=await res.json().catch(()=>({}));if(!res.ok)throw new Error(data.msg||data.message||data.error_description||data.error||'Auth failed');return data}
 async function dbFetch(path,opt={}){if(!token())throw new Error('Not logged in.');let res=await fetch(url()+'/rest/v1'+path,{...opt,headers:{apikey:pubKey(),Authorization:'Bearer '+token(),'Content-Type':'application/json',Prefer:'return=representation',...(opt.headers||{})}});let text=await res.text();let data=null;try{data=text?JSON.parse(text):null}catch{data=text}if(!res.ok)throw new Error(data?.message||data?.hint||data||'Database failed');return data}
 async function login(){try{clearLoginError();let data=await authFetch('/auth/v1/token?grant_type=password',{email:val('loginEmail'),password:val('loginPassword')});storeSession(data);await boot()}catch(e){showLoginError(e.message)}}
