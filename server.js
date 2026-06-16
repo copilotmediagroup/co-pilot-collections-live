@@ -64,9 +64,21 @@ function env(name) {
 }
 
 function dbConfig() {
-  const url = env("SUPABASE_URL") || env("VITE_SUPABASE_URL") || env("BOLT_DATABASE_URL");
-  const anon = env("SUPABASE_ANON_KEY") || env("VITE_SUPABASE_ANON_KEY");
-  const service = env("SUPABASE_SERVICE_ROLE_KEY") || env("VITE_SUPABASE_SERVICE_ROLE_KEY");
+  // Bolt does not allow custom secret names starting with SUPABASE_.
+  // Use the CO_PILOT_* names in Bolt Secrets.
+  const url =
+    env("CO_PILOT_SUPABASE_URL") ||
+    env("VITE_SUPABASE_URL") ||
+    env("BOLT_DATABASE_URL");
+
+  const anon =
+    env("CO_PILOT_SUPABASE_ANON_KEY") ||
+    env("VITE_SUPABASE_ANON_KEY");
+
+  const service =
+    env("CO_PILOT_SUPABASE_SERVICE_ROLE_KEY") ||
+    env("VITE_SUPABASE_SERVICE_ROLE_KEY");
+
   return { url, anon, service };
 }
 
@@ -83,10 +95,10 @@ function hasDbConfig() {
 function missingConfigMessage() {
   const c = dbConfig();
   const missing = [];
-  if (!c.url) missing.push("SUPABASE_URL");
-  if (!c.anon) missing.push("SUPABASE_ANON_KEY");
-  if (!c.service) missing.push("SUPABASE_SERVICE_ROLE_KEY");
-  return "Database secrets missing: " + missing.join(", ") + ". Add them in Bolt Database -> Secrets, then restart the app.";
+  if (!c.url) missing.push("CO_PILOT_SUPABASE_URL");
+  if (!c.anon) missing.push("CO_PILOT_SUPABASE_ANON_KEY");
+  if (!c.service) missing.push("CO_PILOT_SUPABASE_SERVICE_ROLE_KEY");
+  return "Database secrets missing: " + missing.join(", ") + ". Add them in Bolt Database -> Secrets, then restart the app. Do not use the blocked SUPABASE_ prefix.";
 }
 
 function json(res, status, data) {
