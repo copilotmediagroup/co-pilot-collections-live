@@ -58,7 +58,33 @@
 @media(max-width:1200px){.allFieldsGrid{grid-template-columns:repeat(2,1fr)}}@media(max-width:850px){.allFieldsGrid{grid-template-columns:1fr}}
 
     @media(max-width:1200px){.main{grid-template-columns:270px 1fr}.right{display:none}.phoneGrid,.dispoGrid{grid-template-columns:repeat(2,1fr)}}@media(max-width:850px){body{overflow:auto}.app{height:auto;display:block}.main{display:block}.sidebar,.center,.right{overflow:visible;margin-bottom:14px}.accountCard{grid-template-columns:1fr}.bottom{position:sticky;bottom:0}.grid{grid-template-columns:1fr}.two,.full{grid-column:1}}
-  </style>
+  
+/* EXACT MOCKUP LAYOUT FIX */
+:root{--navy:#072b73;--navy2:#0b3fb3;--blue:#1457ff;--bg:#f3f7fc;--card:#ffffff;--line:#d9e3f0;--text:#0f172a;--muted:#64748b;--soft:#f8fbff}
+body{background:var(--bg);font-size:14px}
+.app{height:100vh;display:grid;grid-template-rows:66px 1fr 70px;background:var(--bg)}
+header.topbar{height:66px;background:linear-gradient(90deg,#05225f,#07379a,#0b45c6);padding:0 18px;display:grid;grid-template-columns:330px 1fr auto;gap:18px;align-items:center;box-shadow:0 3px 18px rgba(2,6,23,.18);z-index:5}
+.brand{gap:12px;min-width:0}.logo{width:40px;height:40px;border-radius:10px;font-size:27px}.brand h1{font-size:20px;white-space:nowrap}.sub{font-size:11px;margin-top:2px;max-width:300px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.headerSearch{position:relative;max-width:460px;margin:0 auto;width:100%}.headerSearch input{height:42px;border-radius:12px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.22);color:#fff;padding-left:42px}.headerSearch input::placeholder{color:#dbeafe}.headerSearch .mag{position:absolute;left:14px;top:10px;color:#dbeafe;font-weight:900}.headerSearch .hotkey{position:absolute;right:8px;top:8px;background:rgba(15,23,42,.28);border:1px solid rgba(255,255,255,.18);border-radius:8px;color:#dbeafe;font-size:12px;padding:4px 7px}
+.progressBlock{display:none}.topActions{gap:8px;flex-wrap:nowrap}.topActions button,.topActions .fileBtn{height:38px;padding:0 10px;border-radius:10px;font-size:12px;background:rgba(15,23,42,.38);border:1px solid rgba(255,255,255,.14);white-space:nowrap}.topActions .purple{background:#7c3aed}.topActions .red{background:#dc2626}.roleBadge{height:36px;display:flex;align-items:center;border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.1);border-radius:999px;padding:0 10px;color:white;font-size:12px}
+.main{min-height:0;display:grid;grid-template-columns:54px 330px minmax(640px,1fr) 275px;gap:0;padding:0;overflow:hidden;background:var(--bg)}
+.navRail{background:#06245d;color:#c7d2fe;display:flex;flex-direction:column;align-items:center;gap:14px;padding:18px 8px}.navIcon{width:36px;height:36px;border-radius:10px;display:grid;place-items:center;font-size:17px}.navIcon.active{background:#1457ff;color:white}.navSpacer{flex:1}
+.sidebar{border-radius:0;border-left:0;border-top:0;border-bottom:0;box-shadow:none;background:#fff;padding:16px;gap:14px}.sideHead{padding:0 0 12px;border:0}.sideHead h2{font-size:21px}.filters{padding:0;grid-template-columns:1fr;gap:10px}.filters label{display:none}.filters input,.filters select{height:42px;padding:9px 11px;border-radius:10px}.filters div:nth-child(1),.filters div:nth-child(2){display:inline-block}.filters{display:grid;grid-template-columns:1fr 1fr;grid-template-areas:"search search" "portfolio status"}.filters div:nth-child(3){grid-area:search}.filters div:nth-child(1){grid-area:portfolio}.filters div:nth-child(2){grid-area:status}.queueList{padding:0;gap:8px;overflow:auto}.qItem{padding:11px 10px;border-radius:12px;grid-template-columns:34px 1fr auto}.qName{font-size:14px}.qAcct{font-size:11px}.qBal{font-size:12px}.remaining{font-size:12px;padding:10px 0 0;border-top:0;margin-top:auto}
+.center{padding:16px 18px 84px;gap:10px;overflow:auto;background:linear-gradient(180deg,#f8fbff,#eef4fb);display:grid;grid-template-columns:1fr 1fr;align-content:start}
+.centerProgress{grid-column:1/-1;display:flex;align-items:center;gap:10px;height:34px;color:#0f172a}.centerProgressTitle{font-weight:900}.miniNav{width:34px;height:34px;padding:0;border-radius:10px;background:white;color:#1d4ed8;border:1px solid var(--line);justify-content:center}.centerProgressBar{height:5px;background:#dbeafe;border-radius:999px;overflow:hidden;width:170px}.centerProgressFill{height:100%;background:#1457ff;width:0%}
+.accountCard{grid-column:1/-1;padding:18px 20px;display:grid;grid-template-columns:72px 1.2fr 2.8fr;gap:18px;align-items:center;border-radius:16px}.avatar{width:60px;height:60px;font-size:22px}.name{font-size:22px}.summaryGrid{display:grid;grid-template-columns:repeat(6,1fr);gap:14px}.fieldLabel{font-size:11px;margin-bottom:5px;text-transform:none}.fieldVal{font-size:14px;margin-bottom:0;line-height:1.25}.badge{font-size:11px;padding:4px 8px}
+.allFieldsTopPanel{grid-column:1/-1;border:1px solid var(--line);box-shadow:0 4px 16px rgba(15,23,42,.05);border-radius:16px;padding:16px;background:#fff}.allFieldsTopHeader{margin-bottom:12px}.allFieldsTopTitle{font-size:16px}.allFieldsGrid{display:grid;grid-template-columns:repeat(4,1fr);gap:0;border-top:1px solid #e5edf7;max-height:none;overflow:visible}.allFieldCard{border:0;border-right:1px solid #e5edf7;border-bottom:1px solid #e5edf7;border-radius:0;background:#fff;padding:10px 12px;min-height:54px}.allFieldCard:nth-child(4n){border-right:0}.allFieldKey{font-size:11px;color:#64748b}.allFieldVal{font-size:13px;font-weight:800;color:#0f172a}
+.detailGroup{padding:0}.detailGroupTitle{font-size:13px;font-weight:1000;color:#0f172a;margin:12px 0 8px;display:flex;align-items:center;gap:7px}.detailGroupGrid{display:grid;grid-template-columns:repeat(2,1fr);border:1px solid #e5edf7;border-radius:12px;overflow:hidden}.detailGroupGrid .allFieldCard{border-right:1px solid #e5edf7}.detailGroupGrid .allFieldCard:nth-child(2n){border-right:0}
+.phonePanel,.dispoPanel,.notePanel,.activity{padding:15px;border-radius:16px}.phonePanel{grid-column:1/-1}.phoneGrid{grid-template-columns:repeat(4,1fr)}.phoneChip{padding:10px;border-radius:12px}.phoneIcon{width:31px;height:31px}.phoneNum{font-size:13px}.phoneType{font-size:11px}
+.dispoPanel{grid-column:1/-1}.dispoGrid{grid-template-columns:repeat(8,1fr);gap:8px}.dispo{height:44px;font-size:12px;border-radius:10px;padding:0 8px}
+.notePanel{grid-column:1/2}.notePanel textarea{height:90px;background:#fffdf3;border-color:#f3d38a}.centerActivity{grid-column:2/3}.timeline{max-height:160px;overflow:auto}
+.mappedPanel{display:none}
+.right{padding:16px 14px 84px;background:#f8fbff;overflow:auto}.right .panel{border-radius:14px}.softphone{padding:14px}.ready{border-radius:10px}.dialer{grid-template-columns:1fr;gap:10px}.keys{grid-template-columns:repeat(3,1fr)}.key{height:46px;background:#fff;color:#0f172a;border:1px solid var(--line);border-radius:9px}.callBox{border:0;padding:0}.callBox button{width:100%;justify-content:center;border-radius:8px}.quickActions{padding:14px;margin-top:12px}.qaItem{height:42px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #e5edf7;font-weight:800;font-size:13px}.qaItem:last-child{border-bottom:0}.qaIcon{width:26px;height:26px;border-radius:8px;background:#e0ecff;color:#1457ff;display:grid;place-items:center;margin-right:8px}.qaLeft{display:flex;align-items:center}
+.bottom{height:70px;background:white;border-top:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:12px 18px;box-shadow:0 -4px 18px rgba(15,23,42,.06);z-index:6}.rightBtns{gap:14px}.big,.primaryBig{min-width:165px;height:48px;justify-content:center;border-radius:10px}.primaryBig{background:#1457ff}
+.importProgressBox{z-index:99999}
+@media(max-width:1400px){.main{grid-template-columns:50px 300px 1fr 260px}.summaryGrid{grid-template-columns:repeat(3,1fr)}.allFieldsGrid{grid-template-columns:repeat(3,1fr)}.allFieldCard:nth-child(4n){border-right:1px solid #e5edf7}.allFieldCard:nth-child(3n){border-right:0}.phoneGrid{grid-template-columns:repeat(3,1fr)}.dispoGrid{grid-template-columns:repeat(4,1fr)}}
+
+</style>
 </head>
 <body>
 <div id="loginScreen" class="loginScreen open">
@@ -98,21 +124,31 @@
 </div>
 
 <div class="app">
-  <header>
-    <div class="brand"><div class="logo">b</div><div><h1>Co Pilot Collections Manager</h1><p class="sub">VISIBLE ALL FIELDS FIX v2 — mapped + raw imported fields show on every account.</p></div></div>
-    <div class="progressBlock"><div class="progressTitle" id="accountProgress">Account 1 of 0</div><div class="progressBar"><div class="progressFill" id="progressFill"></div></div></div>
+  <header class="topbar">
+    <div class="brand"><div class="logo">b</div><div><h1>Co Pilot Collections Manager</h1><p class="sub">Compact collector workflow — no repeated account information.</p></div></div>
+    <div class="headerSearch"><span class="mag">⌕</span><input id="globalSearch" placeholder="Search accounts..." oninput="document.getElementById('search').value=this.value;onQueueFilterChange()"><span class="hotkey">⌘ K</span></div>
     <div class="topActions">
+      <label class="fileBtn gray adminOnly hidden">⇩ Import CSV<input type="file" accept=".csv" onchange="importCSV(event)"></label>
+      <button class="purple adminOnly hidden" onclick="downloadTemplate()">⇩ Template CSV</button>
+      <button class="gray adminOnly hidden" onclick="exportCSV()">⇩ Export CSV</button>
+      <button class="red adminOnly hidden" onclick="clearAllAccounts()">🗑 Clear Accounts</button>
       <span class="roleBadge" id="roleBadge">Not logged in</span>
-      <label class="fileBtn gray adminOnly hidden">Import CSV<input type="file" accept=".csv" onchange="importCSV(event)"></label>
-      <button class="purple adminOnly hidden" onclick="downloadTemplate()">Template CSV</button>
-      <button class="gray adminOnly hidden" onclick="exportCSV()">Export CSV</button>
-      <button class="red adminOnly hidden" onclick="clearAllAccounts()">Clear Accounts</button>
       <button class="red" onclick="logout()">Logout</button>
       <span><span class="dot"></span> Available</span>
     </div>
   </header>
 
   <div class="main">
+    <nav class="navRail">
+      <div class="navIcon">⌂</div>
+      <div class="navIcon active">👥</div>
+      <div class="navIcon">▣</div>
+      <div class="navIcon">☎</div>
+      <div class="navIcon">☑</div>
+      <div class="navIcon">▤</div>
+      <div class="navSpacer"></div>
+      <div class="navIcon">⚙</div>
+    </nav>
     <aside class="sidebar panel">
       <div class="sideHead"><h2>Queue</h2><button class="outline" onclick="loadAccounts()">↻</button></div>
       <div class="filters">
@@ -125,40 +161,62 @@
     </aside>
 
     <main class="center">
+      <div class="centerProgress">
+        <div class="centerProgressTitle" id="centerProgressTitle">1 of 0 accounts</div>
+        <button class="miniNav" onclick="skipAccount()">‹</button>
+        <button class="miniNav" onclick="nextAccount()">›</button>
+        <div class="centerProgressBar"><div class="centerProgressFill" id="centerProgressFill"></div></div>
+      </div>
+
       <section class="panel accountCard">
         <div class="avatar" id="avatar">--</div>
-        <div><div class="name" id="accountName">No Account</div><div class="fieldLabel">Account #</div><div class="fieldVal" id="accountNumber">—</div><div class="fieldLabel">State</div><div class="fieldVal" id="state">—</div></div>
-        <div><div class="fieldLabel">Portfolio / Creditor</div><div class="fieldVal" id="creditor">—</div><div class="fieldLabel">SSN</div><div class="fieldVal" id="ssn">—</div></div>
-        <div><div class="fieldLabel">Balance</div><div class="fieldVal" id="balance">$0.00</div><div class="fieldLabel">Status</div><div class="fieldVal" id="statusDisplay">—</div><div class="fieldLabel">Email</div><div class="fieldVal" id="email">—</div></div>
+        <div>
+          <div class="name" id="accountName">No Account <span class="badge">New</span></div>
+          <div style="margin-top:10px"><div class="fieldLabel">Account #</div><div class="fieldVal" id="accountNumber">—</div></div>
+        </div>
+        <div class="summaryGrid">
+          <div><div class="fieldLabel">SSN</div><div class="fieldVal" id="ssn">—</div></div>
+          <div><div class="fieldLabel">State / City</div><div class="fieldVal" id="state">—</div></div>
+          <div><div class="fieldLabel">Balance</div><div class="fieldVal" id="balance">$0.00</div></div>
+          <div><div class="fieldLabel">Creditor / Portfolio</div><div class="fieldVal" id="creditor">—</div></div>
+          <div><div class="fieldLabel">Status</div><div class="fieldVal" id="statusDisplay">—</div></div>
+          <div><div class="fieldLabel">Email</div><div class="fieldVal" id="email">—</div></div>
+        </div>
       </section>
 
       <section class="panel allFieldsTopPanel">
         <div class="allFieldsTopHeader">
           <div>
-            <div class="allFieldsTopTitle">All Imported / Mapped Fields</div>
-            <div class="hint">Store name, store city, store state, bank fields, phone source/status/note, and source row values show here.</div>
+            <div class="allFieldsTopTitle">Account Details</div>
+            <div class="hint">Extra mapped/imported fields only. Primary summary fields are not repeated.</div>
           </div>
           <span class="allFieldsTopBadge" id="allFieldsCount">0 fields</span>
         </div>
         <div id="allFieldsGrid" class="allFieldsGrid"></div>
       </section>
 
-      <section class="panel phonePanel"><div class="panelTitle"><h3>Phone Numbers</h3><button class="outline" onclick="renderPhones(getCurrent())">Refresh Numbers</button></div><div class="hint">Click any number to open your default softphone/dialer using tel: links.</div><div class="phoneGrid" id="phoneGrid"></div></section>
-      <section class="panel mappedPanel">
-        <div class="panelTitle"><h3>All Mapped Account Fields</h3><span class="muted" id="mappedFieldCount">0 fields</span></div>
-        <div class="hint">Everything imported/mapped for this account appears here, including store, bank, phone status/source/note, and original uploaded row values.</div>
-        <div class="mappedGrid" id="mappedFields"></div>
-      </section>
+      <section class="panel phonePanel"><div class="panelTitle"><h3>Phone Numbers</h3><button class="outline" onclick="renderPhones(getCurrent())">Refresh Numbers</button></div><div class="phoneGrid" id="phoneGrid"></div></section>
+
       <section class="panel dispoPanel"><div class="panelTitle"><h3>Disposition / Status</h3><span class="muted" id="selectedDisposition">Select one</span></div><div class="dispoGrid" id="dispoGrid"></div></section>
-      <section class="panel notePanel"><div class="panelTitle"><h3>Agent Notes</h3><span class="muted">Saved to database</span></div><textarea id="agentNote" placeholder="Type call notes, promise to pay details, dispute reason, callback time, wrong number info..."></textarea><div class="counter" id="noteCounter">0 / 2000</div></section>
+
+      <section class="panel notePanel"><div class="panelTitle"><h3>Agent Notes</h3><button class="outline" onclick="saveCurrent()">Save Note</button></div><textarea id="agentNote" placeholder="Type call notes, promise to pay details, dispute reason, callback time, wrong number info..."></textarea><div class="counter" id="noteCounter">0 / 2000</div></section>
+
+      <section class="panel activity centerActivity"><div class="panelTitle"><h3>History / Activity</h3><button class="outline" onclick="loadHistory(getCurrent()?.id)">Refresh</button></div><div class="timeline" id="activityList"></div></section>
     </main>
 
     <aside class="right">
       <section class="panel softphone">
-        <div class="softTop"><b>Softphone</b><span class="connected">● Connected</span></div><div class="ready"><b>Ready to call</b><br><span id="lastDialed">Click a number to dial</span></div>
+        <div class="softTop"><b>Softphone</b><span class="connected">● Connected</span></div>
+        <div class="ready"><b>Ready to call</b><br><span id="lastDialed">Click a number to dial</span></div>
         <div class="dialer"><div class="keys"><button class="key">1</button><button class="key">2<br><small>ABC</small></button><button class="key">3<br><small>DEF</small></button><button class="key">4<br><small>GHI</small></button><button class="key">5<br><small>JKL</small></button><button class="key">6<br><small>MNO</small></button><button class="key">7<br><small>PQRS</small></button><button class="key">8<br><small>TUV</small></button><button class="key">9<br><small>WXYZ</small></button><button class="key">*</button><button class="key">0</button><button class="key">#</button></div><div class="callBox"><div>No active call</div><div class="callNumber" id="callNumber">—</div><button class="green" onclick="callPrimary()">Call</button><br><br><button class="red" onclick="endCall()">End Call</button></div></div>
       </section>
-      <section class="panel activity"><div class="panelTitle"><h3>History / Activity</h3><button class="outline" onclick="loadHistory(getCurrent()?.id)">Refresh</button></div><div class="timeline" id="activityList"></div></section>
+      <section class="panel quickActions">
+        <div class="panelTitle"><h3>Quick Actions</h3></div>
+        <div class="qaItem"><span class="qaLeft"><span class="qaIcon">💳</span>Payment Promise</span><span>›</span></div>
+        <div class="qaItem"><span class="qaLeft"><span class="qaIcon">✎</span>Update Contact Info</span><span>›</span></div>
+        <div class="qaItem"><span class="qaLeft"><span class="qaIcon">▤</span>Send Payoff Quote</span><span>›</span></div>
+        <div class="qaItem"><span class="qaLeft"><span class="qaIcon">▣</span>View Account Docs</span><span>›</span></div>
+      </section>
     </aside>
   </div>
 
@@ -298,31 +356,68 @@ function renderAllImportedFields(a){
  let grid=document.getElementById('allFieldsGrid'),count=document.getElementById('allFieldsCount');
  if(!grid)return;
  if(!a){grid.innerHTML='<div class="allFieldsEmpty">No account selected.</div>';if(count)count.textContent='0 fields';return}
+
  let entries=[];
  try{entries=mappedEntries(a)}catch(e){entries=[]}
+ let raw=rawObj(a);
  if(!entries.length){
-   let raw=rawObj(a);
    entries=Object.entries(raw||{}).filter(([k,v])=>String(v??'').trim()!=='').map(([k,v])=>['Source: '+k,k,v,'raw']);
  }
- if(count)count.textContent=entries.length+' fields';
- if(!entries.length){
-   grid.innerHTML='<div class="allFieldsEmpty">No extra fields were saved on this account. Run the updated SQL, clear accounts, and re-import so store/bank/raw_data fields are saved.</div>';
-   return;
+
+ const summaryKeys=new Set(['portfolio','accountDescription','accountNumber','clientAccountNumber','accountId','firstName','middleName','lastName','fullName','ssn','state','city','currentBalance','email','status','disposition','lastContactNumber']);
+ const summaryLabelWords=['source: pfname','source: pmiddle','source: plname','source: borrowername','source: issueraccountnumber','source: pssn','source: origstate','source: origcity','source: pemail','source: curbalance'];
+
+ let clean=[];
+ let seen=new Set();
+ entries.forEach(([label,k,v,type])=>{
+   if(v==null||String(v).trim()==='')return;
+   let l=String(label||'').toLowerCase();
+   if(summaryKeys.has(k))return;
+   if(summaryLabelWords.some(w=>l.includes(w)))return;
+   let sig=label+'|'+String(v);
+   if(seen.has(sig))return;
+   seen.add(sig);
+   clean.push([label,k,v,type]);
+ });
+
+ function inGroup(label,k,words){let s=(String(label)+' '+String(k)).toLowerCase();return words.some(w=>s.includes(w))}
+ let groups=[
+   ['Borrower Details',['dob','birth','address','zip','employer','occupation','description']],
+   ['Store / Loan Details',['store','product','type','loan','principal','interest','return fee','original loan','chargeoff balance']],
+   ['Bank / Payment Details',['bank','routing','acct','account last','payment','paid']],
+   ['Phone Metadata',['phone','line type','note','status']],
+   ['Dates / Metadata',['date','delinquency','charge','import','receive','source','file','batch','review']]
+ ];
+ let used=new Set();
+ let htmlOut='';
+ groups.forEach(([title,words])=>{
+   let rows=clean.filter((e,i)=>!used.has(i)&&inGroup(e[0],e[1],words)).slice(0,24);
+   rows.forEach(e=>used.add(clean.indexOf(e)));
+   if(!rows.length)return;
+   htmlOut+=`<div class="detailGroup"><div class="detailGroupTitle">${esc(title)}</div><div class="detailGroupGrid">`;
+   htmlOut+=rows.map(([label,k,v,type])=>fieldCard(label,k,v,a)).join('');
+   htmlOut+='</div></div>';
+ });
+ let other=clean.filter((e,i)=>!used.has(i)).slice(0,36);
+ if(other.length){
+   htmlOut+=`<div class="detailGroup"><div class="detailGroupTitle">Other Imported Fields</div><div class="detailGroupGrid">`;
+   htmlOut+=other.map(([label,k,v,type])=>fieldCard(label,k,v,a)).join('');
+   htmlOut+='</div></div>';
  }
- grid.innerHTML=entries.map(([label,k,v,type])=>{
-   if(v==null || String(v).trim()==='')return '';
-   let shown='';
-   let val=String(v);
-   let phones=[];
-   try{phones=extractPhones(val)}catch(e){phones=[]}
-   if(phones.length && /phone|tel|mobile|cell/i.test(String(label)+' '+String(k))){
-     shown=phones.map(p=>`<a href="tel:${normPhone(p)}" onclick="recordDial('${a.id}','${normPhone(p)}')">${fmtPhone(p)}</a>`).join(', ');
-   }else{
-     shown=displayVal(k,v,a);
-   }
-   if(!shown)return '';
-   return `<div class="allFieldCard"><div class="allFieldKey">${esc(label)}</div><div class="allFieldVal">${shown}</div></div>`;
- }).join('');
+ if(count)count.textContent=clean.length+' fields';
+ grid.innerHTML=htmlOut||'<div class="allFieldsEmpty">No extra mapped fields were saved on this account. Run SQL, clear accounts, and re-import.</div>';
+}
+function fieldCard(label,k,v,a){
+ let shown='';
+ let val=String(v??'');
+ let phones=[];
+ try{phones=extractPhones(val)}catch(e){}
+ if(phones.length && /phone|tel|mobile|cell/i.test(String(label)+' '+String(k))){
+   shown=phones.map(p=>`<a href="tel:${normPhone(p)}" onclick="recordDial('${a.id}','${normPhone(p)}')">${fmtPhone(p)}</a>`).join(', ');
+ }else{
+   shown=displayVal(k,v,a);
+ }
+ return `<div class="allFieldCard"><div class="allFieldKey">${esc(label)}</div><div class="allFieldVal">${shown||'—'}</div></div>`;
 }
 function renderMappedFields(a){
  let grid=document.getElementById('mappedFields'),count=document.getElementById('mappedFieldCount');
@@ -339,7 +434,30 @@ function renderMappedFields(a){
 function render(){let q=queue(),cur=getCurrent();updatePortfolioFilter(accounts);renderQueue(q,cur);renderCurrent(cur,q);renderDispos(cur);if(cur)loadHistory(cur.id)}
 function updatePortfolioFilter(all){let sel=document.getElementById('portfolioFilter'),v=sel.value,names=[...new Set(all.map(a=>a.portfolio||a.accountDescription).filter(Boolean))].sort();sel.innerHTML='<option value="">All Portfolios</option>'+names.map(n=>`<option>${esc(n)}</option>`).join('');sel.value=names.includes(v)?v:''}
 function renderQueue(q,cur){let idx=q.findIndex(a=>a.id===cur?.id);if(idx<0)idx=0;let start=Math.max(0,idx-1),next=q.slice(start,start+5);document.getElementById('queueList').innerHTML=next.map((a,i)=>`<div class="qItem ${a.id===cur?.id?'active':''}" onclick="setCurrent('${a.id}')"><div class="qNum">${start+i+1}</div><div><div class="qName">${esc(nameOf(a))}</div><div class="qAcct">${esc(acctNo(a))} <span class="badge">${esc(a.disposition||a.status||'New')}</span></div></div><div class="qBal">${money(a.currentBalance||a.principal||a.originalBalance)}</div></div>`).join('')||'<div class="muted" style="padding:12px">No accounts in queue.</div>';document.getElementById('remainingText').textContent=`Showing ${next.length} of ${q.length} matching accounts`}
-function renderCurrent(a,q){if(!a)return;let idx=q.findIndex(x=>x.id===a.id)+1,total=q.length;document.getElementById('accountProgress').textContent=`Account ${idx||1} of ${total}`;document.getElementById('progressFill').style.width=total?Math.round((idx/total)*100)+'%':'0%';document.getElementById('avatar').textContent=initials(a);document.getElementById('accountName').innerHTML=esc(nameOf(a))+` <span class="badge">${esc(a.disposition||a.status||'New')}</span>`;document.getElementById('accountNumber').textContent=acctNo(a)||'—';document.getElementById('state').textContent=a.state||'—';document.getElementById('creditor').textContent=creditor(a);document.getElementById('ssn').textContent=a.ssn||'—';document.getElementById('balance').textContent=money(a.currentBalance||a.principal||a.originalBalance);document.getElementById('statusDisplay').innerHTML=`<span class="badge">${esc(a.disposition||a.status||'New')}</span>`;document.getElementById('email').textContent=a.email||'—';renderAllImportedFields(a);renderPhones(a);renderMappedFields(a)}
+function renderCurrent(a,q){
+ if(!a)return;
+ let idx=q.findIndex(x=>x.id===a.id)+1,total=q.length;
+ let pct=total?Math.round((idx/total)*100):0;
+ let progressText=`${idx||1} of ${total} accounts`;
+ let old=document.getElementById('accountProgress'); if(old)old.textContent=`Account ${idx||1} of ${total}`;
+ let oldFill=document.getElementById('progressFill'); if(oldFill)oldFill.style.width=pct+'%';
+ let cpt=document.getElementById('centerProgressTitle'); if(cpt)cpt.textContent=progressText;
+ let cpf=document.getElementById('centerProgressFill'); if(cpf)cpf.style.width=pct+'%';
+
+ document.getElementById('avatar').textContent=initials(a);
+ document.getElementById('accountName').innerHTML=esc(nameOf(a))+` <span class="badge">${esc(a.disposition||a.status||'New')}</span>`;
+ document.getElementById('accountNumber').textContent=acctNo(a)||'—';
+ document.getElementById('state').textContent=[a.state,a.city].filter(Boolean).join(' / ')||'—';
+ document.getElementById('creditor').textContent=creditor(a);
+ document.getElementById('ssn').textContent=a.ssn||'—';
+ document.getElementById('balance').textContent=money(a.currentBalance||a.principal||a.originalBalance);
+ document.getElementById('statusDisplay').innerHTML=`<span class="badge">${esc(a.disposition||a.status||'New')}</span>`;
+ document.getElementById('email').textContent=a.email||'—';
+
+ renderAllImportedFields(a);
+ renderPhones(a);
+ renderDispos(a);
+}
 function renderPhones(a){let ps=phones(a);document.getElementById('phoneGrid').innerHTML=ps.map((p,i)=>`<a class="phoneChip" href="tel:${normPhone(p)}" onclick="recordDial('${a.id}','${normPhone(p)}')"><div class="phoneIcon">☎</div><div><div class="phoneNum">${fmtPhone(p)}</div><div class="phoneType">${i===0?'Primary':i===1?'Mobile':'Alt'}</div></div></a>`).join('')||'<div class="muted">No phone numbers on this account.</div>'}
 function renderDispos(a){document.getElementById('selectedDisposition').textContent=currentDisposition||a?.disposition||'Select one';document.getElementById('dispoGrid').innerHTML=DISPOS.map(d=>`<button class="dispo ${d==='Disputed'?'orangeText':['Promise to Pay','Settled'].includes(d)?'greenText':['Bad Number','DNC'].includes(d)?'redText':d==='Callback'?'purpleText':''} ${(currentDisposition||a?.disposition)===d?'selected':''}" onclick="selectDisposition('${d}')">${d}</button>`).join('')}
 async function selectDisposition(d){let cur=getCurrent();if(!cur)return;currentDisposition=d;let old=cur.status,newStatus=d==='Disputed'?'Disputed':d;let updated=(await dbFetch(`/accounts?id=eq.${cur.id}`,{method:'PATCH',body:JSON.stringify({status:newStatus,disposition:d,updated_at:new Date().toISOString()})}))[0];await insertActivity(cur.id,'Status Updated','Disposition set to '+d,'',old,newStatus);let i=accounts.findIndex(a=>a.id===cur.id);if(i>=0)accounts[i]=toCamel(updated);render()}
