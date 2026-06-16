@@ -375,3 +375,65 @@ with check (
   lower(auth.jwt() ->> 'email') = 'afinch2678@gmail.com'
   or lower(coalesce(assigned_to_email,'')) = lower(auth.jwt() ->> 'email')
 );
+
+
+-- EMPLOYEE DROPDOWN / APP USERS
+create table if not exists app_users (
+  id uuid primary key default gen_random_uuid(),
+  email text unique not null,
+  role text default 'employee',
+  full_name text,
+  is_active boolean default true,
+  created_at timestamptz default now(),
+  last_seen_at timestamptz default now()
+);
+
+alter table app_users enable row level security;
+
+drop policy if exists "app_users_select_admin_or_self" on app_users;
+drop policy if exists "app_users_insert_self" on app_users;
+drop policy if exists "app_users_update_admin_or_self" on app_users;
+
+create policy "app_users_select_admin_or_self"
+on app_users for select
+to authenticated
+using (
+  lower(auth.jwt() ->> 'email') = 'afinch2678@gmail.com'
+  or lower(email) = lower(auth.jwt() ->> 'email')
+);
+
+create policy "app_users_insert_self"
+on app_users for insert
+to authenticated
+with check (
+  lower(email) = lower(auth.jwt() ->> 'email')
+  or lower(auth.jwt() ->> 'email') = 'afinch2678@gmail.com'
+);
+
+create policy "app_users_update_admin_or_self"
+on app_users for update
+to authenticated
+using (
+  lower(auth.jwt() ->> 'email') = 'afinch2678@gmail.com'
+  or lower(email) = lower(auth.jwt() ->> 'email')
+)
+with check (
+  lower(auth.jwt() ->> 'email') = 'afinch2678@gmail.com'
+  or lower(email) = lower(auth.jwt() ->> 'email')
+);
+
+-- Pull existing Supabase Auth users into the dropdown table.
+-- This runs only when you execute this SQL in Supabase SQL Editor.
+insert into app_users (email, role, created_at, last_seen_at)
+select lower(email),
+       case when lower(email) = 'afinch2678@gmail.com' then 'admin' else 'employee' end,
+       now(),
+       now()
+from auth.users
+where email is not null
+on conflict (email) do update
+set role = case when excluded.email = 'afinch2678@gmail.com' then 'admin' else app_users.role end,
+    last_seen_at = now();
+
+create index if not exists idx_app_users_email on app_users(lower(email));
+create index if not exists idx_app_users_role_active on app_users(role, is_active);

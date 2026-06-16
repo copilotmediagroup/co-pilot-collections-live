@@ -261,6 +261,16 @@ header.topbar{height:66px;background:linear-gradient(90deg,#05225f,#07379a,#0b45
 @media(max-width:1450px){.assignGrid,.assignOptions,.assignStats{grid-template-columns:repeat(2,1fr)}.assignHalf{grid-column:span 1}}
 @media(max-width:850px){.assignGrid,.assignOptions,.assignStats{grid-template-columns:1fr}.assignHalf{grid-column:1/-1}}
 
+
+/* EMPLOYEE DROPDOWN ASSIGNMENT FIX */
+.employeeSelect{width:100%;min-height:120px;border:1px solid #cbd5e1;border-radius:12px;padding:8px;background:white;font:inherit}
+.employeeSelect option{padding:7px;border-radius:7px;margin:2px 0}
+.employeeHelper{font-size:12px;color:#64748b;margin-top:6px}
+.employeeEmpty{background:#fff7ed;border:1px solid #fed7aa;color:#9a3412;border-radius:12px;padding:10px;font-size:12px;font-weight:850;margin-top:8px}
+.manualEmployeeRow{display:flex;gap:8px;align-items:center}
+.manualEmployeeRow input{flex:1}
+.assignmentNoMatch{background:#fee2e2;border:1px solid #fecaca;color:#991b1b;border-radius:12px;padding:10px;font-size:12px;font-weight:900;margin:10px 0}
+
 </style>
 </head>
 <body>
@@ -302,7 +312,7 @@ header.topbar{height:66px;background:linear-gradient(90deg,#05225f,#07379a,#0b45
 
 <div class="app">
   <header class="topbar">
-    <div class="brand"><div class="logo">b</div><div><h1>Co Pilot Collections Manager</h1><p class="sub">SMART ASSIGNMENT READY — admin can distribute accounts by employee, count, state, city, balance, or random.</p></div></div>
+    <div class="brand"><div class="logo">b</div><div><h1>Co Pilot Collections Manager</h1><p class="sub">EMPLOYEE DROPDOWN ASSIGNMENT FIX — admin selects signed-up users from dropdown.</p></div></div>
     <div class="headerSearch"><span class="mag">⌕</span><input id="globalSearch" placeholder="Search accounts..." oninput="document.getElementById('search').value=this.value;onQueueFilterChange()"><span class="hotkey">⌘ K</span></div>
     <div class="topActions">
       <button class="gray adminOnly hidden" onclick="openAssignModal()">👥 Assign Accounts</button>
@@ -512,8 +522,18 @@ header.topbar{height:66px;background:linear-gradient(90deg,#05225f,#07379a,#0b45
 
     <div class="assignGrid">
       <div class="assignWide">
-        <label>Employee Emails</label>
-        <textarea id="assignEmployees" placeholder="employee1@email.com, employee2@email.com, employee3@email.com"></textarea>
+        <label>Select Employee(s)</label>
+        <select id="assignEmployeeSelect" class="employeeSelect" multiple size="6" onchange="previewAssignment()"></select>
+        <div class="employeeHelper">Admin can select one or multiple signed-up employees. Hold Command on Mac or Ctrl on Windows to select multiple.</div>
+        <div id="employeeEmptyNotice" class="employeeEmpty hidden">No employee users found yet. Run the updated SQL, or have employees sign up/log in once so they appear here.</div>
+      </div>
+      <div class="assignHalf">
+        <label>Manual Add To Dropdown</label>
+        <div class="manualEmployeeRow">
+          <input id="assignManualEmail" placeholder="employee@email.com">
+          <button class="outline" onclick="addManualEmployeeOption()" type="button">Add</button>
+        </div>
+        <div class="employeeHelper">Use only if the employee has not shown in the dropdown yet.</div>
       </div>
 
       <div>
@@ -576,8 +596,8 @@ header.topbar{height:66px;background:linear-gradient(90deg,#05225f,#07379a,#0b45
         <input id="assignSearch" placeholder="name, account, creditor..." oninput="previewAssignment()">
       </div>
       <div>
-        <label>Employee Suggestions</label>
-        <button class="outline" style="width:100%;height:40px" onclick="fillSuggestedEmployees()">Use Known Employees</button>
+        <label>Employee List</label>
+        <button class="outline" style="width:100%;height:40px" onclick="refreshEmployeeDropdown()">Refresh Employee List</button>
       </div>
     </div>
 
@@ -613,7 +633,7 @@ const URL_KEY='coPilotSupabaseUrl';
 const PUB_KEY='coPilotSupabasePublishableKey';
 const TOKEN_KEY='coPilotSupabaseAccessToken';
 const REFRESH_KEY='coPilotSupabaseRefreshToken';
-let accounts=[], currentAccountId='', currentDisposition='', currentUser={email:'',isAdmin:false};
+let accounts=[], appUsers=[], currentAccountId='', currentDisposition='', currentUser={email:'',isAdmin:false};
 const DISPOS=['No Answer','Left Voicemail','Promise to Pay','Disputed','Bad Number','Callback','Settled','DNC'];
 const FIELDS=["portfolio", "accountDescription", "clientAccountNumber", "accountId", "accountNumber", "issuerName", "firstName", "middleName", "lastName", "fullName", "ssn", "dob", "address", "address2", "city", "state", "zip", "employer", "occupation", "description", "email", "originalCreditor", "typeOfDebt", "originalBalance", "principal", "currentBalance", "openDate", "dateAccountOpened", "accountReceiveDate", "delinquencyDate", "chargeOffDate", "origLastPmtDate", "lastPaymentDate", "lastPaymentAmount", "bankRoutingNumber", "bankAccountNumber", "origEmployer", "origStoreName", "origStoreCity", "origStoreState", "origBankName", "origBankAcctLast4Digits", "origPrincipalBalance", "origOriginalLoanAmount", "origChargeOffBalance", "origLoanType", "origPrincipalLoanAmount", "origInterestAmount", "origReturnFee", "phone1", "phone1Type", "phone1LineType", "phone1Source", "phone1Note", "phone1Status", "phone2", "phone2Type", "phone2LineType", "phone2Source", "phone2Note", "phone2Status", "phone3", "phone3Type", "phone3LineType", "phone3Source", "phone3Note", "phone3Status", "phone4", "phone4Type", "phone4LineType", "phone4Source", "phone4Note", "phone4Status", "phone5", "phone5Type", "phone5LineType", "phone5Source", "phone5Note", "phone5Status", "phone6", "phone6Type", "phone6LineType", "phone6Source", "phone6Note", "phone6Status", "phone7", "phone7Type", "phone7LineType", "phone7Source", "phone7Note", "phone7Status", "phone8", "phone8Type", "phone8LineType", "phone8Source", "phone8Note", "phone8Status", "phone9", "phone9Type", "phone9LineType", "phone9Source", "phone9Note", "phone9Status", "phone10", "phone10Type", "phone10LineType", "phone10Source", "phone10Note", "phone10Status", "rawData", "status", "assignedToEmail", "assignedByEmail", "assignmentMethod"];
 const map={"portfolio": "portfolio", "accountDescription": "account_description", "clientAccountNumber": "client_account_number", "accountId": "source_account_id", "accountNumber": "account_number", "issuerName": "issuer_name", "firstName": "first_name", "middleName": "middle_name", "lastName": "last_name", "fullName": "full_name", "ssn": "ssn", "dob": "dob", "address": "address", "address2": "address2", "city": "city", "state": "state", "zip": "zip", "employer": "employer", "occupation": "occupation", "description": "description", "email": "email", "originalCreditor": "original_creditor", "typeOfDebt": "type_of_debt", "originalBalance": "original_balance", "principal": "principal", "currentBalance": "current_balance", "openDate": "open_date", "dateAccountOpened": "date_account_opened", "accountReceiveDate": "account_receive_date", "delinquencyDate": "delinquency_date", "chargeOffDate": "charge_off_date", "origLastPmtDate": "orig_last_pmt_date", "lastPaymentDate": "last_payment_date", "lastPaymentAmount": "last_payment_amount", "bankRoutingNumber": "bank_routing_number", "bankAccountNumber": "bank_account_number", "origEmployer": "orig_employer", "origStoreName": "orig_store_name", "origStoreCity": "orig_store_city", "origStoreState": "orig_store_state", "origBankName": "orig_bank_name", "origBankAcctLast4Digits": "orig_bank_acct_last4_digits", "origPrincipalBalance": "orig_principal_balance", "origOriginalLoanAmount": "orig_original_loan_amount", "origChargeOffBalance": "orig_chargeoff_balance", "origLoanType": "orig_loan_type", "origPrincipalLoanAmount": "orig_principal_loan_amount", "origInterestAmount": "orig_interest_amount", "origReturnFee": "orig_return_fee", "rawData": "raw_data", "status": "status", "disposition": "disposition", "lastContactNumber": "last_contact_number", "phone1": "phone1", "phone1Type": "phone1_type", "phone1LineType": "phone1_line_type", "phone1Source": "phone1_source", "phone1Note": "phone1_note", "phone1Status": "phone1_status", "phone2": "phone2", "phone2Type": "phone2_type", "phone2LineType": "phone2_line_type", "phone2Source": "phone2_source", "phone2Note": "phone2_note", "phone2Status": "phone2_status", "phone3": "phone3", "phone3Type": "phone3_type", "phone3LineType": "phone3_line_type", "phone3Source": "phone3_source", "phone3Note": "phone3_note", "phone3Status": "phone3_status", "phone4": "phone4", "phone4Type": "phone4_type", "phone4LineType": "phone4_line_type", "phone4Source": "phone4_source", "phone4Note": "phone4_note", "phone4Status": "phone4_status", "phone5": "phone5", "phone5Type": "phone5_type", "phone5LineType": "phone5_line_type", "phone5Source": "phone5_source", "phone5Note": "phone5_note", "phone5Status": "phone5_status", "phone6": "phone6", "phone6Type": "phone6_type", "phone6LineType": "phone6_line_type", "phone6Source": "phone6_source", "phone6Note": "phone6_note", "phone6Status": "phone6_status", "phone7": "phone7", "phone7Type": "phone7_type", "phone7LineType": "phone7_line_type", "phone7Source": "phone7_source", "phone7Note": "phone7_note", "phone7Status": "phone7_status", "phone8": "phone8", "phone8Type": "phone8_type", "phone8LineType": "phone8_line_type", "phone8Source": "phone8_source", "phone8Note": "phone8_note", "phone8Status": "phone8_status", "phone9": "phone9", "phone9Type": "phone9_type", "phone9LineType": "phone9_line_type", "phone9Source": "phone9_source", "phone9Note": "phone9_note", "phone9Status": "phone9_status", "phone10": "phone10", "phone10Type": "phone10_type", "phone10LineType": "phone10_line_type", "phone10Source": "phone10_source", "phone10Note": "phone10_note", "phone10Status": "phone10_status","assignedToEmail":"assigned_to_email","assignedByEmail":"assigned_by_email","assignedAt":"assigned_at","assignmentMethod":"assignment_method","assignmentGroupId":"assignment_group_id"};
@@ -644,9 +664,33 @@ async function signup(){try{clearLoginError();let data=await authFetch('/auth/v1
 function storeSession(data){localStorage.setItem(TOKEN_KEY,data.access_token||'');localStorage.setItem(REFRESH_KEY,data.refresh_token||'')}
 function logout(){localStorage.removeItem(TOKEN_KEY);localStorage.removeItem(REFRESH_KEY);location.reload()}
 function showLoginError(msg){let el=document.getElementById('loginError');el.textContent=msg;el.classList.remove('hidden')}function clearLoginError(){document.getElementById('loginError').classList.add('hidden')}
-async function boot(){fillConnection();if(!connectionIsReady()){document.getElementById('loginScreen').classList.add('open');return}if(!token()){document.getElementById('loginScreen').classList.add('open');return}try{let user=await getUser();currentUser={email:(user.email||'').toLowerCase(),isAdmin:(user.email||'').toLowerCase()===ADMIN_EMAIL};document.getElementById('loginScreen').classList.remove('open');applyRoleUI();await loadAccounts()}catch(e){showLoginError(e.message);document.getElementById('loginScreen').classList.add('open')}}
+async function boot(){fillConnection();if(!connectionIsReady()){document.getElementById('loginScreen').classList.add('open');return}if(!token()){document.getElementById('loginScreen').classList.add('open');return}try{let user=await getUser();currentUser={email:(user.email||'').toLowerCase(),isAdmin:(user.email||'').toLowerCase()===ADMIN_EMAIL};await upsertCurrentUser();document.getElementById('loginScreen').classList.remove('open');applyRoleUI();await loadAccounts()}catch(e){showLoginError(e.message);document.getElementById('loginScreen').classList.add('open')}}
 async function getUser(){let res=await fetch(url()+'/auth/v1/user',{headers:{apikey:pubKey(),Authorization:'Bearer '+token()}});let data=await res.json().catch(()=>({}));if(!res.ok)throw new Error(data.msg||data.message||'Login expired. Log in again.');return data}
 function applyRoleUI(){document.getElementById('roleBadge').textContent=(currentUser.isAdmin?'Admin: ':'Employee: ')+currentUser.email;document.querySelectorAll('.adminOnly').forEach(el=>el.classList.toggle('hidden',!currentUser.isAdmin))}
+async function upsertCurrentUser(){
+ if(!currentUser.email)return;
+ try{
+   await dbFetch('/app_users?on_conflict=email',{
+     method:'POST',
+     headers:{Prefer:'resolution=merge-duplicates,return=representation'},
+     body:JSON.stringify([{email:currentUser.email,role:currentUser.isAdmin?'admin':'employee',last_seen_at:new Date().toISOString()}])
+   });
+ }catch(err){
+   console.warn('Could not update app_users profile. Run updated SQL if employee dropdown is empty.',err);
+ }
+}
+async function loadAppUsers(){
+ try{
+   let rows=await dbFetch('/app_users?select=*&order=email.asc');
+   appUsers=(rows||[]).map(toCamel);
+ }catch(err){
+   console.warn('Could not load app users. Run updated SQL.',err);
+   appUsers=[];
+ }
+ return appUsers;
+}
+function validEmail(e){return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(e||'').trim().toLowerCase())}
+
 function snakeToCamel(k){return String(k).replace(/_([a-z])/g,(_,c)=>c.toUpperCase())}function toCamel(row){let o={id:row.id};Object.entries(row||{}).forEach(([k,v])=>{o[reverse[k]||snakeToCamel(k)||k]=v??''});return o}
 function toRow(a){let r={};Object.entries(map).forEach(([k,v])=>{if(a[k]!==undefined)r[v]=numKey(k)?num(a[k]):a[k]});r.full_name=r.full_name||[r.first_name,r.middle_name,r.last_name].filter(Boolean).join(' ');r.account_number=r.account_number||r.client_account_number||r.source_account_id||'';r.portfolio=r.portfolio||r.issuer_name||r.account_description||r.original_creditor||'Imported Portfolio';r.original_creditor=r.original_creditor||r.issuer_name||r.account_description||r.portfolio;r.status=r.status||'New';r.updated_at=new Date().toISOString();r.created_by_email=currentUser.email;return r}
 function numKey(k){return ['originalBalance','principal','currentBalance','lastPaymentAmount','origPrincipalBalance','origOriginalLoanAmount','origChargeOffBalance','origPrincipalLoanAmount','origInterestAmount','origReturnFee'].includes(k)}function num(v){if(v===''||v==null)return null;let n=Number(String(v).replace(/[$,]/g,''));return Number.isFinite(n)?n:null}
@@ -879,28 +923,65 @@ document.getElementById('agentNote').addEventListener('input',()=>{let v=documen
 
 
 let assignmentPreviewRows=[];
-function parseAssignEmails(){
- let text=(document.getElementById('assignEmployees')?.value||'').toLowerCase();
- return [...new Set(text.split(/[\s,;]+/).map(e=>e.trim()).filter(e=>/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e)))];
+function selectedEmployeeEmails(){
+ let sel=document.getElementById('assignEmployeeSelect');
+ let selected=sel?[...sel.selectedOptions].map(o=>o.value.toLowerCase().trim()).filter(validEmail):[];
+ return [...new Set(selected.filter(e=>e!==ADMIN_EMAIL))];
+}
+function parseAssignEmails(){return selectedEmployeeEmails()}
+function addManualEmployeeOption(){
+ let input=document.getElementById('assignManualEmail');
+ let email=(input?.value||'').trim().toLowerCase();
+ if(!validEmail(email))return alert('Enter a valid employee email.');
+ if(email===ADMIN_EMAIL)return alert('Admin does not need to be assigned employee accounts.');
+ let sel=document.getElementById('assignEmployeeSelect');
+ if(!sel)return;
+ let existing=[...sel.options].some(o=>o.value===email);
+ if(!existing){
+   let opt=document.createElement('option');
+   opt.value=email;
+   opt.textContent=email+' (manual)';
+   sel.appendChild(opt);
+ }
+ [...sel.options].forEach(o=>{if(o.value===email)o.selected=true});
+ input.value='';
+ previewAssignment();
+}
+function employeeSuggestions(){
+ let set=new Set();
+ appUsers.forEach(u=>{
+   let email=(u.email||'').toLowerCase();
+   let role=(u.role||'employee').toLowerCase();
+   if(email&&email!==ADMIN_EMAIL&&role!=='admin'&&u.isActive!==false)set.add(email);
+ });
+ accounts.forEach(a=>{if(assignedEmail(a))set.add(assignedEmail(a))});
+ return [...set].filter(validEmail).sort();
+}
+function populateEmployeeSelect(){
+ let sel=document.getElementById('assignEmployeeSelect'), notice=document.getElementById('employeeEmptyNotice');
+ if(!sel)return;
+ let previous=new Set([...sel.selectedOptions].map(o=>o.value));
+ let employees=employeeSuggestions();
+ sel.innerHTML=employees.map(email=>{
+   let u=appUsers.find(x=>(x.email||'').toLowerCase()===email);
+   let label=email+(u?.lastSeenAt?' — last login '+String(u.lastSeenAt).slice(0,10):'');
+   return `<option value="${esc(email)}" ${previous.has(email)?'selected':''}>${esc(label)}</option>`;
+ }).join('');
+ if(notice)notice.classList.toggle('hidden',employees.length>0);
+}
+async function refreshEmployeeDropdown(){
+ await loadAppUsers();
+ populateEmployeeSelect();
+ previewAssignment();
 }
 function normalizeList(v){return String(v||'').split(/[,;]+/).map(x=>x.trim().toLowerCase()).filter(Boolean)}
 function assignedEmail(a){return (a.assignedToEmail||a.assigned_to_email||'').toLowerCase()}
-function employeeSuggestions(){
- let set=new Set();
- accounts.forEach(a=>{if(assignedEmail(a))set.add(assignedEmail(a))});
- if(currentUser.email)set.add(currentUser.email);
- return [...set].filter(e=>e&&e!==ADMIN_EMAIL).sort();
-}
-function fillSuggestedEmployees(){
- let emails=employeeSuggestions();
- if(!emails.length)return alert('No known employees yet. Type employee emails manually.');
- document.getElementById('assignEmployees').value=emails.join(', ');
- previewAssignment();
-}
-function openAssignModal(){
+async function openAssignModal(){
  if(!currentUser.isAdmin)return alert('Admin only');
  fillAssignFilterOptions();
  document.getElementById('assignModal').classList.add('open');
+ await loadAppUsers();
+ populateEmployeeSelect();
  previewAssignment();
 }
 function fillAssignFilterOptions(){
@@ -992,6 +1073,11 @@ function previewAssignment(){
  let tb=document.getElementById('assignTotalBalance'); if(tb)tb.textContent=money(totalBal);
  let box=document.getElementById('assignPreview'); if(!box)return;
  let rows=built.assignments.slice(0,200);
+ if(!built.assignments.length){
+   let msg=!built.employees.length?'Select at least one employee from the dropdown.':(!built.rows.length?'No matching accounts. Clear filters or uncheck Only unassigned / enable Allow reassignment.':'No assignments built. Check assignment count.');
+   box.innerHTML=`<div class="assignmentNoMatch">${esc(msg)}</div>`;
+   return;
+ }
  box.innerHTML=`<table><thead><tr><th>#</th><th>Assign To</th><th>Name</th><th>Account</th><th>State</th><th>City</th><th>Balance</th><th>Current Assignment</th></tr></thead><tbody>`+
  rows.map((x,i)=>`<tr><td>${i+1}</td><td><span class="assignTag">${esc(x.email)}</span></td><td>${esc(nameOf(x.account))}</td><td>${esc(acctNo(x.account))}</td><td>${esc(x.account.state||'')}</td><td>${esc(x.account.city||'')}</td><td>${money(accountBalance(x.account))}</td><td>${esc(assignedEmail(x.account)||'Unassigned')}</td></tr>`).join('')+
  `</tbody></table>${built.assignments.length>200?`<div class="assignWarning">Showing first 200 of ${built.assignments.length} assignments.</div>`:''}`;
@@ -1000,7 +1086,14 @@ async function saveSmartAssignment(){
  if(!currentUser.isAdmin)return alert('Admin only');
  let built=buildAssignments();
  if(!built.employees.length)return alert('Enter at least one valid employee email.');
- if(!built.assignments.length)return alert('No accounts matched your criteria.');
+ if(!built.assignments.length){
+   let reason='No accounts matched your criteria.\n\n';
+   if(!accounts.length)reason+='No accounts are loaded in the app. Reload, check Supabase RLS/SQL, or import accounts first.\n';
+   else if(!built.rows.length)reason+='Your filters removed every account. Try clearing State, City, Portfolio, Status, Min/Max Balance, Search, or uncheck Only unassigned.\n';
+   else reason+='Accounts matched filters, but assignment count/employees produced zero assignments. Check count and selected employees.\n';
+   reason+='\nCurrent settings: Only unassigned='+Boolean(document.getElementById('assignOnlyUnassigned')?.checked)+', Allow reassignment='+Boolean(document.getElementById('assignReplaceExisting')?.checked)+'.';
+   return alert(reason);
+ }
  let ok=confirm('Assign '+built.assignments.length+' account(s) to '+built.employees.length+' employee(s)?');
  if(!ok)return;
  let groupId=crypto.randomUUID?crypto.randomUUID():String(Date.now());
