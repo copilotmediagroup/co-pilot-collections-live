@@ -34,23 +34,34 @@
 <div id="loginScreen" class="loginScreen open">
   <div class="loginBox">
     <h2>Co Pilot Login</h2>
-    <p>This version connects directly to Supabase using your Project URL and Publishable Key. No Bolt Secrets needed.</p>
+    <p>Enter your employee or admin login. Admin access is tied to <b>afinch2678@gmail.com</b>.</p>
     <div id="loginError" class="error hidden"></div>
-    <div class="notice"><b>Do not paste your secret/service role key here.</b> Only use the publishable key that starts with <b>sb_publishable_</b>.</div>
-    <label>Supabase Project URL</label><input id="supabaseUrl" placeholder="https://your-project.supabase.co">
-    <br><br><label>Supabase Publishable Key</label><input id="supabaseKey" placeholder="sb_publishable_...">
-    <br><br><button class="gray" onclick="saveConnection()">Save Connection</button>
-    <hr style="border:0;border-top:1px solid #e2e8f0;margin:18px 0">
-    <label>Email</label><input id="loginEmail" autocomplete="email">
-    <br><br><label>Password</label><input id="loginPassword" type="password" autocomplete="current-password">
+    <div id="connectionNotice" class="notice hidden"></div>
+
+    <label>Email</label>
+    <input id="loginEmail" autocomplete="email">
+
     <br><br>
-    <div style="display:flex;gap:10px"><button onclick="login()">Login</button><button class="gray" onclick="signup()">Sign Up</button></div>
+
+    <label>Password</label>
+    <input id="loginPassword" type="password" autocomplete="current-password">
+
+    <br><br>
+
+    <div style="display:flex;gap:10px">
+      <button onclick="login()">Login</button>
+      <button class="gray" onclick="signup()">Sign Up</button>
+    </div>
+
+    <div class="notice" style="margin-top:16px">
+      Employees should only see this login box. Supabase connection values are now stored in <b>config.js</b>, not shown here.
+    </div>
   </div>
 </div>
 
 <div class="app">
   <header>
-    <div class="brand"><div class="logo">b</div><div><h1>Co Pilot Collections Manager</h1><p class="sub">Supabase browser version. No Bolt secrets. Real database saves.</p></div></div>
+    <div class="brand"><div class="logo">b</div><div><h1>Co Pilot Collections Manager</h1><p class="sub">Clean employee login. Supabase config hidden from login screen. Real database saves.</p></div></div>
     <div class="progressBlock"><div class="progressTitle" id="accountProgress">Account 1 of 0</div><div class="progressBar"><div class="progressFill" id="progressFill"></div></div></div>
     <div class="topActions">
       <span class="roleBadge" id="roleBadge">Not logged in</span>
@@ -107,6 +118,7 @@
   <div class="sectionTitle">Sensitive Bank Fields</div><div><label>Bank Routing Number</label><input id="bankRoutingNumber"></div><div><label>Bank Account Number</label><input id="bankAccountNumber"></div>
 </div><div style="margin-top:16px;text-align:right"><button class="green" type="submit">Save Account</button></div></form></div></div></div>
 
+<script src="config.js"></script>
 <script>
 const ADMIN_EMAIL='afinch2678@gmail.com';
 const URL_KEY='coPilotSupabaseUrl';
@@ -118,19 +130,33 @@ const DISPOS=['No Answer','Left Voicemail','Promise to Pay','Disputed','Bad Numb
 const FIELDS=['portfolio','accountDescription','clientAccountNumber','accountId','accountNumber','firstName','middleName','lastName','fullName','ssn','dob','address','address2','city','state','zip','employer','email','originalCreditor','typeOfDebt','originalBalance','principal','currentBalance','openDate','dateAccountOpened','delinquencyDate','chargeOffDate','origLastPmtDate','lastPaymentDate','lastPaymentAmount','bankRoutingNumber','bankAccountNumber','phone1','phone2','phone3','phone4','phone5','phone6','status'];
 const map={portfolio:'portfolio',accountDescription:'account_description',clientAccountNumber:'client_account_number',accountId:'source_account_id',accountNumber:'account_number',firstName:'first_name',middleName:'middle_name',lastName:'last_name',fullName:'full_name',ssn:'ssn',dob:'dob',address:'address',address2:'address2',city:'city',state:'state',zip:'zip',employer:'employer',email:'email',originalCreditor:'original_creditor',typeOfDebt:'type_of_debt',originalBalance:'original_balance',principal:'principal',currentBalance:'current_balance',openDate:'open_date',dateAccountOpened:'date_account_opened',delinquencyDate:'delinquency_date',chargeOffDate:'charge_off_date',origLastPmtDate:'orig_last_pmt_date',lastPaymentDate:'last_payment_date',lastPaymentAmount:'last_payment_amount',bankRoutingNumber:'bank_routing_number',bankAccountNumber:'bank_account_number',phone1:'phone1',phone2:'phone2',phone3:'phone3',phone4:'phone4',phone5:'phone5',phone6:'phone6',status:'status',disposition:'disposition',lastContactNumber:'last_contact_number'};
 const reverse=Object.fromEntries(Object.entries(map).map(([k,v])=>[v,k]));
-function url(){return (localStorage.getItem(URL_KEY)||'').replace(/\/$/,'')}
-function pubKey(){return localStorage.getItem(PUB_KEY)||''}
+function cfg(){return window.CO_PILOT_SUPABASE_CONFIG||{}}
+function url(){return String(cfg().url||localStorage.getItem(URL_KEY)||'').replace(/\/$/,'')}
+function pubKey(){return String(cfg().publishableKey||localStorage.getItem(PUB_KEY)||'')}
 function token(){return localStorage.getItem(TOKEN_KEY)||''}
-function saveConnection(){localStorage.setItem(URL_KEY,val('supabaseUrl'));localStorage.setItem(PUB_KEY,val('supabaseKey'));alert('Connection saved. Now sign up or log in.')}
-function fillConnection(){setVal('supabaseUrl',localStorage.getItem(URL_KEY)||'https://bwvufgzbkaymffwxuuzr.supabase.co');setVal('supabaseKey',localStorage.getItem(PUB_KEY)||'')}
-async function authFetch(path,body){if(!url()||!pubKey())throw new Error('Save Supabase URL and Publishable Key first.');let res=await fetch(url()+path,{method:'POST',headers:{apikey:pubKey(),'Content-Type':'application/json'},body:JSON.stringify(body)});let data=await res.json().catch(()=>({}));if(!res.ok)throw new Error(data.msg||data.message||data.error_description||data.error||'Auth failed');return data}
+function connectionIsReady(){
+  return Boolean(url() && pubKey() && !pubKey().includes('PASTE_YOUR') && pubKey().startsWith('sb_publishable_'));
+}
+function showConnectionNotice(){
+  let el=document.getElementById('connectionNotice');
+  if(!el)return;
+  if(connectionIsReady()){
+    el.classList.add('hidden');
+  }else{
+    el.textContent='System setup needed: admin must paste the Supabase publishable key into config.js and upload it to GitHub. Employees do not need to touch this.';
+    el.classList.remove('hidden');
+  }
+}
+function saveConnection(){alert('Connection setup has moved to config.js so employees do not see it.')}
+function fillConnection(){showConnectionNotice()}
+async function authFetch(path,body){if(!connectionIsReady())throw new Error('System connection is not configured. Admin must update config.js with the Supabase Project URL and Publishable Key.');let res=await fetch(url()+path,{method:'POST',headers:{apikey:pubKey(),'Content-Type':'application/json'},body:JSON.stringify(body)});let data=await res.json().catch(()=>({}));if(!res.ok)throw new Error(data.msg||data.message||data.error_description||data.error||'Auth failed');return data}
 async function dbFetch(path,opt={}){if(!token())throw new Error('Not logged in.');let res=await fetch(url()+'/rest/v1'+path,{...opt,headers:{apikey:pubKey(),Authorization:'Bearer '+token(),'Content-Type':'application/json',Prefer:'return=representation',...(opt.headers||{})}});let text=await res.text();let data=null;try{data=text?JSON.parse(text):null}catch{data=text}if(!res.ok)throw new Error(data?.message||data?.hint||data||'Database failed');return data}
 async function login(){try{clearLoginError();let data=await authFetch('/auth/v1/token?grant_type=password',{email:val('loginEmail'),password:val('loginPassword')});storeSession(data);await boot()}catch(e){showLoginError(e.message)}}
 async function signup(){try{clearLoginError();let data=await authFetch('/auth/v1/signup',{email:val('loginEmail'),password:val('loginPassword')});if(data.access_token){storeSession(data);await boot()}else showLoginError('Signup created. If email confirmation is enabled, check email, then log in.')}catch(e){showLoginError(e.message)}}
 function storeSession(data){localStorage.setItem(TOKEN_KEY,data.access_token||'');localStorage.setItem(REFRESH_KEY,data.refresh_token||'')}
 function logout(){localStorage.removeItem(TOKEN_KEY);localStorage.removeItem(REFRESH_KEY);location.reload()}
 function showLoginError(msg){let el=document.getElementById('loginError');el.textContent=msg;el.classList.remove('hidden')}function clearLoginError(){document.getElementById('loginError').classList.add('hidden')}
-async function boot(){fillConnection();if(!token()){document.getElementById('loginScreen').classList.add('open');return}try{let user=await getUser();currentUser={email:(user.email||'').toLowerCase(),isAdmin:(user.email||'').toLowerCase()===ADMIN_EMAIL};document.getElementById('loginScreen').classList.remove('open');applyRoleUI();await loadAccounts()}catch(e){showLoginError(e.message);document.getElementById('loginScreen').classList.add('open')}}
+async function boot(){fillConnection();if(!connectionIsReady()){document.getElementById('loginScreen').classList.add('open');return}if(!token()){document.getElementById('loginScreen').classList.add('open');return}try{let user=await getUser();currentUser={email:(user.email||'').toLowerCase(),isAdmin:(user.email||'').toLowerCase()===ADMIN_EMAIL};document.getElementById('loginScreen').classList.remove('open');applyRoleUI();await loadAccounts()}catch(e){showLoginError(e.message);document.getElementById('loginScreen').classList.add('open')}}
 async function getUser(){let res=await fetch(url()+'/auth/v1/user',{headers:{apikey:pubKey(),Authorization:'Bearer '+token()}});let data=await res.json().catch(()=>({}));if(!res.ok)throw new Error(data.msg||data.message||'Login expired. Log in again.');return data}
 function applyRoleUI(){document.getElementById('roleBadge').textContent=(currentUser.isAdmin?'Admin: ':'Employee: ')+currentUser.email;document.querySelectorAll('.adminOnly').forEach(el=>el.classList.toggle('hidden',!currentUser.isAdmin))}
 function toCamel(row){let o={id:row.id};Object.entries(row).forEach(([k,v])=>{o[reverse[k]||k]=v??''});return o}
