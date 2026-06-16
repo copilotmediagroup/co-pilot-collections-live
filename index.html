@@ -170,6 +170,41 @@ header.topbar{height:66px;background:linear-gradient(90deg,#05225f,#07379a,#0b45
   .allFieldsGrid,.phoneGrid{grid-template-columns:1fr!important}
 }
 
+
+/* PAYMENT PLAN QUICK ACTIONS */
+.qaItem{cursor:pointer;border-radius:10px;padding:0 8px;transition:.15s ease}
+.qaItem:hover{background:#eff6ff;color:#1457ff}
+.paymentPlanPanel{grid-column:1/-1;padding:14px 16px;border-radius:16px;background:#fff;border:1px solid #dbe3ef;box-shadow:0 2px 10px rgba(15,23,42,.035)}
+.planTop{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:10px}
+.planTitle{font-size:16px;font-weight:1000;color:#0f172a}
+.planStatus{border-radius:999px;padding:5px 9px;font-size:11px;font-weight:900;background:#dcfce7;color:#166534}
+.planEmpty{border:1px dashed #cbd5e1;background:#f8fafc;border-radius:14px;padding:14px;display:flex;justify-content:space-between;align-items:center;gap:12px}
+.planMetrics{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:12px}
+.planMetric{border:1px solid #e2e8f0;border-radius:12px;background:#f8fbff;padding:10px}
+.planMetricLabel{font-size:10px;font-weight:900;color:#64748b;text-transform:uppercase;letter-spacing:.03em;margin-bottom:4px}
+.planMetricValue{font-size:14px;font-weight:1000;color:#0f172a}
+.planScheduleMini{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.planMiniPay{border:1px solid #e2e8f0;border-radius:12px;padding:9px;background:white}
+.planMiniDate{font-size:11px;color:#64748b;font-weight:900}
+.planMiniAmount{font-size:13px;font-weight:1000;color:#0f172a;margin-top:4px}
+.planMiniStatus{font-size:11px;font-weight:900;margin-top:4px}
+.planPaid{color:#166534}.planPartial{color:#b45309}.planMissed{color:#dc2626}.planScheduled{color:#1d4ed8}
+.paymentModalBox{max-width:1120px}
+.payGrid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.payGrid label{font-size:12px;font-weight:900;color:#334155;display:block;margin-bottom:5px}
+.payGrid input,.payGrid select,.payGrid textarea{width:100%;border:1px solid #cbd5e1;border-radius:10px;padding:10px;font:inherit}
+.payGrid textarea{height:74px;resize:vertical}
+.payActions{display:flex;gap:10px;justify-content:flex-end;align-items:center;flex-wrap:wrap;margin:14px 0}
+.scheduleTableWrap{max-height:360px;overflow:auto;border:1px solid #e2e8f0;border-radius:12px}
+.scheduleTable{width:100%;border-collapse:collapse;font-size:13px}
+.scheduleTable th{position:sticky;top:0;background:#f8fafc;color:#334155;text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.03em;padding:9px;border-bottom:1px solid #e2e8f0}
+.scheduleTable td{padding:8px;border-bottom:1px solid #edf2f8;vertical-align:middle}
+.scheduleTable input,.scheduleTable select{width:100%;border:1px solid #cbd5e1;border-radius:8px;padding:7px;font:inherit}
+.payButtonMini{height:32px;padding:0 9px;border-radius:8px;font-size:11px}
+.planWarning{background:#fff7ed;border:1px solid #fed7aa;color:#9a3412;border-radius:12px;padding:10px;font-size:12px;font-weight:800;margin-bottom:12px}
+@media(max-width:1450px){.planMetrics{grid-template-columns:repeat(3,1fr)}.planScheduleMini{grid-template-columns:repeat(2,1fr)}.payGrid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:900px){.planMetrics,.planScheduleMini,.payGrid{grid-template-columns:1fr}}
+
 </style>
 </head>
 <body>
@@ -211,7 +246,7 @@ header.topbar{height:66px;background:linear-gradient(90deg,#05225f,#07379a,#0b45
 
 <div class="app">
   <header class="topbar">
-    <div class="brand"><div class="logo">b</div><div><h1>Co Pilot Collections Manager</h1><p class="sub">COMPACT CLEAN MOCKUP FIX — curated account details, no raw field dump.</p></div></div>
+    <div class="brand"><div class="logo">b</div><div><h1>Co Pilot Collections Manager</h1><p class="sub">PAYMENT PLAN READY — compact CRM with active quick actions.</p></div></div>
     <div class="headerSearch"><span class="mag">⌕</span><input id="globalSearch" placeholder="Search accounts..." oninput="document.getElementById('search').value=this.value;onQueueFilterChange()"><span class="hotkey">⌘ K</span></div>
     <div class="topActions">
       <label class="fileBtn gray adminOnly hidden">⇩ Import CSV<input type="file" accept=".csv" onchange="importCSV(event)"></label>
@@ -283,6 +318,16 @@ header.topbar{height:66px;background:linear-gradient(90deg,#05225f,#07379a,#0b45
         <div id="rawDumpBox" class="rawDumpBox"><div class="rawDumpGrid" id="rawDumpGrid"></div></div>
       </section>
 
+      <section class="paymentPlanPanel" id="paymentPlanPanel">
+        <div class="planEmpty">
+          <div>
+            <div class="planTitle">Payment Plan</div>
+            <div class="hint">No active payment plan on this account.</div>
+          </div>
+          <button class="green" onclick="openPaymentPlan()">Create Payment Plan</button>
+        </div>
+      </section>
+
       <section class="panel phonePanel"><div class="panelTitle"><h3>Phone Numbers</h3><button class="outline" onclick="renderPhones(getCurrent())">Refresh Numbers</button></div><div class="phoneGrid" id="phoneGrid"></div></section>
 
       <section class="panel dispoPanel"><div class="panelTitle"><h3>Disposition / Status</h3><span class="muted" id="selectedDisposition">Select one</span></div><div class="dispoGrid" id="dispoGrid"></div></section>
@@ -300,10 +345,10 @@ header.topbar{height:66px;background:linear-gradient(90deg,#05225f,#07379a,#0b45
       </section>
       <section class="panel quickActions">
         <div class="panelTitle"><h3>Quick Actions</h3></div>
-        <div class="qaItem"><span class="qaLeft"><span class="qaIcon">💳</span>Payment Promise</span><span>›</span></div>
-        <div class="qaItem"><span class="qaLeft"><span class="qaIcon">✎</span>Update Contact Info</span><span>›</span></div>
-        <div class="qaItem"><span class="qaLeft"><span class="qaIcon">▤</span>Send Payoff Quote</span><span>›</span></div>
-        <div class="qaItem"><span class="qaLeft"><span class="qaIcon">▣</span>View Account Docs</span><span>›</span></div>
+        <div class="qaItem" onclick="openPaymentPlan()"><span class="qaLeft"><span class="qaIcon">💳</span>Payment Promise / Plan</span><span>›</span></div>
+        <div class="qaItem" onclick="openContactUpdate()"><span class="qaLeft"><span class="qaIcon">✎</span>Update Contact Info</span><span>›</span></div>
+        <div class="qaItem" onclick="openPayoffQuote()"><span class="qaLeft"><span class="qaIcon">▤</span>Send Payoff Quote</span><span>›</span></div>
+        <div class="qaItem" onclick="openAccountDocs()"><span class="qaLeft"><span class="qaIcon">▣</span>View Account Docs</span><span>›</span></div>
       </section>
     </aside>
   </div>
@@ -336,6 +381,62 @@ header.topbar{height:66px;background:linear-gradient(90deg,#05225f,#07379a,#0b45
     <button type="button" class="green" onclick="importMappedCSV()">Import Mapped CSV</button>
   </div>
 </div></div></div>
+
+
+<div id="paymentPlanModal" class="modal"><div class="modalbox paymentModalBox">
+  <div class="modalhead"><h2>Payment Promise / Payment Plan</h2><button class="gray" onclick="closeModal('paymentPlanModal')">Close</button></div>
+  <div class="modalbody">
+    <div class="planWarning">
+      Build a promise-to-pay schedule tied to the current account balance. Payments marked paid reduce the payment plan balance and update the account balance.
+    </div>
+
+    <div class="payGrid">
+      <div><label>Plan Total</label><input id="planTotal" type="number" step="0.01" min="0"></div>
+      <div><label>Payment Today</label><input id="planToday" type="number" step="0.01" min="0" value="0"></div>
+      <div><label>Start Date</label><input id="planStartDate" type="date"></div>
+      <div><label>Frequency</label><select id="planFrequency"><option>One Time</option><option>Weekly</option><option>Biweekly</option><option selected>Monthly</option><option>Custom</option></select></div>
+      <div><label># of Future Payments</label><input id="planCount" type="number" min="1" value="1"></div>
+      <div><label>Amount Each</label><input id="planEach" type="number" step="0.01" min="0"></div>
+      <div><label>Plan Status</label><select id="planStatus"><option>Active</option><option>Completed</option><option>Broken</option><option>Cancelled</option></select></div>
+      <div><label>Remaining Balance</label><input id="planRemaining" readonly></div>
+      <div style="grid-column:1/-1"><label>Plan Notes</label><textarea id="planNotes" placeholder="Example: Debtor promised $100 today and $150 every month on the 15th."></textarea></div>
+    </div>
+
+    <div class="payActions">
+      <button class="outline" onclick="generatePlanSchedule()">Generate Schedule</button>
+      <button class="gray" onclick="addCustomPlanRow()">+ Add Custom Date</button>
+      <button class="green" onclick="savePaymentPlan()">Save Payment Plan</button>
+    </div>
+
+    <div class="scheduleTableWrap">
+      <table class="scheduleTable">
+        <thead><tr><th>#</th><th>Due Date</th><th>Amount Due</th><th>Amount Paid</th><th>Paid Date</th><th>Status</th><th>Action</th></tr></thead>
+        <tbody id="planScheduleBody"></tbody>
+      </table>
+    </div>
+  </div>
+</div></div>
+
+<div id="contactModal" class="modal"><div class="modalbox">
+  <div class="modalhead"><h2>Update Contact Info</h2><button class="gray" onclick="closeModal('contactModal')">Close</button></div>
+  <div class="modalbody">
+    <div class="grid">
+      <div><label>Email</label><input id="contactEmail"></div>
+      <div><label>Phone 1</label><input id="contactPhone1"></div>
+      <div><label>Phone 2</label><input id="contactPhone2"></div>
+      <div><label>Address</label><input id="contactAddress"></div>
+      <div><label>City</label><input id="contactCity"></div>
+      <div><label>State</label><input id="contactState"></div>
+      <div><label>Zip</label><input id="contactZip"></div>
+    </div>
+    <br><button class="green" onclick="saveContactUpdate()">Save Contact Info</button>
+  </div>
+</div></div>
+
+<div id="docsModal" class="modal"><div class="modalbox">
+  <div class="modalhead"><h2>Account Docs / Source Fields</h2><button class="gray" onclick="closeModal('docsModal')">Close</button></div>
+  <div class="modalbody"><div id="docsBody"></div></div>
+</div></div>
 
 <script src="config.js"></script>
 <script>
@@ -384,7 +485,7 @@ function numKey(k){return ['originalBalance','principal','currentBalance','lastP
 async function loadAccounts(){accounts=(await dbFetch('/accounts?select=*&order=created_at.asc&limit=20000')).map(toCamel);if(!currentAccountId&&accounts[0])currentAccountId=accounts[0].id;render()}
 function queue(){let q=document.getElementById('search')?.value.toLowerCase()||'',st=document.getElementById('statusFilter')?.value||'',pf=document.getElementById('portfolioFilter')?.value||'';return accounts.filter(a=>{let raw=rawObj(a),text=(FIELDS.map(k=>a[k]).join(' ')+' '+Object.keys(raw).join(' ')+' '+Object.values(raw).join(' ')).toLowerCase();return(!q||text.includes(q))&&(!st||a.status===st)&&(!pf||a.portfolio===pf)})}
 function onQueueFilterChange(){let q=queue();if(q[0]&&!q.some(a=>a.id===currentAccountId))currentAccountId=q[0].id;render()}function setCurrent(id){currentAccountId=id;document.getElementById('agentNote').value='';currentDisposition='';render();loadHistory(id)}function getCurrent(){return queue().find(a=>a.id===currentAccountId)||queue()[0]||accounts[0]}
-function money(n){return Number(n||0).toLocaleString('en-US',{style:'currency',currency:'USD'})}function esc(s){return String(s??'').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;')}function normPhone(p){return String(p||'').replace(/\D/g,'')}function fmtPhone(p){let d=normPhone(p);return d.length===10?'('+d.slice(0,3)+') '+d.slice(3,6)+'-'+d.slice(6):(p||'')}function acctNo(a){return a?.accountNumber||a?.clientAccountNumber||a?.accountId||''}function nameOf(a){return a?.fullName||[a?.firstName,a?.middleName,a?.lastName].filter(Boolean).join(' ')||'Unknown Account'}function initials(a){return nameOf(a).split(/\s+/).filter(Boolean).slice(0,2).map(x=>x[0]).join('').toUpperCase()||'--'}function creditor(a){return a?.originalCreditor||a?.accountDescription||a?.portfolio||'—'}function phones(a){return[a?.phone1,a?.phone2,a?.phone3,a?.phone4,a?.phone5,a?.phone6,a?.phone7,a?.phone8,a?.phone9,a?.phone10].filter(p=>p&&normPhone(p).length>=10)}
+function money(n){return Number(n||0).toLocaleString('en-US',{style:'currency',currency:'USD'})}function moneyNum(v){let n=Number(String(v??'').replace(/[^0-9.-]/g,''));return isNaN(n)?0:n}function accountBalance(a){return moneyNum(a?.currentBalance||a?.principal||a?.originalBalance)}function esc(s){return String(s??'').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;')}function normPhone(p){return String(p||'').replace(/\D/g,'')}function fmtPhone(p){let d=normPhone(p);return d.length===10?'('+d.slice(0,3)+') '+d.slice(3,6)+'-'+d.slice(6):(p||'')}function acctNo(a){return a?.accountNumber||a?.clientAccountNumber||a?.accountId||''}function nameOf(a){return a?.fullName||[a?.firstName,a?.middleName,a?.lastName].filter(Boolean).join(' ')||'Unknown Account'}function initials(a){return nameOf(a).split(/\s+/).filter(Boolean).slice(0,2).map(x=>x[0]).join('').toUpperCase()||'--'}function creditor(a){return a?.originalCreditor||a?.accountDescription||a?.portfolio||'—'}function phones(a){return[a?.phone1,a?.phone2,a?.phone3,a?.phone4,a?.phone5,a?.phone6,a?.phone7,a?.phone8,a?.phone9,a?.phone10].filter(p=>p&&normPhone(p).length>=10)}
 function rawObj(a){return a?.rawData||a?.raw_data||{}}
 
 const EXTRA_FIELD_LABELS={
@@ -573,6 +674,7 @@ function renderCurrent(a,q){
  document.getElementById('email').textContent=a.email||'—';
 
  renderAllImportedFields(a);
+ renderPaymentPlanSummary(a.id);
  renderPhones(a);
  renderDispos(a);
 }
@@ -588,6 +690,210 @@ async function insertActivity(accountId,type,text,phone='',oldStatus='',newStatu
 async function recordDial(id,phone){document.getElementById('callNumber').textContent=fmtPhone(phone);document.getElementById('lastDialed').textContent='Dialing '+fmtPhone(phone);await dbFetch(`/accounts?id=eq.${id}`,{method:'PATCH',body:JSON.stringify({last_contact_number:phone,updated_at:new Date().toISOString()})}).catch(()=>{});await insertActivity(id,'Outbound Call','Clicked phone number '+fmtPhone(phone),phone)}
 async function loadHistory(id){if(!id)return;try{let notes=await dbFetch(`/account_notes?account_id=eq.${id}&select=*&order=created_at.desc&limit=20`),acts=await dbFetch(`/activity_logs?account_id=eq.${id}&select=*&order=created_at.desc&limit=20`);let events=[...acts.map(x=>({date:x.created_at,type:x.action_type,text:x.action_text})),...notes.map(x=>({date:x.created_at,type:'Note',text:x.note}))].sort((a,b)=>new Date(b.date)-new Date(a.date)).slice(0,8);document.getElementById('activityList').innerHTML=events.map(e=>`<div class="event"><div class="eventTitle">${esc(e.type)}</div><div>${esc(e.text)}</div><div class="eventMeta">${new Date(e.date).toLocaleString()}</div></div>`).join('')||'<div class="muted">No activity yet.</div>'}catch{}}
 document.getElementById('agentNote').addEventListener('input',()=>{let v=document.getElementById('agentNote').value;document.getElementById('noteCounter').textContent=v.length+' / 2000'})
+
+let paymentPlanCache={};
+let paymentScheduleDraft=[];
+function todayISO(){return new Date().toISOString().slice(0,10)}
+function addDaysISO(dateStr,days){let d=new Date(dateStr+'T00:00:00');d.setDate(d.getDate()+days);return d.toISOString().slice(0,10)}
+function addMonthsISO(dateStr,months){let d=new Date(dateStr+'T00:00:00');let day=d.getDate();d.setMonth(d.getMonth()+months);if(d.getDate()<day)d.setDate(0);return d.toISOString().slice(0,10)}
+function planStatusClass(s){s=String(s||'Scheduled');return s==='Paid'?'planPaid':s==='Partial'?'planPartial':s==='Missed'?'planMissed':'planScheduled'}
+async function loadPaymentPlanForAccount(accountId,force=false){
+ if(!accountId)return null;
+ if(paymentPlanCache[accountId]&&!force)return paymentPlanCache[accountId];
+ try{
+   let plans=await dbFetch(`/payment_plans?account_id=eq.${accountId}&select=*&order=created_at.desc&limit=1`);
+   if(!plans||!plans[0]){paymentPlanCache[accountId]=null;return null}
+   let plan=toCamel(plans[0]);
+   let pays=await dbFetch(`/payment_plan_payments?plan_id=eq.${plan.id}&select=*&order=due_date.asc`);
+   plan.payments=(pays||[]).map(toCamel);
+   paymentPlanCache[accountId]=plan;
+   return plan;
+ }catch(err){
+   console.warn('Payment plan load failed',err);
+   paymentPlanCache[accountId]=null;
+   return null;
+ }
+}
+function renderPaymentPlanEmpty(){
+ let el=document.getElementById('paymentPlanPanel');if(!el)return;
+ el.innerHTML=`<div class="planEmpty"><div><div class="planTitle">Payment Plan</div><div class="hint">No active payment plan on this account.</div></div><button class="green" onclick="openPaymentPlan()">Create Payment Plan</button></div>`;
+}
+function renderPaymentPlanLoading(){
+ let el=document.getElementById('paymentPlanPanel');if(!el)return;
+ el.innerHTML=`<div class="planEmpty"><div><div class="planTitle">Payment Plan</div><div class="hint">Checking payment plan...</div></div></div>`;
+}
+async function renderPaymentPlanSummary(accountId){
+ let el=document.getElementById('paymentPlanPanel');if(!el||!accountId)return;
+ renderPaymentPlanLoading();
+ let plan=await loadPaymentPlanForAccount(accountId);
+ if(!plan){renderPaymentPlanEmpty();return}
+ let payments=plan.payments||[];
+ let total=moneyNum(plan.totalAmount), remaining=moneyNum(plan.remainingAmount);
+ let paid=payments.reduce((s,p)=>s+moneyNum(p.amountPaid),0);
+ let next=payments.find(p=>!['Paid','Cancelled'].includes(p.status))||payments[0];
+ let mini=payments.slice(0,4).map(p=>`<div class="planMiniPay"><div class="planMiniDate">${esc(p.dueDate||'—')}</div><div class="planMiniAmount">${money(p.amountDue)}</div><div class="planMiniStatus ${planStatusClass(p.status)}">${esc(p.status||'Scheduled')}</div></div>`).join('');
+ el.innerHTML=`<div class="planTop"><div><div class="planTitle">Payment Plan</div><div class="hint">${esc(plan.frequency||'Custom')} plan • Next due: <b>${esc(next?.dueDate||'—')}</b></div></div><div style="display:flex;gap:8px;align-items:center"><span class="planStatus">${esc(plan.status||'Active')}</span><button class="outline" onclick="openPaymentPlan()">Manage Plan</button></div></div>
+ <div class="planMetrics">
+  <div class="planMetric"><div class="planMetricLabel">Plan Total</div><div class="planMetricValue">${money(total)}</div></div>
+  <div class="planMetric"><div class="planMetricLabel">Paid</div><div class="planMetricValue">${money(paid)}</div></div>
+  <div class="planMetric"><div class="planMetricLabel">Remaining</div><div class="planMetricValue">${money(remaining)}</div></div>
+  <div class="planMetric"><div class="planMetricLabel">Account Balance</div><div class="planMetricValue">${money(accountBalance(getCurrent()))}</div></div>
+  <div class="planMetric"><div class="planMetricLabel">Payments</div><div class="planMetricValue">${payments.length}</div></div>
+ </div>
+ <div class="planScheduleMini">${mini||'<div class="muted">No scheduled payments yet.</div>'}</div>`;
+}
+async function openPaymentPlan(){
+ let a=getCurrent();if(!a)return alert('No account selected.');
+ document.getElementById('paymentPlanModal').classList.add('open');
+ let plan=await loadPaymentPlanForAccount(a.id,true);
+ let bal=accountBalance(a);
+ if(plan){
+   document.getElementById('planTotal').value=moneyNum(plan.totalAmount).toFixed(2);
+   document.getElementById('planToday').value='0.00';
+   document.getElementById('planStartDate').value=(plan.payments&&plan.payments[0]?.dueDate)||todayISO();
+   document.getElementById('planFrequency').value=plan.frequency||'Monthly';
+   document.getElementById('planStatus').value=plan.status||'Active';
+   document.getElementById('planNotes').value=plan.notes||'';
+   paymentScheduleDraft=(plan.payments||[]).map(p=>({id:p.id,dueDate:p.dueDate,amountDue:moneyNum(p.amountDue),amountPaid:moneyNum(p.amountPaid),paidDate:p.paidDate||'',status:p.status||'Scheduled'}));
+   document.getElementById('planCount').value=paymentScheduleDraft.length||1;
+   document.getElementById('planEach').value=paymentScheduleDraft[0]?.amountDue?.toFixed(2)||'';
+ }else{
+   document.getElementById('planTotal').value=bal.toFixed(2);
+   document.getElementById('planToday').value='0.00';
+   document.getElementById('planStartDate').value=todayISO();
+   document.getElementById('planFrequency').value='Monthly';
+   document.getElementById('planStatus').value='Active';
+   document.getElementById('planNotes').value='';
+   document.getElementById('planCount').value='1';
+   document.getElementById('planEach').value=bal.toFixed(2);
+   paymentScheduleDraft=[];
+   generatePlanSchedule();
+ }
+ renderPlanSchedule();
+ updatePlanRemainingPreview();
+}
+function updatePlanRemainingPreview(){
+ let total=moneyNum(document.getElementById('planTotal').value);
+ let paidToday=moneyNum(document.getElementById('planToday').value);
+ let draftPaid=paymentScheduleDraft.reduce((s,p)=>s+moneyNum(p.amountPaid),0);
+ document.getElementById('planRemaining').value=Math.max(0,total-paidToday-draftPaid).toFixed(2);
+}
+function generatePlanSchedule(){
+ let total=moneyNum(document.getElementById('planTotal').value);
+ let todayPay=moneyNum(document.getElementById('planToday').value);
+ let count=Math.max(1,parseInt(document.getElementById('planCount').value||'1',10));
+ let freq=document.getElementById('planFrequency').value;
+ let start=document.getElementById('planStartDate').value||todayISO();
+ let remaining=Math.max(0,total-todayPay);
+ let each=moneyNum(document.getElementById('planEach').value);
+ if(!each)each=remaining/count;
+ paymentScheduleDraft=[];
+ for(let i=0;i<count;i++){
+   let due=start;
+   if(freq==='Weekly')due=addDaysISO(start,7*i);
+   else if(freq==='Biweekly')due=addDaysISO(start,14*i);
+   else if(freq==='Monthly')due=addMonthsISO(start,i);
+   else if(freq==='One Time')due=start;
+   paymentScheduleDraft.push({dueDate:due,amountDue:Number(each.toFixed(2)),amountPaid:0,paidDate:'',status:'Scheduled'});
+   if(freq==='One Time')break;
+ }
+ renderPlanSchedule();
+ updatePlanRemainingPreview();
+}
+function addCustomPlanRow(){
+ paymentScheduleDraft.push({dueDate:todayISO(),amountDue:0,amountPaid:0,paidDate:'',status:'Scheduled'});
+ renderPlanSchedule();
+ updatePlanRemainingPreview();
+}
+function renderPlanSchedule(){
+ let body=document.getElementById('planScheduleBody');if(!body)return;
+ body.innerHTML=paymentScheduleDraft.map((p,i)=>`<tr>
+   <td>${i+1}</td>
+   <td><input type="date" value="${esc(p.dueDate||'')}" onchange="paymentScheduleDraft[${i}].dueDate=this.value"></td>
+   <td><input type="number" step="0.01" value="${moneyNum(p.amountDue).toFixed(2)}" onchange="paymentScheduleDraft[${i}].amountDue=moneyNum(this.value);updatePlanRemainingPreview()"></td>
+   <td><input type="number" step="0.01" value="${moneyNum(p.amountPaid).toFixed(2)}" onchange="paymentScheduleDraft[${i}].amountPaid=moneyNum(this.value);paymentScheduleDraft[${i}].status=moneyNum(this.value)>=moneyNum(paymentScheduleDraft[${i}].amountDue)?'Paid':moneyNum(this.value)>0?'Partial':'Scheduled';if(moneyNum(this.value)>0&&!paymentScheduleDraft[${i}].paidDate)paymentScheduleDraft[${i}].paidDate=todayISO();renderPlanSchedule();updatePlanRemainingPreview()"></td>
+   <td><input type="date" value="${esc(p.paidDate||'')}" onchange="paymentScheduleDraft[${i}].paidDate=this.value"></td>
+   <td><select onchange="paymentScheduleDraft[${i}].status=this.value;renderPlanSchedule()"><option ${p.status==='Scheduled'?'selected':''}>Scheduled</option><option ${p.status==='Partial'?'selected':''}>Partial</option><option ${p.status==='Paid'?'selected':''}>Paid</option><option ${p.status==='Missed'?'selected':''}>Missed</option><option ${p.status==='Cancelled'?'selected':''}>Cancelled</option></select></td>
+   <td><button class="green payButtonMini" onclick="markPlanPaymentPaid(${i})">Paid</button> <button class="red payButtonMini" onclick="removePlanRow(${i})">Remove</button></td>
+ </tr>`).join('')||'<tr><td colspan="7">No payments scheduled.</td></tr>';
+ updatePlanRemainingPreview();
+}
+function markPlanPaymentPaid(i){
+ let p=paymentScheduleDraft[i];if(!p)return;
+ p.amountPaid=moneyNum(p.amountDue);
+ p.paidDate=p.paidDate||todayISO();
+ p.status='Paid';
+ renderPlanSchedule();
+}
+function removePlanRow(i){paymentScheduleDraft.splice(i,1);renderPlanSchedule();updatePlanRemainingPreview()}
+async function savePaymentPlan(){
+ let a=getCurrent();if(!a)return alert('No account selected.');
+ if(!paymentScheduleDraft.length)return alert('Generate or add at least one payment date.');
+ let total=moneyNum(document.getElementById('planTotal').value);
+ let paidToday=moneyNum(document.getElementById('planToday').value);
+ let status=document.getElementById('planStatus').value||'Active';
+ let frequency=document.getElementById('planFrequency').value||'Custom';
+ let notes=document.getElementById('planNotes').value.trim();
+ let existing=await loadPaymentPlanForAccount(a.id,true);
+ if(existing){
+   await dbFetch(`/payment_plans?id=eq.${existing.id}`,{method:'PATCH',body:JSON.stringify({status:'Replaced',updated_at:new Date().toISOString()})}).catch(()=>{});
+ }
+ let paidFromSchedule=paymentScheduleDraft.reduce((s,p)=>s+moneyNum(p.amountPaid),0);
+ let remaining=Math.max(0,total-paidToday-paidFromSchedule);
+ let plan=(await dbFetch('/payment_plans',{method:'POST',body:JSON.stringify([{
+   account_id:a.id,total_amount:total,starting_balance:accountBalance(a),remaining_amount:remaining,frequency,status,notes,created_by_email:currentUser.email,updated_at:new Date().toISOString()
+ }])}))[0];
+ let pid=plan.id;
+ let rows=paymentScheduleDraft.map(p=>({
+   plan_id:pid,account_id:a.id,due_date:p.dueDate,amount_due:moneyNum(p.amountDue),amount_paid:moneyNum(p.amountPaid),paid_date:p.paidDate||null,status:p.status||'Scheduled',created_by_email:currentUser.email,updated_at:new Date().toISOString()
+ }));
+ if(rows.length)await dbFetch('/payment_plan_payments',{method:'POST',body:JSON.stringify(rows)});
+ if(paidToday>0){
+   await dbFetch('/payment_plan_payments',{method:'POST',body:JSON.stringify([{
+     plan_id:pid,account_id:a.id,due_date:todayISO(),amount_due:paidToday,amount_paid:paidToday,paid_date:todayISO(),status:'Paid',created_by_email:currentUser.email,updated_at:new Date().toISOString()
+   }])});
+ }
+ await dbFetch(`/accounts?id=eq.${a.id}`,{method:'PATCH',body:JSON.stringify({current_balance:remaining,status:status==='Active'?'Promise to Pay':a.status,disposition:'Promise to Pay',updated_at:new Date().toISOString()})});
+ await insertActivity(a.id,'Payment Plan','Payment plan saved: total '+money(total)+', remaining '+money(remaining));
+ closeModal('paymentPlanModal');
+ delete paymentPlanCache[a.id];
+ await loadAccounts();
+ await renderPaymentPlanSummary(a.id);
+}
+function openContactUpdate(){
+ let a=getCurrent();if(!a)return alert('No account selected.');
+ document.getElementById('contactEmail').value=a.email||'';
+ document.getElementById('contactPhone1').value=a.phone1||'';
+ document.getElementById('contactPhone2').value=a.phone2||'';
+ document.getElementById('contactAddress').value=a.address||'';
+ document.getElementById('contactCity').value=a.city||'';
+ document.getElementById('contactState').value=a.state||'';
+ document.getElementById('contactZip').value=a.zip||'';
+ document.getElementById('contactModal').classList.add('open');
+}
+async function saveContactUpdate(){
+ let a=getCurrent();if(!a)return;
+ let body={email:document.getElementById('contactEmail').value.trim(),phone1:document.getElementById('contactPhone1').value.trim(),phone2:document.getElementById('contactPhone2').value.trim(),address:document.getElementById('contactAddress').value.trim(),city:document.getElementById('contactCity').value.trim(),state:document.getElementById('contactState').value.trim(),zip:document.getElementById('contactZip').value.trim(),updatedAt:new Date().toISOString()};
+ let db={};Object.entries(body).forEach(([k,v])=>{if(reverse[k])db[reverse[k]]=v});
+ let updated=(await dbFetch(`/accounts?id=eq.${a.id}`,{method:'PATCH',body:JSON.stringify(db)}))[0];
+ await insertActivity(a.id,'Contact Updated','Contact info updated');
+ let i=accounts.findIndex(x=>x.id===a.id);if(i>=0)accounts[i]=toCamel(updated);
+ closeModal('contactModal');render();
+}
+function openPayoffQuote(){
+ let a=getCurrent();if(!a)return alert('No account selected.');
+ let msg=`Payoff quote for ${nameOf(a)}\nAccount: ${acctNo(a)}\nCurrent balance: ${money(accountBalance(a))}`;
+ alert(msg);
+ insertActivity(a.id,'Payoff Quote','Viewed payoff quote for '+money(accountBalance(a))).catch(()=>{});
+}
+function openAccountDocs(){
+ let a=getCurrent();if(!a)return alert('No account selected.');
+ let raw=rawObj(a);
+ let body=document.getElementById('docsBody');
+ body.innerHTML=Object.entries(raw).filter(([k,v])=>String(v??'').trim()!=='').map(([k,v])=>`<div class="rawDumpItem"><div class="rawDumpKey">${esc(k)}</div><div class="rawDumpVal">${esc(v)}</div></div>`).join('')||'<div class="muted">No source fields saved for this account.</div>';
+ document.getElementById('docsModal').classList.add('open');
+}
+
 async function saveCurrent(){let a=getCurrent();if(!a)return;let note=document.getElementById('agentNote').value.trim();if(note){await dbFetch('/account_notes',{method:'POST',body:JSON.stringify([{account_id:a.id,note,created_by_email:currentUser.email}])});await insertActivity(a.id,'Note',note)}document.getElementById('agentNote').value='';await loadAccounts()}async function saveAndNext(){await saveCurrent();nextAccount()}function nextAccount(){let q=queue(),cur=getCurrent(),idx=q.findIndex(a=>a.id===cur?.id);if(q[idx+1])setCurrent(q[idx+1].id)}function skipAccount(){nextAccount()}function callPrimary(){let p=phones(getCurrent())[0];if(p)window.location.href='tel:'+normPhone(p)}function endCall(){document.getElementById('lastDialed').textContent='Call ended';document.getElementById('callNumber').textContent='—'}
 function val(id){return document.getElementById(id).value.trim()}function setVal(id,v){document.getElementById(id).value=v??''}function inputId(k){return{accountNumber:'accountNumberInput',status:'statusInput',ssn:'ssnInput',state:'stateInput',email:'emailInput'}[k]||k}function openModal(){document.querySelector('#modal form').reset();document.getElementById('id').value='';document.getElementById('modalTitle').textContent='Add Account';document.getElementById('modal').classList.add('open')}function closeModal(id){document.getElementById(id).classList.remove('open')}
 async function saveAccount(e){e.preventDefault();if(!currentUser.isAdmin)return alert('Admin only');let id=val('id'),acct={};FIELDS.forEach(k=>acct[k]=val(inputId(k)));acct.fullName=acct.fullName||[acct.firstName,acct.middleName,acct.lastName].filter(Boolean).join(' ');if(id)await dbFetch(`/accounts?id=eq.${id}`,{method:'PATCH',body:JSON.stringify(toRow(acct))});else await dbFetch('/accounts',{method:'POST',body:JSON.stringify([toRow(acct)])});closeModal('modal');await loadAccounts()}

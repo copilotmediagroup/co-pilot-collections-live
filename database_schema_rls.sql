@@ -283,3 +283,58 @@ alter table accounts add column if not exists phone7 text;
 alter table accounts add column if not exists phone8 text;
 alter table accounts add column if not exists phone9 text;
 alter table accounts add column if not exists phone10 text;
+
+
+-- PAYMENT PLAN QUICK ACTIONS
+create extension if not exists pgcrypto;
+
+create table if not exists payment_plans (
+  id uuid primary key default gen_random_uuid(),
+  account_id uuid references accounts(id) on delete cascade,
+  total_amount numeric default 0,
+  starting_balance numeric default 0,
+  remaining_amount numeric default 0,
+  frequency text default 'Custom',
+  status text default 'Active',
+  notes text,
+  created_by_email text,
+  created_at timestamptz default now(),
+  updated_at timestamptz default now()
+);
+
+create table if not exists payment_plan_payments (
+  id uuid primary key default gen_random_uuid(),
+  plan_id uuid references payment_plans(id) on delete cascade,
+  account_id uuid references accounts(id) on delete cascade,
+  due_date date,
+  amount_due numeric default 0,
+  amount_paid numeric default 0,
+  paid_date date,
+  status text default 'Scheduled',
+  created_by_email text,
+  created_at timestamptz default now(),
+  updated_at timestamptz default now()
+);
+
+alter table payment_plans enable row level security;
+alter table payment_plan_payments enable row level security;
+
+drop policy if exists "payment_plans_select_authenticated" on payment_plans;
+drop policy if exists "payment_plans_insert_authenticated" on payment_plans;
+drop policy if exists "payment_plans_update_authenticated" on payment_plans;
+drop policy if exists "payment_plans_delete_authenticated" on payment_plans;
+
+create policy "payment_plans_select_authenticated" on payment_plans for select to authenticated using (true);
+create policy "payment_plans_insert_authenticated" on payment_plans for insert to authenticated with check (true);
+create policy "payment_plans_update_authenticated" on payment_plans for update to authenticated using (true) with check (true);
+create policy "payment_plans_delete_authenticated" on payment_plans for delete to authenticated using (true);
+
+drop policy if exists "payment_plan_payments_select_authenticated" on payment_plan_payments;
+drop policy if exists "payment_plan_payments_insert_authenticated" on payment_plan_payments;
+drop policy if exists "payment_plan_payments_update_authenticated" on payment_plan_payments;
+drop policy if exists "payment_plan_payments_delete_authenticated" on payment_plan_payments;
+
+create policy "payment_plan_payments_select_authenticated" on payment_plan_payments for select to authenticated using (true);
+create policy "payment_plan_payments_insert_authenticated" on payment_plan_payments for insert to authenticated with check (true);
+create policy "payment_plan_payments_update_authenticated" on payment_plan_payments for update to authenticated using (true) with check (true);
+create policy "payment_plan_payments_delete_authenticated" on payment_plan_payments for delete to authenticated using (true);
