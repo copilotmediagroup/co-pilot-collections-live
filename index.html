@@ -1,0 +1,162 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Co Pilot Collections Manager</title>
+  <style>
+    *{box-sizing:border-box}body{margin:0;font-family:Arial,Helvetica,sans-serif;background:#eef2f7;color:#0f172a}
+    header{background:linear-gradient(135deg,#0f172a,#1d4ed8);color:white;padding:24px 30px;display:flex;justify-content:space-between;gap:15px;align-items:center}
+    h1{margin:0;font-size:28px}header p{margin:6px 0 0;color:#cbd5e1}.wrap{padding:24px;max-width:1350px;margin:auto}
+    button{border:0;background:#2563eb;color:white;border-radius:10px;padding:11px 14px;font-weight:700;cursor:pointer}.gray{background:#334155}.red{background:#dc2626}.green{background:#16a34a}
+    .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:18px}.card{background:white;border-radius:14px;padding:18px;box-shadow:0 4px 14px rgba(0,0,0,.07)}
+    .card span{display:block;color:#64748b;font-size:13px;margin-bottom:7px}.card strong{font-size:25px}
+    .panel{background:white;border-radius:14px;padding:18px;box-shadow:0 4px 14px rgba(0,0,0,.07);margin-bottom:18px}
+    .toolbar{display:grid;grid-template-columns:1fr 200px auto;gap:12px;align-items:center}
+    input,select,textarea{width:100%;padding:12px;border:1px solid #cbd5e1;border-radius:10px;font-size:14px}
+    table{width:100%;border-collapse:collapse;min-width:850px}th{background:#f1f5f9;text-align:left;padding:12px;border-bottom:1px solid #e2e8f0}td{padding:12px;border-bottom:1px solid #e2e8f0}tr:hover td{background:#f8fafc}.tablewrap{overflow:auto}
+    .status{display:inline-block;border-radius:999px;padding:5px 10px;font-size:12px;font-weight:800}.active{background:#dcfce7;color:#166534}.disputed{background:#fee2e2;color:#991b1b}.settled{background:#dbeafe;color:#1d4ed8}.closed{background:#e2e8f0;color:#334155}.payment-plan{background:#fef3c7;color:#92400e}
+    .modal{display:none;position:fixed;inset:0;background:rgba(15,23,42,.65);align-items:center;justify-content:center;padding:20px}.modal.open{display:flex}.modalbox{background:white;border-radius:16px;max-width:850px;width:100%;max-height:92vh;overflow:auto}
+    .modalhead{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #e2e8f0;padding:16px 20px}.modalbody{padding:20px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:13px}.full{grid-column:1/-1}label{display:block;font-size:13px;font-weight:700;color:#334155;margin-bottom:6px}
+    .actions{display:flex;gap:7px;flex-wrap:wrap}.small{padding:8px 10px;font-size:12px}.note{background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:10px;margin-top:10px}.muted{color:#64748b}
+    @media(max-width:800px){header{flex-direction:column;align-items:flex-start}.stats,.toolbar,.grid{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+<header>
+  <div><h1>Co Pilot Collections Manager</h1><p>Simple account-holder CRM. No install. No React. No tokens.</p></div>
+  <div><button onclick="openModal()">+ Add Account</button> <button class="gray" onclick="exportCSV()">Export CSV</button></div>
+</header>
+
+<div class="wrap">
+  <div class="stats">
+    <div class="card"><span>Total Accounts</span><strong id="total">0</strong></div>
+    <div class="card"><span>Total Balance</span><strong id="balance">$0.00</strong></div>
+    <div class="card"><span>Active</span><strong id="active">0</strong></div>
+    <div class="card"><span>Disputed</span><strong id="disputed">0</strong></div>
+  </div>
+
+  <div class="panel toolbar">
+    <input id="search" placeholder="Search name, account number, phone, creditor..." oninput="render()">
+    <select id="filter" onchange="render()">
+      <option value="">All statuses</option><option>Active</option><option>Disputed</option><option>Payment Plan</option><option>Settled</option><option>Closed</option>
+    </select>
+    <button class="red" onclick="clearAll()">Clear All</button>
+  </div>
+
+  <div class="panel">
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th>Account #</th><th>Name</th><th>Phone</th><th>Creditor</th><th>Balance</th><th>Status</th><th>Last Note</th><th>Actions</th></tr></thead>
+        <tbody id="rows"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<div id="modal" class="modal">
+  <div class="modalbox">
+    <div class="modalhead"><h2 id="modalTitle">Add Account</h2><button class="gray" onclick="closeModal()">Close</button></div>
+    <div class="modalbody">
+      <form onsubmit="saveAccount(event)">
+        <input type="hidden" id="id">
+        <div class="grid">
+          <div><label>Account Number</label><input id="accountNumber" required></div>
+          <div><label>Status</label><select id="status"><option>Active</option><option>Disputed</option><option>Payment Plan</option><option>Settled</option><option>Closed</option></select></div>
+          <div><label>First Name</label><input id="firstName" required></div>
+          <div><label>Last Name</label><input id="lastName" required></div>
+          <div><label>Phone</label><input id="phone"></div>
+          <div><label>Email</label><input id="email"></div>
+          <div><label>Original Creditor</label><input id="creditor"></div>
+          <div><label>Balance</label><input id="currentBalance" type="number" step="0.01"></div>
+          <div class="full"><label>Address</label><input id="address"></div>
+          <div><label>City</label><input id="city"></div>
+          <div><label>State</label><input id="state"></div>
+          <div><label>ZIP</label><input id="zip"></div>
+          <div class="full"><label>Note</label><textarea id="note" rows="3"></textarea></div>
+        </div>
+        <div style="margin-top:16px;text-align:right"><button class="green" type="submit">Save Account</button></div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+const KEY='coPilotCrmAccounts';
+const demo=[
+ {id:crypto.randomUUID(),accountNumber:'10001',firstName:'John',lastName:'Doe',phone:'555-555-5555',email:'john@example.com',creditor:'Capital One',currentBalance:1250.75,status:'Active',address:'',city:'Las Vegas',state:'NV',zip:'',notes:[{text:'Demo account created',date:new Date().toLocaleString()}],createdAt:Date.now()},
+ {id:crypto.randomUUID(),accountNumber:'10002',firstName:'Jane',lastName:'Smith',phone:'555-222-1111',email:'jane@example.com',creditor:'Synchrony Bank',currentBalance:875.50,status:'Disputed',address:'',city:'Henderson',state:'NV',zip:'',notes:[{text:'Consumer disputed account',date:new Date().toLocaleString()}],createdAt:Date.now()-1000}
+];
+
+function load(){let raw=localStorage.getItem(KEY); if(!raw){localStorage.setItem(KEY,JSON.stringify(demo)); return demo;} try{return JSON.parse(raw)}catch{return []}}
+function save(list){localStorage.setItem(KEY,JSON.stringify(list))}
+function money(n){return Number(n||0).toLocaleString('en-US',{style:'currency',currency:'USD'})}
+function esc(s){return String(s??'').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;')}
+function statusClass(s){return String(s||'').toLowerCase().replaceAll(' ','-')}
+
+function render(){
+ let q=document.getElementById('search').value.toLowerCase();
+ let f=document.getElementById('filter').value;
+ let list=load().filter(a=>{
+  let text=[a.accountNumber,a.firstName,a.lastName,a.phone,a.email,a.creditor,a.status].join(' ').toLowerCase();
+  return (!q || text.includes(q)) && (!f || a.status===f);
+ });
+ let all=load();
+ document.getElementById('total').textContent=all.length;
+ document.getElementById('balance').textContent=money(all.reduce((s,a)=>s+Number(a.currentBalance||0),0));
+ document.getElementById('active').textContent=all.filter(a=>a.status==='Active').length;
+ document.getElementById('disputed').textContent=all.filter(a=>a.status==='Disputed').length;
+ document.getElementById('rows').innerHTML=list.map(a=>{
+  let last=a.notes?.length?a.notes[a.notes.length-1].text:'';
+  return `<tr>
+   <td><b>${esc(a.accountNumber)}</b></td>
+   <td>${esc(a.firstName)} ${esc(a.lastName)}</td>
+   <td>${esc(a.phone)}</td>
+   <td>${esc(a.creditor)}</td>
+   <td><b>${money(a.currentBalance)}</b></td>
+   <td><span class="status ${statusClass(a.status)}">${esc(a.status)}</span></td>
+   <td>${esc(last).slice(0,80)}</td>
+   <td><div class="actions"><button class="small" onclick="editAccount('${a.id}')">Edit</button><button class="small gray" onclick="addNote('${a.id}')">Note</button><button class="small red" onclick="deleteAccount('${a.id}')">Delete</button></div></td>
+  </tr>`
+ }).join('') || '<tr><td colspan="8" class="muted">No accounts found.</td></tr>';
+}
+
+function openModal(){document.querySelector('form').reset();document.getElementById('id').value='';document.getElementById('modalTitle').textContent='Add Account';document.getElementById('modal').classList.add('open')}
+function closeModal(){document.getElementById('modal').classList.remove('open')}
+function val(id){return document.getElementById(id).value.trim()}
+function set(id,v){document.getElementById(id).value=v??''}
+
+function saveAccount(e){
+ e.preventDefault();
+ let list=load(), id=val('id')||crypto.randomUUID(), old=list.find(a=>a.id===id), note=val('note');
+ let acct={id,accountNumber:val('accountNumber'),firstName:val('firstName'),lastName:val('lastName'),phone:val('phone'),email:val('email'),creditor:val('creditor'),currentBalance:Number(val('currentBalance')||0),status:val('status'),address:val('address'),city:val('city'),state:val('state'),zip:val('zip'),notes:old?.notes||[],createdAt:old?.createdAt||Date.now()};
+ if(note) acct.notes.push({text:note,date:new Date().toLocaleString()});
+ let i=list.findIndex(a=>a.id===id); if(i>=0) list[i]=acct; else list.push(acct);
+ save(list); closeModal(); render();
+}
+
+function editAccount(id){
+ let a=load().find(x=>x.id===id); if(!a)return;
+ document.getElementById('modalTitle').textContent='Edit Account';
+ ['id','accountNumber','firstName','lastName','phone','email','creditor','currentBalance','status','address','city','state','zip'].forEach(k=>set(k,a[k]));
+ set('note',''); document.getElementById('modal').classList.add('open');
+}
+
+function addNote(id){
+ let text=prompt('Enter note / call result:'); if(!text)return;
+ let list=load(), a=list.find(x=>x.id===id); if(!a)return;
+ a.notes=a.notes||[]; a.notes.push({text,date:new Date().toLocaleString()}); save(list); render();
+}
+
+function deleteAccount(id){if(confirm('Delete this account?')){save(load().filter(a=>a.id!==id));render()}}
+function clearAll(){if(confirm('Clear all accounts from this browser?')){localStorage.removeItem(KEY);render()}}
+function exportCSV(){
+ let headers=['accountNumber','firstName','lastName','phone','email','creditor','currentBalance','status','address','city','state','zip'];
+ let rows=[headers.join(',')].concat(load().map(a=>headers.map(h=>`"${String(a[h]??'').replaceAll('"','""')}"`).join(',')));
+ let blob=new Blob([rows.join('\n')],{type:'text/csv'}), url=URL.createObjectURL(blob), a=document.createElement('a');
+ a.href=url; a.download='co-pilot-accounts.csv'; a.click(); URL.revokeObjectURL(url);
+}
+render();
+</script>
+</body>
+</html>
