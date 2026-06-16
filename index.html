@@ -205,6 +205,28 @@ header.topbar{height:66px;background:linear-gradient(90deg,#05225f,#07379a,#0b45
 @media(max-width:1450px){.planMetrics{grid-template-columns:repeat(3,1fr)}.planScheduleMini{grid-template-columns:repeat(2,1fr)}.payGrid{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:900px){.planMetrics,.planScheduleMini,.payGrid{grid-template-columns:1fr}}
 
+
+/* DYNAMIC PAYMENT PLAN SUMMARY FIX */
+.planMetrics{grid-template-columns:repeat(6,1fr)!important}
+.planMetricValue.bigBalance{font-size:17px;color:#1d4ed8}
+.planMetaLine{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
+.planChip{border:1px solid #c7d2fe;background:#eef2ff;color:#1e40af;border-radius:999px;padding:5px 9px;font-size:11px;font-weight:900}
+.planChip.greenish{border-color:#bbf7d0;background:#dcfce7;color:#166534}
+.planChip.orangeish{border-color:#fed7aa;background:#fff7ed;color:#9a3412}
+.planScheduleMini{grid-template-columns:repeat(6,1fr)!important}
+.planMiniPay{min-height:72px}
+.planMiniPaid{font-size:10px;color:#64748b;margin-top:3px}
+.planMiniPay.nextDue{border:2px solid #2563eb;background:#eff6ff}
+.planMiniPay.overdueDue{border:2px solid #dc2626;background:#fff1f2}
+.planSummaryNote{font-size:12px;color:#475569;margin-top:10px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:9px 11px}
+.planBalanceWarn{background:#fff7ed;border:1px solid #fed7aa;color:#9a3412;border-radius:10px;padding:9px;font-size:12px;font-weight:800;margin-top:8px}
+.paymentPreviewLine{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:12px 0}
+.paymentPreviewCard{border:1px solid #e2e8f0;border-radius:12px;background:#f8fbff;padding:10px}
+.paymentPreviewLabel{font-size:10px;font-weight:900;color:#64748b;text-transform:uppercase;margin-bottom:5px}
+.paymentPreviewValue{font-size:15px;font-weight:1000;color:#0f172a}
+@media(max-width:1550px){.planMetrics{grid-template-columns:repeat(3,1fr)!important}.planScheduleMini{grid-template-columns:repeat(3,1fr)!important}.paymentPreviewLine{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:1000px){.planMetrics,.planScheduleMini,.paymentPreviewLine{grid-template-columns:1fr!important}}
+
 </style>
 </head>
 <body>
@@ -246,7 +268,7 @@ header.topbar{height:66px;background:linear-gradient(90deg,#05225f,#07379a,#0b45
 
 <div class="app">
   <header class="topbar">
-    <div class="brand"><div class="logo">b</div><div><h1>Co Pilot Collections Manager</h1><p class="sub">PAYMENT PLAN READY — compact CRM with active quick actions.</p></div></div>
+    <div class="brand"><div class="logo">b</div><div><h1>Co Pilot Collections Manager</h1><p class="sub">DYNAMIC PAYMENT PLAN FIX — balances, dates, frequency, and payment amounts update live.</p></div></div>
     <div class="headerSearch"><span class="mag">⌕</span><input id="globalSearch" placeholder="Search accounts..." oninput="document.getElementById('search').value=this.value;onQueueFilterChange()"><span class="hotkey">⌘ K</span></div>
     <div class="topActions">
       <label class="fileBtn gray adminOnly hidden">⇩ Import CSV<input type="file" accept=".csv" onchange="importCSV(event)"></label>
@@ -391,15 +413,22 @@ header.topbar{height:66px;background:linear-gradient(90deg,#05225f,#07379a,#0b45
     </div>
 
     <div class="payGrid">
-      <div><label>Plan Total</label><input id="planTotal" type="number" step="0.01" min="0"></div>
-      <div><label>Payment Today</label><input id="planToday" type="number" step="0.01" min="0" value="0"></div>
-      <div><label>Start Date</label><input id="planStartDate" type="date"></div>
-      <div><label>Frequency</label><select id="planFrequency"><option>One Time</option><option>Weekly</option><option>Biweekly</option><option selected>Monthly</option><option>Custom</option></select></div>
-      <div><label># of Future Payments</label><input id="planCount" type="number" min="1" value="1"></div>
-      <div><label>Amount Each</label><input id="planEach" type="number" step="0.01" min="0"></div>
+      <div><label>Plan Total</label><input id="planTotal" type="number" step="0.01" min="0" oninput="updatePlanRemainingPreview()"></div>
+      <div><label>Payment Today</label><input id="planToday" type="number" step="0.01" min="0" value="0" oninput="updatePlanRemainingPreview()"></div>
+      <div><label>Start Date</label><input id="planStartDate" type="date" onchange="generatePlanSchedule()"></div>
+      <div><label>Frequency</label><select id="planFrequency" onchange="generatePlanSchedule()"><option>One Time</option><option>Weekly</option><option>Biweekly</option><option selected>Monthly</option><option>Custom</option></select></div>
+      <div><label># of Future Payments</label><input id="planCount" type="number" min="1" value="1" oninput="generatePlanSchedule()"></div>
+      <div><label>Amount Each</label><input id="planEach" type="number" step="0.01" min="0" oninput="generatePlanSchedule()"></div>
       <div><label>Plan Status</label><select id="planStatus"><option>Active</option><option>Completed</option><option>Broken</option><option>Cancelled</option></select></div>
       <div><label>Remaining Balance</label><input id="planRemaining" readonly></div>
       <div style="grid-column:1/-1"><label>Plan Notes</label><textarea id="planNotes" placeholder="Example: Debtor promised $100 today and $150 every month on the 15th."></textarea></div>
+    </div>
+
+    <div class="paymentPreviewLine">
+      <div class="paymentPreviewCard"><div class="paymentPreviewLabel">Current Account Balance</div><div class="paymentPreviewValue" id="previewAccountBalance">$0.00</div></div>
+      <div class="paymentPreviewCard"><div class="paymentPreviewLabel">Payment Today</div><div class="paymentPreviewValue" id="previewPaidToday">$0.00</div></div>
+      <div class="paymentPreviewCard"><div class="paymentPreviewLabel">New Balance After Today</div><div class="paymentPreviewValue" id="previewNewBalance">$0.00</div></div>
+      <div class="paymentPreviewCard"><div class="paymentPreviewLabel">Future Scheduled</div><div class="paymentPreviewValue" id="previewFutureScheduled">$0.00</div></div>
     </div>
 
     <div class="payActions">
@@ -479,7 +508,7 @@ function showLoginError(msg){let el=document.getElementById('loginError');el.tex
 async function boot(){fillConnection();if(!connectionIsReady()){document.getElementById('loginScreen').classList.add('open');return}if(!token()){document.getElementById('loginScreen').classList.add('open');return}try{let user=await getUser();currentUser={email:(user.email||'').toLowerCase(),isAdmin:(user.email||'').toLowerCase()===ADMIN_EMAIL};document.getElementById('loginScreen').classList.remove('open');applyRoleUI();await loadAccounts()}catch(e){showLoginError(e.message);document.getElementById('loginScreen').classList.add('open')}}
 async function getUser(){let res=await fetch(url()+'/auth/v1/user',{headers:{apikey:pubKey(),Authorization:'Bearer '+token()}});let data=await res.json().catch(()=>({}));if(!res.ok)throw new Error(data.msg||data.message||'Login expired. Log in again.');return data}
 function applyRoleUI(){document.getElementById('roleBadge').textContent=(currentUser.isAdmin?'Admin: ':'Employee: ')+currentUser.email;document.querySelectorAll('.adminOnly').forEach(el=>el.classList.toggle('hidden',!currentUser.isAdmin))}
-function toCamel(row){let o={id:row.id};Object.entries(row).forEach(([k,v])=>{o[reverse[k]||k]=v??''});return o}
+function snakeToCamel(k){return String(k).replace(/_([a-z])/g,(_,c)=>c.toUpperCase())}function toCamel(row){let o={id:row.id};Object.entries(row||{}).forEach(([k,v])=>{o[reverse[k]||snakeToCamel(k)||k]=v??''});return o}
 function toRow(a){let r={};Object.entries(map).forEach(([k,v])=>{if(a[k]!==undefined)r[v]=numKey(k)?num(a[k]):a[k]});r.full_name=r.full_name||[r.first_name,r.middle_name,r.last_name].filter(Boolean).join(' ');r.account_number=r.account_number||r.client_account_number||r.source_account_id||'';r.portfolio=r.portfolio||r.issuer_name||r.account_description||r.original_creditor||'Imported Portfolio';r.original_creditor=r.original_creditor||r.issuer_name||r.account_description||r.portfolio;r.status=r.status||'New';r.updated_at=new Date().toISOString();r.created_by_email=currentUser.email;return r}
 function numKey(k){return ['originalBalance','principal','currentBalance','lastPaymentAmount','origPrincipalBalance','origOriginalLoanAmount','origChargeOffBalance','origPrincipalLoanAmount','origInterestAmount','origReturnFee'].includes(k)}function num(v){if(v===''||v==null)return null;let n=Number(String(v).replace(/[$,]/g,''));return Number.isFinite(n)?n:null}
 async function loadAccounts(){accounts=(await dbFetch('/accounts?select=*&order=created_at.asc&limit=20000')).map(toCamel);if(!currentAccountId&&accounts[0])currentAccountId=accounts[0].id;render()}
@@ -722,25 +751,77 @@ function renderPaymentPlanLoading(){
  let el=document.getElementById('paymentPlanPanel');if(!el)return;
  el.innerHTML=`<div class="planEmpty"><div><div class="planTitle">Payment Plan</div><div class="hint">Checking payment plan...</div></div></div>`;
 }
+function planPaidAmount(plan){
+ return (plan?.payments||[]).reduce((s,p)=>s+moneyNum(p.amountPaid),0);
+}
+function planFutureAmount(plan){
+ return (plan?.payments||[]).filter(p=>!['Paid','Cancelled'].includes(p.status)).reduce((s,p)=>s+moneyNum(p.amountDue)-moneyNum(p.amountPaid),0);
+}
+function nextUnpaidPayment(payments){
+ let today=todayISO();
+ return (payments||[]).find(p=>!['Paid','Cancelled'].includes(p.status) && String(p.dueDate||'')>=today) || (payments||[]).find(p=>!['Paid','Cancelled'].includes(p.status)) || null;
+}
+function regularPaymentAmount(payments){
+ let p=(payments||[]).find(x=>!['Paid','Cancelled'].includes(x.status) && moneyNum(x.amountDue)>0) || (payments||[]).find(x=>moneyNum(x.amountDue)>0);
+ return p?moneyNum(p.amountDue):0;
+}
+function displayPayStatus(p){
+ if(p.status==='Paid')return 'Paid';
+ if(p.status==='Partial')return 'Partial';
+ if(p.status==='Cancelled')return 'Cancelled';
+ if(p.dueDate && p.dueDate<todayISO())return 'Missed';
+ return p.status||'Scheduled';
+}
 async function renderPaymentPlanSummary(accountId){
  let el=document.getElementById('paymentPlanPanel');if(!el||!accountId)return;
  renderPaymentPlanLoading();
- let plan=await loadPaymentPlanForAccount(accountId);
+ let plan=await loadPaymentPlanForAccount(accountId,true);
  if(!plan){renderPaymentPlanEmpty();return}
- let payments=plan.payments||[];
- let total=moneyNum(plan.totalAmount), remaining=moneyNum(plan.remainingAmount);
- let paid=payments.reduce((s,p)=>s+moneyNum(p.amountPaid),0);
- let next=payments.find(p=>!['Paid','Cancelled'].includes(p.status))||payments[0];
- let mini=payments.slice(0,4).map(p=>`<div class="planMiniPay"><div class="planMiniDate">${esc(p.dueDate||'—')}</div><div class="planMiniAmount">${money(p.amountDue)}</div><div class="planMiniStatus ${planStatusClass(p.status)}">${esc(p.status||'Scheduled')}</div></div>`).join('');
- el.innerHTML=`<div class="planTop"><div><div class="planTitle">Payment Plan</div><div class="hint">${esc(plan.frequency||'Custom')} plan • Next due: <b>${esc(next?.dueDate||'—')}</b></div></div><div style="display:flex;gap:8px;align-items:center"><span class="planStatus">${esc(plan.status||'Active')}</span><button class="outline" onclick="openPaymentPlan()">Manage Plan</button></div></div>
+ let payments=(plan.payments||[]).sort((a,b)=>String(a.dueDate||'').localeCompare(String(b.dueDate||'')));
+ let total=moneyNum(plan.totalAmount);
+ let paid=planPaidAmount(plan);
+ let remaining=Math.max(0, moneyNum(plan.remainingAmount || (total-paid)));
+ let next=nextUnpaidPayment(payments);
+ let freq=plan.frequency||'Custom';
+ let each=regularPaymentAmount(payments);
+ let scheduledCount=payments.filter(p=>!['Paid','Cancelled'].includes(p.status)).length;
+ let paidCount=payments.filter(p=>p.status==='Paid').length;
+ let missedCount=payments.filter(p=>displayPayStatus(p)==='Missed').length;
+ let accountBal=accountBalance(getCurrent());
+ let mini=payments.slice(0,6).map((p,i)=>{
+   let ds=displayPayStatus(p), cls=planStatusClass(ds);
+   if(next && p.id===next.id)cls+=' nextDue';
+   if(ds==='Missed')cls+=' overdueDue';
+   return `<div class="planMiniPay ${cls.includes('nextDue')?'nextDue':''} ${ds==='Missed'?'overdueDue':''}">
+     <div class="planMiniDate">${esc(p.dueDate||'No date')}</div>
+     <div class="planMiniAmount">${money(p.amountDue)}</div>
+     <div class="planMiniPaid">Paid: ${money(p.amountPaid)}</div>
+     <div class="planMiniStatus ${planStatusClass(ds)}">${esc(ds)}</div>
+   </div>`;
+ }).join('');
+ el.innerHTML=`<div class="planTop">
+   <div>
+    <div class="planTitle">Payment Plan</div>
+    <div class="hint">${esc(freq)} plan • ${scheduledCount} scheduled • ${paidCount} paid • Next due: <b>${esc(next?.dueDate||'—')}</b> for <b>${next?money(next.amountDue):'—'}</b></div>
+    <div class="planMetaLine">
+      <span class="planChip">${esc(freq)}</span>
+      <span class="planChip">Each payment: ${each?money(each):'Varies'}</span>
+      <span class="planChip greenish">Paid: ${money(paid)}</span>
+      <span class="planChip orangeish">Missed: ${missedCount}</span>
+    </div>
+   </div>
+   <div style="display:flex;gap:8px;align-items:center"><span class="planStatus">${esc(plan.status||'Active')}</span><button class="outline" onclick="openPaymentPlan()">Manage Plan</button></div>
+ </div>
  <div class="planMetrics">
   <div class="planMetric"><div class="planMetricLabel">Plan Total</div><div class="planMetricValue">${money(total)}</div></div>
+  <div class="planMetric"><div class="planMetricLabel">Payment Amount</div><div class="planMetricValue">${each?money(each):'Varies'}</div></div>
+  <div class="planMetric"><div class="planMetricLabel">Frequency</div><div class="planMetricValue">${esc(freq)}</div></div>
   <div class="planMetric"><div class="planMetricLabel">Paid</div><div class="planMetricValue">${money(paid)}</div></div>
-  <div class="planMetric"><div class="planMetricLabel">Remaining</div><div class="planMetricValue">${money(remaining)}</div></div>
-  <div class="planMetric"><div class="planMetricLabel">Account Balance</div><div class="planMetricValue">${money(accountBalance(getCurrent()))}</div></div>
-  <div class="planMetric"><div class="planMetricLabel">Payments</div><div class="planMetricValue">${payments.length}</div></div>
+  <div class="planMetric"><div class="planMetricLabel">Remaining</div><div class="planMetricValue bigBalance">${money(remaining)}</div></div>
+  <div class="planMetric"><div class="planMetricLabel">Account Balance</div><div class="planMetricValue">${money(accountBal)}</div></div>
  </div>
- <div class="planScheduleMini">${mini||'<div class="muted">No scheduled payments yet.</div>'}</div>`;
+ <div class="planScheduleMini">${mini||'<div class="muted">No scheduled payments yet.</div>'}</div>
+ <div class="planSummaryNote">Balance math: ${money(total)} plan total − ${money(paid)} paid = ${money(remaining)} remaining. Account balance should match remaining after paid payments are saved.</div>`;
 }
 async function openPaymentPlan(){
  let a=getCurrent();if(!a)return alert('No account selected.');
@@ -773,10 +854,27 @@ async function openPaymentPlan(){
  updatePlanRemainingPreview();
 }
 function updatePlanRemainingPreview(){
- let total=moneyNum(document.getElementById('planTotal').value);
- let paidToday=moneyNum(document.getElementById('planToday').value);
+ let a=getCurrent();
+ let acctBal=accountBalance(a);
+ let total=moneyNum(document.getElementById('planTotal')?.value || acctBal);
+ let paidToday=moneyNum(document.getElementById('planToday')?.value);
  let draftPaid=paymentScheduleDraft.reduce((s,p)=>s+moneyNum(p.amountPaid),0);
- document.getElementById('planRemaining').value=Math.max(0,total-paidToday-draftPaid).toFixed(2);
+ let futureScheduled=paymentScheduleDraft.reduce((s,p)=>s+moneyNum(p.amountDue),0);
+ let remaining=Math.max(0,total-paidToday-draftPaid);
+ let remainingInput=document.getElementById('planRemaining'); if(remainingInput)remainingInput.value=remaining.toFixed(2);
+ let previewAccount=document.getElementById('previewAccountBalance'); if(previewAccount)previewAccount.textContent=money(acctBal);
+ let previewToday=document.getElementById('previewPaidToday'); if(previewToday)previewToday.textContent=money(paidToday);
+ let previewNew=document.getElementById('previewNewBalance'); if(previewNew)previewNew.textContent=money(Math.max(0,total-paidToday-draftPaid));
+ let previewFuture=document.getElementById('previewFutureScheduled'); if(previewFuture)previewFuture.textContent=money(futureScheduled);
+ let warn=document.getElementById('planBalanceWarn');
+ if(!warn){
+   let grid=document.querySelector('#paymentPlanModal .paymentPreviewLine');
+   if(grid){grid.insertAdjacentHTML('afterend','<div id="planBalanceWarn" class="planBalanceWarn hidden"></div>');warn=document.getElementById('planBalanceWarn')}
+ }
+ if(warn){
+   if(total>acctBal+0.01){warn.textContent='Plan total is higher than this account balance. Lower the plan total or verify this is intentional before saving.';warn.classList.remove('hidden')}
+   else warn.classList.add('hidden');
+ }
 }
 function generatePlanSchedule(){
  let total=moneyNum(document.getElementById('planTotal').value);
@@ -788,14 +886,21 @@ function generatePlanSchedule(){
  let each=moneyNum(document.getElementById('planEach').value);
  if(!each)each=remaining/count;
  paymentScheduleDraft=[];
- for(let i=0;i<count;i++){
+ let scheduleCount=freq==='One Time'?1:count;
+ let running=0;
+ for(let i=0;i<scheduleCount;i++){
    let due=start;
    if(freq==='Weekly')due=addDaysISO(start,7*i);
    else if(freq==='Biweekly')due=addDaysISO(start,14*i);
    else if(freq==='Monthly')due=addMonthsISO(start,i);
    else if(freq==='One Time')due=start;
-   paymentScheduleDraft.push({dueDate:due,amountDue:Number(each.toFixed(2)),amountPaid:0,paidDate:'',status:'Scheduled'});
-   if(freq==='One Time')break;
+   let amt=Number(each.toFixed(2));
+   if(i===scheduleCount-1){
+     let finalAmt=Number((remaining-running).toFixed(2));
+     if(finalAmt>0)amt=finalAmt;
+   }
+   running+=amt;
+   paymentScheduleDraft.push({dueDate:due,amountDue:amt,amountPaid:0,paidDate:'',status:'Scheduled'});
  }
  renderPlanSchedule();
  updatePlanRemainingPreview();
@@ -829,8 +934,15 @@ function removePlanRow(i){paymentScheduleDraft.splice(i,1);renderPlanSchedule();
 async function savePaymentPlan(){
  let a=getCurrent();if(!a)return alert('No account selected.');
  if(!paymentScheduleDraft.length)return alert('Generate or add at least one payment date.');
+ let acctBal=accountBalance(a);
  let total=moneyNum(document.getElementById('planTotal').value);
+ if(total<=0)return alert('Plan total must be greater than zero.');
+ if(total>acctBal+0.01){
+   let ok=confirm('Plan total '+money(total)+' is higher than this account balance '+money(acctBal)+'. Continue anyway?');
+   if(!ok)return;
+ }
  let paidToday=moneyNum(document.getElementById('planToday').value);
+ if(paidToday>total)return alert('Payment today cannot be greater than the plan total.');
  let status=document.getElementById('planStatus').value||'Active';
  let frequency=document.getElementById('planFrequency').value||'Custom';
  let notes=document.getElementById('planNotes').value.trim();
@@ -839,10 +951,12 @@ async function savePaymentPlan(){
    await dbFetch(`/payment_plans?id=eq.${existing.id}`,{method:'PATCH',body:JSON.stringify({status:'Replaced',updated_at:new Date().toISOString()})}).catch(()=>{});
  }
  let paidFromSchedule=paymentScheduleDraft.reduce((s,p)=>s+moneyNum(p.amountPaid),0);
- let remaining=Math.max(0,total-paidToday-paidFromSchedule);
- let plan=(await dbFetch('/payment_plans',{method:'POST',body:JSON.stringify([{
-   account_id:a.id,total_amount:total,starting_balance:accountBalance(a),remaining_amount:remaining,frequency,status,notes,created_by_email:currentUser.email,updated_at:new Date().toISOString()
- }])}))[0];
+ let paidTotal=paidToday+paidFromSchedule;
+ let remaining=Math.max(0,total-paidTotal);
+ let planRows=await dbFetch('/payment_plans',{method:'POST',body:JSON.stringify([{
+   account_id:a.id,total_amount:total,starting_balance:acctBal,remaining_amount:remaining,frequency,status,notes,created_by_email:currentUser.email,updated_at:new Date().toISOString()
+ }])});
+ let plan=Array.isArray(planRows)?planRows[0]:planRows;
  let pid=plan.id;
  let rows=paymentScheduleDraft.map(p=>({
    plan_id:pid,account_id:a.id,due_date:p.dueDate,amount_due:moneyNum(p.amountDue),amount_paid:moneyNum(p.amountPaid),paid_date:p.paidDate||null,status:p.status||'Scheduled',created_by_email:currentUser.email,updated_at:new Date().toISOString()
@@ -853,12 +967,15 @@ async function savePaymentPlan(){
      plan_id:pid,account_id:a.id,due_date:todayISO(),amount_due:paidToday,amount_paid:paidToday,paid_date:todayISO(),status:'Paid',created_by_email:currentUser.email,updated_at:new Date().toISOString()
    }])});
  }
- await dbFetch(`/accounts?id=eq.${a.id}`,{method:'PATCH',body:JSON.stringify({current_balance:remaining,status:status==='Active'?'Promise to Pay':a.status,disposition:'Promise to Pay',updated_at:new Date().toISOString()})});
- await insertActivity(a.id,'Payment Plan','Payment plan saved: total '+money(total)+', remaining '+money(remaining));
+ let acctPatch={current_balance:remaining,status:status==='Active'?'Promise to Pay':a.status,disposition:'Promise to Pay',updated_at:new Date().toISOString()};
+ let updatedAccountRows=await dbFetch(`/accounts?id=eq.${a.id}`,{method:'PATCH',body:JSON.stringify(acctPatch)});
+ await insertActivity(a.id,'Payment Plan','Payment plan saved: total '+money(total)+', paid '+money(paidTotal)+', remaining '+money(remaining)+', frequency '+frequency);
  closeModal('paymentPlanModal');
  delete paymentPlanCache[a.id];
  await loadAccounts();
+ currentAccountId=a.id;
  await renderPaymentPlanSummary(a.id);
+ alert('Payment plan saved. Account balance updated to '+money(remaining)+'.');
 }
 function openContactUpdate(){
  let a=getCurrent();if(!a)return alert('No account selected.');
