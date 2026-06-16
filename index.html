@@ -335,7 +335,7 @@ header.topbar{height:66px;background:linear-gradient(90deg,#05225f,#07379a,#0b45
 
 <div class="app">
   <header class="topbar">
-    <div class="brand"><div class="logo">b</div><div><h1>Co Pilot Collections Manager</h1><p class="sub">LOGIN FIX + EMPLOYEE APPROVAL — admin login restored; employees require approval.</p></div></div>
+    <div class="brand"><div class="logo">b</div><div><h1>Co Pilot Collections Manager</h1><p class="sub">APPLYROLEUI LOGIN FIX — admin login restored; employee approval remains active.</p></div></div>
     <div class="headerSearch"><span class="mag">⌕</span><input id="globalSearch" placeholder="Search accounts..." oninput="document.getElementById('search').value=this.value;onQueueFilterChange()"><span class="hotkey">⌘ K</span></div>
     <div class="topActions">
       <button class="gray adminOnly hidden" onclick="openEmployeeAdminModal()">✅ Manage Employees</button>
@@ -714,7 +714,17 @@ function saveConnection(){alert('Connection setup is already handled in config.j
 function fillConnection(){showConnectionNotice()}
 async function authFetch(path,body){if(!connectionIsReady())throw new Error('System connection is not configured. Admin must update config.js with the Supabase Project URL and Publishable Key.');let res=await fetch(url()+path,{method:'POST',headers:{apikey:pubKey(),'Content-Type':'application/json'},body:JSON.stringify(body)});let data=await res.json().catch(()=>({}));if(!res.ok)throw new Error(data.msg||data.message||data.error_description||data.error||'Auth failed');return data}
 async function dbFetch(path,opt={}){if(!token())throw new Error('Not logged in.');let res=await fetch(url()+'/rest/v1'+path,{...opt,headers:{apikey:pubKey(),Authorization:'Bearer '+token(),'Content-Type':'application/json',Prefer:'return=representation',...(opt.headers||{})}});let text=await res.text();let data=null;try{data=text?JSON.parse(text):null}catch{data=text}if(!res.ok)throw new Error(data?.message||data?.hint||data||'Database failed');return data}
-async function login(){try{clearLoginError();let data=await authFetch('/auth/v1/token?grant_type=password',{email:val('loginEmail'),password:val('loginPassword')});storeSession(data);await boot()}catch(e){showLoginError(e.message)}}
+
+function applyRoleUI(){
+  const badge=document.getElementById('roleBadge');
+  if(badge) badge.textContent=(currentUser.isAdmin?'Admin: ':'Employee: ')+(currentUser.email||'');
+  document.querySelectorAll('.adminOnly').forEach(el=>el.classList.toggle('hidden',!currentUser.isAdmin));
+}
+
+async function login(){try{clearLoginError();let email=val('loginEmail').trim().toLowerCase(),password=val('loginPassword');if(!email||!password)throw new Error('Enter email and password.');let data=await authFetch('/auth/v1/token?grant_type=password',{email,password});storeSession(data);await boot()}catch(e){showLoginError(e.message||String(e))}}
+
+window.applyRoleUI = window.applyRoleUI || applyRoleUI;
+
 async function signup(){
  try{
    clearLoginError();
