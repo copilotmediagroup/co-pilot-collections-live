@@ -619,3 +619,13 @@ where lower(email)<>'afinch2678@gmail.com';
 
 create index if not exists idx_app_users_email on app_users(lower(email));
 create index if not exists idx_app_users_approval on app_users(approval_status, is_approved, is_active);
+
+
+-- ADMIN EMPLOYEE MONITOR INDEXES
+create index if not exists idx_activity_logs_created_by_email on activity_logs(lower(created_by_email));
+create index if not exists idx_activity_logs_action_type on activity_logs(action_type);
+create index if not exists idx_activity_logs_created_at on activity_logs(created_at);
+create index if not exists idx_account_notes_created_by_email on account_notes(lower(created_by_email));
+create index if not exists idx_account_notes_created_at on account_notes(created_at);
+create index if not exists idx_payment_plans_created_by_email on payment_plans(lower(created_by_email));
+create index if not exists idx_payment_plans_created_at on payment_plans(created_at);

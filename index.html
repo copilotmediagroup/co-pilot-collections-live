@@ -294,6 +294,44 @@ header.topbar{height:66px;background:linear-gradient(90deg,#05225f,#07379a,#0b45
 .employeeAdminStat{border:1px solid #e2e8f0;border-radius:999px;background:#f8fbff;padding:6px 10px;font-size:12px;font-weight:900;color:#334155}
 .assignNoManualNotice{background:#eff6ff;border:1px solid #bfdbfe;color:#1e40af;border-radius:12px;padding:10px;font-size:12px;font-weight:850;margin:8px 0}
 
+
+/* ADMIN EMPLOYEE MONITOR */
+.monitorBox{max-width:1280px}
+.monitorTop{display:flex;justify-content:space-between;gap:12px;align-items:flex-end;flex-wrap:wrap;margin-bottom:12px}
+.monitorFilters{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;align-items:end;width:100%}
+.monitorFilters label{font-size:11px;font-weight:900;color:#334155;margin-bottom:4px}
+.monitorFilters input,.monitorFilters select{height:40px;padding:8px 10px}
+.monitorStats{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin:12px 0}
+.monitorStat{border:1px solid #e2e8f0;border-radius:13px;background:#f8fbff;padding:10px}
+.monitorStatLabel{font-size:10px;text-transform:uppercase;font-weight:900;color:#64748b;letter-spacing:.03em;margin-bottom:4px}
+.monitorStatValue{font-size:18px;font-weight:1000;color:#0f172a}
+.monitorGrid{display:grid;grid-template-columns:1.1fr .9fr;gap:12px}
+.monitorTableWrap{border:1px solid #e2e8f0;border-radius:14px;overflow:auto;max-height:520px;background:#fff}
+.monitorTable{width:100%;border-collapse:collapse;font-size:12px}
+.monitorTable th{position:sticky;top:0;background:#f8fafc;text-align:left;padding:9px;border-bottom:1px solid #e2e8f0;color:#334155;font-size:10px;text-transform:uppercase;letter-spacing:.03em;z-index:1}
+.monitorTable td{padding:8px 9px;border-bottom:1px solid #edf2f8;vertical-align:middle}
+.monitorEmployee{font-weight:1000;color:#0f172a;max-width:210px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.monitorSub{font-size:11px;color:#64748b;margin-top:3px}
+.monitorBadge{display:inline-block;border-radius:999px;background:#eef2ff;color:#1e40af;padding:3px 7px;font-size:10px;font-weight:900}
+.monitorStatusBtn{border:1px solid #bfdbfe;background:#eff6ff;color:#1d4ed8;border-radius:999px;padding:4px 8px;font-size:11px;font-weight:900;cursor:pointer;display:inline-flex;margin:2px 3px 2px 0}
+.monitorStatusBtn:hover{background:#dbeafe}
+.monitorPanel{border:1px solid #e2e8f0;border-radius:14px;background:#fff;padding:12px;max-height:520px;overflow:auto}
+.monitorPanelTitle{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:10px}
+.monitorPanel h3{margin:0;font-size:16px}
+.monitorAccountCard{border:1px solid #e2e8f0;border-radius:12px;padding:10px;margin-bottom:8px;background:#f8fbff}
+.monitorAccountTop{display:flex;justify-content:space-between;gap:8px;align-items:flex-start}
+.monitorAccountName{font-weight:1000;color:#0f172a}
+.monitorAccountMeta{font-size:11px;color:#475569;margin-top:4px;line-height:1.35}
+.monitorMoney{font-weight:1000;color:#0f172a}
+.monitorClick{color:#1d4ed8;text-decoration:underline;cursor:pointer;font-weight:900}
+.monitorEmpty{background:#f8fafc;border:1px dashed #cbd5e1;border-radius:14px;padding:18px;color:#64748b;text-align:center;font-weight:800}
+.monitorBar{height:8px;background:#e2e8f0;border-radius:99px;overflow:hidden;margin-top:5px}
+.monitorBarFill{height:100%;background:#2563eb;border-radius:99px}
+.monitorActionRow{display:flex;gap:8px;flex-wrap:wrap}
+.monitorWarning{background:#fff7ed;border:1px solid #fed7aa;color:#9a3412;border-radius:12px;padding:10px;font-size:12px;font-weight:850;margin:10px 0}
+@media(max-width:1450px){.monitorStats{grid-template-columns:repeat(3,1fr)}.monitorFilters{grid-template-columns:repeat(2,1fr)}.monitorGrid{grid-template-columns:1fr}}
+@media(max-width:850px){.monitorStats,.monitorFilters{grid-template-columns:1fr}}
+
 </style>
 </head>
 <body>
@@ -335,9 +373,10 @@ header.topbar{height:66px;background:linear-gradient(90deg,#05225f,#07379a,#0b45
 
 <div class="app">
   <header class="topbar">
-    <div class="brand"><div class="logo">b</div><div><h1>Co Pilot Collections Manager</h1><p class="sub">APPLYROLEUI LOGIN FIX — admin login restored; employee approval remains active.</p></div></div>
+    <div class="brand"><div class="logo">b</div><div><h1>Co Pilot Collections Manager</h1><p class="sub">ADMIN EMPLOYEE MONITOR READY — track assigned accounts, calls, statuses, notes, and employee performance.</p></div></div>
     <div class="headerSearch"><span class="mag">⌕</span><input id="globalSearch" placeholder="Search accounts..." oninput="document.getElementById('search').value=this.value;onQueueFilterChange()"><span class="hotkey">⌘ K</span></div>
     <div class="topActions">
+      <button class="gray adminOnly hidden" onclick="openEmployeeMonitorModal()">📊 Monitor Employees</button>
       <button class="gray adminOnly hidden" onclick="openEmployeeAdminModal()">✅ Manage Employees</button>
       <button class="gray adminOnly hidden" onclick="openAssignModal()">👥 Assign Accounts</button>
       <label class="fileBtn gray adminOnly hidden">⇩ Import CSV<input type="file" accept=".csv" onchange="importCSV(event)"></label>
@@ -677,6 +716,88 @@ header.topbar{height:66px;background:linear-gradient(90deg,#05225f,#07379a,#0b45
         <thead><tr><th>Email</th><th>Role</th><th>Status</th><th>Active</th><th>Created</th><th>Last Seen</th><th>Actions</th></tr></thead>
         <tbody id="employeeAdminBody"></tbody>
       </table>
+    </div>
+  </div>
+</div></div>
+
+
+<div id="employeeMonitorModal" class="modal"><div class="modalbox monitorBox">
+  <div class="modalhead">
+    <h2>Employee Monitor Dashboard</h2>
+    <button class="gray" onclick="closeModal('employeeMonitorModal')">Close</button>
+  </div>
+  <div class="modalbody">
+    <div class="monitorWarning">
+      Admin only. Track each employee's assigned accounts, calls made, accounts statused, notes entered, payment plans, and status buckets. Click any status count to see those accounts.
+    </div>
+
+    <div class="monitorTop">
+      <div class="monitorFilters">
+        <div>
+          <label>Date Range</label>
+          <select id="monitorRange" onchange="loadEmployeeMonitor()">
+            <option value="today">Today</option>
+            <option value="7">Last 7 days</option>
+            <option value="30" selected>Last 30 days</option>
+            <option value="all">All time</option>
+          </select>
+        </div>
+        <div>
+          <label>Employee</label>
+          <select id="monitorEmployeeFilter" onchange="renderEmployeeMonitor()"><option value="">All Employees</option></select>
+        </div>
+        <div>
+          <label>Status</label>
+          <select id="monitorStatusFilter" onchange="renderEmployeeMonitor()"><option value="">All Statuses</option></select>
+        </div>
+        <div>
+          <label>Search</label>
+          <input id="monitorSearch" placeholder="employee, name, account, city..." oninput="renderEmployeeMonitor()">
+        </div>
+        <div>
+          <label>Actions</label>
+          <div class="monitorActionRow">
+            <button class="outline" onclick="loadEmployeeMonitor()">Refresh</button>
+            <button class="green" onclick="exportEmployeeMonitorCSV()">Export Report</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="monitorStats">
+      <div class="monitorStat"><div class="monitorStatLabel">Employees</div><div class="monitorStatValue" id="monEmployees">0</div></div>
+      <div class="monitorStat"><div class="monitorStatLabel">Assigned Accounts</div><div class="monitorStatValue" id="monAssigned">0</div></div>
+      <div class="monitorStat"><div class="monitorStatLabel">Calls Made</div><div class="monitorStatValue" id="monCalls">0</div></div>
+      <div class="monitorStat"><div class="monitorStatLabel">Status Updates</div><div class="monitorStatValue" id="monStatused">0</div></div>
+      <div class="monitorStat"><div class="monitorStatLabel">Notes Added</div><div class="monitorStatValue" id="monNotes">0</div></div>
+      <div class="monitorStat"><div class="monitorStatLabel">Assigned Balance</div><div class="monitorStatValue" id="monBalance">$0.00</div></div>
+    </div>
+
+    <div class="monitorGrid">
+      <div class="monitorTableWrap">
+        <table class="monitorTable">
+          <thead>
+            <tr>
+              <th>Employee</th>
+              <th>Assigned</th>
+              <th>Calls</th>
+              <th>Statused</th>
+              <th>Notes</th>
+              <th>Payment Plans</th>
+              <th>Balance</th>
+              <th>Status Buckets</th>
+            </tr>
+          </thead>
+          <tbody id="employeeMonitorBody"></tbody>
+        </table>
+      </div>
+      <div class="monitorPanel">
+        <div class="monitorPanelTitle">
+          <h3 id="monitorDetailTitle">Employee Account Detail</h3>
+          <button class="outline" onclick="clearMonitorDetail()">Clear</button>
+        </div>
+        <div id="monitorDetailBody" class="monitorEmpty">Click an employee or a status count to view the accounts here.</div>
+      </div>
     </div>
   </div>
 </div></div>
@@ -1350,6 +1471,187 @@ async function toggleEmployeeActive(email,active){
  if(email===ADMIN_EMAIL)return alert('Cannot deactivate admin.');
  await dbFetch('/app_users?email=eq.'+encodeURIComponent(email),{method:'PATCH',body:JSON.stringify({is_active:active,updated_at:new Date().toISOString()})});
  await loadEmployeeAdminList();
+}
+
+
+let monitorData={activities:[],notes:[],plans:[],rows:[],lastRows:[]};
+
+function monitorRangeStart(){
+ let r=document.getElementById('monitorRange')?.value||'30';
+ if(r==='all')return '';
+ let d=new Date();
+ if(r==='today'){d.setHours(0,0,0,0);return d.toISOString()}
+ d.setDate(d.getDate()-Number(r||30));
+ return d.toISOString();
+}
+async function openEmployeeMonitorModal(){
+ if(!currentUser.isAdmin)return alert('Admin only');
+ document.getElementById('employeeMonitorModal').classList.add('open');
+ await loadEmployeeMonitor();
+}
+async function loadEmployeeMonitor(){
+ if(!currentUser.isAdmin)return;
+ await loadAppUsers().catch(()=>{});
+ if(!accounts.length)await loadAccounts();
+ let start=monitorRangeStart();
+ let suffix=start?'&created_at=gte.'+encodeURIComponent(start):'';
+ let acts=[],notes=[],plans=[];
+ try{acts=await dbFetch('/activity_logs?select=*&order=created_at.desc&limit=50000'+suffix)}catch(e){console.warn('monitor activity load failed',e)}
+ try{notes=await dbFetch('/account_notes?select=*&order=created_at.desc&limit=50000'+suffix)}catch(e){console.warn('monitor notes load failed',e)}
+ try{plans=await dbFetch('/payment_plans?select=*&order=created_at.desc&limit=50000'+suffix)}catch(e){plans=[]}
+ monitorData.activities=(acts||[]).map(toCamel);
+ monitorData.notes=(notes||[]).map(toCamel);
+ monitorData.plans=(plans||[]).map(toCamel);
+ fillMonitorFilters();
+ renderEmployeeMonitor();
+}
+function monitorEmployees(){
+ let set=new Set();
+ appUsers.forEach(u=>{
+   let email=(u.email||'').toLowerCase();
+   if(email&&email!==ADMIN_EMAIL&&u.role!=='admin')set.add(email);
+ });
+ accounts.forEach(a=>{let e=(a.assignedToEmail||'').toLowerCase();if(e)set.add(e)});
+ monitorData.activities.forEach(a=>{let e=(a.createdByEmail||'').toLowerCase();if(e&&e!==ADMIN_EMAIL)set.add(e)});
+ monitorData.notes.forEach(n=>{let e=(n.createdByEmail||'').toLowerCase();if(e&&e!==ADMIN_EMAIL)set.add(e)});
+ return [...set].filter(Boolean).sort();
+}
+function fillMonitorFilters(){
+ let empSel=document.getElementById('monitorEmployeeFilter');
+ let stSel=document.getElementById('monitorStatusFilter');
+ if(empSel){
+   let keep=empSel.value;
+   let emps=monitorEmployees();
+   empSel.innerHTML='<option value="">All Employees</option>'+emps.map(e=>`<option value="${esc(e)}">${esc(e)}</option>`).join('');
+   empSel.value=emps.includes(keep)?keep:'';
+ }
+ if(stSel){
+   let keep=stSel.value;
+   let statuses=[...new Set(accounts.map(a=>a.disposition||a.status||'New').filter(Boolean))].sort();
+   stSel.innerHTML='<option value="">All Statuses</option>'+statuses.map(s=>`<option value="${esc(s)}">${esc(s)}</option>`).join('');
+   stSel.value=statuses.includes(keep)?keep:'';
+ }
+}
+function actEmail(a){return (a.createdByEmail||a.created_by_email||'').toLowerCase()}
+function noteEmail(n){return (n.createdByEmail||n.created_by_email||'').toLowerCase()}
+function planEmail(p){return (p.createdByEmail||p.created_by_email||'').toLowerCase()}
+function isCallActivity(a){return /call|dial/i.test(a.actionType||a.action_type||'') || /clicked phone|dialing/i.test(a.actionText||a.action_text||'')}
+function isStatusActivity(a){return /status|disposition/i.test(a.actionType||a.action_type||'') || /disposition set|status/i.test(a.actionText||a.action_text||'')}
+function accountStatus(a){return a.disposition||a.status||'New'}
+function monitorBuildRows(){
+ let emps=monitorEmployees();
+ let rows=emps.map(email=>{
+   let assigned=accounts.filter(a=>(a.assignedToEmail||'').toLowerCase()===email);
+   let acts=monitorData.activities.filter(a=>actEmail(a)===email);
+   let notes=monitorData.notes.filter(n=>noteEmail(n)===email);
+   let plans=monitorData.plans.filter(p=>planEmail(p)===email || assigned.some(a=>a.id===p.accountId));
+   let calls=acts.filter(isCallActivity);
+   let statusActs=acts.filter(isStatusActivity);
+   let statusCounts={};
+   assigned.forEach(a=>{let s=accountStatus(a);statusCounts[s]=(statusCounts[s]||0)+1});
+   let balance=assigned.reduce((s,a)=>s+accountBalance(a),0);
+   let touchedIds=new Set([...acts.map(a=>a.accountId),...notes.map(n=>n.accountId)].filter(Boolean));
+   return {email,assigned,assignedCount:assigned.length,acts,notes,plans,calls,statusActs,statusCounts,balance,touchedCount:touchedIds.size};
+ });
+ return rows;
+}
+function filteredMonitorRows(){
+ let rows=monitorBuildRows();
+ let emp=document.getElementById('monitorEmployeeFilter')?.value||'';
+ let st=document.getElementById('monitorStatusFilter')?.value||'';
+ let q=(document.getElementById('monitorSearch')?.value||'').toLowerCase().trim();
+ if(emp)rows=rows.filter(r=>r.email===emp);
+ if(st)rows=rows.map(r=>({...r,assigned:r.assigned.filter(a=>accountStatus(a)===st),assignedCount:r.assigned.filter(a=>accountStatus(a)===st).length})).filter(r=>r.assignedCount>0);
+ if(q)rows=rows.filter(r=>{
+   let acctText=r.assigned.map(a=>[nameOf(a),acctNo(a),a.city,a.state,a.portfolio,a.originalCreditor,accountStatus(a)].join(' ')).join(' ');
+   return (r.email+' '+acctText).toLowerCase().includes(q);
+ });
+ return rows;
+}
+function renderEmployeeMonitor(){
+ let rows=filteredMonitorRows();
+ monitorData.lastRows=rows;
+ let totalAssigned=rows.reduce((s,r)=>s+r.assignedCount,0);
+ let totalCalls=rows.reduce((s,r)=>s+r.calls.length,0);
+ let totalStatused=rows.reduce((s,r)=>s+r.statusActs.length,0);
+ let totalNotes=rows.reduce((s,r)=>s+r.notes.length,0);
+ let totalBal=rows.reduce((s,r)=>s+r.balance,0);
+ document.getElementById('monEmployees').textContent=rows.length;
+ document.getElementById('monAssigned').textContent=totalAssigned;
+ document.getElementById('monCalls').textContent=totalCalls;
+ document.getElementById('monStatused').textContent=totalStatused;
+ document.getElementById('monNotes').textContent=totalNotes;
+ document.getElementById('monBalance').textContent=money(totalBal);
+
+ let maxAssigned=Math.max(1,...rows.map(r=>r.assignedCount));
+ let body=document.getElementById('employeeMonitorBody');
+ if(!body)return;
+ body.innerHTML=rows.map(r=>{
+   let buckets=Object.entries(r.statusCounts).sort((a,b)=>b[1]-a[1]).map(([s,c])=>`<button class="monitorStatusBtn" onclick="showMonitorStatus('${esc(r.email)}','${esc(s)}')">${esc(s)}: ${c}</button>`).join('')||'<span class="muted">No assigned accounts</span>';
+   let callRate=r.assignedCount?Math.round((r.calls.length/r.assignedCount)*100):0;
+   return `<tr>
+     <td><div class="monitorEmployee monitorClick" onclick="showMonitorEmployee('${esc(r.email)}')">${esc(r.email)}</div><div class="monitorSub">${r.touchedCount} account(s) touched</div></td>
+     <td><b>${r.assignedCount}</b><div class="monitorBar"><div class="monitorBarFill" style="width:${Math.min(100,(r.assignedCount/maxAssigned)*100)}%"></div></div></td>
+     <td><b>${r.calls.length}</b><div class="monitorSub">${callRate}% call/account ratio</div></td>
+     <td><b>${r.statusActs.length}</b></td>
+     <td><b>${r.notes.length}</b></td>
+     <td><b>${r.plans.length}</b></td>
+     <td class="monitorMoney">${money(r.balance)}</td>
+     <td>${buckets}</td>
+   </tr>`;
+ }).join('')||'<tr><td colspan="8"><div class="monitorEmpty">No employee activity or assigned accounts found for this filter.</div></td></tr>';
+}
+function monitorAccountCard(a){
+ let phone=(phones(a)[0]||'').replace(/\D/g,'');
+ return `<div class="monitorAccountCard">
+   <div class="monitorAccountTop">
+     <div>
+       <div class="monitorAccountName">${esc(nameOf(a))}</div>
+       <div class="monitorAccountMeta">
+        Account: ${esc(acctNo(a))}<br>
+        State/City: ${esc(a.state||'—')} / ${esc(a.city||'—')}<br>
+        Creditor: ${esc(creditor(a)||'—')}<br>
+        Status: <span class="monitorBadge">${esc(accountStatus(a))}</span>
+       </div>
+     </div>
+     <div style="text-align:right">
+       <div class="monitorMoney">${money(accountBalance(a))}</div>
+       ${phone?`<a href="tel:${phone}" onclick="recordDial('${a.id}','${phone}')">Call ${fmtPhone(phone)}</a>`:''}
+     </div>
+   </div>
+ </div>`;
+}
+function showMonitorEmployee(email){
+ let r=monitorBuildRows().find(x=>x.email===email);
+ document.getElementById('monitorDetailTitle').textContent='All assigned accounts — '+email;
+ let body=document.getElementById('monitorDetailBody');
+ if(!r||!r.assigned.length){body.className='monitorEmpty';body.textContent='No assigned accounts for this employee.';return}
+ body.className='';
+ body.innerHTML=r.assigned.sort((a,b)=>accountBalance(b)-accountBalance(a)).map(monitorAccountCard).join('');
+}
+function showMonitorStatus(email,status){
+ let r=monitorBuildRows().find(x=>x.email===email);
+ let list=r?r.assigned.filter(a=>accountStatus(a)===status):[];
+ document.getElementById('monitorDetailTitle').textContent=status+' accounts — '+email;
+ let body=document.getElementById('monitorDetailBody');
+ if(!list.length){body.className='monitorEmpty';body.textContent='No accounts under this status.';return}
+ body.className='';
+ body.innerHTML=list.sort((a,b)=>accountBalance(b)-accountBalance(a)).map(monitorAccountCard).join('');
+}
+function clearMonitorDetail(){
+ document.getElementById('monitorDetailTitle').textContent='Employee Account Detail';
+ let body=document.getElementById('monitorDetailBody');
+ body.className='monitorEmpty';
+ body.textContent='Click an employee or a status count to view the accounts here.';
+}
+function exportEmployeeMonitorCSV(){
+ let rows=monitorData.lastRows||filteredMonitorRows();
+ let csv=['employee,assigned_accounts,calls_made,status_updates,notes_added,payment_plans,assigned_balance,status_buckets'];
+ rows.forEach(r=>{
+   let buckets=Object.entries(r.statusCounts).map(([s,c])=>`${s}:${c}`).join(' | ');
+   csv.push([r.email,r.assignedCount,r.calls.length,r.statusActs.length,r.notes.length,r.plans.length,r.balance.toFixed(2),buckets].map(v=>`"${String(v).replace(/"/g,'""')}"`).join(','));
+ });
+ download('employee_monitor_report.csv',csv.join('\n'),'text/csv');
 }
 
 let paymentPlanCache={};
