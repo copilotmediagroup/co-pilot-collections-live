@@ -29,6 +29,21 @@
     .loginBox{background:white;width:min(560px,100%);border-radius:20px;padding:24px;box-shadow:0 30px 90px rgba(0,0,0,.35)}.loginBox h2{margin:0 0 8px}.loginBox p{color:#64748b;margin-top:0}.error{background:#fef2f2;color:#991b1b;border:1px solid #fecaca;border-radius:10px;padding:10px;margin:10px 0}.notice{background:#fffbeb;color:#92400e;border:1px solid #fde68a;border-radius:10px;padding:10px;margin:10px 0;font-size:13px}
     .mappingGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.mapField{border:1px solid #e2e8f0;border-radius:12px;padding:12px;background:#f8fafc}.mapField small{display:block;color:#64748b;margin-top:4px}.mapActions{display:flex;gap:10px;flex-wrap:wrap;margin:12px 0}.mapSummary{background:#eff6ff;border:1px solid #bfdbfe;color:#1e3a8a;border-radius:12px;padding:12px;margin:12px 0;font-size:13px}.previewTable{width:100%;border-collapse:collapse;margin-top:12px;font-size:12px}.previewTable th,.previewTable td{border:1px solid #e2e8f0;padding:6px;text-align:left;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .mapModalBox{max-width:1280px}.mappingGrid{grid-template-columns:repeat(4,1fr)}@media(max-width:1100px){.mappingGrid{grid-template-columns:repeat(2,1fr)}}
+
+.mappedPanel{max-height:420px;overflow:auto}
+.mappedGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.mappedItem{border:1px solid #dbe3ef;border-radius:12px;background:#f8fafc;padding:10px;min-width:0}
+.mappedKey{font-size:12px;font-weight:900;color:#334155;margin-bottom:5px;word-break:break-word}
+.mappedVal{font-size:13px;color:#0f172a;word-break:break-word;white-space:pre-wrap}
+.mappedVal a{color:#1d4ed8;font-weight:900;text-decoration:none}
+.importProgressBox{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:99999;background:#fff;border:1px solid #dbe3ef;border-radius:18px;box-shadow:0 30px 80px rgba(15,23,42,.35);width:min(520px,92vw);padding:22px}
+.importProgressBox.hidden{display:none}
+.progressBarOuter{height:14px;background:#e2e8f0;border-radius:999px;overflow:hidden;margin:14px 0}
+.progressBarInner{height:100%;width:0%;background:#2563eb;border-radius:999px;transition:width .15s ease}
+.progressText{font-weight:900;color:#0f172a}
+.progressSub{color:#64748b;font-size:13px;margin-top:6px}
+@media(max-width:1200px){.mappedGrid{grid-template-columns:repeat(2,1fr)}}@media(max-width:850px){.mappedGrid{grid-template-columns:1fr}}
+
     @media(max-width:1200px){.main{grid-template-columns:270px 1fr}.right{display:none}.phoneGrid,.dispoGrid{grid-template-columns:repeat(2,1fr)}}@media(max-width:850px){body{overflow:auto}.app{height:auto;display:block}.main{display:block}.sidebar,.center,.right{overflow:visible;margin-bottom:14px}.accountCard{grid-template-columns:1fr}.bottom{position:sticky;bottom:0}.grid{grid-template-columns:1fr}.two,.full{grid-column:1}}
   </style>
 </head>
@@ -59,6 +74,14 @@
       New employees can sign up here. Admin approval/settings are handled separately.
     </div>
   </div>
+</div>
+
+
+<div id="importProgressBox" class="importProgressBox hidden">
+  <h2 style="margin:0 0 4px">Importing CSV</h2>
+  <div class="progressSub" id="importProgressSub">Preparing import...</div>
+  <div class="progressBarOuter"><div class="progressBarInner" id="importProgressBar"></div></div>
+  <div class="progressText" id="importProgressText">0%</div>
 </div>
 
 <div class="app">
@@ -97,6 +120,11 @@
       </section>
 
       <section class="panel phonePanel"><div class="panelTitle"><h3>Phone Numbers</h3><button class="outline" onclick="renderPhones(getCurrent())">Refresh Numbers</button></div><div class="hint">Click any number to open your default softphone/dialer using tel: links.</div><div class="phoneGrid" id="phoneGrid"></div></section>
+      <section class="panel mappedPanel">
+        <div class="panelTitle"><h3>All Mapped Account Fields</h3><span class="muted" id="mappedFieldCount">0 fields</span></div>
+        <div class="hint">Everything imported/mapped for this account appears here, including store, bank, phone status/source/note, and original uploaded row values.</div>
+        <div class="mappedGrid" id="mappedFields"></div>
+      </section>
       <section class="panel dispoPanel"><div class="panelTitle"><h3>Disposition / Status</h3><span class="muted" id="selectedDisposition">Select one</span></div><div class="dispoGrid" id="dispoGrid"></div></section>
       <section class="panel notePanel"><div class="panelTitle"><h3>Agent Notes</h3><span class="muted">Saved to database</span></div><textarea id="agentNote" placeholder="Type call notes, promise to pay details, dispute reason, callback time, wrong number info..."></textarea><div class="counter" id="noteCounter">0 / 2000</div></section>
     </main>
@@ -184,13 +212,53 @@ function toCamel(row){let o={id:row.id};Object.entries(row).forEach(([k,v])=>{o[
 function toRow(a){let r={};Object.entries(map).forEach(([k,v])=>{if(a[k]!==undefined)r[v]=numKey(k)?num(a[k]):a[k]});r.full_name=r.full_name||[r.first_name,r.middle_name,r.last_name].filter(Boolean).join(' ');r.account_number=r.account_number||r.client_account_number||r.source_account_id||'';r.portfolio=r.portfolio||r.issuer_name||r.account_description||r.original_creditor||'Imported Portfolio';r.original_creditor=r.original_creditor||r.issuer_name||r.account_description||r.portfolio;r.status=r.status||'New';r.updated_at=new Date().toISOString();r.created_by_email=currentUser.email;return r}
 function numKey(k){return ['originalBalance','principal','currentBalance','lastPaymentAmount','origPrincipalBalance','origOriginalLoanAmount','origChargeOffBalance','origPrincipalLoanAmount','origInterestAmount','origReturnFee'].includes(k)}function num(v){if(v===''||v==null)return null;let n=Number(String(v).replace(/[$,]/g,''));return Number.isFinite(n)?n:null}
 async function loadAccounts(){accounts=(await dbFetch('/accounts?select=*&order=created_at.asc&limit=20000')).map(toCamel);if(!currentAccountId&&accounts[0])currentAccountId=accounts[0].id;render()}
-function queue(){let q=document.getElementById('search')?.value.toLowerCase()||'',st=document.getElementById('statusFilter')?.value||'',pf=document.getElementById('portfolioFilter')?.value||'';return accounts.filter(a=>{let text=FIELDS.map(k=>a[k]).join(' ').toLowerCase();return(!q||text.includes(q))&&(!st||a.status===st)&&(!pf||a.portfolio===pf)})}
+function queue(){let q=document.getElementById('search')?.value.toLowerCase()||'',st=document.getElementById('statusFilter')?.value||'',pf=document.getElementById('portfolioFilter')?.value||'';return accounts.filter(a=>{let raw=rawObj(a),text=(FIELDS.map(k=>a[k]).join(' ')+' '+Object.keys(raw).join(' ')+' '+Object.values(raw).join(' ')).toLowerCase();return(!q||text.includes(q))&&(!st||a.status===st)&&(!pf||a.portfolio===pf)})}
 function onQueueFilterChange(){let q=queue();if(q[0]&&!q.some(a=>a.id===currentAccountId))currentAccountId=q[0].id;render()}function setCurrent(id){currentAccountId=id;document.getElementById('agentNote').value='';currentDisposition='';render();loadHistory(id)}function getCurrent(){return queue().find(a=>a.id===currentAccountId)||queue()[0]||accounts[0]}
 function money(n){return Number(n||0).toLocaleString('en-US',{style:'currency',currency:'USD'})}function esc(s){return String(s??'').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;')}function normPhone(p){return String(p||'').replace(/\D/g,'')}function fmtPhone(p){let d=normPhone(p);return d.length===10?'('+d.slice(0,3)+') '+d.slice(3,6)+'-'+d.slice(6):(p||'')}function acctNo(a){return a?.accountNumber||a?.clientAccountNumber||a?.accountId||''}function nameOf(a){return a?.fullName||[a?.firstName,a?.middleName,a?.lastName].filter(Boolean).join(' ')||'Unknown Account'}function initials(a){return nameOf(a).split(/\s+/).filter(Boolean).slice(0,2).map(x=>x[0]).join('').toUpperCase()||'--'}function creditor(a){return a?.originalCreditor||a?.accountDescription||a?.portfolio||'—'}function phones(a){return[a?.phone1,a?.phone2,a?.phone3,a?.phone4,a?.phone5,a?.phone6,a?.phone7,a?.phone8,a?.phone9,a?.phone10].filter(Boolean)}
+function rawObj(a){return a?.rawData||a?.raw_data||{}}
+function titleFromField(k){
+ let labels={};
+ try{(MANUAL_FIELDS||[]).forEach(([field,label])=>labels[field]=label)}catch{}
+ return labels[k]||String(k).replace(/([A-Z])/g,' $1').replace(/^./,c=>c.toUpperCase());
+}
+function displayVal(k,v,a){
+ if(v==null||v==='')return '';
+ if(typeof v==='object')return '';
+ let val=String(v);
+ let phone=normPhone(val);
+ if(phone.length>=10 && phone.length<=11 && /phone/i.test(k))return `<a href="tel:${phone}" onclick="recordDial('${a.id}','${phone}')">${fmtPhone(phone)}</a>`;
+ return esc(val);
+}
+function mappedEntries(a){
+ let skip=new Set(['id','status','disposition','lastContactNumber','rawData']);
+ let out=[];
+ FIELDS.forEach(k=>{
+   if(skip.has(k))return;
+   let v=a?.[k];
+   if(v!==undefined && v!==null && String(v).trim()!=='')out.push([titleFromField(k),k,v,'mapped']);
+ });
+ let raw=rawObj(a);
+ Object.entries(raw).forEach(([k,v])=>{
+   if(v!==undefined && v!==null && String(v).trim()!=='')out.push(['Source: '+k,k,v,'raw']);
+ });
+ return out;
+}
+function renderMappedFields(a){
+ let grid=document.getElementById('mappedFields'),count=document.getElementById('mappedFieldCount');
+ if(!grid)return;
+ if(!a){grid.innerHTML='<div class="muted">No account selected.</div>';if(count)count.textContent='0 fields';return}
+ let entries=mappedEntries(a);
+ if(count)count.textContent=entries.length+' fields';
+ grid.innerHTML=entries.map(([label,k,v,type])=>{
+   let shown=displayVal(k,v,a);
+   if(!shown)return '';
+   return `<div class="mappedItem ${type==='raw'?'rawMapped':''}"><div class="mappedKey">${esc(label)}</div><div class="mappedVal">${shown}</div></div>`;
+ }).join('')||'<div class="muted">No mapped fields found. If you imported before this fix, run SQL, clear accounts, and re-import.</div>';
+}
 function render(){let q=queue(),cur=getCurrent();updatePortfolioFilter(accounts);renderQueue(q,cur);renderCurrent(cur,q);renderDispos(cur);if(cur)loadHistory(cur.id)}
 function updatePortfolioFilter(all){let sel=document.getElementById('portfolioFilter'),v=sel.value,names=[...new Set(all.map(a=>a.portfolio||a.accountDescription).filter(Boolean))].sort();sel.innerHTML='<option value="">All Portfolios</option>'+names.map(n=>`<option>${esc(n)}</option>`).join('');sel.value=names.includes(v)?v:''}
 function renderQueue(q,cur){let idx=q.findIndex(a=>a.id===cur?.id);if(idx<0)idx=0;let start=Math.max(0,idx-1),next=q.slice(start,start+5);document.getElementById('queueList').innerHTML=next.map((a,i)=>`<div class="qItem ${a.id===cur?.id?'active':''}" onclick="setCurrent('${a.id}')"><div class="qNum">${start+i+1}</div><div><div class="qName">${esc(nameOf(a))}</div><div class="qAcct">${esc(acctNo(a))} <span class="badge">${esc(a.disposition||a.status||'New')}</span></div></div><div class="qBal">${money(a.currentBalance||a.principal||a.originalBalance)}</div></div>`).join('')||'<div class="muted" style="padding:12px">No accounts in queue.</div>';document.getElementById('remainingText').textContent=`Showing ${next.length} of ${q.length} matching accounts`}
-function renderCurrent(a,q){if(!a)return;let idx=q.findIndex(x=>x.id===a.id)+1,total=q.length;document.getElementById('accountProgress').textContent=`Account ${idx||1} of ${total}`;document.getElementById('progressFill').style.width=total?Math.round((idx/total)*100)+'%':'0%';document.getElementById('avatar').textContent=initials(a);document.getElementById('accountName').innerHTML=esc(nameOf(a))+` <span class="badge">${esc(a.disposition||a.status||'New')}</span>`;document.getElementById('accountNumber').textContent=acctNo(a)||'—';document.getElementById('state').textContent=a.state||'—';document.getElementById('creditor').textContent=creditor(a);document.getElementById('ssn').textContent=a.ssn||'—';document.getElementById('balance').textContent=money(a.currentBalance||a.principal||a.originalBalance);document.getElementById('statusDisplay').innerHTML=`<span class="badge">${esc(a.disposition||a.status||'New')}</span>`;document.getElementById('email').textContent=a.email||'—';renderPhones(a)}
+function renderCurrent(a,q){if(!a)return;let idx=q.findIndex(x=>x.id===a.id)+1,total=q.length;document.getElementById('accountProgress').textContent=`Account ${idx||1} of ${total}`;document.getElementById('progressFill').style.width=total?Math.round((idx/total)*100)+'%':'0%';document.getElementById('avatar').textContent=initials(a);document.getElementById('accountName').innerHTML=esc(nameOf(a))+` <span class="badge">${esc(a.disposition||a.status||'New')}</span>`;document.getElementById('accountNumber').textContent=acctNo(a)||'—';document.getElementById('state').textContent=a.state||'—';document.getElementById('creditor').textContent=creditor(a);document.getElementById('ssn').textContent=a.ssn||'—';document.getElementById('balance').textContent=money(a.currentBalance||a.principal||a.originalBalance);document.getElementById('statusDisplay').innerHTML=`<span class="badge">${esc(a.disposition||a.status||'New')}</span>`;document.getElementById('email').textContent=a.email||'—';renderPhones(a);renderMappedFields(a)}
 function renderPhones(a){let ps=phones(a);document.getElementById('phoneGrid').innerHTML=ps.map((p,i)=>`<a class="phoneChip" href="tel:${normPhone(p)}" onclick="recordDial('${a.id}','${normPhone(p)}')"><div class="phoneIcon">☎</div><div><div class="phoneNum">${fmtPhone(p)}</div><div class="phoneType">${i===0?'Primary':i===1?'Mobile':'Alt'}</div></div></a>`).join('')||'<div class="muted">No phone numbers on this account.</div>'}
 function renderDispos(a){document.getElementById('selectedDisposition').textContent=currentDisposition||a?.disposition||'Select one';document.getElementById('dispoGrid').innerHTML=DISPOS.map(d=>`<button class="dispo ${d==='Disputed'?'orangeText':['Promise to Pay','Settled'].includes(d)?'greenText':['Bad Number','DNC'].includes(d)?'redText':d==='Callback'?'purpleText':''} ${(currentDisposition||a?.disposition)===d?'selected':''}" onclick="selectDisposition('${d}')">${d}</button>`).join('')}
 async function selectDisposition(d){let cur=getCurrent();if(!cur)return;currentDisposition=d;let old=cur.status,newStatus=d==='Disputed'?'Disputed':d;let updated=(await dbFetch(`/accounts?id=eq.${cur.id}`,{method:'PATCH',body:JSON.stringify({status:newStatus,disposition:d,updated_at:new Date().toISOString()})}))[0];await insertActivity(cur.id,'Status Updated','Disposition set to '+d,'',old,newStatus);let i=accounts.findIndex(a=>a.id===cur.id);if(i>=0)accounts[i]=toCamel(updated);render()}
@@ -319,21 +387,71 @@ function renderMappingPreview(){
  let acct=getMappedAccount(pendingImport.rows.find(r=>r.some(c=>String(c).trim()))||pendingImport.rows[0]);
  document.getElementById('mappingPreview').innerHTML=`<div class="mapSummary"><b>Preview first mapped row:</b> Name: ${esc(acct.fullName||'—')} | Account #: ${esc(acct.accountNumber||'—')} | SSN: ${esc(acct.ssn||'—')} | Balance: ${esc(acct.currentBalance||acct.principal||acct.originalBalance||'—')} | Phone: ${esc(acct.phone1||acct.phone2||acct.phone3||'—')}</div>`;
 }
+const CORE_ACCOUNT_COLUMNS=['portfolio','account_description','client_account_number','source_account_id','account_number','first_name','middle_name','last_name','full_name','ssn','dob','address','address2','city','state','zip','employer','email','original_creditor','type_of_debt','original_balance','principal','current_balance','open_date','date_account_opened','delinquency_date','charge_off_date','orig_last_pmt_date','last_payment_date','last_payment_amount','bank_routing_number','bank_account_number','phone1','phone2','phone3','phone4','phone5','phone6','raw_data','status','disposition','last_contact_number','created_by_email','updated_at'];
+function coreAccountRow(row){let out={};CORE_ACCOUNT_COLUMNS.forEach(k=>{if(row[k]!==undefined)out[k]=row[k]});return out}
+function setImportProgress(percent,text,sub=''){
+ let box=document.getElementById('importProgressBox'),bar=document.getElementById('importProgressBar'),t=document.getElementById('importProgressText'),s=document.getElementById('importProgressSub');
+ if(!box||!bar||!t)return;
+ box.classList.remove('hidden');
+ bar.style.width=Math.max(0,Math.min(100,percent))+'%';
+ t.textContent=Math.round(percent)+'%';
+ if(text)t.textContent=Math.round(percent)+'% — '+text;
+ if(s&&sub)s.textContent=sub;
+}
+function hideImportProgress(){let box=document.getElementById('importProgressBox');if(box)box.classList.add('hidden')}
+async function insertAccountRows(rows){
+ let mode='full';
+ let total=rows.length, done=0;
+ for(let i=0;i<rows.length;i+=250){
+   let chunk=rows.slice(i,i+250);
+   setImportProgress(Math.max(1,Math.round((done/Math.max(total,1))*100)),'Saving batch '+(Math.floor(i/250)+1),'Saving '+Math.min(i+chunk.length,total)+' of '+total+' rows to database...');
+   try{
+     await dbFetch('/accounts',{method:'POST',body:JSON.stringify(mode==='core'?chunk.map(coreAccountRow):chunk)});
+   }catch(err){
+     let msg=String(err.message||err);
+     if(mode==='full' && (msg.toLowerCase().includes('schema cache') || msg.toLowerCase().includes('column') || msg.toLowerCase().includes('could not find'))){
+       mode='core';
+       await dbFetch('/accounts',{method:'POST',body:JSON.stringify(chunk.map(coreAccountRow))});
+     }else{
+       throw err;
+     }
+   }
+   done+=chunk.length;
+   setImportProgress(Math.round((done/Math.max(total,1))*100),'Saved '+done+' / '+total,'Saving rows to database...');
+   await new Promise(r=>setTimeout(r,10));
+ }
+ return mode;
+}
 async function importMappedCSV(){
  if(!currentUser.isAdmin)return alert('Admin only');
- let mapped=[], skipped=0;
- pendingImport.rows.forEach(cells=>{
-   if(cells.every(c=>!String(c).trim()))return;
-   let acct=getMappedAccount(cells);
-   if(!acct.fullName && !acct.accountNumber && !acct.ssn && !acct.phone1){skipped++;return;}
-   mapped.push(toRow(acct));
- });
- if(!mapped.length)return alert('No rows were mapped. Choose at least name, account number, SSN, or phone.');
- let named=mapped.filter(r=>r.full_name).length, numbered=mapped.filter(r=>r.account_number).length, ssned=mapped.filter(r=>r.ssn).length, emailed=mapped.filter(r=>r.email).length, phoned=mapped.filter(r=>r.phone1||r.phone2||r.phone3||r.phone4||r.phone5||r.phone6||r.phone7||r.phone8||r.phone9||r.phone10).length;
- for(let i=0;i<mapped.length;i+=500){await dbFetch('/accounts',{method:'POST',body:JSON.stringify(mapped.slice(i,i+500))});}
- closeModal('mapModal');
- alert('Imported '+mapped.length+' accounts. Names found: '+named+'. Account numbers found: '+numbered+'. SSNs found: '+ssned+'. Emails found: '+emailed+'. Phone rows found: '+phoned+'. Skipped blank/unmapped rows: '+skipped+'.');
- await loadAccounts();
+ let btn=event?.target;
+ let oldText=btn?.textContent;
+ try{
+   if(btn){btn.disabled=true;btn.textContent='Importing...';}
+   setImportProgress(1,'Reading mapped rows','Preparing import...');
+   let mapped=[], skipped=0;
+   pendingImport.rows.forEach((cells,idx)=>{
+     if(cells.every(c=>!String(c).trim())){skipped++;return;}
+     let acct=getMappedAccount(cells);
+     if(!acct.fullName && !acct.accountNumber && !acct.ssn && !acct.phone1){skipped++;return;}
+     mapped.push(toRow(acct));
+     if(idx%500===0)setImportProgress(3,'Preparing rows','Prepared '+idx+' rows...');
+   });
+   if(!mapped.length)return alert('No rows were mapped. Choose at least name, account number, SSN, or phone.');
+   let named=mapped.filter(r=>r.full_name).length, numbered=mapped.filter(r=>r.account_number).length, ssned=mapped.filter(r=>r.ssn).length, emailed=mapped.filter(r=>r.email).length, phoned=mapped.filter(r=>r.phone1||r.phone2||r.phone3||r.phone4||r.phone5||r.phone6||r.phone7||r.phone8||r.phone9||r.phone10).length;
+   setImportProgress(5,'Starting database save','Found '+mapped.length+' rows to import...');
+   let mode=await insertAccountRows(mapped);
+   setImportProgress(100,'Import complete','Refreshing accounts...');
+   closeModal('mapModal');
+   let extra=mode==='core'?'\\n\\nImported using CORE fields + raw_data because Supabase is missing some new full-PDL columns. The account page will still display the original uploaded row if raw_data exists. To save extended fields as separate searchable DB columns too, run the updated database_schema_rls.sql in Supabase SQL Editor and re-import.':'';
+   alert('Imported '+mapped.length+' accounts. Names found: '+named+'. Account numbers found: '+numbered+'. SSNs found: '+ssned+'. Emails found: '+emailed+'. Phone rows found: '+phoned+'. Skipped blank/unmapped rows: '+skipped+'.'+extra);
+   await loadAccounts();
+ }catch(err){
+   alert('Import failed: '+(err.message||err)+'\\n\\nMost common fix: run the updated database_schema_rls.sql in Supabase SQL Editor, then reload Bolt and try again.');
+ }finally{
+   hideImportProgress();
+   if(btn){btn.disabled=false;btn.textContent=oldText||'Import Mapped CSV';}
+ }
 }
 function extractPhones(text){
  let matches=String(text||'').match(/(?:\+?1[\s.-]?)?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}/g)||[];

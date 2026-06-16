@@ -251,3 +251,8 @@ alter table accounts add column if not exists phone10_source text;
 alter table accounts add column if not exists phone10_note text;
 alter table accounts add column if not exists phone10_status text;
 alter table accounts add column if not exists raw_data jsonb;
+
+
+-- MAPPED FIELDS DISPLAY PROGRESS FIX
+-- Ensures raw_data exists so the app can display every uploaded/source row field.
+alter table accounts add column if not exists raw_data jsonb;
