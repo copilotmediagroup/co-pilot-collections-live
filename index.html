@@ -339,6 +339,38 @@ header.topbar{height:66px;background:linear-gradient(90deg,#05225f,#07379a,#0b45
 .fireWarning{background:#fee2e2;border:1px solid #fecaca;color:#991b1b;border-radius:12px;padding:10px;font-size:12px;font-weight:900;margin:10px 0}
 .fireNote{font-size:11px;color:#64748b;margin-top:4px;line-height:1.35}
 
+
+/* COLLECTIONS POWER FEATURES */
+.powerBox{max-width:1240px}
+.powerGrid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.powerGrid label{font-size:12px;font-weight:900;color:#334155;display:block;margin-bottom:5px}
+.powerGrid input,.powerGrid select,.powerGrid textarea{width:100%;border:1px solid #cbd5e1;border-radius:10px;padding:10px;font:inherit;background:#fff}
+.powerGrid textarea{min-height:92px;resize:vertical}
+.powerWide{grid-column:1/-1}.powerHalf{grid-column:span 2}
+.powerStats{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin:12px 0}
+.powerStat{border:1px solid #e2e8f0;border-radius:13px;background:#f8fbff;padding:10px}
+.powerStatLabel{font-size:10px;text-transform:uppercase;font-weight:900;color:#64748b;margin-bottom:4px}
+.powerStatValue{font-size:18px;font-weight:1000;color:#0f172a}
+.powerTableWrap{border:1px solid #e2e8f0;border-radius:14px;overflow:auto;max-height:470px;background:#fff}
+.powerTable{width:100%;border-collapse:collapse;font-size:12px}
+.powerTable th{position:sticky;top:0;background:#f8fafc;text-align:left;padding:9px;border-bottom:1px solid #e2e8f0;color:#334155;font-size:10px;text-transform:uppercase;z-index:1}
+.powerTable td{padding:8px 9px;border-bottom:1px solid #edf2f8;vertical-align:top}
+.powerCard{border:1px solid #e2e8f0;border-radius:13px;background:#fff;padding:12px;margin-bottom:10px}
+.powerCardTop{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+.powerTitle{font-weight:1000;color:#0f172a}.powerMeta{font-size:12px;color:#475569;line-height:1.4;margin-top:4px}
+.powerPill{display:inline-block;border-radius:999px;padding:4px 8px;font-size:11px;font-weight:900;background:#eef2ff;color:#1d4ed8}
+.powerPill.red{background:#fee2e2;color:#991b1b}.powerPill.green{background:#dcfce7;color:#166534}.powerPill.orange{background:#fff7ed;color:#9a3412}.powerPill.gray{background:#f1f5f9;color:#334155}
+.powerToolbar{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:center;margin:10px 0}
+.powerTabs{display:flex;gap:8px;flex-wrap:wrap}.powerTab{border:1px solid #bfdbfe;background:#eff6ff;color:#1d4ed8;border-radius:999px;padding:7px 11px;font-size:12px;font-weight:900;cursor:pointer}.powerTab.active{background:#2563eb;color:white}
+.powerList{max-height:520px;overflow:auto}.powerEmpty{border:1px dashed #cbd5e1;background:#f8fafc;color:#64748b;border-radius:14px;padding:18px;text-align:center;font-weight:800}
+.powerWarning{background:#fff7ed;border:1px solid #fed7aa;color:#9a3412;border-radius:12px;padding:10px;font-size:12px;font-weight:850;margin:10px 0}
+.priorityScore{font-size:22px;font-weight:1000;color:#1d4ed8}.priorityBar{height:8px;background:#e2e8f0;border-radius:99px;overflow:hidden;margin-top:6px}.priorityFill{height:100%;background:#2563eb;border-radius:99px}
+.docList{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}.docItem{border:1px solid #e2e8f0;background:#f8fbff;border-radius:12px;padding:10px}.docTitle{font-weight:1000;color:#0f172a}.docMeta{font-size:12px;color:#475569;margin-top:4px}
+.settlementPreview{background:#eff6ff;border:1px solid #bfdbfe;color:#1e3a8a;border-radius:12px;padding:12px;font-weight:900;margin-top:10px}
+.auditDanger{background:#fee2e2;color:#991b1b}.auditInfo{background:#eff6ff;color:#1d4ed8}.auditGood{background:#dcfce7;color:#166534}
+@media(max-width:1450px){.powerGrid,.powerStats{grid-template-columns:repeat(2,1fr)}.powerHalf{grid-column:span 1}.docList{grid-template-columns:1fr}}
+@media(max-width:850px){.powerGrid,.powerStats{grid-template-columns:1fr}.powerHalf{grid-column:1/-1}}
+
 </style>
 </head>
 <body>
@@ -380,9 +412,13 @@ header.topbar{height:66px;background:linear-gradient(90deg,#05225f,#07379a,#0b45
 
 <div class="app">
   <header class="topbar">
-    <div class="brand"><div class="logo">b</div><div><h1>Co Pilot Collections Manager</h1><p class="sub">FIRED EMPLOYEE REMOVAL READY — admin can remove employees, block access, and unassign their accounts.</p></div></div>
+    <div class="brand"><div class="logo">b</div><div><h1>Co Pilot Collections Manager</h1><p class="sub">POWER FEATURES READY — callbacks, promises, disputes, settlements, docs, audits, and daily work queue.</p></div></div>
     <div class="headerSearch"><span class="mag">⌕</span><input id="globalSearch" placeholder="Search accounts..." oninput="document.getElementById('search').value=this.value;onQueueFilterChange()"><span class="hotkey">⌘ K</span></div>
     <div class="topActions">
+      <button class="gray" onclick="openDailyWorkQueue()">📅 Work Queue</button>
+      <button class="gray" onclick="openPromiseDashboard()">💰 Promises</button>
+      <button class="gray adminOnly hidden" onclick="openAuditLog()">🛡 Audit Log</button>
+      <button class="gray adminOnly hidden" onclick="openPermissionsModal()">🔐 Permissions</button>
       <button class="gray adminOnly hidden" onclick="openEmployeeMonitorModal()">📊 Monitor Employees</button>
       <button class="gray adminOnly hidden" onclick="openEmployeeAdminModal()">✅ Manage Employees</button>
       <button class="gray adminOnly hidden" onclick="openAssignModal()">👥 Assign Accounts</button>
@@ -483,6 +519,10 @@ header.topbar{height:66px;background:linear-gradient(90deg,#05225f,#07379a,#0b45
       <section class="panel quickActions">
         <div class="panelTitle"><h3>Quick Actions</h3></div>
         <div class="qaItem" onclick="openPaymentPlan()"><span class="qaLeft"><span class="qaIcon">💳</span>Payment Promise / Plan</span><span>›</span></div>
+        <div class="qaItem" onclick="openFollowUpModal('Callback')"><span class="qaLeft"><span class="qaIcon">📅</span>Schedule Callback / Follow-Up</span><span>›</span></div>
+        <div class="qaItem" onclick="openCallResultModal()"><span class="qaLeft"><span class="qaIcon">☎</span>Log Call Result</span><span>›</span></div>
+        <div class="qaItem" onclick="openDisputeModal()"><span class="qaLeft"><span class="qaIcon">⚠</span>Dispute Tracker</span><span>›</span></div>
+        <div class="qaItem" onclick="openSettlementModal()"><span class="qaLeft"><span class="qaIcon">%</span>Settlement Offer</span><span>›</span></div>
         <div class="qaItem" onclick="openContactUpdate()"><span class="qaLeft"><span class="qaIcon">✎</span>Update Contact Info</span><span>›</span></div>
         <div class="qaItem" onclick="openPayoffQuote()"><span class="qaLeft"><span class="qaIcon">▤</span>Send Payoff Quote</span><span>›</span></div>
         <div class="qaItem" onclick="openAccountDocs()"><span class="qaLeft"><span class="qaIcon">▣</span>View Account Docs</span><span>›</span></div>
@@ -577,9 +617,23 @@ header.topbar{height:66px;background:linear-gradient(90deg,#05225f,#07379a,#0b45
   </div>
 </div></div>
 
-<div id="docsModal" class="modal"><div class="modalbox">
+
+<div id="docsModal" class="modal"><div class="modalbox powerBox">
   <div class="modalhead"><h2>Account Docs / Source Fields</h2><button class="gray" onclick="closeModal('docsModal')">Close</button></div>
-  <div class="modalbody"><div id="docsBody"></div></div>
+  <div class="modalbody">
+    <div class="powerWarning">Attach document links, settlement letters, contracts, payment agreements, dispute proof, or call recording links. Source fields from the CSV are still shown below.</div>
+    <div class="powerGrid">
+      <div><label>Document Title</label><input id="docTitle" placeholder="Payment agreement, contract, statement..."></div>
+      <div><label>Document Type</label><select id="docType"><option>Contract</option><option>Statement</option><option>Payment Agreement</option><option>Settlement Letter</option><option>Dispute Document</option><option>Call Recording</option><option>Other</option></select></div>
+      <div class="powerHalf"><label>URL / File Link</label><input id="docUrl" placeholder="https://..."></div>
+      <div class="powerWide"><label>Notes</label><textarea id="docNotes" placeholder="Describe this document..."></textarea></div>
+    </div>
+    <div style="text-align:right;margin:10px 0"><button class="green" onclick="saveAccountDoc()">Save Document Link</button></div>
+    <h3>Saved Documents</h3>
+    <div id="accountDocsList" class="docList"></div>
+    <h3 style="margin-top:18px">Source Fields</h3>
+    <div id="docsBody" class="rawDumpGrid"></div>
+  </div>
 </div></div>
 
 
@@ -808,6 +862,48 @@ header.topbar{height:66px;background:linear-gradient(90deg,#05225f,#07379a,#0b45
     </div>
   </div>
 </div></div>
+
+
+<div id="followUpModal" class="modal"><div class="modalbox">
+  <div class="modalhead"><h2>Schedule Callback / Follow-Up</h2><button class="gray" onclick="closeModal('followUpModal')">Close</button></div>
+  <div class="modalbody"><div class="powerGrid">
+    <div><label>Type</label><select id="fuType"><option>Callback</option><option>Promise Follow-Up</option><option>Dispute Follow-Up</option><option>Document Follow-Up</option><option>Manager Review</option></select></div>
+    <div><label>Due Date</label><input id="fuDate" type="date"></div>
+    <div><label>Due Time</label><input id="fuTime" type="time"></div>
+    <div><label>Status</label><select id="fuStatus"><option>Open</option><option>Completed</option><option>Missed</option><option>Cancelled</option></select></div>
+    <div class="powerHalf"><label>Assigned Employee</label><input id="fuAssigned" placeholder="employee@email.com"></div>
+    <div class="powerHalf"><label>Reason</label><input id="fuReason" placeholder="Called back after work, promise follow-up..."></div>
+    <div class="powerWide"><label>Notes</label><textarea id="fuNotes"></textarea></div>
+  </div><div style="text-align:right;margin-top:12px"><button class="green" onclick="saveFollowUp()">Save Follow-Up</button></div></div>
+</div></div>
+
+<div id="dailyWorkQueueModal" class="modal"><div class="modalbox powerBox">
+  <div class="modalhead"><h2>Daily Work Queue</h2><button class="gray" onclick="closeModal('dailyWorkQueueModal')">Close</button></div>
+  <div class="modalbody">
+    <div class="powerToolbar"><div class="powerTabs"><button class="powerTab active" id="workTabDue" onclick="renderDailyWorkQueue('due')">Due / Overdue</button><button class="powerTab" id="workTabPromises" onclick="renderDailyWorkQueue('promises')">Promises Due</button><button class="powerTab" id="workTabPriority" onclick="renderDailyWorkQueue('priority')">Priority Accounts</button></div><button class="outline" onclick="loadDailyWorkQueue()">Refresh</button></div>
+    <div class="powerStats"><div class="powerStat"><div class="powerStatLabel">Follow-ups Due</div><div class="powerStatValue" id="workFollowupsDue">0</div></div><div class="powerStat"><div class="powerStatLabel">Overdue</div><div class="powerStatValue" id="workOverdue">0</div></div><div class="powerStat"><div class="powerStatLabel">Promises Due</div><div class="powerStatValue" id="workPromisesDue">0</div></div><div class="powerStat"><div class="powerStatLabel">Promise Amount</div><div class="powerStatValue" id="workPromiseAmount">$0.00</div></div><div class="powerStat"><div class="powerStatLabel">High Priority</div><div class="powerStatValue" id="workPriorityCount">0</div></div><div class="powerStat"><div class="powerStatLabel">Untouched</div><div class="powerStatValue" id="workUntouched">0</div></div></div>
+    <div id="dailyWorkList" class="powerList"></div>
+  </div>
+</div></div>
+
+<div id="promiseDashboardModal" class="modal"><div class="modalbox powerBox">
+  <div class="modalhead"><h2>Promise-to-Pay Dashboard</h2><button class="gray" onclick="closeModal('promiseDashboardModal')">Close</button></div>
+  <div class="modalbody">
+    <div class="powerToolbar"><div class="powerTabs"><button class="powerTab active" id="promTabDue" onclick="renderPromiseDashboard('due')">Due Today</button><button class="powerTab" id="promTabOverdue" onclick="renderPromiseDashboard('overdue')">Overdue / Broken</button><button class="powerTab" id="promTabUpcoming" onclick="renderPromiseDashboard('upcoming')">Upcoming</button><button class="powerTab" id="promTabAll" onclick="renderPromiseDashboard('all')">All</button></div><button class="outline" onclick="loadPromiseDashboard()">Refresh</button></div>
+    <div class="powerStats"><div class="powerStat"><div class="powerStatLabel">Due Today</div><div class="powerStatValue" id="promiseDueToday">0</div></div><div class="powerStat"><div class="powerStatLabel">Overdue</div><div class="powerStatValue" id="promiseOverdue">0</div></div><div class="powerStat"><div class="powerStatLabel">Upcoming</div><div class="powerStatValue" id="promiseUpcoming">0</div></div><div class="powerStat"><div class="powerStatLabel">Promised Due</div><div class="powerStatValue" id="promiseDueAmount">$0.00</div></div><div class="powerStat"><div class="powerStatLabel">Paid</div><div class="powerStatValue" id="promisePaidAmount">$0.00</div></div><div class="powerStat"><div class="powerStatLabel">Broken</div><div class="powerStatValue" id="promiseBroken">0</div></div></div>
+    <div id="promiseDashboardList" class="powerList"></div>
+  </div>
+</div></div>
+
+<div id="callResultModal" class="modal"><div class="modalbox"><div class="modalhead"><h2>Log Call Result</h2><button class="gray" onclick="closeModal('callResultModal')">Close</button></div><div class="modalbody"><div class="powerGrid"><div><label>Phone Number</label><input id="callResultPhone"></div><div><label>Result</label><select id="callResultStatus"><option>No Answer</option><option>Left Voicemail</option><option>Promise to Pay</option><option>Callback</option><option>Bad Number</option><option>Wrong Number</option><option>Disputed</option><option>Settled</option><option>DNC</option></select></div><div><label>Duration Seconds</label><input id="callDuration" type="number" min="0" value="0"></div><div><label>Callback Date if Needed</label><input id="callCallbackDate" type="date"></div><div class="powerWide"><label>Call Notes</label><textarea id="callResultNotes"></textarea></div></div><div style="text-align:right;margin-top:12px"><button class="green" onclick="saveCallResult()">Save Call Result</button></div></div></div></div>
+
+<div id="disputeModal" class="modal"><div class="modalbox"><div class="modalhead"><h2>Dispute Tracker</h2><button class="gray" onclick="closeModal('disputeModal')">Close</button></div><div class="modalbody"><div class="powerGrid"><div class="powerHalf"><label>Dispute Reason</label><input id="disputeReason" placeholder="Not mine, amount wrong, fraud, paid already..."></div><div><label>Date Received</label><input id="disputeDate" type="date"></div><div><label>Status</label><select id="disputeStatus"><option>Open</option><option>Docs Needed</option><option>Under Review</option><option>Resolved</option><option>Closed</option></select></div><div><label>Proof Requested?</label><select id="proofRequested"><option>No</option><option>Yes</option></select></div><div><label>Account Frozen?</label><select id="accountFrozen"><option>Yes</option><option>No</option></select></div><div><label>Follow-Up Date</label><input id="disputeFollowUp" type="date"></div><div class="powerWide"><label>Documents Needed</label><input id="docsNeeded" placeholder="Contract, statement, payment history..."></div><div class="powerWide"><label>Notes</label><textarea id="disputeNotes"></textarea></div></div><div style="text-align:right;margin-top:12px"><button class="green" onclick="saveDispute()">Save Dispute</button></div></div></div></div>
+
+<div id="settlementModal" class="modal"><div class="modalbox"><div class="modalhead"><h2>Settlement Offer Calculator</h2><button class="gray" onclick="closeModal('settlementModal')">Close</button></div><div class="modalbody"><div class="powerGrid"><div><label>Current Balance</label><input id="settleBalance" type="number" step="0.01" readonly></div><div><label>Settlement %</label><input id="settlePercent" type="number" step="0.01" min="0" max="100" value="50" oninput="recalcSettlement('percent')"></div><div><label>Settlement Amount</label><input id="settleAmount" type="number" step="0.01" min="0" oninput="recalcSettlement('amount')"></div><div><label>Offer Expires</label><input id="settleDueDate" type="date"></div><div><label>Payment Type</label><select id="settlePaymentType"><option>Lump Sum</option><option>Payment Plan</option></select></div><div><label>Manager Approval</label><select id="settleApproval"><option>No</option><option>Yes</option></select></div><div class="powerWide"><label>Notes</label><textarea id="settleNotes"></textarea></div></div><div id="settlementPreview" class="settlementPreview"></div><div style="text-align:right;margin-top:12px"><button class="green" onclick="saveSettlement()">Save Settlement Offer</button></div></div></div></div>
+
+<div id="auditLogModal" class="modal"><div class="modalbox powerBox"><div class="modalhead"><h2>Admin Audit Log</h2><button class="gray" onclick="closeModal('auditLogModal')">Close</button></div><div class="modalbody"><div class="powerToolbar"><div class="powerWarning">Tracks sensitive admin actions like exports, clears, employee removal, assignments, settlements, disputes, and document activity.</div><button class="outline" onclick="loadAuditLog()">Refresh</button></div><div class="powerTableWrap"><table class="powerTable"><thead><tr><th>Date</th><th>User</th><th>Action</th><th>Target</th><th>Details</th></tr></thead><tbody id="auditLogBody"></tbody></table></div></div></div></div>
+
+<div id="permissionsModal" class="modal"><div class="modalbox powerBox"><div class="modalhead"><h2>Role Permissions</h2><button class="gray" onclick="closeModal('permissionsModal')">Close</button></div><div class="modalbody"><div class="powerWarning">This stores role permissions for your CRM. Current hard rules still remain: admin controls imports/exports/assignments; employees work assigned accounts.</div><div class="powerTableWrap"><table class="powerTable"><thead><tr><th>Permission</th><th>Admin</th><th>Manager</th><th>Collector</th></tr></thead><tbody id="permissionsBody"></tbody></table></div><div style="text-align:right;margin-top:12px"><button class="green" onclick="savePermissions()">Save Permissions</button></div></div></div></div>
 
 <script src="config.js"></script>
 <script>
@@ -1203,9 +1299,9 @@ function renderPhones(a){
  document.getElementById('phoneGrid').innerHTML=ps.map((p,i)=>`<a class="phoneChip" href="tel:${normPhone(p)}" onclick="recordDial('${a.id}','${normPhone(p)}')"><div class="phoneIcon">☎</div><div><div class="phoneNum">${fmtPhone(p)}</div><div class="phoneType">${i===0?'Primary':i===1?'Mobile':'Alternate'}</div></div></a>`).join('')||'<div class="muted">No phone numbers on this account.</div>'
 }
 function renderDispos(a){document.getElementById('selectedDisposition').textContent=currentDisposition||a?.disposition||'Select one';document.getElementById('dispoGrid').innerHTML=DISPOS.map(d=>`<button class="dispo ${d==='Disputed'?'orangeText':['Promise to Pay','Settled'].includes(d)?'greenText':['Bad Number','DNC'].includes(d)?'redText':d==='Callback'?'purpleText':''} ${(currentDisposition||a?.disposition)===d?'selected':''}" onclick="selectDisposition('${d}')">${d}</button>`).join('')}
-async function selectDisposition(d){let cur=getCurrent();if(!cur)return;currentDisposition=d;let old=cur.status,newStatus=d==='Disputed'?'Disputed':d;let updated=(await dbFetch(`/accounts?id=eq.${cur.id}`,{method:'PATCH',body:JSON.stringify({status:newStatus,disposition:d,updated_at:new Date().toISOString()})}))[0];await insertActivity(cur.id,'Status Updated','Disposition set to '+d,'',old,newStatus);let i=accounts.findIndex(a=>a.id===cur.id);if(i>=0)accounts[i]=toCamel(updated);render()}
+async function selectDisposition(d){let cur=getCurrent();if(!cur)return;currentDisposition=d;let old=cur.status,newStatus=d==='Disputed'?'Disputed':d;let updated=(await dbFetch(`/accounts?id=eq.${cur.id}`,{method:'PATCH',body:JSON.stringify({status:newStatus,disposition:d,updated_at:new Date().toISOString()})}))[0];await insertActivity(cur.id,'Status Updated','Disposition set to '+d,'',old,newStatus);await insertAudit('Status Updated','Disposition set to '+d,'account',cur.id);let i=accounts.findIndex(a=>a.id===cur.id);if(i>=0)accounts[i]=toCamel(updated);render();if(d==='Callback')openFollowUpModal('Callback');if(d==='Disputed')openDisputeModal();if(d==='Promise to Pay')openPaymentPlan();}
 async function insertActivity(accountId,type,text,phone='',oldStatus='',newStatus=''){await dbFetch('/activity_logs',{method:'POST',body:JSON.stringify([{account_id:accountId,action_type:type,action_text:text,phone_number:phone,old_status:oldStatus,new_status:newStatus,created_by_email:currentUser.email}])}).catch(()=>{})}
-async function recordDial(id,phone){document.getElementById('callNumber').textContent=fmtPhone(phone);document.getElementById('lastDialed').textContent='Dialing '+fmtPhone(phone);await dbFetch(`/accounts?id=eq.${id}`,{method:'PATCH',body:JSON.stringify({last_contact_number:phone,updated_at:new Date().toISOString()})}).catch(()=>{});await insertActivity(id,'Outbound Call','Clicked phone number '+fmtPhone(phone),phone)}
+async function recordDial(id,phone){document.getElementById('callNumber').textContent=fmtPhone(phone);document.getElementById('lastDialed').textContent='Dialing '+fmtPhone(phone);await dbFetch(`/accounts?id=eq.${id}`,{method:'PATCH',body:JSON.stringify({last_contact_number:phone,updated_at:new Date().toISOString()})}).catch(()=>{});await insertActivity(id,'Outbound Call','Clicked phone number '+fmtPhone(phone),phone);await insertAudit('Outbound Call','Clicked phone '+fmtPhone(phone),'account',id)}
 async function loadHistory(id){if(!id)return;try{let notes=await dbFetch(`/account_notes?account_id=eq.${id}&select=*&order=created_at.desc&limit=20`),acts=await dbFetch(`/activity_logs?account_id=eq.${id}&select=*&order=created_at.desc&limit=20`);let events=[...acts.map(x=>({date:x.created_at,type:x.action_type,text:x.action_text})),...notes.map(x=>({date:x.created_at,type:'Note',text:x.note}))].sort((a,b)=>new Date(b.date)-new Date(a.date)).slice(0,8);document.getElementById('activityList').innerHTML=events.map(e=>`<div class="event"><div class="eventTitle">${esc(e.type)}</div><div>${esc(e.text)}</div><div class="eventMeta">${new Date(e.date).toLocaleString()}</div></div>`).join('')||'<div class="muted">No activity yet.</div>'}catch{}}
 document.getElementById('agentNote').addEventListener('input',()=>{let v=document.getElementById('agentNote').value;document.getElementById('noteCounter').textContent=v.length+' / 2000'})
 
@@ -1715,377 +1811,51 @@ function exportEmployeeMonitorCSV(){
  download('employee_monitor_report.csv',csv.join('\n'),'text/csv');
 }
 
-let paymentPlanCache={};
-let paymentScheduleDraft=[];
-function todayISO(){return new Date().toISOString().slice(0,10)}
-function addDaysISO(dateStr,days){let d=new Date(dateStr+'T00:00:00');d.setDate(d.getDate()+days);return d.toISOString().slice(0,10)}
-function addMonthsISO(dateStr,months){let d=new Date(dateStr+'T00:00:00');let day=d.getDate();d.setMonth(d.getMonth()+months);if(d.getDate()<day)d.setDate(0);return d.toISOString().slice(0,10)}
-function planStatusClass(s){s=String(s||'Scheduled');return s==='Paid'?'planPaid':s==='Partial'?'planPartial':s==='Missed'?'planMissed':'planScheduled'}
-async function loadPaymentPlanForAccount(accountId,force=false){
- if(!accountId)return null;
- if(paymentPlanCache[accountId]&&!force)return paymentPlanCache[accountId];
- try{
-   let plans=await dbFetch(`/payment_plans?account_id=eq.${accountId}&select=*&order=created_at.desc&limit=1`);
-   if(!plans||!plans[0]){paymentPlanCache[accountId]=null;return null}
-   let plan=toCamel(plans[0]);
-   let pays=await dbFetch(`/payment_plan_payments?plan_id=eq.${plan.id}&select=*&order=due_date.asc`);
-   plan.payments=(pays||[]).map(toCamel);
-   paymentPlanCache[accountId]=plan;
-   return plan;
- }catch(err){
-   console.warn('Payment plan load failed',err);
-   paymentPlanCache[accountId]=null;
-   return null;
- }
-}
-function renderPaymentPlanEmpty(){
- let el=document.getElementById('paymentPlanPanel');if(!el)return;
- el.innerHTML=`<div class="planEmpty"><div><div class="planTitle">Payment Plan</div><div class="hint">No active payment plan on this account.</div></div><button class="green" onclick="openPaymentPlan()">Create Payment Plan</button></div>`;
-}
-function renderPaymentPlanLoading(){
- let el=document.getElementById('paymentPlanPanel');if(!el)return;
- el.innerHTML=`<div class="planEmpty"><div><div class="planTitle">Payment Plan</div><div class="hint">Checking payment plan...</div></div></div>`;
-}
-function planPaidAmount(plan){
- return (plan?.payments||[]).reduce((s,p)=>s+moneyNum(p.amountPaid),0);
-}
-function planFutureAmount(plan){
- return (plan?.payments||[]).filter(p=>!['Paid','Cancelled'].includes(p.status)).reduce((s,p)=>s+moneyNum(p.amountDue)-moneyNum(p.amountPaid),0);
-}
-function nextUnpaidPayment(payments){
- let today=todayISO();
- return (payments||[]).find(p=>!['Paid','Cancelled'].includes(p.status) && String(p.dueDate||'')>=today) || (payments||[]).find(p=>!['Paid','Cancelled'].includes(p.status)) || null;
-}
-function regularPaymentAmount(payments){
- let p=(payments||[]).find(x=>!['Paid','Cancelled'].includes(x.status) && moneyNum(x.amountDue)>0) || (payments||[]).find(x=>moneyNum(x.amountDue)>0);
- return p?moneyNum(p.amountDue):0;
-}
-function displayPayStatus(p){
- if(p.status==='Paid')return 'Paid';
- if(p.status==='Partial')return 'Partial';
- if(p.status==='Cancelled')return 'Cancelled';
- if(p.dueDate && p.dueDate<todayISO())return 'Missed';
- return p.status||'Scheduled';
-}
-async function renderPaymentPlanSummary(accountId){
- let el=document.getElementById('paymentPlanPanel');if(!el||!accountId)return;
- renderPaymentPlanLoading();
- let plan=await loadPaymentPlanForAccount(accountId,true);
- if(!plan){renderPaymentPlanEmpty();return}
- let payments=(plan.payments||[]).sort((a,b)=>String(a.dueDate||'').localeCompare(String(b.dueDate||'')));
- let total=moneyNum(plan.totalAmount);
- let paid=planPaidAmount(plan);
- let remaining=Math.max(0, moneyNum(plan.remainingAmount || (total-paid)));
- let next=nextUnpaidPayment(payments);
- let freq=plan.frequency||'Custom';
- let each=regularPaymentAmount(payments);
- let scheduledCount=payments.filter(p=>!['Paid','Cancelled'].includes(p.status)).length;
- let paidCount=payments.filter(p=>p.status==='Paid').length;
- let missedCount=payments.filter(p=>displayPayStatus(p)==='Missed').length;
- let accountBal=accountBalance(getCurrent());
- let mini=payments.slice(0,6).map((p,i)=>{
-   let ds=displayPayStatus(p), cls=planStatusClass(ds);
-   if(next && p.id===next.id)cls+=' nextDue';
-   if(ds==='Missed')cls+=' overdueDue';
-   return `<div class="planMiniPay ${cls.includes('nextDue')?'nextDue':''} ${ds==='Missed'?'overdueDue':''}">
-     <div class="planMiniDate">${esc(p.dueDate||'No date')}</div>
-     <div class="planMiniAmount">${money(p.amountDue)}</div>
-     <div class="planMiniPaid">Paid: ${money(p.amountPaid)}</div>
-     <div class="planMiniStatus ${planStatusClass(ds)}">${esc(ds)}</div>
-   </div>`;
- }).join('');
- el.innerHTML=`<div class="planTop">
-   <div>
-    <div class="planTitle">Payment Plan</div>
-    <div class="hint">${esc(freq)} plan • ${scheduledCount} scheduled • ${paidCount} paid • Next due: <b>${esc(next?.dueDate||'—')}</b> for <b>${next?money(next.amountDue):'—'}</b></div>
-    <div class="planMetaLine">
-      <span class="planChip">${esc(freq)}</span>
-      <span class="planChip">Each payment: ${each?money(each):'Varies'}</span>
-      <span class="planChip greenish">Paid: ${money(paid)}</span>
-      <span class="planChip orangeish">Missed: ${missedCount}</span>
-    </div>
-   </div>
-   <div style="display:flex;gap:8px;align-items:center"><span class="planStatus">${esc(plan.status||'Active')}</span><button class="outline" onclick="openPaymentPlan()">Manage Plan</button></div>
- </div>
- <div class="planMetrics">
-  <div class="planMetric"><div class="planMetricLabel">Plan Total</div><div class="planMetricValue">${money(total)}</div></div>
-  <div class="planMetric"><div class="planMetricLabel">Payment Amount</div><div class="planMetricValue">${each?money(each):'Varies'}</div></div>
-  <div class="planMetric"><div class="planMetricLabel">Frequency</div><div class="planMetricValue">${esc(freq)}</div></div>
-  <div class="planMetric"><div class="planMetricLabel">Paid</div><div class="planMetricValue">${money(paid)}</div></div>
-  <div class="planMetric"><div class="planMetricLabel">Remaining</div><div class="planMetricValue bigBalance">${money(remaining)}</div></div>
-  <div class="planMetric"><div class="planMetricLabel">Account Balance</div><div class="planMetricValue">${money(accountBal)}</div></div>
- </div>
- <div class="planScheduleMini">${mini||'<div class="muted">No scheduled payments yet.</div>'}</div>
- <div class="planSummaryNote">Balance math: ${money(total)} plan total − ${money(paid)} paid = ${money(remaining)} remaining. Account balance should match remaining after paid payments are saved.</div>`;
-}
-async function openPaymentPlan(){
- let a=getCurrent();if(!a)return alert('No account selected.');
- document.getElementById('paymentPlanModal').classList.add('open');
- let plan=await loadPaymentPlanForAccount(a.id,true);
- let bal=accountBalance(a);
- if(plan){
-   document.getElementById('planTotal').value=moneyNum(plan.totalAmount).toFixed(2);
-   document.getElementById('planToday').value='0.00';
-   document.getElementById('planStartDate').value=(plan.payments&&plan.payments[0]?.dueDate)||todayISO();
-   document.getElementById('planFrequency').value=plan.frequency||'Monthly';
-   document.getElementById('planStatus').value=plan.status||'Active';
-   document.getElementById('planNotes').value=plan.notes||'';
-   paymentScheduleDraft=(plan.payments||[]).map(p=>({id:p.id,dueDate:p.dueDate,amountDue:moneyNum(p.amountDue),amountPaid:moneyNum(p.amountPaid),paidDate:p.paidDate||'',status:p.status||'Scheduled'}));
-   document.getElementById('planCount').value=paymentScheduleDraft.length||1;
-   document.getElementById('planEach').value=paymentScheduleDraft[0]?.amountDue?.toFixed(2)||'';
- }else{
-   document.getElementById('planTotal').value=bal.toFixed(2);
-   document.getElementById('planToday').value='0.00';
-   document.getElementById('planStartDate').value=todayISO();
-   document.getElementById('planFrequency').value='Monthly';
-   document.getElementById('planStatus').value='Active';
-   document.getElementById('planNotes').value='';
-   document.getElementById('planCount').value='1';
-   document.getElementById('planEach').value=bal.toFixed(2);
-   paymentScheduleDraft=[];
-   recalcPlanFromInputs('count');
- }
- renderPlanSchedule();
- updatePlanRemainingPreview();
-}
-function planCap(){
- let bal=accountBalance(getCurrent());
- return Math.max(0, Number(bal.toFixed(2)));
-}
-function setInputNumber(id,val){
- let el=document.getElementById(id);
- if(el)el.value=Number(Math.max(0,val)).toFixed(2);
-}
-function clampPlanInputs(){
- let cap=planCap();
- let totalEl=document.getElementById('planTotal'), todayEl=document.getElementById('planToday');
- let total=moneyNum(totalEl?.value);
- if(!total || total<=0) total=cap;
- if(total>cap) total=cap;
- if(total<0) total=0;
- if(totalEl) totalEl.value=Number(total).toFixed(2);
- let today=moneyNum(todayEl?.value);
- if(today>total) today=total;
- if(today<0) today=0;
- if(todayEl) todayEl.value=Number(today).toFixed(2);
- return {cap,total,today,remaining:Number(Math.max(0,total-today).toFixed(2))};
-}
-function splitAmounts(total,count,preferredEach=0){
- total=Number(Math.max(0,total).toFixed(2));
- count=Math.max(1,parseInt(count||1,10));
- let amounts=[];
- if(total<=0)return amounts;
- let each=moneyNum(preferredEach);
- if(!each || each<=0) each=total/count;
- if(each>total) each=total;
- let running=0;
- for(let i=0;i<count;i++){
-   let left=Number((total-running).toFixed(2));
-   if(left<=0)break;
-   let amt=i===count-1?left:Math.min(Number(each.toFixed(2)),left);
-   amounts.push(Number(amt.toFixed(2)));
-   running=Number((running+amt).toFixed(2));
- }
- return amounts;
-}
-function dateForIndex(start,freq,i){
- let due=start||todayISO();
- if(freq==='Weekly')due=addDaysISO(start,7*i);
- else if(freq==='Biweekly')due=addDaysISO(start,14*i);
- else if(freq==='Monthly')due=addMonthsISO(start,i);
- else if(freq==='One Time')due=start;
- return due;
-}
-function recalcPlanFromInputs(source='count'){
- let {cap,total,today,remaining}=clampPlanInputs();
- let countEl=document.getElementById('planCount'), eachEl=document.getElementById('planEach'), freqEl=document.getElementById('planFrequency'), startEl=document.getElementById('planStartDate');
- let freq=freqEl?.value||'Monthly';
- let start=startEl?.value||todayISO();
- let count=Math.max(1,parseInt(countEl?.value||'1',10));
- let each=moneyNum(eachEl?.value);
- if(freq==='One Time')count=1;
 
- if(source==='amount'){
-   if(each<=0) each=remaining;
-   if(each>remaining) each=remaining;
-   count=remaining>0?Math.ceil(remaining/each):1;
- }else{
-   each=remaining>0?remaining/count:0;
- }
+/* COLLECTIONS POWER FEATURES */
+let workQueueData={followups:[],payments:[],plans:[],accounts:[]};
+let promiseData={payments:[],plans:[]};
 
- if(countEl)countEl.value=count;
- if(eachEl)eachEl.value=Number(each||0).toFixed(2);
+function accountById(id){return accounts.find(a=>String(a.id)===String(id))}
+function currentAssignee(a){return (a?.assignedToEmail||a?.assigned_to_email||currentUser.email||'').toLowerCase()}
+function ownsAccount(a){return currentUser.isAdmin || currentAssignee(a)===(currentUser.email||'').toLowerCase()}
+function powerDateLabel(d){if(!d)return '—';let x=new Date(String(d)+'T00:00:00');return isNaN(x)?String(d):x.toLocaleDateString()}
+function isTodayISO(d){return String(d||'')===todayISO()}
+function isPastISO(d){return String(d||'') && String(d)<todayISO()}
+function isFutureISO(d){return String(d||'') && String(d)>todayISO()}
+async function insertAudit(action,text,targetType='',targetId=''){try{await dbFetch('/audit_logs',{method:'POST',body:JSON.stringify([{action_type:action,action_text:text,target_type:targetType,target_id:String(targetId||''),created_by_email:currentUser.email}])})}catch(e){}}
+function setAccountFromModal(id,modalId=''){if(modalId)closeModal(modalId);currentAccountId=id;render()}
+function priorityScore(a){let score=0,reasons=[];let bal=accountBalance(a);if(bal>=1000){score+=30;reasons.push('High balance')}else if(bal>=500){score+=20;reasons.push('Medium balance')}else if(bal>0){score+=10;reasons.push('Positive balance')}if(phones(a).length){score+=20;reasons.push('Phone available')}if(a.email){score+=8;reasons.push('Email')}if(a.employer||a.origEmployer){score+=12;reasons.push('Employer')}if(a.bankAccountNumber||a.origBankAcctLast4Digits||a.bankRoutingNumber){score+=12;reasons.push('Bank info')}if(a.lastPaymentDate||moneyNum(a.lastPaymentAmount)>0){score+=10;reasons.push('Past payment')}if(['Promise to Pay','Callback'].includes(a.disposition||a.status)){score+=15;reasons.push(a.disposition||a.status)}return{score:Math.min(100,score),reasons}}
 
- let amounts=splitAmounts(remaining,count,each);
- paymentScheduleDraft=amounts.map((amt,i)=>({
-   dueDate:dateForIndex(start,freq,i),
-   amountDue:amt,
-   amountPaid:0,
-   paidDate:'',
-   status:'Scheduled'
- }));
- renderPlanSchedule(false);
- updatePlanRemainingPreview();
-}
-function updatePlanRemainingPreview(){
- let a=getCurrent();
- let {cap,total,today,remaining}=clampPlanInputs();
- let draftPaid=paymentScheduleDraft.reduce((s,p)=>s+moneyNum(p.amountPaid),0);
- let futureScheduled=paymentScheduleDraft.reduce((s,p)=>s+moneyNum(p.amountDue),0);
- let newBal=Number(Math.max(0,total-today-draftPaid).toFixed(2));
+function openFollowUpModal(type='Callback'){let a=getCurrent();if(!a)return alert('No account selected.');document.getElementById('fuType').value=type;document.getElementById('fuDate').value=todayISO();document.getElementById('fuTime').value='09:00';document.getElementById('fuStatus').value='Open';document.getElementById('fuAssigned').value=currentAssignee(a);document.getElementById('fuReason').value=type==='Callback'?'Consumer requested callback':'';document.getElementById('fuNotes').value='';document.getElementById('followUpModal').classList.add('open')}
+async function saveFollowUp(){let a=getCurrent();if(!a)return;let row={account_id:a.id,follow_up_type:val('fuType'),due_date:val('fuDate'),due_time:val('fuTime'),status:val('fuStatus')||'Open',assigned_to_email:val('fuAssigned').toLowerCase()||currentAssignee(a),reason:val('fuReason'),notes:val('fuNotes'),created_by_email:currentUser.email};if(!row.due_date)return alert('Choose a due date.');await dbFetch('/follow_ups',{method:'POST',body:JSON.stringify([row])});await insertActivity(a.id,'Follow-Up Scheduled',`${row.follow_up_type} scheduled for ${row.due_date} ${row.due_time||''}. ${row.reason||''}`);await insertAudit('Follow-Up Scheduled',`${row.follow_up_type} for ${nameOf(a)} on ${row.due_date}`,'account',a.id);closeModal('followUpModal');await loadHistory(a.id);alert('Follow-up saved.')}
 
- let remainingInput=document.getElementById('planRemaining'); if(remainingInput)remainingInput.value=newBal.toFixed(2);
- let previewAccount=document.getElementById('previewAccountBalance'); if(previewAccount)previewAccount.textContent=money(cap);
- let previewToday=document.getElementById('previewPaidToday'); if(previewToday)previewToday.textContent=money(today);
- let previewNew=document.getElementById('previewNewBalance'); if(previewNew){previewNew.textContent=money(newBal); previewNew.className='paymentPreviewValue '+(newBal<=cap?'good':'danger');}
- let previewFuture=document.getElementById('previewFutureScheduled'); if(previewFuture){previewFuture.textContent=money(futureScheduled); previewFuture.className='paymentPreviewValue '+(futureScheduled<=remaining+0.01?'good':'danger');}
+async function openDailyWorkQueue(){document.getElementById('dailyWorkQueueModal').classList.add('open');await loadDailyWorkQueue()}
+async function loadDailyWorkQueue(){let fus=[],pays=[],plans=[];try{fus=(await dbFetch('/follow_ups?select=*&order=due_date.asc&limit=5000')).map(toCamel)}catch(e){fus=[]}try{pays=(await dbFetch('/payment_plan_payments?select=*&order=due_date.asc&limit=5000')).map(toCamel)}catch(e){pays=[]}try{plans=(await dbFetch('/payment_plans?select=*&order=created_at.desc&limit=5000')).map(toCamel)}catch(e){plans=[]}if(!currentUser.isAdmin){fus=fus.filter(f=>(f.assignedToEmail||'').toLowerCase()===currentUser.email);let allowedIds=new Set(accounts.map(a=>String(a.id)));pays=pays.filter(p=>allowedIds.has(String(p.accountId)));plans=plans.filter(p=>allowedIds.has(String(p.accountId)))}workQueueData={followups:fus,payments:pays,plans,accounts};renderDailyWorkQueue('due')}
+function unpaidPayment(p){return !['Paid','Cancelled'].includes(p.status) && moneyNum(p.amountDue)>moneyNum(p.amountPaid)}
+function renderDailyWorkStats(){let fus=workQueueData.followups.filter(f=>!['Completed','Cancelled'].includes(f.status));let due=fus.filter(f=>String(f.dueDate)<=todayISO()).length;let overdue=fus.filter(f=>isPastISO(f.dueDate)).length;let duePays=workQueueData.payments.filter(p=>unpaidPayment(p)&&String(p.dueDate)<=todayISO());let promAmt=duePays.reduce((s,p)=>s+moneyNum(p.amountDue)-moneyNum(p.amountPaid),0);let high=accounts.filter(a=>ownsAccount(a)&&priorityScore(a).score>=60).length;document.getElementById('workFollowupsDue').textContent=due;document.getElementById('workOverdue').textContent=overdue;document.getElementById('workPromisesDue').textContent=duePays.length;document.getElementById('workPromiseAmount').textContent=money(promAmt);document.getElementById('workPriorityCount').textContent=high;document.getElementById('workUntouched').textContent=accounts.filter(a=>ownsAccount(a)&&!a.updatedAt&&!a.updated_at).length}
+function renderDailyWorkQueue(tab='due'){renderDailyWorkStats();['Due','Promises','Priority'].forEach(t=>document.getElementById('workTab'+t)?.classList.toggle('active',tab.toLowerCase()===t.toLowerCase()||(tab==='due'&&t==='Due')));let box=document.getElementById('dailyWorkList');if(tab==='promises'){let list=workQueueData.payments.filter(unpaidPayment).filter(p=>String(p.dueDate)<=todayISO()).sort((a,b)=>String(a.dueDate).localeCompare(String(b.dueDate)));box.innerHTML=list.map(p=>promiseCard(p,'dailyWorkQueueModal')).join('')||'<div class="powerEmpty">No promises due today.</div>';return}if(tab==='priority'){let list=accounts.filter(ownsAccount).map(a=>({a,...priorityScore(a)})).sort((x,y)=>y.score-x.score).slice(0,50);box.innerHTML=list.map(x=>priorityCard(x.a,x.score,x.reasons,'dailyWorkQueueModal')).join('')||'<div class="powerEmpty">No priority accounts found.</div>';return}let list=workQueueData.followups.filter(f=>!['Completed','Cancelled'].includes(f.status)&&String(f.dueDate)<=todayISO()).sort((a,b)=>String(a.dueDate).localeCompare(String(b.dueDate)));box.innerHTML=list.map(f=>followUpCard(f,'dailyWorkQueueModal')).join('')||'<div class="powerEmpty">No callbacks or follow-ups due.</div>'}
+function followUpCard(f,modalId){let a=accountById(f.accountId);let overdue=isPastISO(f.dueDate);return `<div class="powerCard"><div class="powerCardTop"><div><div class="powerTitle">${esc(f.followUpType||'Follow-Up')} — ${esc(a?nameOf(a):'Unknown Account')}</div><div class="powerMeta">Due: ${powerDateLabel(f.dueDate)} ${esc(f.dueTime||'')} • Assigned: ${esc(f.assignedToEmail||'—')}<br>Reason: ${esc(f.reason||'—')}<br>${esc(f.notes||'')}</div></div><span class="powerPill ${overdue?'red':'orange'}">${overdue?'Overdue':'Due'}</span></div><div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap"><button class="outline" onclick="setAccountFromModal('${f.accountId}','${modalId}')">Open Account</button><button class="green" onclick="completeFollowUp('${f.id}')">Mark Completed</button></div></div>`}
+async function completeFollowUp(id){await dbFetch('/follow_ups?id=eq.'+id,{method:'PATCH',body:JSON.stringify({status:'Completed',completed_at:new Date().toISOString(),updated_at:new Date().toISOString()})});await insertAudit('Follow-Up Completed','Follow-up marked completed','follow_up',id);await loadDailyWorkQueue()}
 
- let math=document.getElementById('planMathLine');
- if(math){
-   let count=paymentScheduleDraft.length||0;
-   let each=count?regularPaymentAmount({payments:paymentScheduleDraft}):0;
-   math.textContent=`Balance limit: ${money(cap)}. Payment today: ${money(today)}. Future plan amount: ${money(remaining)} ÷ ${count||1} payment(s) = ${each?money(each):money(0)} each${count>1?' with final payment adjusted if needed':''}.`;
- }
- let hard=document.getElementById('planHardLimit');
- if(hard){
-   if(total>cap+0.01 || today>total+0.01 || futureScheduled>remaining+0.01){
-     hard.textContent='Blocked: payment plan total, payment today, and scheduled payments cannot exceed the account balance.';
-     hard.classList.remove('hidden');
-   }else hard.classList.add('hidden');
- }
-}
-function generatePlanSchedule(){
- recalcPlanFromInputs('count');
-}
-function addCustomPlanRow(){
- let {remaining}=clampPlanInputs();
- let scheduled=paymentScheduleDraft.reduce((s,p)=>s+moneyNum(p.amountDue),0);
- let left=Number(Math.max(0,remaining-scheduled).toFixed(2));
- if(left<=0)return alert('No remaining balance is available for another payment date. Lower existing scheduled payments first.');
- paymentScheduleDraft.push({dueDate:todayISO(),amountDue:left,amountPaid:0,paidDate:'',status:'Scheduled'});
- renderPlanSchedule();
- updatePlanRemainingPreview();
-}
-function sanitizeDraftAmounts(){
- let {remaining}=clampPlanInputs();
- let running=0;
- paymentScheduleDraft.forEach((p,i)=>{
-   let maxLeft=Number(Math.max(0,remaining-running).toFixed(2));
-   let due=moneyNum(p.amountDue);
-   if(due>maxLeft)due=maxLeft;
-   p.amountDue=Number(due.toFixed(2));
-   let paid=moneyNum(p.amountPaid);
-   if(paid>p.amountDue)paid=p.amountDue;
-   p.amountPaid=Number(paid.toFixed(2));
-   if(p.amountPaid>=p.amountDue && p.amountDue>0)p.status='Paid';
-   else if(p.amountPaid>0)p.status='Partial';
-   else if(p.status==='Paid')p.status='Scheduled';
-   running=Number((running+p.amountDue).toFixed(2));
- });
- paymentScheduleDraft=paymentScheduleDraft.filter(p=>moneyNum(p.amountDue)>0 || moneyNum(p.amountPaid)>0);
-}
-function renderPlanSchedule(doSanitize=true){
- if(doSanitize)sanitizeDraftAmounts();
- let body=document.getElementById('planScheduleBody');if(!body)return;
- body.innerHTML=paymentScheduleDraft.map((p,i)=>`<tr>
-   <td>${i+1}</td>
-   <td><input type="date" value="${esc(p.dueDate||'')}" onchange="paymentScheduleDraft[${i}].dueDate=this.value"></td>
-   <td><input type="number" step="0.01" value="${moneyNum(p.amountDue).toFixed(2)}" onchange="paymentScheduleDraft[${i}].amountDue=moneyNum(this.value);renderPlanSchedule();updatePlanRemainingPreview()"></td>
-   <td><input type="number" step="0.01" value="${moneyNum(p.amountPaid).toFixed(2)}" onchange="paymentScheduleDraft[${i}].amountPaid=moneyNum(this.value);if(moneyNum(this.value)>0&&!paymentScheduleDraft[${i}].paidDate)paymentScheduleDraft[${i}].paidDate=todayISO();renderPlanSchedule();updatePlanRemainingPreview()"></td>
-   <td><input type="date" value="${esc(p.paidDate||'')}" onchange="paymentScheduleDraft[${i}].paidDate=this.value"></td>
-   <td><select onchange="paymentScheduleDraft[${i}].status=this.value;renderPlanSchedule()"><option ${p.status==='Scheduled'?'selected':''}>Scheduled</option><option ${p.status==='Partial'?'selected':''}>Partial</option><option ${p.status==='Paid'?'selected':''}>Paid</option><option ${p.status==='Missed'?'selected':''}>Missed</option><option ${p.status==='Cancelled'?'selected':''}>Cancelled</option></select></td>
-   <td><button class="green payButtonMini" onclick="markPlanPaymentPaid(${i})">Paid</button> <button class="red payButtonMini" onclick="removePlanRow(${i})">Remove</button></td>
- </tr>`).join('')||'<tr><td colspan="7">No payments scheduled.</td></tr>';
- updatePlanRemainingPreview();
-}
-function markPlanPaymentPaid(i){
- let p=paymentScheduleDraft[i];if(!p)return;
- p.amountPaid=moneyNum(p.amountDue);
- p.paidDate=p.paidDate||todayISO();
- p.status='Paid';
- renderPlanSchedule();
-}
-function removePlanRow(i){paymentScheduleDraft.splice(i,1);renderPlanSchedule();updatePlanRemainingPreview()}
-async function savePaymentPlan(){
- let a=getCurrent();if(!a)return alert('No account selected.');
- if(!paymentScheduleDraft.length)return alert('Generate or add at least one payment date.');
- sanitizeDraftAmounts();
- let acctBal=accountBalance(a);
- let total=moneyNum(document.getElementById('planTotal').value);
- if(total<=0)return alert('Plan total must be greater than zero.');
- if(total>acctBal+0.01)return alert('Not allowed: plan total cannot exceed the current account balance of '+money(acctBal)+'.');
- let paidToday=moneyNum(document.getElementById('planToday').value);
- if(paidToday>total+0.01)return alert('Payment today cannot be greater than the plan total.');
- let remainingAfterToday=Number(Math.max(0,total-paidToday).toFixed(2));
- let scheduledDue=paymentScheduleDraft.reduce((s,p)=>s+moneyNum(p.amountDue),0);
- if(scheduledDue>remainingAfterToday+0.01)return alert('Not allowed: scheduled future payments '+money(scheduledDue)+' exceed remaining balance after today '+money(remainingAfterToday)+'.');
- let status=document.getElementById('planStatus').value||'Active';
- let frequency=document.getElementById('planFrequency').value||'Custom';
- let notes=document.getElementById('planNotes').value.trim();
- let existing=await loadPaymentPlanForAccount(a.id,true);
- if(existing){
-   await dbFetch(`/payment_plans?id=eq.${existing.id}`,{method:'PATCH',body:JSON.stringify({status:'Replaced',updated_at:new Date().toISOString()})}).catch(()=>{});
- }
- let paidFromSchedule=paymentScheduleDraft.reduce((s,p)=>s+moneyNum(p.amountPaid),0);
- let paidTotal=paidToday+paidFromSchedule;
- let remaining=Math.max(0,total-paidTotal);
- let planRows=await dbFetch('/payment_plans',{method:'POST',body:JSON.stringify([{
-   account_id:a.id,total_amount:total,starting_balance:acctBal,remaining_amount:remaining,frequency,status,notes,created_by_email:currentUser.email,updated_at:new Date().toISOString()
- }])});
- let plan=Array.isArray(planRows)?planRows[0]:planRows;
- let pid=plan.id;
- let rows=paymentScheduleDraft.map(p=>({
-   plan_id:pid,account_id:a.id,due_date:p.dueDate,amount_due:moneyNum(p.amountDue),amount_paid:moneyNum(p.amountPaid),paid_date:p.paidDate||null,status:p.status||'Scheduled',created_by_email:currentUser.email,updated_at:new Date().toISOString()
- }));
- if(rows.length)await dbFetch('/payment_plan_payments',{method:'POST',body:JSON.stringify(rows)});
- if(paidToday>0){
-   await dbFetch('/payment_plan_payments',{method:'POST',body:JSON.stringify([{
-     plan_id:pid,account_id:a.id,due_date:todayISO(),amount_due:paidToday,amount_paid:paidToday,paid_date:todayISO(),status:'Paid',created_by_email:currentUser.email,updated_at:new Date().toISOString()
-   }])});
- }
- let acctPatch={current_balance:remaining,status:status==='Active'?'Promise to Pay':a.status,disposition:'Promise to Pay',updated_at:new Date().toISOString()};
- await dbFetch(`/accounts?id=eq.${a.id}`,{method:'PATCH',body:JSON.stringify(acctPatch)});
- await insertActivity(a.id,'Payment Plan','Payment plan saved: total '+money(total)+', payment today '+money(paidToday)+', paid total '+money(paidTotal)+', remaining '+money(remaining)+', frequency '+frequency);
- closeModal('paymentPlanModal');
- delete paymentPlanCache[a.id];
- await loadAccounts();
- currentAccountId=a.id;
- await renderPaymentPlanSummary(a.id);
- alert('Payment plan saved. Account balance updated to '+money(remaining)+'.');
-}
-function openContactUpdate(){
- let a=getCurrent();if(!a)return alert('No account selected.');
- document.getElementById('contactEmail').value=a.email||'';
- document.getElementById('contactPhone1').value=a.phone1||'';
- document.getElementById('contactPhone2').value=a.phone2||'';
- document.getElementById('contactAddress').value=a.address||'';
- document.getElementById('contactCity').value=a.city||'';
- document.getElementById('contactState').value=a.state||'';
- document.getElementById('contactZip').value=a.zip||'';
- document.getElementById('contactModal').classList.add('open');
-}
-async function saveContactUpdate(){
- let a=getCurrent();if(!a)return;
- let body={email:document.getElementById('contactEmail').value.trim(),phone1:document.getElementById('contactPhone1').value.trim(),phone2:document.getElementById('contactPhone2').value.trim(),address:document.getElementById('contactAddress').value.trim(),city:document.getElementById('contactCity').value.trim(),state:document.getElementById('contactState').value.trim(),zip:document.getElementById('contactZip').value.trim(),updatedAt:new Date().toISOString()};
- let db={};Object.entries(body).forEach(([k,v])=>{if(reverse[k])db[reverse[k]]=v});
- let updated=(await dbFetch(`/accounts?id=eq.${a.id}`,{method:'PATCH',body:JSON.stringify(db)}))[0];
- await insertActivity(a.id,'Contact Updated','Contact info updated');
- let i=accounts.findIndex(x=>x.id===a.id);if(i>=0)accounts[i]=toCamel(updated);
- closeModal('contactModal');render();
-}
-function openPayoffQuote(){
- let a=getCurrent();if(!a)return alert('No account selected.');
- let msg=`Payoff quote for ${nameOf(a)}\nAccount: ${acctNo(a)}\nCurrent balance: ${money(accountBalance(a))}`;
- alert(msg);
- insertActivity(a.id,'Payoff Quote','Viewed payoff quote for '+money(accountBalance(a))).catch(()=>{});
-}
-function openAccountDocs(){
- let a=getCurrent();if(!a)return alert('No account selected.');
- let raw=rawObj(a);
- let body=document.getElementById('docsBody');
- body.innerHTML=Object.entries(raw).filter(([k,v])=>String(v??'').trim()!=='').map(([k,v])=>`<div class="rawDumpItem"><div class="rawDumpKey">${esc(k)}</div><div class="rawDumpVal">${esc(v)}</div></div>`).join('')||'<div class="muted">No source fields saved for this account.</div>';
- document.getElementById('docsModal').classList.add('open');
-}
+async function openPromiseDashboard(){document.getElementById('promiseDashboardModal').classList.add('open');await loadPromiseDashboard()}
+async function loadPromiseDashboard(){let pays=[],plans=[];try{pays=(await dbFetch('/payment_plan_payments?select=*&order=due_date.asc&limit=10000')).map(toCamel)}catch(e){pays=[]}try{plans=(await dbFetch('/payment_plans?select=*&order=created_at.desc&limit=10000')).map(toCamel)}catch(e){plans=[]}if(!currentUser.isAdmin){let ids=new Set(accounts.map(a=>String(a.id)));pays=pays.filter(p=>ids.has(String(p.accountId)));plans=plans.filter(p=>ids.has(String(p.accountId)))}promiseData={payments:pays,plans};renderPromiseDashboard('due')}
+function promiseCard(p,modalId='promiseDashboardModal'){let plan=promiseData.plans.find(x=>String(x.id)===String(p.planId))||workQueueData.plans.find(x=>String(x.id)===String(p.planId));let a=accountById(p.accountId)||accountById(plan?.accountId);let due=String(p.dueDate||'');let status=p.status||'Scheduled';let owed=Math.max(0,moneyNum(p.amountDue)-moneyNum(p.amountPaid));let cls=status==='Paid'?'green':isPastISO(due)?'red':isTodayISO(due)?'orange':'gray';return `<div class="powerCard"><div class="powerCardTop"><div><div class="powerTitle">${esc(a?nameOf(a):'Unknown Account')} — ${money(owed)} due</div><div class="powerMeta">Due date: ${powerDateLabel(due)} • Status: ${esc(status)}<br>Account: ${esc(a?acctNo(a):'—')} • Balance: ${a?money(accountBalance(a)):'—'}<br>Assigned: ${esc(a?.assignedToEmail||'—')}</div></div><span class="powerPill ${cls}">${isPastISO(due)&&status!=='Paid'?'Broken/Overdue':esc(status)}</span></div><div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap"><button class="outline" onclick="setAccountFromModal('${a?.id||p.accountId}','${modalId}')">Open Account</button><button class="green" onclick="markPromisePaid('${p.id}')">Mark Paid</button></div></div>`}
+async function markPromisePaid(paymentId){let p=[...promiseData.payments,...workQueueData.payments].find(x=>String(x.id)===String(paymentId));if(!p)return alert('Payment not found.');await dbFetch('/payment_plan_payments?id=eq.'+paymentId,{method:'PATCH',body:JSON.stringify({amount_paid:moneyNum(p.amountDue),paid_date:todayISO(),status:'Paid',updated_at:new Date().toISOString()})});await insertActivity(p.accountId,'Payment Promise Paid','Promise payment marked paid: '+money(p.amountDue));await insertAudit('Promise Paid','Promise payment marked paid '+money(p.amountDue),'account',p.accountId);await loadPromiseDashboard();if(document.getElementById('dailyWorkQueueModal')?.classList.contains('open'))await loadDailyWorkQueue()}
+function renderPromiseDashboard(tab='due'){['Due','Overdue','Upcoming','All'].forEach(t=>document.getElementById('promTab'+t)?.classList.toggle('active',tab.toLowerCase()===t.toLowerCase()));let pays=promiseData.payments.filter(unpaidPayment);let dueToday=pays.filter(p=>isTodayISO(p.dueDate));let overdue=pays.filter(p=>isPastISO(p.dueDate));let upcoming=pays.filter(p=>isFutureISO(p.dueDate));document.getElementById('promiseDueToday').textContent=dueToday.length;document.getElementById('promiseOverdue').textContent=overdue.length;document.getElementById('promiseUpcoming').textContent=upcoming.length;document.getElementById('promiseDueAmount').textContent=money([...dueToday,...overdue].reduce((s,p)=>s+moneyNum(p.amountDue)-moneyNum(p.amountPaid),0));document.getElementById('promisePaidAmount').textContent=money(promiseData.payments.reduce((s,p)=>s+moneyNum(p.amountPaid),0));document.getElementById('promiseBroken').textContent=overdue.length;let list=tab==='due'?dueToday:tab==='overdue'?overdue:tab==='upcoming'?upcoming:promiseData.payments;document.getElementById('promiseDashboardList').innerHTML=list.map(p=>promiseCard(p)).join('')||'<div class="powerEmpty">No promises found for this view.</div>'}
+
+function openCallResultModal(){let a=getCurrent();if(!a)return alert('No account selected.');document.getElementById('callResultPhone').value=a.lastContactNumber||phones(a)[0]||'';document.getElementById('callResultStatus').value='No Answer';document.getElementById('callDuration').value='0';document.getElementById('callCallbackDate').value='';document.getElementById('callResultNotes').value='';document.getElementById('callResultModal').classList.add('open')}
+async function saveCallResult(){let a=getCurrent();if(!a)return;let result=val('callResultStatus'),phone=normPhone(val('callResultPhone')),duration=Number(val('callDuration')||0),notes=val('callResultNotes');await dbFetch('/call_results',{method:'POST',body:JSON.stringify([{account_id:a.id,phone_number:phone,call_result:result,duration_seconds:duration,notes,created_by_email:currentUser.email}])});await insertActivity(a.id,'Call Result',`${result} ${phone?fmtPhone(phone):''}. ${notes}`.trim(),phone);if(result){let updated=(await dbFetch(`/accounts?id=eq.${a.id}`,{method:'PATCH',body:JSON.stringify({status:result,disposition:result,last_contact_number:phone,updated_at:new Date().toISOString()})}))[0];let i=accounts.findIndex(x=>x.id===a.id);if(i>=0)accounts[i]=toCamel(updated)}if(result==='Callback'&&val('callCallbackDate')){await dbFetch('/follow_ups',{method:'POST',body:JSON.stringify([{account_id:a.id,follow_up_type:'Callback',due_date:val('callCallbackDate'),status:'Open',assigned_to_email:currentAssignee(a),reason:'Callback from call result',notes,created_by_email:currentUser.email}])})}await insertAudit('Call Result',`${result} for ${nameOf(a)}`,'account',a.id);closeModal('callResultModal');render()}
+
+function openDisputeModal(){let a=getCurrent();if(!a)return alert('No account selected.');document.getElementById('disputeReason').value='';document.getElementById('disputeDate').value=todayISO();document.getElementById('disputeStatus').value='Open';document.getElementById('proofRequested').value='No';document.getElementById('accountFrozen').value='Yes';document.getElementById('disputeFollowUp').value='';document.getElementById('docsNeeded').value='';document.getElementById('disputeNotes').value='';document.getElementById('disputeModal').classList.add('open')}
+async function saveDispute(){let a=getCurrent();if(!a)return;let row={account_id:a.id,dispute_reason:val('disputeReason'),received_date:val('disputeDate'),status:val('disputeStatus'),proof_requested:val('proofRequested')==='Yes',account_frozen:val('accountFrozen')==='Yes',follow_up_date:val('disputeFollowUp')||null,docs_needed:val('docsNeeded'),notes:val('disputeNotes'),created_by_email:currentUser.email};if(!row.dispute_reason)return alert('Enter dispute reason.');await dbFetch('/disputes',{method:'POST',body:JSON.stringify([row])});let updated=(await dbFetch(`/accounts?id=eq.${a.id}`,{method:'PATCH',body:JSON.stringify({status:'Disputed',disposition:'Disputed',updated_at:new Date().toISOString()})}))[0];let i=accounts.findIndex(x=>x.id===a.id);if(i>=0)accounts[i]=toCamel(updated);await insertActivity(a.id,'Dispute',`${row.dispute_reason}. Status: ${row.status}`);if(row.follow_up_date){await dbFetch('/follow_ups',{method:'POST',body:JSON.stringify([{account_id:a.id,follow_up_type:'Dispute Follow-Up',due_date:row.follow_up_date,status:'Open',assigned_to_email:currentAssignee(a),reason:'Dispute follow-up',notes:row.docs_needed,created_by_email:currentUser.email}])})}await insertAudit('Dispute Created',row.dispute_reason,'account',a.id);closeModal('disputeModal');render()}
+
+function openSettlementModal(){let a=getCurrent();if(!a)return alert('No account selected.');let bal=accountBalance(a);document.getElementById('settleBalance').value=bal.toFixed(2);document.getElementById('settlePercent').value='50';document.getElementById('settleAmount').value=(bal*.5).toFixed(2);document.getElementById('settleDueDate').value=addDaysISO(todayISO(),7);document.getElementById('settlePaymentType').value='Lump Sum';document.getElementById('settleApproval').value='No';document.getElementById('settleNotes').value='';recalcSettlement('percent');document.getElementById('settlementModal').classList.add('open')}
+function recalcSettlement(src){let bal=moneyNum(document.getElementById('settleBalance').value);let pct=moneyNum(document.getElementById('settlePercent').value);let amt=moneyNum(document.getElementById('settleAmount').value);if(src==='percent'){amt=bal*(pct/100);document.getElementById('settleAmount').value=amt.toFixed(2)}else{pct=bal?amt/bal*100:0;document.getElementById('settlePercent').value=pct.toFixed(2)}document.getElementById('settlementPreview').textContent=`Settlement offer: ${money(amt)} (${pct.toFixed(2)}%) on balance ${money(bal)}. Expires ${powerDateLabel(document.getElementById('settleDueDate').value)}.`}
+async function saveSettlement(){let a=getCurrent();if(!a)return;let row={account_id:a.id,balance:moneyNum(val('settleBalance')),settlement_percent:moneyNum(val('settlePercent')),settlement_amount:moneyNum(val('settleAmount')),due_date:val('settleDueDate'),payment_type:val('settlePaymentType'),manager_approval_required:val('settleApproval')==='Yes',status:'Offered',notes:val('settleNotes'),created_by_email:currentUser.email};if(row.settlement_amount>row.balance)return alert('Settlement cannot be higher than balance.');await dbFetch('/settlements',{method:'POST',body:JSON.stringify([row])});await insertActivity(a.id,'Settlement Offer',`Offered ${money(row.settlement_amount)} (${row.settlement_percent}%) due ${row.due_date}`);await insertAudit('Settlement Offer',`Offered ${money(row.settlement_amount)} for ${nameOf(a)}`,'account',a.id);closeModal('settlementModal');alert('Settlement offer saved.')}
+
+async function loadAccountDocs(accountId){try{return(await dbFetch(`/account_docs?account_id=eq.${accountId}&select=*&order=created_at.desc&limit=200`)).map(toCamel)}catch(e){return[]}}
+async /* old openAccountDocs replaced by power docs */
 
 async function saveCurrent(){let a=getCurrent();if(!a)return;let note=document.getElementById('agentNote').value.trim();if(note){await dbFetch('/account_notes',{method:'POST',body:JSON.stringify([{account_id:a.id,note,created_by_email:currentUser.email}])});await insertActivity(a.id,'Note',note)}document.getElementById('agentNote').value='';await loadAccounts()}async function saveAndNext(){await saveCurrent();nextAccount()}function nextAccount(){let q=queue(),cur=getCurrent(),idx=q.findIndex(a=>a.id===cur?.id);if(q[idx+1])setCurrent(q[idx+1].id)}function skipAccount(){nextAccount()}function callPrimary(){let p=phones(getCurrent())[0];if(p)window.location.href='tel:'+normPhone(p)}function endCall(){document.getElementById('lastDialed').textContent='Call ended';document.getElementById('callNumber').textContent='—'}
 function val(id){return document.getElementById(id).value.trim()}function setVal(id,v){document.getElementById(id).value=v??''}function inputId(k){return{accountNumber:'accountNumberInput',status:'statusInput',ssn:'ssnInput',state:'stateInput',email:'emailInput'}[k]||k}function openModal(){document.querySelector('#modal form').reset();document.getElementById('id').value='';document.getElementById('modalTitle').textContent='Add Account';document.getElementById('modal').classList.add('open')}function closeModal(id){document.getElementById(id).classList.remove('open')}
@@ -2311,6 +2081,7 @@ async function clearAllAccounts(){
    currentAccountId='';
    render();
 
+   await insertAudit('Clear Accounts','Deleted '+accountsDeleted+' accounts, '+notesDeleted+' notes, and '+activityDeleted+' activity rows','accounts','');
    alert('Clear complete. Deleted '+accountsDeleted+' accounts, '+notesDeleted+' notes, and '+activityDeleted+' activity rows. Now re-import the CSV.');
    await loadAccounts();
  }catch(err){
@@ -2318,7 +2089,7 @@ async function clearAllAccounts(){
  }
 }
 
-function exportCSV(){if(!currentUser.isAdmin)return alert('Admin only');let headers=FIELDS,rows=[headers.join(',')].concat(accounts.map(a=>headers.map(h=>`"${String(a[h]??'').replaceAll('"','""')}"`).join(',')));download('co-pilot-accounts-export.csv',rows.join('\n'),'text/csv')}function downloadTemplate(){let headers=FIELDS,sample=['PlainGreen LLC','PlainGreen LLC','36972835','13242556','36972835','John','','Doe','John Doe','123-45-6789','01/01/1980','123 Main St','','Las Vegas','NV','89101','Employer','email@example.com','PlainGreen LLC','installment loan','','',1000,'01/01/2020','','','02/01/2020','','','0','','','702-555-1111','','','','','','New'];download('co-pilot-import-template.csv',headers.join(',')+'\n'+sample.map(v=>`"${String(v).replaceAll('"','""')}"`).join(','),'text/csv')}function download(name,text,type){let blob=new Blob([text],{type}),u=URL.createObjectURL(blob),a=document.createElement('a');a.href=u;a.download=name;a.click();URL.revokeObjectURL(u)}
+function exportCSV(){if(!currentUser.isAdmin)return alert('Admin only');let headers=FIELDS,rows=[headers.join(',')].concat(accounts.map(a=>headers.map(h=>`"${String(a[h]??'').replaceAll('"','""')}"`).join(',')));insertAudit('Export CSV','Exported '+accounts.length+' accounts','accounts','');download('co-pilot-accounts-export.csv',rows.join('\n'),'text/csv')}function downloadTemplate(){let headers=FIELDS,sample=['PlainGreen LLC','PlainGreen LLC','36972835','13242556','36972835','John','','Doe','John Doe','123-45-6789','01/01/1980','123 Main St','','Las Vegas','NV','89101','Employer','email@example.com','PlainGreen LLC','installment loan','','',1000,'01/01/2020','','','02/01/2020','','','0','','','702-555-1111','','','','','','New'];download('co-pilot-import-template.csv',headers.join(',')+'\n'+sample.map(v=>`"${String(v).replaceAll('"','""')}"`).join(','),'text/csv')}function download(name,text,type){let blob=new Blob([text],{type}),u=URL.createObjectURL(blob),a=document.createElement('a');a.href=u;a.download=name;a.click();URL.revokeObjectURL(u)}
 boot();
 </script>
 </body>

@@ -646,3 +646,174 @@ set is_approved=false,
     updated_at=now()
 where approval_status='removed'
   and lower(email) <> 'afinch2678@gmail.com';
+
+
+-- COLLECTIONS POWER FEATURES: callbacks, calls, disputes, docs, settlements, audit, permissions, import batches
+create table if not exists follow_ups (
+  id uuid primary key default gen_random_uuid(),
+  account_id uuid references accounts(id) on delete cascade,
+  follow_up_type text default 'Callback',
+  due_date date,
+  due_time text,
+  status text default 'Open',
+  assigned_to_email text,
+  reason text,
+  notes text,
+  created_by_email text,
+  created_at timestamptz default now(),
+  updated_at timestamptz default now(),
+  completed_at timestamptz
+);
+
+create table if not exists call_results (
+  id uuid primary key default gen_random_uuid(),
+  account_id uuid references accounts(id) on delete cascade,
+  phone_number text,
+  call_result text,
+  duration_seconds integer default 0,
+  notes text,
+  created_by_email text,
+  created_at timestamptz default now()
+);
+
+create table if not exists disputes (
+  id uuid primary key default gen_random_uuid(),
+  account_id uuid references accounts(id) on delete cascade,
+  dispute_reason text,
+  received_date date,
+  status text default 'Open',
+  proof_requested boolean default false,
+  account_frozen boolean default true,
+  follow_up_date date,
+  docs_needed text,
+  notes text,
+  created_by_email text,
+  created_at timestamptz default now(),
+  updated_at timestamptz default now()
+);
+
+create table if not exists settlements (
+  id uuid primary key default gen_random_uuid(),
+  account_id uuid references accounts(id) on delete cascade,
+  balance numeric default 0,
+  settlement_percent numeric default 0,
+  settlement_amount numeric default 0,
+  due_date date,
+  payment_type text,
+  manager_approval_required boolean default false,
+  status text default 'Offered',
+  notes text,
+  created_by_email text,
+  created_at timestamptz default now(),
+  updated_at timestamptz default now()
+);
+
+create table if not exists account_docs (
+  id uuid primary key default gen_random_uuid(),
+  account_id uuid references accounts(id) on delete cascade,
+  doc_title text,
+  doc_type text,
+  doc_url text,
+  notes text,
+  created_by_email text,
+  created_at timestamptz default now()
+);
+
+create table if not exists audit_logs (
+  id uuid primary key default gen_random_uuid(),
+  action_type text,
+  action_text text,
+  target_type text,
+  target_id text,
+  created_by_email text,
+  created_at timestamptz default now()
+);
+
+create table if not exists role_permissions (
+  id uuid primary key default gen_random_uuid(),
+  role text,
+  permission_key text,
+  is_enabled boolean default false,
+  updated_by_email text,
+  updated_at timestamptz default now(),
+  unique(role, permission_key)
+);
+
+create table if not exists import_batches (
+  id uuid primary key default gen_random_uuid(),
+  file_name text,
+  portfolio text,
+  imported_by_email text,
+  imported_count integer default 0,
+  skipped_count integer default 0,
+  failed_count integer default 0,
+  headers jsonb,
+  mapping jsonb,
+  created_at timestamptz default now()
+);
+
+alter table follow_ups enable row level security;
+alter table call_results enable row level security;
+alter table disputes enable row level security;
+alter table settlements enable row level security;
+alter table account_docs enable row level security;
+alter table audit_logs enable row level security;
+alter table role_permissions enable row level security;
+alter table import_batches enable row level security;
+
+drop policy if exists "follow_ups_access" on follow_ups;
+drop policy if exists "call_results_access" on call_results;
+drop policy if exists "disputes_access" on disputes;
+drop policy if exists "settlements_access" on settlements;
+drop policy if exists "account_docs_access" on account_docs;
+drop policy if exists "audit_logs_admin" on audit_logs;
+drop policy if exists "role_permissions_admin" on role_permissions;
+drop policy if exists "import_batches_admin" on import_batches;
+
+create policy "follow_ups_access" on follow_ups for all to authenticated
+using (lower(auth.jwt() ->> 'email') = 'afinch2678@gmail.com' or lower(coalesce(assigned_to_email,'')) = lower(auth.jwt() ->> 'email') or lower(coalesce(created_by_email,'')) = lower(auth.jwt() ->> 'email'))
+with check (lower(auth.jwt() ->> 'email') = 'afinch2678@gmail.com' or lower(coalesce(assigned_to_email,'')) = lower(auth.jwt() ->> 'email') or lower(coalesce(created_by_email,'')) = lower(auth.jwt() ->> 'email'));
+
+create policy "call_results_access" on call_results for all to authenticated
+using (lower(auth.jwt() ->> 'email') = 'afinch2678@gmail.com' or lower(coalesce(created_by_email,'')) = lower(auth.jwt() ->> 'email') or exists (select 1 from accounts where accounts.id = call_results.account_id and lower(coalesce(accounts.assigned_to_email,'')) = lower(auth.jwt() ->> 'email')))
+with check (lower(auth.jwt() ->> 'email') = 'afinch2678@gmail.com' or lower(coalesce(created_by_email,'')) = lower(auth.jwt() ->> 'email') or exists (select 1 from accounts where accounts.id = call_results.account_id and lower(coalesce(accounts.assigned_to_email,'')) = lower(auth.jwt() ->> 'email')));
+
+create policy "disputes_access" on disputes for all to authenticated
+using (lower(auth.jwt() ->> 'email') = 'afinch2678@gmail.com' or lower(coalesce(created_by_email,'')) = lower(auth.jwt() ->> 'email') or exists (select 1 from accounts where accounts.id = disputes.account_id and lower(coalesce(accounts.assigned_to_email,'')) = lower(auth.jwt() ->> 'email')))
+with check (lower(auth.jwt() ->> 'email') = 'afinch2678@gmail.com' or lower(coalesce(created_by_email,'')) = lower(auth.jwt() ->> 'email') or exists (select 1 from accounts where accounts.id = disputes.account_id and lower(coalesce(accounts.assigned_to_email,'')) = lower(auth.jwt() ->> 'email')));
+
+create policy "settlements_access" on settlements for all to authenticated
+using (lower(auth.jwt() ->> 'email') = 'afinch2678@gmail.com' or lower(coalesce(created_by_email,'')) = lower(auth.jwt() ->> 'email') or exists (select 1 from accounts where accounts.id = settlements.account_id and lower(coalesce(accounts.assigned_to_email,'')) = lower(auth.jwt() ->> 'email')))
+with check (lower(auth.jwt() ->> 'email') = 'afinch2678@gmail.com' or lower(coalesce(created_by_email,'')) = lower(auth.jwt() ->> 'email') or exists (select 1 from accounts where accounts.id = settlements.account_id and lower(coalesce(accounts.assigned_to_email,'')) = lower(auth.jwt() ->> 'email')));
+
+create policy "account_docs_access" on account_docs for all to authenticated
+using (lower(auth.jwt() ->> 'email') = 'afinch2678@gmail.com' or lower(coalesce(created_by_email,'')) = lower(auth.jwt() ->> 'email') or exists (select 1 from accounts where accounts.id = account_docs.account_id and lower(coalesce(accounts.assigned_to_email,'')) = lower(auth.jwt() ->> 'email')))
+with check (lower(auth.jwt() ->> 'email') = 'afinch2678@gmail.com' or lower(coalesce(created_by_email,'')) = lower(auth.jwt() ->> 'email') or exists (select 1 from accounts where accounts.id = account_docs.account_id and lower(coalesce(accounts.assigned_to_email,'')) = lower(auth.jwt() ->> 'email')));
+
+create policy "audit_logs_admin" on audit_logs for all to authenticated
+using (lower(auth.jwt() ->> 'email') = 'afinch2678@gmail.com')
+with check (lower(auth.jwt() ->> 'email') = 'afinch2678@gmail.com' or lower(coalesce(created_by_email,'')) = lower(auth.jwt() ->> 'email'));
+
+create policy "role_permissions_admin" on role_permissions for all to authenticated
+using (lower(auth.jwt() ->> 'email') = 'afinch2678@gmail.com')
+with check (lower(auth.jwt() ->> 'email') = 'afinch2678@gmail.com');
+
+create policy "import_batches_admin" on import_batches for all to authenticated
+using (lower(auth.jwt() ->> 'email') = 'afinch2678@gmail.com')
+with check (lower(auth.jwt() ->> 'email') = 'afinch2678@gmail.com');
+
+create index if not exists idx_follow_ups_due on follow_ups(due_date, status);
+create index if not exists idx_follow_ups_assigned on follow_ups(lower(assigned_to_email));
+create index if not exists idx_call_results_account on call_results(account_id, created_at);
+create index if not exists idx_disputes_account on disputes(account_id, status);
+create index if not exists idx_settlements_account on settlements(account_id, created_at);
+create index if not exists idx_account_docs_account on account_docs(account_id, created_at);
+create index if not exists idx_audit_logs_created on audit_logs(created_at);
+create index if not exists idx_audit_logs_user on audit_logs(lower(created_by_email));
+
+insert into role_permissions(role, permission_key, is_enabled)
+values
+('admin','can_import',true),('admin','can_export',true),('admin','can_see_ssn',true),('admin','can_see_bank',true),('admin','can_assign',true),('admin','can_remove_employees',true),('admin','can_view_reports',true),('admin','can_edit_payment_plans',true),('admin','can_clear_accounts',true),
+('collector','can_import',false),('collector','can_export',false),('collector','can_see_ssn',true),('collector','can_see_bank',true),('collector','can_assign',false),('collector','can_remove_employees',false),('collector','can_view_reports',false),('collector','can_edit_payment_plans',true),('collector','can_clear_accounts',false),
+('manager','can_import',false),('manager','can_export',false),('manager','can_see_ssn',true),('manager','can_see_bank',true),('manager','can_assign',true),('manager','can_remove_employees',false),('manager','can_view_reports',true),('manager','can_edit_payment_plans',true),('manager','can_clear_accounts',false)
+on conflict(role, permission_key) do nothing;
