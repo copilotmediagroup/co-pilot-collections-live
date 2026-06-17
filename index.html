@@ -1331,6 +1331,103 @@ main.center > *,
   content:" Watermark prints behind the words at about 16% visibility.";
 }
 
+
+/* QUEUE SIDEBAR OVERFLOW FIX */
+.sidebar{
+  overflow:hidden!important;
+  min-width:0!important;
+}
+.queueList{
+  overflow-y:auto!important;
+  overflow-x:hidden!important;
+  max-width:100%!important;
+  width:100%!important;
+  box-sizing:border-box!important;
+}
+.qItem{
+  width:100%!important;
+  max-width:100%!important;
+  min-width:0!important;
+  box-sizing:border-box!important;
+  overflow:hidden!important;
+  grid-template-columns:32px minmax(0,1fr) minmax(48px,64px)!important;
+  gap:8px!important;
+  align-items:center!important;
+}
+.qItem > div{
+  min-width:0!important;
+}
+.qItem > div:nth-child(2){
+  min-width:0!important;
+  overflow:hidden!important;
+}
+.qName{
+  max-width:100%!important;
+  white-space:nowrap!important;
+  overflow:hidden!important;
+  text-overflow:ellipsis!important;
+  line-height:1.2!important;
+}
+.qAcct{
+  max-width:100%!important;
+  white-space:nowrap!important;
+  overflow:hidden!important;
+  text-overflow:ellipsis!important;
+  display:block!important;
+  line-height:1.25!important;
+}
+.qAcct .badge{
+  display:inline-block!important;
+  max-width:72px!important;
+  white-space:nowrap!important;
+  overflow:hidden!important;
+  text-overflow:ellipsis!important;
+  vertical-align:middle!important;
+}
+.qBal{
+  min-width:0!important;
+  max-width:64px!important;
+  width:64px!important;
+  justify-self:end!important;
+  text-align:right!important;
+  white-space:nowrap!important;
+  overflow:hidden!important;
+  text-overflow:ellipsis!important;
+  font-size:11px!important;
+  line-height:1.2!important;
+}
+.assignedPill,
+.unassignedPill{
+  display:inline-block!important;
+  max-width:100%!important;
+  white-space:nowrap!important;
+  overflow:hidden!important;
+  text-overflow:ellipsis!important;
+}
+.filters,
+.filters > div,
+.filters input,
+.filters select{
+  max-width:100%!important;
+  min-width:0!important;
+  box-sizing:border-box!important;
+}
+@media(max-width:1350px){
+  .qItem{
+    grid-template-columns:30px minmax(0,1fr) minmax(44px,58px)!important;
+    gap:7px!important;
+    padding-left:8px!important;
+    padding-right:8px!important;
+  }
+  .qBal{
+    width:58px!important;
+    max-width:58px!important;
+    font-size:10.5px!important;
+  }
+  .qName{font-size:12.5px!important}
+  .qAcct{font-size:10.5px!important}
+}
+
 </style>
 </head>
 <body>
@@ -1372,7 +1469,7 @@ main.center > *,
 
 <div class="app">
   <header class="topbar">
-    <div class="brand"><div class="logo">b</div><div><h1>Co Pilot Collections Manager</h1><p class="sub">EXPIRED LOGIN TOKEN FIX READY — auto-refreshes session and clears stale JWT tokens cleanly.</p></div></div>
+    <div class="brand"><div class="logo">b</div><div><h1>Co Pilot Collections Manager</h1><p class="sub">QUEUE SIDEBAR OVERFLOW FIX READY — account list cards stay inside the left sidebar.</p></div></div>
     <div class="headerSearch"><span class="mag">⌕</span><input id="globalSearch" placeholder="Search accounts..." oninput="document.getElementById('search').value=this.value;onQueueFilterChange()"><span class="hotkey">⌘ K</span></div>
     <div class="topActions">
       <button class="gray" onclick="openDocumentGenerator()">Letters</button>
