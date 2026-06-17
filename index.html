@@ -1704,10 +1704,20 @@ main.center > *,
   .todayHero{align-items:flex-start;flex-direction:column}
 }
 
+
+/* FOLLOW-UP SAVE STATUS */
+.saveStatus{
+  margin-top:8px;
+  font-size:12px;
+  font-weight:850;
+  color:#475569;
+  min-height:16px;
+}
+.saveStatus.ok{color:#15803d}
+.saveStatus.err{color:#b91c1c}
+.saveStatus.busy{color:#1d4ed8}
+
 </style>
-  <meta property="og:image" content="https://bolt.new/static/og_default.png">
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:image" content="https://bolt.new/static/og_default.png">
 </head>
 <body>
 <div id="loginScreen" class="loginScreen open">
@@ -1748,7 +1758,7 @@ main.center > *,
 
 <div class="app">
   <header class="topbar">
-    <div class="brand"><div class="logo">b</div><div><h1>Co Pilot Collections Manager</h1><p class="sub">TODAY DASHBOARD READY — promises, callbacks, overdue payments, and broken promises in one simple view.</p></div></div>
+    <div class="brand"><div class="logo">b</div><div><h1>Co Pilot Collections Manager</h1><p class="sub">FOLLOW-UP SAVE FIX READY — Save Follow-Up shows progress, errors, and refreshes Today Dashboard.</p></div></div>
     <div class="headerSearch"><span class="mag">⌕</span><input id="globalSearch" placeholder="Search phone, name, SSN, address..." oninput="document.getElementById('search').value=this.value;onQueueFilterChange()"><span class="hotkey">⌘ K</span></div>
     <div class="topActions">
       <button class="gray" onclick="openDocumentGenerator()">Letters</button>
@@ -2217,7 +2227,7 @@ main.center > *,
     <div class="powerHalf"><label>Assigned Employee</label><input id="fuAssigned" placeholder="employee@email.com"></div>
     <div class="powerHalf"><label>Reason</label><input id="fuReason" placeholder="Called back after work, promise follow-up..."></div>
     <div class="powerWide"><label>Notes</label><textarea id="fuNotes"></textarea></div>
-  </div><div style="text-align:right;margin-top:12px"><button class="green" onclick="saveFollowUp()">Save Follow-Up</button></div></div>
+  </div><div style="text-align:right;margin-top:12px"><button type="button" class="green" id="saveFollowUpBtn" onclick="saveFollowUp()">Save Follow-Up</button><div id="followUpSaveStatus" class="saveStatus"></div></div></div>
 </div></div>
 
 
@@ -3601,7 +3611,63 @@ function setAccountFromModal(id,modalId=''){if(modalId)closeModal(modalId);curre
 function priorityScore(a){let score=0,reasons=[];let bal=accountBalance(a);if(bal>=1000){score+=30;reasons.push('High balance')}else if(bal>=500){score+=20;reasons.push('Medium balance')}else if(bal>0){score+=10;reasons.push('Positive balance')}if(phones(a).length){score+=20;reasons.push('Phone available')}if(a.email){score+=8;reasons.push('Email')}if(a.employer||a.origEmployer){score+=12;reasons.push('Employer')}if(a.bankAccountNumber||a.origBankAcctLast4Digits||a.bankRoutingNumber){score+=12;reasons.push('Bank info')}if(a.lastPaymentDate||moneyNum(a.lastPaymentAmount)>0){score+=10;reasons.push('Past payment')}if(['Promise to Pay','Callback'].includes(a.disposition||a.status)){score+=15;reasons.push(a.disposition||a.status)}return{score:Math.min(100,score),reasons}}
 
 function openFollowUpModal(type='Callback'){let a=getCurrent();if(!a)return alert('No account selected.');document.getElementById('fuType').value=type;document.getElementById('fuDate').value=todayISO();document.getElementById('fuTime').value='09:00';document.getElementById('fuStatus').value='Open';document.getElementById('fuAssigned').value=currentAssignee(a);document.getElementById('fuReason').value=type==='Callback'?'Consumer requested callback':'';document.getElementById('fuNotes').value='';document.getElementById('followUpModal').classList.add('open')}
-async function saveFollowUp(){let a=getCurrent();if(!a)return;let row={account_id:a.id,follow_up_type:val('fuType'),due_date:val('fuDate'),due_time:val('fuTime'),status:val('fuStatus')||'Open',assigned_to_email:val('fuAssigned').toLowerCase()||currentAssignee(a),reason:val('fuReason'),notes:val('fuNotes'),created_by_email:currentUser.email};if(!row.due_date)return alert('Choose a due date.');await dbFetch('/follow_ups',{method:'POST',body:JSON.stringify([row])});await insertActivity(a.id,'Follow-Up Scheduled',`${row.follow_up_type} scheduled for ${row.due_date} ${row.due_time||''}. ${row.reason||''}`);await insertAudit('Follow-Up Scheduled',`${row.follow_up_type} for ${nameOf(a)} on ${row.due_date}`,'account',a.id);closeModal('followUpModal');await loadHistory(a.id);alert('Follow-up saved.')}
+async function saveFollowUp(){
+ let btn=document.getElementById('saveFollowUpBtn');
+ let status=document.getElementById('followUpSaveStatus');
+ function setStatus(msg,cls=''){
+   if(status){status.className='saveStatus '+cls;status.textContent=msg||'';}
+ }
+ try{
+   let a=getCurrent();
+   if(!a){alert('No account selected.');return;}
+   let dueDate=val('fuDate');
+   if(!dueDate){alert('Choose a due date.');return;}
+   let assigned=(val('fuAssigned')||currentAssignee(a)||currentUser.email||'').trim().toLowerCase();
+   if(!assigned){alert('Assigned employee is required.');return;}
+   let row={
+     account_id:a.id,
+     follow_up_type:val('fuType')||'Callback',
+     due_date:dueDate,
+     due_time:val('fuTime')||null,
+     status:val('fuStatus')||'Open',
+     assigned_to_email:assigned,
+     reason:val('fuReason'),
+     notes:val('fuNotes'),
+     created_by_email:(currentUser.email||'').toLowerCase()
+   };
+
+   if(btn){btn.disabled=true;btn.textContent='Saving...';}
+   setStatus('Saving follow-up to database...','busy');
+
+   let saved=await dbFetch('/follow_ups',{
+     method:'POST',
+     body:JSON.stringify([row])
+   });
+
+   setStatus('Follow-up saved. Updating account history...','busy');
+
+   try{await insertActivity(a.id,'Follow-Up Scheduled',`${row.follow_up_type} scheduled for ${row.due_date} ${row.due_time||''}. ${row.reason||''}`)}catch(e){console.warn('activity failed',e)}
+   try{await insertAudit('Follow-Up Scheduled',`${row.follow_up_type} for ${nameOf(a)} on ${row.due_date}`,'account',a.id)}catch(e){console.warn('audit failed',e)}
+   try{await loadHistory(a.id)}catch(e){console.warn('history refresh failed',e)}
+
+   // If Today Dashboard is open, refresh it so the new callback/promise appears immediately.
+   try{
+     if(document.getElementById('todayDashboardModal')?.classList.contains('open')){
+       await loadTodayDashboard();
+     }
+   }catch(e){console.warn('today dashboard refresh failed',e)}
+
+   setStatus('Saved successfully.','ok');
+   closeModal('followUpModal');
+   alert('Follow-up saved.');
+ }catch(err){
+   let msg=err?.message||String(err);
+   setStatus('Save failed: '+msg,'err');
+   alert('Save Follow-Up failed:\n\n'+msg+'\n\nIf this says table/policy/permission, run RUN_THIS_FOLLOW_UPS_SQL.sql in Supabase SQL Editor, reload Bolt, and try again.');
+ }finally{
+   if(btn){btn.disabled=false;btn.textContent='Save Follow-Up';}
+ }
+}
 
 
 let todayDashboardData={followups:[],payments:[],plans:[]};
