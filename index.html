@@ -1428,10 +1428,115 @@ main.center > *,
   .qAcct{font-size:10.5px!important}
 }
 
+
+/* QUEUE SIDEBAR WIDTH + CLEAN CARD FIX */
+.main{
+  grid-template-columns:38px 255px minmax(0,1fr) 190px!important;
+}
+.sidebar{
+  width:255px!important;
+  min-width:255px!important;
+  max-width:255px!important;
+  overflow:hidden!important;
+  box-sizing:border-box!important;
+}
+.queueList{
+  width:100%!important;
+  max-width:100%!important;
+  overflow-x:hidden!important;
+  padding-right:6px!important;
+  box-sizing:border-box!important;
+}
+.qItem{
+  width:100%!important;
+  max-width:100%!important;
+  box-sizing:border-box!important;
+  display:grid!important;
+  grid-template-columns:34px minmax(0,1fr) 68px!important;
+  gap:8px!important;
+  padding:10px 9px!important;
+  overflow:hidden!important;
+}
+.qItem > div{
+  min-width:0!important;
+}
+.qName{
+  display:block!important;
+  max-width:100%!important;
+  white-space:nowrap!important;
+  overflow:hidden!important;
+  text-overflow:ellipsis!important;
+  font-size:12.5px!important;
+}
+.qAcct{
+  display:block!important;
+  max-width:100%!important;
+  white-space:nowrap!important;
+  overflow:hidden!important;
+  text-overflow:ellipsis!important;
+  font-size:10.5px!important;
+}
+.qAcct .badge{
+  max-width:80px!important;
+}
+.qBal{
+  width:68px!important;
+  max-width:68px!important;
+  min-width:0!important;
+  justify-self:end!important;
+  text-align:right!important;
+  white-space:nowrap!important;
+  overflow:hidden!important;
+  text-overflow:ellipsis!important;
+  font-size:10.8px!important;
+}
+.filters{
+  display:grid!important;
+  grid-template-columns:1fr 1fr!important;
+  gap:7px!important;
+}
+.filters select{
+  width:100%!important;
+  min-width:0!important;
+  font-size:11px!important;
+  padding-left:8px!important;
+  padding-right:18px!important;
+}
+.sidebar input{
+  width:100%!important;
+  box-sizing:border-box!important;
+}
+@media(max-width:1250px){
+  .main{
+    grid-template-columns:38px 235px minmax(0,1fr) 180px!important;
+  }
+  .sidebar{
+    width:235px!important;
+    min-width:235px!important;
+    max-width:235px!important;
+  }
+  .qItem{
+    grid-template-columns:32px minmax(0,1fr) 62px!important;
+    gap:7px!important;
+    padding-left:8px!important;
+    padding-right:8px!important;
+  }
+  .qBal{
+    width:62px!important;
+    max-width:62px!important;
+    font-size:10.5px!important;
+  }
+}
+@media(max-width:1050px){
+  .main{
+    grid-template-columns:38px 235px minmax(0,1fr)!important;
+  }
+  .right{
+    display:none!important;
+  }
+}
+
 </style>
-  <meta property="og:image" content="https://bolt.new/static/og_default.png">
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:image" content="https://bolt.new/static/og_default.png">
 </head>
 <body>
 <div id="loginScreen" class="loginScreen open">
@@ -1472,7 +1577,7 @@ main.center > *,
 
 <div class="app">
   <header class="topbar">
-    <div class="brand"><div class="logo">b</div><div><h1>Co Pilot Collections Manager</h1><p class="sub">QUEUE SIDEBAR OVERFLOW FIX READY — account list cards stay inside the left sidebar.</p></div></div>
+    <div class="brand"><div class="logo">b</div><div><h1>Co Pilot Collections Manager</h1><p class="sub">CLEAR ACCOUNTS FIX READY — uses secure database clear function and avoids fetch/URL failures.</p></div></div>
     <div class="headerSearch"><span class="mag">⌕</span><input id="globalSearch" placeholder="Search accounts..." oninput="document.getElementById('search').value=this.value;onQueueFilterChange()"><span class="hotkey">⌘ K</span></div>
     <div class="topActions">
       <button class="gray" onclick="openDocumentGenerator()">Letters</button>
@@ -4882,9 +4987,10 @@ function extractPhones(text){
 function parseCSV(text){let rows=[],row=[],cell='',q=false;for(let i=0;i<text.length;i++){let ch=text[i],nx=text[i+1];if(ch=='"'&&q&&nx=='"'){cell+='"';i++}else if(ch=='"'){q=!q}else if(ch==','&&!q){row.push(cell);cell=''}else if((ch=='\n'||ch=='\r')&&!q){if(ch=='\r'&&nx=='\n')i++;row.push(cell);rows.push(row);row=[];cell=''}else cell+=ch}if(cell||row.length){row.push(cell);rows.push(row)}return rows}
 
 async function deleteAllRows(table){
+ // Fallback delete only. Small ID batches avoid browser/server URL-length failures.
  let total=0;
  while(true){
-   let rows=await dbFetch('/'+table+'?select=id&limit=500');
+   let rows=await dbFetch('/'+table+'?select=id&limit=50');
    if(!rows || rows.length===0)break;
    let ids=rows.map(r=>r.id).filter(Boolean);
    if(ids.length===0)break;
@@ -4893,30 +4999,67 @@ async function deleteAllRows(table){
      headers:{Prefer:'return=minimal'}
    });
    total+=ids.length;
-   if(ids.length<500)break;
+   if(ids.length<50)break;
+   await new Promise(r=>setTimeout(r,20));
  }
  return total;
 }
 
 async function clearAllAccounts(){
  if(!currentUser.isAdmin)return alert('Admin only');
- let phrase=prompt('This will delete ALL accounts, notes, and activity from this Supabase project. Type CLEAR to continue.');
+ let phrase=prompt('This will delete ALL accounts and all account-related records from this Supabase project. Type CLEAR to continue.');
  if(phrase!=='CLEAR')return;
 
  try{
-   let activityDeleted=await deleteAllRows('activity_logs');
-   let notesDeleted=await deleteAllRows('account_notes');
-   let accountsDeleted=await deleteAllRows('accounts');
+   let result=null;
+
+   // Preferred method: secure SQL function. This avoids long delete URLs and bypasses client-side fetch failures.
+   try{
+     result=await dbFetch('/rpc/admin_clear_accounts',{
+       method:'POST',
+       body:JSON.stringify({})
+     });
+   }catch(rpcErr){
+     // Fallback for users who have not run the SQL yet.
+     console.warn('admin_clear_accounts RPC failed, falling back to client deletes:', rpcErr);
+     const tables=[
+       'payment_plan_payments',
+       'payment_plans',
+       'payments_ledger',
+       'account_docs',
+       'account_notes',
+       'activity_logs',
+       'follow_ups',
+       'call_results',
+       'disputes',
+       'settlements',
+       'import_batches',
+       'accounts'
+     ];
+     let fallbackCounts={};
+     for(const table of tables){
+       try{fallbackCounts[table]=await deleteAllRows(table)}
+       catch(e){fallbackCounts[table]='failed: '+(e.message||e)}
+     }
+     result={fallback:true,counts:fallbackCounts};
+   }
 
    accounts=[];
    currentAccountId='';
    render();
 
-   await insertAudit('Clear Accounts','Deleted '+accountsDeleted+' accounts, '+notesDeleted+' notes, and '+activityDeleted+' activity rows','accounts','');
-   alert('Clear complete. Deleted '+accountsDeleted+' accounts, '+notesDeleted+' notes, and '+activityDeleted+' activity rows. Now re-import the CSV.');
+   let summary='';
+   if(result && result.counts){
+     summary=Object.entries(result.counts).map(([k,v])=>k+': '+v).join('\n');
+   }else{
+     summary='Accounts and related records were cleared.';
+   }
+
+   try{await insertAudit('Clear Accounts','Cleared accounts and related records','accounts','')}catch(e){}
+   alert('Clear complete.\n\n'+summary+'\n\nNow re-import the CSV.');
    await loadAccounts();
  }catch(err){
-   alert('Clear failed: '+(err.message||err)+'\n\nFix: go to Supabase SQL Editor, run the updated database_schema_rls.sql from this ZIP, then try Clear Accounts again.');
+   alert('Clear failed: '+(err.message||err)+'\n\nFix: open Supabase SQL Editor, run RUN_THIS_CLEAR_ACCOUNTS_SQL.sql from this ZIP, reload Bolt, then try Clear Accounts again.');
  }
 }
 
