@@ -1536,10 +1536,33 @@ main.center > *,
   }
 }
 
+
+/* PHONE-FIRST SEARCH DISPLAY */
+.qPhoneHit{
+  display:block!important;
+  color:#1d4ed8!important;
+  font-weight:900!important;
+  font-size:11px!important;
+  line-height:1.2!important;
+  white-space:nowrap!important;
+  overflow:hidden!important;
+  text-overflow:ellipsis!important;
+  margin-top:2px!important;
+}
+.searchModePill{
+  display:inline-block!important;
+  background:#dbeafe!important;
+  color:#1d4ed8!important;
+  border:1px solid #bfdbfe!important;
+  border-radius:999px!important;
+  padding:2px 6px!important;
+  font-size:10px!important;
+  font-weight:1000!important;
+  margin-left:4px!important;
+  vertical-align:middle!important;
+}
+
 </style>
-  <meta property="og:image" content="https://bolt.new/static/og_default.png">
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:image" content="https://bolt.new/static/og_default.png">
 </head>
 <body>
 <div id="loginScreen" class="loginScreen open">
@@ -1580,8 +1603,8 @@ main.center > *,
 
 <div class="app">
   <header class="topbar">
-    <div class="brand"><div class="logo">b</div><div><h1>Co Pilot Collections Manager</h1><p class="sub">CLEAR ACCOUNTS FIX READY — uses secure database clear function and avoids fetch/URL failures.</p></div></div>
-    <div class="headerSearch"><span class="mag">⌕</span><input id="globalSearch" placeholder="Search accounts..." oninput="document.getElementById('search').value=this.value;onQueueFilterChange()"><span class="hotkey">⌘ K</span></div>
+    <div class="brand"><div class="logo">b</div><div><h1>Co Pilot Collections Manager</h1><p class="sub">PHONE-FIRST SEARCH READY — search prioritizes phone numbers, then name, address, SSN, and account number.</p></div></div>
+    <div class="headerSearch"><span class="mag">⌕</span><input id="globalSearch" placeholder="Search phone, name, SSN, address..." oninput="document.getElementById('search').value=this.value;onQueueFilterChange()"><span class="hotkey">⌘ K</span></div>
     <div class="topActions">
       <button class="gray" onclick="openDocumentGenerator()">Letters</button>
       <button class="gray" onclick="openPaymentsDashboard()">Pay</button>
@@ -1619,7 +1642,7 @@ main.center > *,
       <div class="filters">
         <div><label>Portfolio</label><select id="portfolioFilter" onchange="onQueueFilterChange()"><option value="">All Portfolios</option></select></div>
         <div><label>Status</label><select id="statusFilter" onchange="onQueueFilterChange()"><option value="">All Statuses</option><option>New</option><option>Active</option><option>No Answer</option><option>Left Voicemail</option><option>Promise to Pay</option><option>Disputed</option><option>Callback</option><option>Settled</option><option>DNC</option><option>Bad Number</option><option>Closed</option></select></div>
-        <div><label>Search Queue</label><input id="search" placeholder="Name, account #, phone, state..." oninput="onQueueFilterChange()"></div>
+        <div><label>Search Queue</label><input id="search" placeholder="Phone number first, then name, SSN, address..." oninput="onQueueFilterChange()"></div>
       </div>
       <div class="queueList" id="queueList"></div>
       <div class="remaining" id="remainingText">Showing queue</div>
@@ -2532,10 +2555,121 @@ async function loadAccounts(){
  if(typeof runBrokenPromiseAutomation==='function')runBrokenPromiseAutomation(false).catch(()=>{});
  render()
 }
-function queue(){let q=document.getElementById('search')?.value.toLowerCase()||'',st=document.getElementById('statusFilter')?.value||'',pf=document.getElementById('portfolioFilter')?.value||'';return accounts.filter(a=>{let raw=rawObj(a),text=(FIELDS.map(k=>a[k]).join(' ')+' '+Object.keys(raw).join(' ')+' '+Object.values(raw).join(' ')).toLowerCase();return(!q||text.includes(q))&&(!st||a.status===st)&&(!pf||a.portfolio===pf)})}
-function onQueueFilterChange(){let q=queue();if(q[0]&&!q.some(a=>a.id===currentAccountId))currentAccountId=q[0].id;render()}function setCurrent(id){currentAccountId=id;document.getElementById('agentNote').value='';currentDisposition='';render();loadHistory(id)}function getCurrent(){return queue().find(a=>a.id===currentAccountId)||queue()[0]||accounts[0]}
+function queue(){
+ let q=(document.getElementById('search')?.value||'').trim();
+ let st=document.getElementById('statusFilter')?.value||'';
+ let pf=document.getElementById('portfolioFilter')?.value||'';
+ let filtered=accounts.filter(a=>{
+   return (!q||accountMatchesSearch(a,q))&&(!st||a.status===st)&&(!pf||a.portfolio===pf);
+ });
+ if(q){
+   filtered.sort((a,b)=>{
+     let sb=phoneSearchScore(b,q), sa=phoneSearchScore(a,q);
+     if(sb!==sa)return sb-sa;
+     return nameOf(a).localeCompare(nameOf(b));
+   });
+ }
+ return filtered;
+}
+function onQueueFilterChange(){
+ let main=document.getElementById('search');
+ let global=document.getElementById('globalSearch');
+ if(main&&global&&document.activeElement===main)global.value=main.value;
+ if(main&&global&&document.activeElement===global)main.value=global.value;
+ let q=queue();
+ if(q[0]&&!q.some(a=>a.id===currentAccountId))currentAccountId=q[0].id;
+ render();
+}function setCurrent(id){currentAccountId=id;document.getElementById('agentNote').value='';currentDisposition='';render();loadHistory(id)}function getCurrent(){return queue().find(a=>a.id===currentAccountId)||queue()[0]||accounts[0]}
 function money(n){return Number(n||0).toLocaleString('en-US',{style:'currency',currency:'USD'})}function moneyNum(v){let n=Number(String(v??'').replace(/[^0-9.-]/g,''));return isNaN(n)?0:n}function accountBalance(a){return moneyNum(a?.currentBalance||a?.principal||a?.originalBalance)}function esc(s){return String(s??'').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;')}function normPhone(p){return String(p||'').replace(/\D/g,'')}function fmtPhone(p){let d=normPhone(p);return d.length===10?'('+d.slice(0,3)+') '+d.slice(3,6)+'-'+d.slice(6):(p||'')}function acctNo(a){return a?.accountNumber||a?.clientAccountNumber||a?.accountId||''}function nameOf(a){return a?.fullName||[a?.firstName,a?.middleName,a?.lastName].filter(Boolean).join(' ')||'Unknown Account'}function initials(a){return nameOf(a).split(/\s+/).filter(Boolean).slice(0,2).map(x=>x[0]).join('').toUpperCase()||'--'}function creditor(a){return a?.originalCreditor||a?.accountDescription||a?.portfolio||'—'}function phones(a){return[a?.phone1,a?.phone2,a?.phone3,a?.phone4,a?.phone5,a?.phone6,a?.phone7,a?.phone8,a?.phone9,a?.phone10].filter(p=>p&&normPhone(p).length>=10)}
 function rawObj(a){return a?.rawData||a?.raw_data||{}}
+
+function phoneSearchDigitsList(a){
+ let raw=rawObj(a)||{};
+ let vals=[];
+ ['phone1','phone2','phone3','phone4','phone5','phone6','phone7','phone8','phone9','phone10','homePhone','cellPhone','mobilePhone','workPhone'].forEach(k=>{
+   if(a?.[k])vals.push(a[k]);
+ });
+ Object.entries(raw).forEach(([k,v])=>{
+   if(/phone|mobile|cell|tel/i.test(String(k)) && v!==undefined && v!==null)vals.push(v);
+ });
+ let out=[];
+ vals.forEach(v=>{
+   let str=String(v||'');
+   let extracted=[];
+   try{extracted=extractPhones(str)||[]}catch(e){extracted=[]}
+   if(extracted.length){
+     extracted.forEach(p=>out.push(normPhone(p)));
+   }else{
+     let d=normPhone(str);
+     if(d.length>=7)out.push(d);
+   }
+ });
+ let seen=new Set();
+ return out.map(d=>d.length===11&&d.startsWith('1')?d.slice(1):d).filter(d=>{
+   if(!d || d.length<7)return false;
+   let key=d.slice(-10);
+   if(seen.has(key))return false;
+   seen.add(key);
+   return true;
+ });
+}
+function searchableAccountText(a){
+ let raw=rawObj(a)||{};
+ let important=[
+   nameOf(a), acctNo(a), a?.ssn, a?.address, a?.address2, a?.city, a?.state, a?.zip,
+   a?.email, creditor(a), a?.portfolio, a?.accountDescription, a?.issuerName,
+   a?.employer, a?.bankAccountNumber, a?.bankRoutingNumber
+ ];
+ return (important.join(' ')+' '+FIELDS.map(k=>a?.[k]).join(' ')+' '+Object.keys(raw).join(' ')+' '+Object.values(raw).join(' ')).toLowerCase();
+}
+function phoneSearchScore(a,q){
+ q=String(q||'').trim().toLowerCase();
+ if(!q)return 1;
+ let qDigits=normPhone(q);
+ if(qDigits.length===11 && qDigits.startsWith('1'))qDigits=qDigits.slice(1);
+ let text=searchableAccountText(a);
+ let phones=phoneSearchDigitsList(a);
+ let acctDigits=normPhone(acctNo(a));
+ let ssnDigits=normPhone(a?.ssn);
+ let addressText=[a?.address,a?.address2,a?.city,a?.state,a?.zip].filter(Boolean).join(' ').toLowerCase();
+ let nameText=nameOf(a).toLowerCase();
+
+ // Phone is primary. Exact full phone > starts with phone > contains phone.
+ if(qDigits.length>=3){
+   for(let p of phones){
+     let last=p.slice(-10);
+     if(qDigits.length>=10 && last===qDigits.slice(-10))return 1000;
+   }
+   for(let p of phones){
+     let last=p.slice(-10);
+     if(last.startsWith(qDigits))return 920;
+   }
+   for(let p of phones){
+     let last=p.slice(-10);
+     if(last.includes(qDigits))return 860;
+   }
+   if(acctDigits && acctDigits.includes(qDigits))return 520;
+   if(qDigits.length>=4 && ssnDigits && ssnDigits.includes(qDigits))return 500;
+ }
+ if(nameText.includes(q))return 420;
+ if(addressText.includes(q))return 360;
+ if(text.includes(q))return 250;
+ return 0;
+}
+function accountMatchesSearch(a,q){
+ if(!q)return true;
+ return phoneSearchScore(a,q)>0;
+}
+function bestPhoneHit(a,q){
+ let qDigits=normPhone(q||'');
+ if(qDigits.length===11 && qDigits.startsWith('1'))qDigits=qDigits.slice(1);
+ if(qDigits.length<3)return '';
+ let phones=phoneSearchDigitsList(a);
+ let exact=phones.find(p=>p.slice(-10)===qDigits.slice(-10) && qDigits.length>=10);
+ let starts=phones.find(p=>p.slice(-10).startsWith(qDigits));
+ let contains=phones.find(p=>p.slice(-10).includes(qDigits));
+ return exact||starts||contains||'';
+}
 
 const EXTRA_FIELD_LABELS={
  issuerName:'Issuer Name',
@@ -2708,11 +2842,16 @@ function updatePortfolioFilter(all){let sel=document.getElementById('portfolioFi
 function renderQueue(q,cur){
  let idx=q.findIndex(a=>a.id===cur?.id);if(idx<0)idx=0;
  let start=Math.max(0,idx-1),next=q.slice(start,start+5);
+ let searchValue=document.getElementById('search')?.value||'';
+ let searchDigits=normPhone(searchValue);
  document.getElementById('queueList').innerHTML=next.map((a,i)=>{
    let assigned=currentUser.isAdmin?(a.assignedToEmail?`<span class="assignedPill">Assigned: ${esc(a.assignedToEmail)}</span>`:`<span class="unassignedPill">Unassigned</span>`):'';
-   return `<div class="qItem ${a.id===cur?.id?'active':''}" onclick="setCurrent('${a.id}')"><div class="qNum">${start+i+1}</div><div><div class="qName">${esc(nameOf(a))}</div><div class="qAcct">${esc(acctNo(a))} <span class="badge">${esc(a.disposition||a.status||'New')}</span></div>${assigned}</div><div class="qBal">${money(a.currentBalance||a.principal||a.originalBalance)}</div></div>`;
+   let hit=bestPhoneHit(a,searchValue);
+   let phoneLine=(searchDigits.length>=3 && hit)?`<div class="qPhoneHit">☎ ${esc(fmtPhone(hit))}<span class="searchModePill">PHONE</span></div>`:'';
+   return `<div class="qItem ${a.id===cur?.id?'active':''}" onclick="setCurrent('${a.id}')"><div class="qNum">${start+i+1}</div><div><div class="qName">${esc(nameOf(a))}</div>${phoneLine}<div class="qAcct">${esc(acctNo(a))} <span class="badge">${esc(a.disposition||a.status||'New')}</span></div>${assigned}</div><div class="qBal">${money(a.currentBalance||a.principal||a.originalBalance)}</div></div>`;
  }).join('')||'<div class="muted" style="padding:12px">No accounts in queue.</div>';
- document.getElementById('remainingText').textContent=`Showing ${next.length} of ${q.length} matching accounts`
+ let mode=searchDigits.length>=3?' — phone search first':'';
+ document.getElementById('remainingText').textContent=`Showing ${next.length} of ${q.length} matching accounts${mode}`;
 }
 function renderCurrent(a,q){
  if(!a)return;
