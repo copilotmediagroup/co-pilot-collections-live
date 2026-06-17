@@ -1166,6 +1166,55 @@ main.center > *,
   .allFieldsGrid,.phoneGrid,.dispoGrid{grid-template-columns:1fr!important}
 }
 
+
+/* PROFESSIONAL LETTER FORMAT */
+.pdfPreviewPaper .letterPreview{
+  font-family: ui-serif, Georgia, "Times New Roman", serif!important;
+  color:#111827!important;
+  line-height:1.55!important;
+  font-size:13px!important;
+}
+.pdfPreviewPaper .letterTitle{
+  text-align:center!important;
+  font-weight:900!important;
+  font-size:18px!important;
+  letter-spacing:.04em!important;
+  margin:0 0 28px!important;
+  text-transform:uppercase!important;
+}
+.pdfPreviewPaper .letterAddress{
+  margin:0 0 24px!important;
+  white-space:pre-line!important;
+}
+.pdfPreviewPaper .letterMeta{
+  margin:0 0 26px!important;
+}
+.pdfPreviewPaper .letterMeta div{
+  margin:3px 0!important;
+}
+.pdfPreviewPaper .letterSalute{
+  margin:0 0 18px!important;
+}
+.pdfPreviewPaper .letterBody p{
+  margin:0 0 16px!important;
+}
+.pdfPreviewPaper .letterClose{
+  margin-top:30px!important;
+  margin-bottom:34px!important;
+}
+.pdfPreviewPaper .letterDisclosure{
+  margin-top:24px!important;
+  padding-top:14px!important;
+  border-top:1px solid #cbd5e1!important;
+  font-size:12px!important;
+  color:#334155!important;
+}
+.pdfPreviewPaper .letterDisclosure b{
+  display:block!important;
+  margin-bottom:8px!important;
+  color:#0f172a!important;
+}
+
 </style>
 </head>
 <body>
@@ -1207,7 +1256,7 @@ main.center > *,
 
 <div class="app">
   <header class="topbar">
-    <div class="brand"><div class="logo">b</div><div><h1>Co Pilot Collections Manager</h1><p class="sub">LETTER PDF FORMAT FIX — file number uses account number and PDF top spacing/address formatting repaired.</p></div></div>
+    <div class="brand"><div class="logo">b</div><div><h1>Co Pilot Collections Manager</h1><p class="sub">PROFESSIONAL LETTER FORMAT READY — debtor block, spaced metadata, clean body, and separate disclosure/footer.</p></div></div>
     <div class="headerSearch"><span class="mag">⌕</span><input id="globalSearch" placeholder="Search accounts..." oninput="document.getElementById('search').value=this.value;onQueueFilterChange()"><span class="hotkey">⌘ K</span></div>
     <div class="topActions">
       <button class="gray" onclick="openDocumentGenerator()">Letters</button>
@@ -3065,18 +3114,151 @@ function pdfTemplateSections(d){
  if(d.disclaimer)sections.push(['DISCLOSURE', [d.disclaimer]]);
  return sections;
 }
+
+function pdfProfessionalTemplate(d){
+ let recipient=pdfRecipientLines(d);
+ let docType=d.docType||'Demand Letter';
+ let accountNumber=d.accountNumber||d.fileNumber||'';
+ let meta=[
+   ['Date', pdfDateLabel(d.docDate)],
+   ['Original Creditor', d.originalCreditor||'—'],
+   ['File/Account Number', accountNumber]
+ ];
+ let salutation=`Dear ${d.debtorName||'Consumer'};`;
+ let closingName=d.authorizedBy||'Collections agency';
+ let paragraphs=[];
+ let post=[];
+
+ if(docType==='Demand Letter'){
+   paragraphs=[
+     `Our records indicate the above account remains unresolved. The total amount currently claimed due is ${pdfMoney(d.currentBalance)}.`,
+     `Please submit payment or contact the account representative by ${pdfDateLabel(d.dueDate)} to discuss resolution options.`,
+     `If you believe this account is inaccurate or disputed, notify the account representative so the matter can be reviewed.`
+   ];
+ }
+ else if(docType==='Assignment / Notification of Debt'){
+   paragraphs=[
+     `The purpose of this communication is to notify you that the account identified above has been assigned, sold, or transferred for servicing or collection.`,
+     `The amount currently claimed due is ${pdfMoney(d.currentBalance)}.`,
+     `Please direct account questions or payments according to the instructions provided by the account representative so payments can be accurately applied.`
+   ];
+ }
+ else if(docType==='Standard Mailer'){
+   paragraphs=[
+     `Attached is information which pertains to your account. This information may be sensitive, and you should keep a copy for your records.`,
+     `If you have questions or concerns, please contact the representative handling your account.`
+   ];
+ }
+ else if(docType==='Release of Liability'){
+   paragraphs=[
+     `In consideration of account #${accountNumber}, and upon receipt and clearance of the agreed payment amount of ${pdfMoney(d.settlementAmount||d.currentBalance)}, the account holder releases ${d.debtorName} from further liability on the above account.`,
+     `This release applies to claims or demands related to the account identified above through the date of this release.`
+   ];
+   post.push(['Authorized Representative', '________________________________']);
+   post.push(['Consumer', '________________________________']);
+ }
+ else if(docType==='Billing Statement - Paid In Full'){
+   meta.push(['Minimum Due','$0.00']);
+   meta.push(['Account Balance','$0.00']);
+   paragraphs=[
+     `Thank you for your recent payment of ${pdfMoney(d.lastPaymentAmount||d.settlementAmount||d.currentBalance)}. This payment was received and applied to the account identified above.`,
+     `Your account is now paid in full. We appreciate your prompt attention toward this financial obligation.`
+   ];
+ }
+ else if(docType==='Billing Statement - Payment Plan'){
+   meta.push(['Minimum Due',pdfMoney(d.minimumDue||d.installmentAmount)]);
+   meta.push(['Account Balance',pdfMoney(d.currentBalance)]);
+   paragraphs=[
+     `Thank you for your recent payment of ${pdfMoney(d.lastPaymentAmount)}${d.lastPaymentDate?` received on ${pdfDateLabel(d.lastPaymentDate)}`:''}.`,
+     `Your next payment of ${pdfMoney(d.installmentAmount||d.minimumDue)} is due by ${pdfDateLabel(d.dueDate)}.`
+   ];
+ }
+ else if(docType==='NSF / Returned Payment Statement'){
+   meta.push(['Minimum Due',pdfMoney(d.minimumDue||d.returnedAmount)]);
+   meta.push(['Account Balance',pdfMoney(d.currentBalance)]);
+   paragraphs=[
+     `Notice: a recent payment in the amount of ${pdfMoney(d.returnedAmount)} was returned or not honored.`,
+     `Please submit replacement payment by ${pdfDateLabel(d.dueDate)} so it can be applied to the account identified above.`
+   ];
+ }
+ else if(docType==='Stipulation - Paid In Full + Card Authorization'){
+   meta.push(['Current Balance',pdfMoney(d.currentBalance)]);
+   meta.push(['Paid-In-Full Amount',pdfMoney(d.settlementAmount)]);
+   meta.push(['Payment Method',d.paymentMethod||'—']);
+   paragraphs=[
+     `The parties agree to compromise the indebtedness on this account. The accepted paid-in-full amount is ${pdfMoney(d.settlementAmount)} if received by ${pdfDateLabel(d.dueDate)}.`,
+     `Upon receipt and clearance of the agreed amount, the account will be considered satisfied in full and no further collection activity will continue on this account.`,
+     `Payment method authorized: ${d.paymentMethod}. Authorized card or account reference: ${d.cardMask}.`
+   ];
+   post.push(['Cardholder Name','________________________________']);
+   post.push(['Card Number',d.cardMask||'XXXX-XXXX-XXXX-____']);
+   post.push(['Expiration Date','__________']);
+   post.push(['Billing ZIP','__________']);
+   post.push(['Signature','________________________________']);
+   post.push(['Date','________________']);
+ }
+ else if(docType==='Stipulation - Payment Plan + Card Authorization'){
+   meta.push(['Current Balance',pdfMoney(d.currentBalance)]);
+   meta.push(['Initial Payment',pdfMoney(d.initialPayment)]);
+   meta.push(['Installment Amount',pdfMoney(d.installmentAmount)]);
+   meta.push(['Frequency',d.frequency||'—']);
+   paragraphs=[
+     `The parties agree to resolve the account through a scheduled payment arrangement.`,
+     `If a scheduled payment is missed or returned, the agreement may be reviewed and the remaining balance may become due according to the account terms.`,
+     `Payment method authorized: ${d.paymentMethod}. Authorized card or account reference: ${d.cardMask}.`
+   ];
+   let sched=pdfScheduleLines(d);
+   if(sched.length){
+     post.push(['Scheduled Payments', sched.map(r=>`${r[0]}. ${r[1]} — ${r[2]}`).join(' | ')]);
+   }
+   post.push(['Cardholder Name','________________________________']);
+   post.push(['Card Number',d.cardMask||'XXXX-XXXX-XXXX-____']);
+   post.push(['Expiration Date','__________']);
+   post.push(['Billing ZIP','__________']);
+   post.push(['Signature','________________________________']);
+   post.push(['Date','________________']);
+ }
+ else{
+   paragraphs=[
+     `This document concerns the account identified above.`,
+     `Please review the account information and contact the account representative if you have questions.`
+   ];
+ }
+
+ if(d.notes)paragraphs.push(d.notes);
+
+ return {
+   title:docType,
+   recipient,
+   meta,
+   salutation,
+   paragraphs,
+   closing:`Sincerely,`,
+   closingName,
+   post,
+   disclosure:d.disclaimer||''
+ };
+}
+
 function renderPdfDocPreview(){
  let d=pdfDocData();
- let sections=pdfTemplateSections(d);
- let htmlPreview=`<h2>${esc(d.docType)}</h2>`;
- sections.forEach(([title,lines])=>{
-   htmlPreview+=`<h3>${esc(title)}</h3>`;
-   (lines||[]).forEach(line=>{
-     htmlPreview+=`<div class="docRow"><div class="docLabel"></div><div>${esc(line||'')}</div></div>`;
-   });
- });
- document.getElementById('pdfDocPreview').innerHTML=htmlPreview;
+ let t=pdfProfessionalTemplate(d);
+ let recipientHtml=t.recipient.map(x=>esc(x)).join('<br>');
+ let metaHtml=t.meta.map(([k,v])=>`<div><b>${esc(k)}:</b> ${esc(v||'—')}</div>`).join('');
+ let bodyHtml=t.paragraphs.map(p=>`<p>${esc(p)}</p>`).join('');
+ let postHtml=t.post.length?`<div class="letterDisclosure"><b>ADDITIONAL INFORMATION</b>${t.post.map(([k,v])=>`<div><b>${esc(k)}:</b> ${esc(v||'—')}</div>`).join('')}</div>`:'';
+ document.getElementById('pdfDocPreview').innerHTML=`<div class="letterPreview">
+   <div class="letterTitle">${esc(t.title)}</div>
+   <div class="letterAddress">${recipientHtml}</div>
+   <div class="letterMeta">${metaHtml}</div>
+   <div class="letterSalute">${esc(t.salutation)}</div>
+   <div class="letterBody">${bodyHtml}</div>
+   <div class="letterClose">${esc(t.closing)}<br><br>${esc(t.closingName)}</div>
+   ${postHtml}
+   ${t.disclosure?`<div class="letterDisclosure"><b>DISCLOSURE</b>${esc(t.disclosure)}</div>`:''}
+ </div>`;
 }
+
 async function fillPdfFromPaymentPlan(){
  let a=getCurrent(); if(!a)return;
  try{
@@ -3124,14 +3306,13 @@ function pdfWrapText(text,maxChars=92){
  return lines.length?lines:[''];
 }
 function makeSimplePdf(title,lines){
- // Clean letter layout: 1-inch margins, no clipped top title, no company header.
- let pageLines=[],pages=[],lineLimit=42;
+ let pageLines=[],pages=[],lineLimit=38;
  lines.forEach(line=>{
    if(String(line||'').trim()===''){
      pageLines.push('');
      return;
    }
-   let wraps=pdfWrapText(line,88);
+   let wraps=pdfWrapText(line,82);
    wraps.forEach(w=>{
      pageLines.push(w);
      if(pageLines.length>=lineLimit){pages.push(pageLines);pageLines=[];}
@@ -3144,29 +3325,30 @@ function makeSimplePdf(title,lines){
  let boldId=addObj("<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >>");
  let pageIds=[];
  pages.forEach((p,idx)=>{
-   let y=720,content=[];
-   // Main document title starts lower, so browser PDF toolbar/top edge never clips it.
-   content.push("BT /F2 18 Tf 72 744 Td ("+pdfEscape(idx===0?title:title+" - continued")+") Tj ET");
-   content.push("0.5 w 72 732 m 540 732 l S");
+   let y=704,content=[];
+   let titleText=idx===0?title:title+" - continued";
+   let approxWidth=Math.min(420, titleText.length*8.5);
+   let titleX=Math.max(72, 306-(approxWidth/2));
+   content.push(`BT /F2 17 Tf ${titleX.toFixed(0)} 742 Td (${pdfEscape(titleText)}) Tj ET`);
+   y=694;
    p.forEach((line)=>{
      let raw=String(line||'');
      if(raw.trim()===''){
-       y-=10;
+       y-=13;
        return;
      }
      let isHead=raw.startsWith('## ');
      let font=isHead?'/F2 11 Tf':'/F1 10 Tf';
      let clean=raw.replace(/^##\s*/,'');
      if(isHead){
-       y-=4;
+       y-=6;
        content.push(`BT ${font} 72 ${y} Td (${pdfEscape(clean)}) Tj ET`);
        y-=18;
      }else{
        content.push(`BT ${font} 72 ${y} Td (${pdfEscape(clean)}) Tj ET`);
-       y-=14;
+       y-=15;
      }
    });
-   // Page number only, small and at bottom.
    content.push(`BT /F1 8 Tf 72 38 Td (Page ${idx+1} of ${pages.length}) Tj ET`);
    let stream=content.join("\n");
    let contentId=addObj(`<< /Length ${stream.length} >>\nstream\n${stream}\nendstream`);
@@ -3189,17 +3371,35 @@ function makeSimplePdf(title,lines){
  return new Blob([pdf],{type:'application/pdf'});
 }
 function pdfDocumentLines(d){
- let sections=pdfTemplateSections(d);
+ let t=pdfProfessionalTemplate(d);
  let lines=[];
- sections.forEach(([title,content],idx)=>{
-   // The PDF title is already printed at the top by makeSimplePdf, so skip duplicate heading once.
-   if(!(idx===0 && String(title||'').toUpperCase()===String(d.docType||'').toUpperCase())){
-     lines.push('## '+title);
-   }
-   (content||[]).forEach(x=>lines.push(x));
+ lines.push(...t.recipient);
+ lines.push('');
+ t.meta.forEach(([k,v])=>lines.push(`${k}: ${v||'—'}`));
+ lines.push('');
+ lines.push(t.salutation);
+ lines.push('');
+ t.paragraphs.forEach(p=>{lines.push(p);lines.push('')});
+ lines.push(t.closing);
+ lines.push('');
+ lines.push(t.closingName);
+ lines.push('');
+ if(t.post.length){
+   lines.push('## ADDITIONAL INFORMATION');
+   t.post.forEach(([k,v])=>{
+     if(String(v||'').includes(' | ')){
+       lines.push(`${k}:`);
+       String(v).split(' | ').forEach(x=>lines.push(x));
+     }else{
+       lines.push(`${k}: ${v||'—'}`);
+     }
+   });
    lines.push('');
- });
- // Keep audit info in app history, but keep downloaded debtor letter clean.
+ }
+ if(t.disclosure){
+   lines.push('## DISCLOSURE');
+   lines.push(t.disclosure);
+ }
  return lines;
 }
 function pdfFileName(d){
