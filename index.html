@@ -1207,7 +1207,7 @@ main.center > *,
 
 <div class="app">
   <header class="topbar">
-    <div class="brand"><div class="logo">b</div><div><h1>Co Pilot Collections Manager</h1><p class="sub">LAYOUT REPAIR + DEBTOR DOCS READY — account screen restored and debtor document generator added.</p></div></div>
+    <div class="brand"><div class="logo">b</div><div><h1>Co Pilot Collections Manager</h1><p class="sub">LETTER PDF FORMAT FIX — file number uses account number and PDF top spacing/address formatting repaired.</p></div></div>
     <div class="headerSearch"><span class="mag">⌕</span><input id="globalSearch" placeholder="Search accounts..." oninput="document.getElementById('search').value=this.value;onQueueFilterChange()"><span class="hotkey">⌘ K</span></div>
     <div class="topActions">
       <button class="gray" onclick="openDocumentGenerator()">Letters</button>
@@ -2827,10 +2827,13 @@ function pdfGetAccountOriginalCreditor(a){
  return a?.originalCreditor||a?.origCreditor||a?.creditor||a?.issuerName||a?.portfolio||a?.sourceFile||'';
 }
 function pdfGetFileNumber(a){
- return a?.fileNumber||a?.fileNo||a?.sourceRefNum||a?.sourceRef||a?.accountId||a?.id||'';
+ return acctNo(a)||a?.accountNumber||a?.account_number||a?.issuerAccountNumber||a?.clientAccountNumber||a?.sourceRefNum||'';
 }
 function pdfGetRecipientAddress(a){
  return [nameOf(a),a?.address,a?.address2,[a?.city,a?.state,a?.zip].filter(Boolean).join(', ')].filter(Boolean).join('\n');
+}
+function pdfRecipientLines(d){
+ return String(d.recipientAddress||'').split(/\n+/).map(x=>x.trim()).filter(Boolean);
 }
 function pdfCardMask(last4){
  let s=String(last4||'').replace(/\D/g,'').slice(-4);
@@ -2943,7 +2946,7 @@ function pdfScheduleLines(d){
 }
 function pdfTemplateSections(d){
  let sections=[];
- let partyLine=`${d.debtorName} | Account #: ${d.accountNumber} | File #: ${d.fileNumber}`;
+ let partyLine=`${d.debtorName} | Account #: ${d.accountNumber} | File/Account #: ${d.fileNumber}`;
  let creditorLine=`Original Creditor: ${d.originalCreditor||'—'} | Current Balance: ${pdfMoney(d.currentBalance)}`;
 
  if(d.docType==='Stipulation - Paid In Full + Card Authorization'){
@@ -2990,7 +2993,7 @@ function pdfTemplateSections(d){
  }
  else if(d.docType==='Standard Mailer'){
    sections.push(['STANDARD MAILER',[
-     d.recipientAddress,
+     ...pdfRecipientLines(d),
      `Dear ${d.debtorName};`,
      `Attached is information which pertains to your account. This information may be sensitive, and you should keep a copy for your records.`,
      `If you have questions or concerns, please contact the representative handling your account.`,
@@ -3000,7 +3003,7 @@ function pdfTemplateSections(d){
  }
  else if(d.docType==='Assignment / Notification of Debt'){
    sections.push(['ASSIGNMENT / NOTIFICATION OF DEBT',[
-     d.recipientAddress,
+     ...pdfRecipientLines(d),
      `The purpose of this communication is to notify you that the account identified below has been assigned, sold, or transferred for servicing/collection.`,
      `Original Creditor: ${d.originalCreditor||'—'}`,
      `Account Number: ${d.accountNumber}`,
@@ -3011,19 +3014,19 @@ function pdfTemplateSections(d){
  else if(d.docType==='Billing Statement - Paid In Full'){
    sections.push(['BILLING STATEMENT - PAID IN FULL',[
      `Statement Date: ${pdfDateLabel(d.docDate)}`,
-     `File Number: ${d.fileNumber}`,
+     `File/Account Number: ${d.fileNumber}`,
      `Bill To: ${d.debtorName}`,
      `Due Date: ${pdfDateLabel(d.dueDate)}`,
      `Minimum Due: $0.00`,
      `Account Balance: $0.00`,
-     `Thank you for your recent payment of ${pdfMoney(d.lastPaymentAmount||d.settlementAmount||d.currentBalance)}. This payment was received and applied to file ${d.fileNumber}.`,
+     `Thank you for your recent payment of ${pdfMoney(d.lastPaymentAmount||d.settlementAmount||d.currentBalance)}. This payment was received and applied to account ${d.fileNumber}.`,
      `Your account is now paid in full. We appreciate your prompt attention toward this financial obligation.`
    ]]);
  }
  else if(d.docType==='Billing Statement - Payment Plan'){
    sections.push(['BILLING STATEMENT - PAYMENT PLAN',[
      `Statement Date: ${pdfDateLabel(d.docDate)}`,
-     `File Number: ${d.fileNumber}`,
+     `File/Account Number: ${d.fileNumber}`,
      `Bill To: ${d.debtorName}`,
      `Due Date: ${pdfDateLabel(d.dueDate)}`,
      `Minimum Due: ${pdfMoney(d.minimumDue||d.installmentAmount)}`,
@@ -3034,10 +3037,10 @@ function pdfTemplateSections(d){
  }
  else if(d.docType==='Demand Letter'){
    sections.push(['DEMAND LETTER',[
-     d.recipientAddress,
+     ...pdfRecipientLines(d),
      `Date: ${pdfDateLabel(d.docDate)}`,
      `Original Creditor: ${d.originalCreditor||'—'}`,
-     `File Number: ${d.fileNumber}`,
+     `File/Account Number: ${d.fileNumber}`,
      `Dear ${d.debtorName};`,
      `Our records indicate the above account remains unresolved. The total amount currently claimed due is ${pdfMoney(d.currentBalance)}.`,
      `Please submit payment or contact the account representative by ${pdfDateLabel(d.dueDate)} to discuss resolution options.`,
@@ -3049,13 +3052,13 @@ function pdfTemplateSections(d){
  else if(d.docType==='NSF / Returned Payment Statement'){
    sections.push(['NSF / RETURNED PAYMENT STATEMENT',[
      `Statement Date: ${pdfDateLabel(d.docDate)}`,
-     `File Number: ${d.fileNumber}`,
+     `File/Account Number: ${d.fileNumber}`,
      `Bill To: ${d.debtorName}`,
      `Due Date: ${pdfDateLabel(d.dueDate)}`,
      `Minimum Due: ${pdfMoney(d.minimumDue||d.returnedAmount)}`,
      `Account Balance: ${pdfMoney(d.currentBalance)}`,
      `NOTICE: A recent payment in the amount of ${pdfMoney(d.returnedAmount)} was returned or not honored.`,
-     `Please submit replacement payment by ${pdfDateLabel(d.dueDate)} so it can be applied to file ${d.fileNumber}.`
+     `Please submit replacement payment by ${pdfDateLabel(d.dueDate)} so it can be applied to account ${d.fileNumber}.`
    ]]);
  }
  if(d.notes)sections.push(['ADDITIONAL NOTES', [d.notes]]);
@@ -3121,9 +3124,14 @@ function pdfWrapText(text,maxChars=92){
  return lines.length?lines:[''];
 }
 function makeSimplePdf(title,lines){
- let pageLines=[],pages=[],lineLimit=46;
+ // Clean letter layout: 1-inch margins, no clipped top title, no company header.
+ let pageLines=[],pages=[],lineLimit=42;
  lines.forEach(line=>{
-   let wraps=pdfWrapText(line,96);
+   if(String(line||'').trim()===''){
+     pageLines.push('');
+     return;
+   }
+   let wraps=pdfWrapText(line,88);
    wraps.forEach(w=>{
      pageLines.push(w);
      if(pageLines.length>=lineLimit){pages.push(pageLines);pageLines=[];}
@@ -3136,17 +3144,30 @@ function makeSimplePdf(title,lines){
  let boldId=addObj("<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >>");
  let pageIds=[];
  pages.forEach((p,idx)=>{
-   let y=760,content=[];
-   content.push("BT /F2 18 Tf 50 790 Td ("+pdfEscape(idx===0?title:title+" continued")+") Tj ET");
-   content.push("BT /F1 9 Tf 50 772 Td (Generated "+pdfEscape(new Date().toLocaleString())+") Tj ET");
-   content.push("0.2 w 50 760 m 545 760 l S");
+   let y=720,content=[];
+   // Main document title starts lower, so browser PDF toolbar/top edge never clips it.
+   content.push("BT /F2 18 Tf 72 744 Td ("+pdfEscape(idx===0?title:title+" - continued")+") Tj ET");
+   content.push("0.5 w 72 732 m 540 732 l S");
    p.forEach((line)=>{
-     let isHead=line.startsWith('## ');
+     let raw=String(line||'');
+     if(raw.trim()===''){
+       y-=10;
+       return;
+     }
+     let isHead=raw.startsWith('## ');
      let font=isHead?'/F2 11 Tf':'/F1 10 Tf';
-     let clean=line.replace(/^##\s*/,'');
-     content.push(`BT ${font} 50 ${y} Td (${pdfEscape(clean)}) Tj ET`);
-     y-=isHead?18:14;
+     let clean=raw.replace(/^##\s*/,'');
+     if(isHead){
+       y-=4;
+       content.push(`BT ${font} 72 ${y} Td (${pdfEscape(clean)}) Tj ET`);
+       y-=18;
+     }else{
+       content.push(`BT ${font} 72 ${y} Td (${pdfEscape(clean)}) Tj ET`);
+       y-=14;
+     }
    });
+   // Page number only, small and at bottom.
+   content.push(`BT /F1 8 Tf 72 38 Td (Page ${idx+1} of ${pages.length}) Tj ET`);
    let stream=content.join("\n");
    let contentId=addObj(`<< /Length ${stream.length} >>\nstream\n${stream}\nendstream`);
    let pageId=addObj(`<< /Type /Page /Parent 0 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 ${fontId} 0 R /F2 ${boldId} 0 R >> >> /Contents ${contentId} 0 R >>`);
@@ -3170,13 +3191,15 @@ function makeSimplePdf(title,lines){
 function pdfDocumentLines(d){
  let sections=pdfTemplateSections(d);
  let lines=[];
- sections.forEach(([title,content])=>{
-   lines.push('## '+title);
+ sections.forEach(([title,content],idx)=>{
+   // The PDF title is already printed at the top by makeSimplePdf, so skip duplicate heading once.
+   if(!(idx===0 && String(title||'').toUpperCase()===String(d.docType||'').toUpperCase())){
+     lines.push('## '+title);
+   }
    (content||[]).forEach(x=>lines.push(x));
    lines.push('');
  });
- lines.push('Created By: '+(d.createdBy||''));
- lines.push('Generated: '+new Date().toLocaleString());
+ // Keep audit info in app history, but keep downloaded debtor letter clean.
  return lines;
 }
 function pdfFileName(d){
