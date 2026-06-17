@@ -868,3 +868,13 @@ create index if not exists idx_payments_ledger_date on payments_ledger(payment_d
 create index if not exists idx_payments_ledger_user on payments_ledger(lower(created_by_email));
 create index if not exists idx_payments_ledger_status on payments_ledger(status);
 create index if not exists idx_payment_plan_payments_due_status on payment_plan_payments(due_date, status);
+
+
+-- PDF DOCUMENT GENERATOR SUPPORT
+-- Uses account_docs table from the Power Features pack.
+alter table account_docs add column if not exists generated_file_name text;
+alter table account_docs add column if not exists generated_doc_type text;
+alter table account_docs add column if not exists generated_by_email text;
+alter table account_docs add column if not exists generated_at timestamptz;
+
+create index if not exists idx_account_docs_generated on account_docs(account_id, generated_at);
