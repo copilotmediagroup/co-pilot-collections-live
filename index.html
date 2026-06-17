@@ -398,6 +398,408 @@ header.topbar{height:66px;background:linear-gradient(90deg,#05225f,#07379a,#0b45
 @media(max-width:1450px){.ledgerGrid,.ledgerStats,.ledgerBalancePreview{grid-template-columns:repeat(2,1fr)}.ledgerHalf{grid-column:span 1}}
 @media(max-width:850px){.ledgerGrid,.ledgerStats,.ledgerBalancePreview{grid-template-columns:1fr}.ledgerHalf{grid-column:1/-1}}
 
+
+/* FULL SCREEN FIT FIX — prevents the CRM from overflowing off the right side */
+*{box-sizing:border-box}
+html,body{
+  width:100%!important;
+  max-width:100%!important;
+  height:100%!important;
+  overflow:hidden!important;
+}
+body{
+  margin:0!important;
+}
+.app{
+  width:100vw!important;
+  max-width:100vw!important;
+  min-width:0!important;
+  overflow:hidden!important;
+  height:100vh!important;
+  display:grid!important;
+  grid-template-rows:auto minmax(0,1fr) 54px!important;
+}
+
+/* Top bar: wraps into compact rows instead of pushing off-screen */
+.topbar{
+  width:100%!important;
+  max-width:100vw!important;
+  min-width:0!important;
+  height:auto!important;
+  min-height:54px!important;
+  padding:6px 8px!important;
+  gap:6px!important;
+  display:grid!important;
+  grid-template-columns:minmax(220px,270px) minmax(150px,230px) minmax(0,1fr)!important;
+  align-items:center!important;
+  overflow:visible!important;
+}
+.brand{
+  min-width:0!important;
+  gap:7px!important;
+}
+.logo{
+  width:32px!important;
+  height:32px!important;
+  border-radius:8px!important;
+  font-size:21px!important;
+  flex:0 0 auto!important;
+}
+.brand h1{
+  font-size:15px!important;
+  line-height:1.05!important;
+  max-width:220px!important;
+  overflow:hidden!important;
+  text-overflow:ellipsis!important;
+  white-space:nowrap!important;
+}
+.sub{
+  font-size:9px!important;
+  line-height:1.05!important;
+  max-width:225px!important;
+  margin-top:1px!important;
+  overflow:hidden!important;
+  text-overflow:ellipsis!important;
+  white-space:nowrap!important;
+}
+.headerSearch{
+  width:100%!important;
+  max-width:230px!important;
+  min-width:0!important;
+  margin:0!important;
+}
+.headerSearch input{
+  height:30px!important;
+  border-radius:9px!important;
+  font-size:11px!important;
+  padding-left:28px!important;
+  padding-right:36px!important;
+}
+.headerSearch .mag{
+  left:9px!important;
+  top:6px!important;
+}
+.headerSearch .hotkey{
+  right:5px!important;
+  top:5px!important;
+  font-size:9px!important;
+  padding:1px 5px!important;
+}
+.topActions{
+  min-width:0!important;
+  width:100%!important;
+  max-width:100%!important;
+  display:flex!important;
+  flex-wrap:wrap!important;
+  justify-content:flex-end!important;
+  align-items:center!important;
+  gap:4px!important;
+  overflow:visible!important;
+}
+.topActions button,
+.topActions .fileBtn{
+  height:26px!important;
+  min-height:26px!important;
+  padding:0 7px!important;
+  border-radius:7px!important;
+  font-size:10px!important;
+  line-height:1!important;
+  white-space:nowrap!important;
+  flex:0 0 auto!important;
+}
+.topActions .roleBadge,
+.roleBadge{
+  height:26px!important;
+  min-height:26px!important;
+  max-width:64px!important;
+  padding:0 7px!important;
+  border-radius:999px!important;
+  font-size:10px!important;
+  white-space:nowrap!important;
+  overflow:hidden!important;
+  text-overflow:ellipsis!important;
+}
+.topActions span:not(.roleBadge):not(.dot){
+  font-size:10px!important;
+  white-space:nowrap!important;
+}
+.dot{
+  width:7px!important;
+  height:7px!important;
+}
+
+/* Main app grid: shrink fixed columns so right panel fits inside Bolt preview */
+.main{
+  width:100%!important;
+  max-width:100vw!important;
+  min-width:0!important;
+  overflow:hidden!important;
+  display:grid!important;
+  grid-template-columns:42px 245px minmax(0,1fr) 215px!important;
+  gap:0!important;
+  padding:0!important;
+}
+.navRail{
+  width:42px!important;
+  min-width:42px!important;
+  padding:10px 4px!important;
+  gap:10px!important;
+  overflow:hidden!important;
+}
+.navIcon{
+  width:30px!important;
+  height:30px!important;
+  border-radius:8px!important;
+  font-size:14px!important;
+}
+.sidebar{
+  width:245px!important;
+  min-width:0!important;
+  padding:10px!important;
+  overflow:auto!important;
+}
+.sideHead h2{
+  font-size:17px!important;
+}
+.filters{
+  gap:7px!important;
+}
+.filters input,
+.filters select{
+  height:36px!important;
+  font-size:12px!important;
+}
+.qItem{
+  grid-template-columns:30px minmax(0,1fr) auto!important;
+  gap:7px!important;
+  padding:9px!important;
+  border-radius:10px!important;
+}
+.qNum{
+  width:26px!important;
+  height:26px!important;
+  font-size:12px!important;
+}
+.qName{
+  font-size:12px!important;
+}
+.qMeta{
+  font-size:10px!important;
+}
+.qBal{
+  font-size:11px!important;
+}
+.center{
+  min-width:0!important;
+  max-width:100%!important;
+  overflow:auto!important;
+  padding:10px 10px 62px!important;
+  grid-template-columns:minmax(0,1fr)!important;
+}
+.right{
+  width:215px!important;
+  min-width:0!important;
+  max-width:215px!important;
+  padding:10px 8px 62px!important;
+  overflow:auto!important;
+}
+.right .panel{
+  min-width:0!important;
+}
+.softphone{
+  padding:10px!important;
+}
+.softTop{
+  font-size:12px!important;
+}
+.connected{
+  font-size:11px!important;
+}
+.ready{
+  padding:8px!important;
+  font-size:11px!important;
+}
+.keys{
+  gap:5px!important;
+}
+.key{
+  height:37px!important;
+  padding:4px!important;
+  font-size:12px!important;
+}
+.key small{
+  font-size:8px!important;
+}
+.callBox{
+  padding:8px!important;
+}
+.callBox button{
+  height:34px!important;
+  font-size:11px!important;
+}
+.qaItem{
+  padding:7px!important;
+  font-size:11px!important;
+}
+
+/* Account content: no internal minimums that create horizontal overflow */
+.centerProgress,
+.accountCard,
+.allFieldsTopPanel,
+.paymentPlanPanel,
+.phonePanel,
+.dispoPanel,
+.notePanel,
+.centerActivity{
+  min-width:0!important;
+  max-width:100%!important;
+}
+.centerProgress{
+  height:28px!important;
+  font-size:12px!important;
+}
+.accountCard{
+  grid-template-columns:52px minmax(0,1fr)!important;
+  gap:10px!important;
+  padding:12px!important;
+  min-height:0!important;
+}
+.avatar{
+  width:46px!important;
+  height:46px!important;
+  font-size:18px!important;
+}
+.name{
+  font-size:18px!important;
+}
+.summaryGrid{
+  grid-template-columns:repeat(3,minmax(0,1fr))!important;
+  gap:8px!important;
+}
+.fieldLabel{
+  font-size:9px!important;
+}
+.fieldVal{
+  font-size:12px!important;
+  overflow-wrap:anywhere!important;
+}
+.allFieldsGrid{
+  grid-template-columns:repeat(4,minmax(0,1fr))!important;
+  gap:8px!important;
+}
+.detailGroup{
+  min-width:0!important;
+}
+.allFieldCard{
+  min-width:0!important;
+  padding:8px!important;
+}
+.allFieldKey{
+  font-size:10px!important;
+}
+.allFieldVal{
+  font-size:11px!important;
+  overflow-wrap:anywhere!important;
+}
+.phoneGrid{
+  grid-template-columns:repeat(3,minmax(0,1fr))!important;
+}
+.phoneChip{
+  min-width:0!important;
+  padding:8px!important;
+}
+.phoneNum{
+  font-size:11px!important;
+}
+.dispoGrid{
+  grid-template-columns:repeat(4,minmax(0,1fr))!important;
+}
+.dispo{
+  height:34px!important;
+  font-size:10px!important;
+  padding:0 5px!important;
+}
+.notePanel textarea{
+  height:66px!important;
+}
+.timeline{
+  max-height:110px!important;
+}
+
+/* Bottom bar: do not let action buttons run off-screen */
+.bottom{
+  width:100%!important;
+  max-width:100vw!important;
+  min-width:0!important;
+  height:54px!important;
+  padding:8px 10px!important;
+  gap:8px!important;
+  overflow:hidden!important;
+}
+.rightBtns{
+  display:flex!important;
+  gap:8px!important;
+  min-width:0!important;
+  justify-content:flex-end!important;
+  flex:1 1 auto!important;
+}
+.big,
+.primaryBig{
+  min-width:120px!important;
+  height:38px!important;
+  border-radius:9px!important;
+  font-size:13px!important;
+  padding:0 12px!important;
+}
+.primaryBig{
+  min-width:145px!important;
+}
+
+/* Fit inside narrower Bolt preview widths */
+@media(max-width:1350px){
+  .topbar{
+    grid-template-columns:minmax(190px,250px) minmax(140px,200px) minmax(0,1fr)!important;
+  }
+  .main{
+    grid-template-columns:38px 225px minmax(0,1fr) 195px!important;
+  }
+  .navRail{width:38px!important;min-width:38px!important}
+  .sidebar{width:225px!important}
+  .right{width:195px!important;max-width:195px!important}
+  .allFieldsGrid{grid-template-columns:repeat(3,minmax(0,1fr))!important}
+  .summaryGrid{grid-template-columns:repeat(3,minmax(0,1fr))!important}
+  .phoneGrid{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+  .big{min-width:105px!important}
+  .primaryBig{min-width:130px!important}
+}
+@media(max-width:1100px){
+  .topbar{
+    grid-template-columns:1fr!important;
+    grid-template-areas:"brand" "search" "actions"!important;
+  }
+  .brand{grid-area:brand!important}
+  .headerSearch{grid-area:search!important;max-width:none!important}
+  .topActions{grid-area:actions!important;justify-content:flex-start!important}
+  .main{
+    grid-template-columns:38px 220px minmax(0,1fr)!important;
+  }
+  .right{
+    display:none!important;
+  }
+  .allFieldsGrid{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+}
+@media(max-width:850px){
+  body{overflow:auto!important}
+  .app{height:auto!important;display:block!important}
+  .topbar{position:sticky;top:0;z-index:10}
+  .main{display:block!important}
+  .navRail{display:none!important}
+  .sidebar,.center,.right{width:100%!important;max-width:100%!important;display:block!important;padding:10px!important}
+  .summaryGrid,.allFieldsGrid,.phoneGrid,.dispoGrid{grid-template-columns:1fr!important}
+  .bottom{position:sticky!important;bottom:0!important}
+  .rightBtns{flex-wrap:wrap!important}
+}
+
 </style>
 </head>
 <body>
@@ -439,22 +841,22 @@ header.topbar{height:66px;background:linear-gradient(90deg,#05225f,#07379a,#0b45
 
 <div class="app">
   <header class="topbar">
-    <div class="brand"><div class="logo">b</div><div><h1>Co Pilot Collections Manager</h1><p class="sub">PAYMENT LEDGER + BROKEN PROMISE READY — real payments, balance updates, receipts, and missed promise automation.</p></div></div>
+    <div class="brand"><div class="logo">b</div><div><h1>Co Pilot Collections Manager</h1><p class="sub">FULL SCREEN FIT FIX — no right-side overflow, compact toolbar, responsive CRM layout.</p></div></div>
     <div class="headerSearch"><span class="mag">⌕</span><input id="globalSearch" placeholder="Search accounts..." oninput="document.getElementById('search').value=this.value;onQueueFilterChange()"><span class="hotkey">⌘ K</span></div>
     <div class="topActions">
-      <button class="gray" onclick="openPaymentsDashboard()">💵 Payments</button>
-      <button class="gray" onclick="runBrokenPromiseAutomation(true)">⚡ Broken Check</button>
-      <button class="gray" onclick="openDailyWorkQueue()">📅 Work Queue</button>
-      <button class="gray" onclick="openPromiseDashboard()">💰 Promises</button>
-      <button class="gray adminOnly hidden" onclick="openAuditLog()">🛡 Audit Log</button>
-      <button class="gray adminOnly hidden" onclick="openPermissionsModal()">🔐 Permissions</button>
-      <button class="gray adminOnly hidden" onclick="openEmployeeMonitorModal()">📊 Monitor Employees</button>
-      <button class="gray adminOnly hidden" onclick="openEmployeeAdminModal()">✅ Manage Employees</button>
-      <button class="gray adminOnly hidden" onclick="openAssignModal()">👥 Assign Accounts</button>
-      <label class="fileBtn gray adminOnly hidden">⇩ Import CSV<input type="file" accept=".csv" onchange="importCSV(event)"></label>
-      <button class="purple adminOnly hidden" onclick="downloadTemplate()">⇩ Template CSV</button>
-      <button class="gray adminOnly hidden" onclick="exportCSV()">⇩ Export CSV</button>
-      <button class="red adminOnly hidden" onclick="clearAllAccounts()">🗑 Clear Accounts</button>
+      <button class="gray" onclick="openPaymentsDashboard()">Pay</button>
+      <button class="gray" onclick="runBrokenPromiseAutomation(true)">Broken</button>
+      <button class="gray" onclick="openDailyWorkQueue()">Queue</button>
+      <button class="gray" onclick="openPromiseDashboard()">Promises</button>
+      <button class="gray adminOnly hidden" onclick="openAuditLog()">Audit</button>
+      <button class="gray adminOnly hidden" onclick="openPermissionsModal()">Perms</button>
+      <button class="gray adminOnly hidden" onclick="openEmployeeMonitorModal()">Monitor</button>
+      <button class="gray adminOnly hidden" onclick="openEmployeeAdminModal()">Staff</button>
+      <button class="gray adminOnly hidden" onclick="openAssignModal()">Assign</button>
+      <label class="fileBtn gray adminOnly hidden">Import<input type="file" accept=".csv" onchange="importCSV(event)"></label>
+      <button class="purple adminOnly hidden" onclick="downloadTemplate()">Template</button>
+      <button class="gray adminOnly hidden" onclick="exportCSV()">Export</button>
+      <button class="red adminOnly hidden" onclick="clearAllAccounts()">Clear</button>
       <span class="roleBadge" id="roleBadge">Not logged in</span>
       <button class="red" onclick="logout()">Logout</button>
       <span><span class="dot"></span> Available</span>
@@ -1039,7 +1441,10 @@ async function dbFetch(path,opt={}){if(!token())throw new Error('Not logged in.'
 
 function applyRoleUI(){
   const badge=document.getElementById('roleBadge');
-  if(badge) badge.textContent=(currentUser.isAdmin?'Admin: ':'Employee: ')+(currentUser.email||'');
+  if(badge){
+    badge.textContent=currentUser.isAdmin?'Admin':'Employee';
+    badge.title=currentUser.email||'';
+  }
   document.querySelectorAll('.adminOnly').forEach(el=>el.classList.toggle('hidden',!currentUser.isAdmin));
 }
 
