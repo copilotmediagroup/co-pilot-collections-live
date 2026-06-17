@@ -936,6 +936,21 @@ body{
   }
 }
 
+
+/* DEBTOR DOC TEMPLATE GENERATOR REFINEMENT */
+.pdfDocBox{max-width:1240px!important}
+.pdfDocWarning{background:#eff6ff!important;border-color:#bfdbfe!important;color:#1e3a8a!important}
+.pdfDocGrid{grid-template-columns:repeat(4,minmax(0,1fr))!important}
+.pdfDocGrid textarea{min-height:74px!important}
+.pdfPreviewPaper h2{font-size:18px!important;text-transform:uppercase!important}
+.pdfPreviewPaper h3{font-size:13px!important;margin-top:14px!important;padding-top:8px!important;border-top:1px solid #e2e8f0!important}
+.pdfPreviewPaper .docRow{grid-template-columns:1fr!important}
+.topActions button[onclick="openDocumentGenerator()"]{background:#0ea5e9!important;color:#fff!important;font-weight:1000!important}
+.allFieldsTopHeader button[onclick="openDocumentGenerator()"]{background:#eff6ff!important;border-color:#bfdbfe!important;color:#1d4ed8!important;font-weight:1000!important}
+.quickActions .qaItem[onclick="openDocumentGenerator()"]{background:#eff6ff!important;border-color:#bfdbfe!important;color:#1d4ed8!important;font-weight:1000!important}
+@media(max-width:1350px){.pdfDocGrid{grid-template-columns:repeat(2,minmax(0,1fr))!important}}
+@media(max-width:850px){.pdfDocGrid{grid-template-columns:1fr!important}.pdfHalf,.pdfWide{grid-column:1/-1!important}}
+
 </style>
 </head>
 <body>
@@ -977,10 +992,10 @@ body{
 
 <div class="app">
   <header class="topbar">
-    <div class="brand"><div class="logo">b</div><div><h1>Co Pilot Collections Manager</h1><p class="sub">VISIBLE DOCS + CARD LAYOUT FIX — top account card no longer overlaps and PDF button is easy to find.</p></div></div>
+    <div class="brand"><div class="logo">b</div><div><h1>Co Pilot Collections Manager</h1><p class="sub">DEBTOR DOC TEMPLATE GENERATOR READY — employee chooses document, creates/downloads debtor docs without company header info.</p></div></div>
     <div class="headerSearch"><span class="mag">⌕</span><input id="globalSearch" placeholder="Search accounts..." oninput="document.getElementById('search').value=this.value;onQueueFilterChange()"><span class="hotkey">⌘ K</span></div>
     <div class="topActions">
-      <button class="gray" onclick="openDocumentGenerator()">Docs</button>
+      <button class="gray" onclick="openDocumentGenerator()">Letters</button>
       <button class="gray" onclick="openPaymentsDashboard()">Pay</button>
       <button class="gray" onclick="runBrokenPromiseAutomation(true)">Broken</button>
       <button class="gray" onclick="openDailyWorkQueue()">Queue</button>
@@ -1052,7 +1067,7 @@ body{
             <div class="allFieldsTopTitle">Account Details</div>
             <div class="hint">Curated extra fields only. Primary summary info is not repeated here.</div>
           </div>
-          <button class="outline" onclick="openDocumentGenerator()">Generate PDF</button>
+          <button class="outline" onclick="openDocumentGenerator()">Create Letter</button>
           <button class="outline rawDumpToggle" onclick="toggleRawDump()">Show Source Fields</button>
           <span class="allFieldsTopBadge" id="allFieldsCount">0 details</span>
         </div>
@@ -1089,7 +1104,7 @@ body{
         <div class="panelTitle"><h3>Quick Actions</h3></div>
         <div class="qaItem" onclick="openPaymentPlan()"><span class="qaLeft"><span class="qaIcon">💳</span>Payment Promise / Plan</span><span>›</span></div>
         <div class="qaItem" onclick="openPaymentLedger()"><span class="qaLeft"><span class="qaIcon">💵</span>Record Payment / Ledger</span><span>›</span></div>
-        <div class="qaItem" onclick="openDocumentGenerator()"><span class="qaLeft"><span class="qaIcon">🧾</span>Generate Payoff / Settlement PDF</span><span>›</span></div>
+        <div class="qaItem" onclick="openDocumentGenerator()"><span class="qaLeft"><span class="qaIcon">🧾</span>Create Debtor Letter / PDF</span><span>›</span></div>
         <div class="qaItem" onclick="openFollowUpModal('Callback')"><span class="qaLeft"><span class="qaIcon">📅</span>Schedule Callback / Follow-Up</span><span>›</span></div>
         <div class="qaItem" onclick="openCallResultModal()"><span class="qaLeft"><span class="qaIcon">☎</span>Log Call Result</span><span>›</span></div>
         <div class="qaItem" onclick="openDisputeModal()"><span class="qaLeft"><span class="qaIcon">⚠</span>Dispute Tracker</span><span>›</span></div>
@@ -1545,44 +1560,60 @@ body{
 </div></div>
 
 
+
 <div id="documentGeneratorModal" class="modal"><div class="modalbox pdfDocBox">
-  <div class="modalhead"><h2>Payoff / Settlement PDF Generator</h2><button class="gray" onclick="closeModal('documentGeneratorModal')">Close</button></div>
+  <div class="modalhead"><h2>Debtor Document Generator</h2><button class="gray" onclick="closeModal('documentGeneratorModal')">Close</button></div>
   <div class="modalbody">
     <div class="pdfDocWarning">
-      Generate professional account documents directly from the selected debtor account. PDFs download to your computer and a document record is saved to the account history.
+      Employee chooses the document type, reviews the auto-filled debtor/account values, then downloads the PDF and/or saves the document record to the account. No company name, company address, or company email is printed on the letters.
     </div>
+
     <div class="pdfDocGrid">
-      <div><label>Document Type</label><select id="pdfDocType" onchange="pdfDocTypeChanged()">
-        <option>Payoff Quote</option>
-        <option>Settlement Offer</option>
-        <option>Payment Agreement</option>
-        <option>Promise-to-Pay Confirmation</option>
-        <option>Payment Receipt</option>
+      <div class="pdfHalf"><label>Document Type</label><select id="pdfDocType" onchange="pdfDocTypeChanged()">
+        <option>Stipulation - Paid In Full + Card Authorization</option>
+        <option>Stipulation - Payment Plan + Card Authorization</option>
+        <option>Release of Liability</option>
+        <option>Standard Mailer</option>
+        <option>Assignment / Notification of Debt</option>
+        <option>Billing Statement - Paid In Full</option>
+        <option>Billing Statement - Payment Plan</option>
+        <option>Demand Letter</option>
+        <option>NSF / Returned Payment Statement</option>
       </select></div>
       <div><label>Document Date</label><input id="pdfDocDate" type="date" onchange="renderPdfDocPreview()"></div>
-      <div><label>Expires / Due Date</label><input id="pdfDocDueDate" type="date" onchange="renderPdfDocPreview()"></div>
-      <div><label>Authorized By</label><input id="pdfAuthorizedBy" oninput="renderPdfDocPreview()" placeholder="Agent / Manager name"></div>
+      <div><label>Due / Expiration Date</label><input id="pdfDocDueDate" type="date" onchange="renderPdfDocPreview()"></div>
 
-      <div><label>Company Name</label><input id="pdfCompanyName" oninput="savePdfCompanyConfig();renderPdfDocPreview()" placeholder="Co Pilot Collections Manager"></div>
-      <div><label>Company Phone</label><input id="pdfCompanyPhone" oninput="savePdfCompanyConfig();renderPdfDocPreview()" placeholder="Phone number"></div>
-      <div class="pdfHalf"><label>Company Email</label><input id="pdfCompanyEmail" oninput="savePdfCompanyConfig();renderPdfDocPreview()" placeholder="payments@company.com"></div>
-      <div class="pdfWide"><label>Company Address</label><input id="pdfCompanyAddress" oninput="savePdfCompanyConfig();renderPdfDocPreview()" placeholder="Company mailing address"></div>
+      <div><label>File / Case Number</label><input id="pdfFileNumber" oninput="renderPdfDocPreview()"></div>
+      <div><label>Original Creditor</label><input id="pdfOriginalCreditor" oninput="renderPdfDocPreview()"></div>
+      <div><label>Account Number</label><input id="pdfAccountNumber" oninput="renderPdfDocPreview()"></div>
+      <div><label>Authorized By</label><input id="pdfAuthorizedBy" oninput="renderPdfDocPreview()" placeholder="Employee / manager"></div>
 
       <div><label>Current Balance</label><input id="pdfCurrentBalance" type="number" step="0.01" oninput="renderPdfDocPreview()"></div>
-      <div><label>Settlement Amount</label><input id="pdfSettlementAmount" type="number" step="0.01" oninput="renderPdfDocPreview()"></div>
-      <div><label>Payment Amount</label><input id="pdfPaymentAmount" type="number" step="0.01" oninput="renderPdfDocPreview()"></div>
-      <div><label>Payment Method</label><select id="pdfPaymentMethod" onchange="renderPdfDocPreview()"><option>Card</option><option>ACH</option><option>Zelle</option><option>Cash App</option><option>Money Order</option><option>Check</option><option>Other</option></select></div>
+      <div><label>Settlement / PIF Amount</label><input id="pdfSettlementAmount" type="number" step="0.01" oninput="renderPdfDocPreview()"></div>
+      <div><label>Initial Payment</label><input id="pdfInitialPayment" type="number" step="0.01" oninput="renderPdfDocPreview()"></div>
+      <div><label>Installment Amount</label><input id="pdfInstallmentAmount" type="number" step="0.01" oninput="renderPdfDocPreview()"></div>
 
-      <div class="pdfHalf"><label>Payment Instructions</label><textarea id="pdfPaymentInstructions" oninput="savePdfCompanyConfig();renderPdfDocPreview()" placeholder="How debtor should make payment..."></textarea></div>
-      <div class="pdfHalf"><label>Document Notes</label><textarea id="pdfDocNotes" oninput="renderPdfDocPreview()" placeholder="Extra terms, payment schedule details, confirmation notes..."></textarea></div>
-      <div class="pdfWide"><label>Disclaimer / Terms</label><textarea id="pdfDisclaimer" oninput="savePdfCompanyConfig();renderPdfDocPreview()"></textarea></div>
+      <div><label># of Payments</label><input id="pdfPaymentCount" type="number" min="0" step="1" oninput="renderPdfDocPreview()"></div>
+      <div><label>Frequency</label><select id="pdfFrequency" onchange="renderPdfDocPreview()"><option>One-Time</option><option>Weekly</option><option>Biweekly</option><option>Monthly</option></select></div>
+      <div><label>Payment Method</label><select id="pdfPaymentMethod" onchange="renderPdfDocPreview()"><option>Card</option><option>ACH</option><option>Zelle</option><option>Cash App</option><option>Money Order</option><option>Check</option><option>Other</option></select></div>
+      <div><label>Card / Account Last 4</label><input id="pdfCardLast4" maxlength="8" oninput="renderPdfDocPreview()" placeholder="Last 4 only"></div>
+
+      <div><label>Last Payment Amount</label><input id="pdfLastPaymentAmount" type="number" step="0.01" oninput="renderPdfDocPreview()"></div>
+      <div><label>Last Payment Date</label><input id="pdfLastPaymentDate" type="date" onchange="renderPdfDocPreview()"></div>
+      <div><label>Minimum Due</label><input id="pdfMinimumDue" type="number" step="0.01" oninput="renderPdfDocPreview()"></div>
+      <div><label>Returned / NSF Amount</label><input id="pdfReturnedAmount" type="number" step="0.01" oninput="renderPdfDocPreview()"></div>
+
+      <div class="pdfHalf"><label>Recipient Address</label><textarea id="pdfRecipientAddress" oninput="renderPdfDocPreview()"></textarea></div>
+      <div class="pdfHalf"><label>Custom Notes / Terms</label><textarea id="pdfDocNotes" oninput="renderPdfDocPreview()" placeholder="Optional custom language or payment schedule notes..."></textarea></div>
+      <div class="pdfWide"><label>Debt Collection Disclosure / Disclaimer</label><textarea id="pdfDisclaimer" oninput="renderPdfDocPreview()">This is an attempt to collect a debt. Any information obtained will be used for that purpose. This is a communication from a debt collector.</textarea></div>
     </div>
 
     <div class="pdfDocActions">
       <button class="outline" onclick="fillPdfFromPaymentPlan()">Use Active Payment Plan</button>
       <button class="outline" onclick="fillPdfFromLatestPayment()">Use Latest Payment</button>
       <button class="gray" onclick="renderPdfDocPreview()">Refresh Preview</button>
-      <button class="green" onclick="generateAccountPdf()">Download PDF</button>
+      <button class="outline" onclick="saveDocumentRecordOnly()">Save Record Only</button>
+      <button class="green" onclick="generateAccountPdf()">Download PDF + Save</button>
     </div>
 
     <div class="pdfPreviewWrap">
@@ -1591,11 +1622,12 @@ body{
     </div>
 
     <div class="pdfSavedList">
-      <div style="padding:10px 12px;font-weight:1000;color:#0f172a;border-bottom:1px solid #edf2f7">Recently Generated Documents</div>
+      <div style="padding:10px 12px;font-weight:1000;color:#0f172a;border-bottom:1px solid #edf2f7">Recently Created Documents</div>
       <div id="pdfGeneratedList"></div>
     </div>
   </div>
 </div></div>
+
 
 <script src="config.js"></script>
 <script>
@@ -2568,149 +2600,278 @@ async function saveSettlement(){let a=getCurrent();if(!a)return;let row={account
 /* RESTORED STABLE PAYMENT PLAN ENGINE */
 
 
-/* PDF DOCUMENT GENERATOR — pure browser PDF, no external libraries */
+
+/* DEBTOR DOC TEMPLATE GENERATOR — pure browser PDF, no external libraries */
 let pdfGeneratedDocsCache=[];
 
 function pdfDateLabel(d){
  try{return typeof powerDateLabel==='function'?powerDateLabel(d):String(d||'—')}catch(e){return String(d||'—')}
 }
-function pdfCompanyDefaults(){
- return {
-   companyName:localStorage.getItem('pdfCompanyName')||'Co Pilot Collections Manager',
-   companyPhone:localStorage.getItem('pdfCompanyPhone')||'',
-   companyEmail:localStorage.getItem('pdfCompanyEmail')||'',
-   companyAddress:localStorage.getItem('pdfCompanyAddress')||'',
-   paymentInstructions:localStorage.getItem('pdfPaymentInstructions')||'Contact our office to complete payment using an approved payment method.',
-   disclaimer:localStorage.getItem('pdfDisclaimer')||'This communication is from a debt collector. This is an attempt to collect a debt and any information obtained will be used for that purpose. This document is for account resolution purposes only. Terms may expire or be withdrawn if payment is not received by the stated date.'
- };
+function pdfMoney(v){return moneyNum(v).toLocaleString(undefined,{style:'currency',currency:'USD'});}
+function pdfGetAccountOriginalCreditor(a){
+ return a?.originalCreditor||a?.origCreditor||a?.creditor||a?.issuerName||a?.portfolio||a?.sourceFile||'';
 }
-function savePdfCompanyConfig(){
- [
-   ['pdfCompanyName','pdfCompanyName'],
-   ['pdfCompanyPhone','pdfCompanyPhone'],
-   ['pdfCompanyEmail','pdfCompanyEmail'],
-   ['pdfCompanyAddress','pdfCompanyAddress'],
-   ['pdfPaymentInstructions','pdfPaymentInstructions'],
-   ['pdfDisclaimer','pdfDisclaimer']
- ].forEach(([id,key])=>{
-   let el=document.getElementById(id); if(el)localStorage.setItem(key,el.value||'');
- });
+function pdfGetFileNumber(a){
+ return a?.fileNumber||a?.fileNo||a?.sourceRefNum||a?.sourceRef||a?.accountId||a?.id||'';
+}
+function pdfGetRecipientAddress(a){
+ return [nameOf(a),a?.address,a?.address2,[a?.city,a?.state,a?.zip].filter(Boolean).join(', ')].filter(Boolean).join('\n');
+}
+function pdfCardMask(last4){
+ let s=String(last4||'').replace(/\D/g,'').slice(-4);
+ return s?('XXXX-XXXX-XXXX-'+s):'XXXX-XXXX-XXXX-____';
 }
 function pdfDocTypeChanged(){
  let t=val('pdfDocType');
- let a=getCurrent();
- let bal=accountBalance(a);
- if(t==='Settlement Offer' && !moneyNum(val('pdfSettlementAmount')))document.getElementById('pdfSettlementAmount').value=(bal*.5).toFixed(2);
- if(t==='Payoff Quote')document.getElementById('pdfPaymentAmount').value=bal.toFixed(2);
- if(t==='Payment Receipt' && !moneyNum(val('pdfPaymentAmount')))document.getElementById('pdfPaymentAmount').value=bal.toFixed(2);
+ let bal=moneyNum(val('pdfCurrentBalance'));
+ if(t.includes('Paid In Full')){
+   if(!moneyNum(val('pdfSettlementAmount')))document.getElementById('pdfSettlementAmount').value=bal.toFixed(2);
+   document.getElementById('pdfFrequency').value='One-Time';
+   document.getElementById('pdfPaymentCount').value='1';
+ }
+ if(t.includes('Payment Plan')){
+   if(!moneyNum(val('pdfPaymentCount')))document.getElementById('pdfPaymentCount').value='3';
+   if(!moneyNum(val('pdfInstallmentAmount')))document.getElementById('pdfInstallmentAmount').value=(bal/Math.max(1,moneyNum(val('pdfPaymentCount'))||3)).toFixed(2);
+   document.getElementById('pdfFrequency').value=document.getElementById('pdfFrequency').value==='One-Time'?'Monthly':document.getElementById('pdfFrequency').value;
+ }
+ if(t.includes('NSF')){
+   if(!moneyNum(val('pdfReturnedAmount')))document.getElementById('pdfReturnedAmount').value=moneyNum(val('pdfLastPaymentAmount')||val('pdfMinimumDue')||0).toFixed(2);
+ }
  renderPdfDocPreview();
 }
 async function openDocumentGenerator(){
  let a=getCurrent(); if(!a)return alert('No account selected.');
- let cfg=pdfCompanyDefaults();
- document.getElementById('pdfDocType').value='Payoff Quote';
+ let bal=accountBalance(a);
+ document.getElementById('pdfDocType').value='Stipulation - Paid In Full + Card Authorization';
  document.getElementById('pdfDocDate').value=todayISO();
  document.getElementById('pdfDocDueDate').value=addDaysISO(todayISO(),10);
+ document.getElementById('pdfFileNumber').value=pdfGetFileNumber(a);
+ document.getElementById('pdfOriginalCreditor').value=pdfGetAccountOriginalCreditor(a);
+ document.getElementById('pdfAccountNumber').value=acctNo(a);
  document.getElementById('pdfAuthorizedBy').value=currentUser.email||'';
- document.getElementById('pdfCompanyName').value=cfg.companyName;
- document.getElementById('pdfCompanyPhone').value=cfg.companyPhone;
- document.getElementById('pdfCompanyEmail').value=cfg.companyEmail;
- document.getElementById('pdfCompanyAddress').value=cfg.companyAddress;
- document.getElementById('pdfCurrentBalance').value=accountBalance(a).toFixed(2);
- document.getElementById('pdfSettlementAmount').value='';
- document.getElementById('pdfPaymentAmount').value=accountBalance(a).toFixed(2);
+ document.getElementById('pdfCurrentBalance').value=bal.toFixed(2);
+ document.getElementById('pdfSettlementAmount').value=bal.toFixed(2);
+ document.getElementById('pdfInitialPayment').value='';
+ document.getElementById('pdfInstallmentAmount').value='';
+ document.getElementById('pdfPaymentCount').value='1';
+ document.getElementById('pdfFrequency').value='One-Time';
  document.getElementById('pdfPaymentMethod').value='Card';
- document.getElementById('pdfPaymentInstructions').value=cfg.paymentInstructions;
+ document.getElementById('pdfCardLast4').value='';
+ document.getElementById('pdfLastPaymentAmount').value=moneyNum(a.lastPaymentAmount||0).toFixed(2);
+ document.getElementById('pdfLastPaymentDate').value=a.lastPaymentDate||'';
+ document.getElementById('pdfMinimumDue').value='';
+ document.getElementById('pdfReturnedAmount').value='';
+ document.getElementById('pdfRecipientAddress').value=pdfGetRecipientAddress(a);
  document.getElementById('pdfDocNotes').value='';
- document.getElementById('pdfDisclaimer').value=cfg.disclaimer;
+ document.getElementById('pdfDisclaimer').value=localStorage.getItem('pdfDisclosure')||'This is an attempt to collect a debt. Any information obtained will be used for that purpose. This is a communication from a debt collector.';
  document.getElementById('documentGeneratorModal').classList.add('open');
  await loadGeneratedDocsForCurrent();
  renderPdfDocPreview();
 }
 function pdfDocData(){
  let a=getCurrent()||{};
- let docType=val('pdfDocType')||'Payoff Quote';
+ let docType=val('pdfDocType')||'Stipulation - Paid In Full + Card Authorization';
  let balance=moneyNum(val('pdfCurrentBalance'));
  let settlement=moneyNum(val('pdfSettlementAmount'));
- let payment=moneyNum(val('pdfPaymentAmount'));
- let creditor=a.creditor||a.originalCreditor||a.issuerName||a.portfolio||'';
+ let initial=moneyNum(val('pdfInitialPayment'));
+ let installment=moneyNum(val('pdfInstallmentAmount'));
+ let count=parseInt(val('pdfPaymentCount')||'0',10)||0;
+ let minimumDue=moneyNum(val('pdfMinimumDue'));
+ let lastPay=moneyNum(val('pdfLastPaymentAmount'));
+ let returned=moneyNum(val('pdfReturnedAmount'));
+ localStorage.setItem('pdfDisclosure',val('pdfDisclaimer')||'');
  return {
    docType,
    docDate:val('pdfDocDate')||todayISO(),
    dueDate:val('pdfDocDueDate')||addDaysISO(todayISO(),10),
    authorizedBy:val('pdfAuthorizedBy')||currentUser.email||'',
-   companyName:val('pdfCompanyName')||'Co Pilot Collections Manager',
-   companyPhone:val('pdfCompanyPhone'),
-   companyEmail:val('pdfCompanyEmail'),
-   companyAddress:val('pdfCompanyAddress'),
    debtorName:nameOf(a),
-   accountNumber:acctNo(a),
-   ssn:a.ssn||'',
-   creditor,
-   portfolio:a.portfolio||a.sourceFile||'',
+   accountNumber:val('pdfAccountNumber')||acctNo(a),
+   fileNumber:val('pdfFileNumber')||pdfGetFileNumber(a),
+   originalCreditor:val('pdfOriginalCreditor')||pdfGetAccountOriginalCreditor(a),
    currentBalance:balance,
    settlementAmount:settlement,
-   paymentAmount:payment,
+   initialPayment:initial,
+   installmentAmount:installment,
+   paymentCount:count,
+   frequency:val('pdfFrequency')||'One-Time',
    paymentMethod:val('pdfPaymentMethod')||'',
-   paymentInstructions:val('pdfPaymentInstructions')||'',
+   cardLast4:val('pdfCardLast4'),
+   cardMask:pdfCardMask(val('pdfCardLast4')),
+   lastPaymentAmount:lastPay,
+   lastPaymentDate:val('pdfLastPaymentDate')||'',
+   minimumDue:minimumDue,
+   returnedAmount:returned,
+   recipientAddress:val('pdfRecipientAddress')||pdfGetRecipientAddress(a),
    notes:val('pdfDocNotes')||'',
    disclaimer:val('pdfDisclaimer')||'',
-   receiptNumber:(typeof ledgerReceiptNo==='function')?ledgerReceiptNo():'RCPT-'+Date.now(),
-   address:[a.address,a.address2,a.city,a.state,a.zip].filter(Boolean).join(', ')
+   createdBy:currentUser.email||''
  };
 }
-function pdfMoney(v){return moneyNum(v).toLocaleString(undefined,{style:'currency',currency:'USD'});}
-function pdfRowsForDoc(d){
- let rows=[
-   ['Debtor Name',d.debtorName],
-   ['Account Number',d.accountNumber],
-   ['Creditor / Portfolio',d.creditor||d.portfolio],
-   ['Current Balance',pdfMoney(d.currentBalance)],
-   ['Document Date',pdfDateLabel(d.docDate)],
-   ['Expires / Due Date',pdfDateLabel(d.dueDate)],
-   ['Authorized By',d.authorizedBy]
- ];
- if(d.docType==='Settlement Offer'){
-   rows.splice(4,0,['Settlement Amount',pdfMoney(d.settlementAmount)],['Savings / Adjustment',pdfMoney(Math.max(0,d.currentBalance-d.settlementAmount))]);
+function pdfScheduleLines(d){
+ let lines=[];
+ let start=d.dueDate||todayISO();
+ let count=Math.max(0,d.paymentCount||0);
+ let amount=d.installmentAmount || (count?((d.currentBalance-(d.initialPayment||0))/count):0);
+ for(let i=0;i<count;i++){
+   let due=start;
+   if(d.frequency==='Weekly')due=addDaysISO(start,7*i);
+   if(d.frequency==='Biweekly')due=addDaysISO(start,14*i);
+   if(d.frequency==='Monthly'){
+     let dt=new Date(start+'T00:00:00');
+     dt.setMonth(dt.getMonth()+i);
+     due=dt.toISOString().slice(0,10);
+   }
+   lines.push([i+1,pdfDateLabel(due),pdfMoney(amount)]);
  }
- if(d.docType==='Payment Agreement'||d.docType==='Promise-to-Pay Confirmation'){
-   rows.splice(4,0,['Payment Amount',pdfMoney(d.paymentAmount)],['Payment Method',d.paymentMethod]);
+ return lines;
+}
+function pdfTemplateSections(d){
+ let sections=[];
+ let partyLine=`${d.debtorName} | Account #: ${d.accountNumber} | File #: ${d.fileNumber}`;
+ let creditorLine=`Original Creditor: ${d.originalCreditor||'—'} | Current Balance: ${pdfMoney(d.currentBalance)}`;
+
+ if(d.docType==='Stipulation - Paid In Full + Card Authorization'){
+   sections.push(['STIPULATION OF AGREEMENT',[
+     partyLine, creditorLine,
+     `The parties agree to compromise the indebtedness on this account. The account balance is ${pdfMoney(d.currentBalance)}.`,
+     `The accepted paid-in-full amount is ${pdfMoney(d.settlementAmount)} if received by ${pdfDateLabel(d.dueDate)}.`,
+     `Upon receipt and clearance of the agreed amount, the account will be considered satisfied in full and no further collection activity will continue on this account.`,
+     `Payment method authorized: ${d.paymentMethod}. Authorized debt/card reference: ${d.cardMask}.`,
+     `Cardholder Name: ________________________________`,
+     `Card Number: ${d.cardMask}`,
+     `Expiration Date: __________  Billing ZIP: __________  Phone: __________________`,
+     `Signature: ________________________________  Date: ________________`
+   ]]);
  }
- if(d.docType==='Payment Receipt'){
-   rows.splice(4,0,['Amount Paid',pdfMoney(d.paymentAmount)],['Payment Method',d.paymentMethod],['Receipt Number',d.receiptNumber],['Balance After Payment',pdfMoney(Math.max(0,d.currentBalance-d.paymentAmount))]);
+ else if(d.docType==='Stipulation - Payment Plan + Card Authorization'){
+   let schedule=pdfScheduleLines(d);
+   sections.push(['STIPULATION OF PAYMENT AGREEMENT',[
+     partyLine, creditorLine,
+     `The parties agree to resolve the account through a scheduled payment arrangement.`,
+     `Total balance / plan amount: ${pdfMoney(d.currentBalance)}.`,
+     `Initial payment: ${pdfMoney(d.initialPayment)}. Installment amount: ${pdfMoney(d.installmentAmount)}. Frequency: ${d.frequency}.`,
+     `If a scheduled payment is missed or returned, the agreement may be reviewed and the remaining balance may become due according to the account terms.`,
+     `Payment method authorized: ${d.paymentMethod}. Authorized card/account reference: ${d.cardMask}.`
+   ]]);
+   sections.push(['SCHEDULED PAYMENTS',schedule.length?schedule.map(r=>`${r[0]}. ${r[1]} — ${r[2]}`):['No schedule entered.']]);
+   sections.push(['CARD AUTHORIZATION',[
+     `I, ${d.debtorName}, authorize payments according to the schedule above.`,
+     `Cardholder Name: ________________________________`,
+     `Card Number: ${d.cardMask}`,
+     `Expiration Date: __________  Billing ZIP: __________  Phone: __________________`,
+     `Signature: ________________________________  Date: ________________`
+   ]]);
  }
- if(d.address)rows.push(['Debtor Address',d.address]);
- return rows;
+ else if(d.docType==='Release of Liability'){
+   sections.push(['RELEASE OF LIABILITY',[
+     partyLine, creditorLine,
+     `In consideration of account #${d.accountNumber}, and upon receipt/clearance of the agreed payment amount of ${pdfMoney(d.settlementAmount||d.currentBalance)}, the account holder releases ${d.debtorName} from further liability on the above account.`,
+     `This release applies to claims or demands related to the account identified above through the date of this release.`,
+     `Dated: ${pdfDateLabel(d.docDate)}`,
+     `Authorized Representative: ________________________________`,
+     `Consumer: ________________________________`
+   ]]);
+ }
+ else if(d.docType==='Standard Mailer'){
+   sections.push(['STANDARD MAILER',[
+     d.recipientAddress,
+     `Dear ${d.debtorName};`,
+     `Attached is information which pertains to your account. This information may be sensitive, and you should keep a copy for your records.`,
+     `If you have questions or concerns, please contact the representative handling your account.`,
+     `Sincerely,`,
+     `${d.authorizedBy}`
+   ]]);
+ }
+ else if(d.docType==='Assignment / Notification of Debt'){
+   sections.push(['ASSIGNMENT / NOTIFICATION OF DEBT',[
+     d.recipientAddress,
+     `The purpose of this communication is to notify you that the account identified below has been assigned, sold, or transferred for servicing/collection.`,
+     `Original Creditor: ${d.originalCreditor||'—'}`,
+     `Account Number: ${d.accountNumber}`,
+     `Amount Claimed Due: ${pdfMoney(d.currentBalance)}`,
+     `Please direct account questions or payments according to the instructions provided by the account representative so payments can be accurately applied.`
+   ]]);
+ }
+ else if(d.docType==='Billing Statement - Paid In Full'){
+   sections.push(['BILLING STATEMENT - PAID IN FULL',[
+     `Statement Date: ${pdfDateLabel(d.docDate)}`,
+     `File Number: ${d.fileNumber}`,
+     `Bill To: ${d.debtorName}`,
+     `Due Date: ${pdfDateLabel(d.dueDate)}`,
+     `Minimum Due: $0.00`,
+     `Account Balance: $0.00`,
+     `Thank you for your recent payment of ${pdfMoney(d.lastPaymentAmount||d.settlementAmount||d.currentBalance)}. This payment was received and applied to file ${d.fileNumber}.`,
+     `Your account is now paid in full. We appreciate your prompt attention toward this financial obligation.`
+   ]]);
+ }
+ else if(d.docType==='Billing Statement - Payment Plan'){
+   sections.push(['BILLING STATEMENT - PAYMENT PLAN',[
+     `Statement Date: ${pdfDateLabel(d.docDate)}`,
+     `File Number: ${d.fileNumber}`,
+     `Bill To: ${d.debtorName}`,
+     `Due Date: ${pdfDateLabel(d.dueDate)}`,
+     `Minimum Due: ${pdfMoney(d.minimumDue||d.installmentAmount)}`,
+     `Account Balance: ${pdfMoney(d.currentBalance)}`,
+     `Thank you for your recent payment of ${pdfMoney(d.lastPaymentAmount)}${d.lastPaymentDate?` received on ${pdfDateLabel(d.lastPaymentDate)}`:''}.`,
+     `Your next payment of ${pdfMoney(d.installmentAmount||d.minimumDue)} is due by ${pdfDateLabel(d.dueDate)}.`
+   ]]);
+ }
+ else if(d.docType==='Demand Letter'){
+   sections.push(['DEMAND LETTER',[
+     d.recipientAddress,
+     `Date: ${pdfDateLabel(d.docDate)}`,
+     `Original Creditor: ${d.originalCreditor||'—'}`,
+     `File Number: ${d.fileNumber}`,
+     `Dear ${d.debtorName};`,
+     `Our records indicate the above account remains unresolved. The total amount currently claimed due is ${pdfMoney(d.currentBalance)}.`,
+     `Please submit payment or contact the account representative by ${pdfDateLabel(d.dueDate)} to discuss resolution options.`,
+     `If you believe this account is inaccurate or disputed, notify the account representative so the matter can be reviewed.`,
+     `Sincerely,`,
+     `${d.authorizedBy}`
+   ]]);
+ }
+ else if(d.docType==='NSF / Returned Payment Statement'){
+   sections.push(['NSF / RETURNED PAYMENT STATEMENT',[
+     `Statement Date: ${pdfDateLabel(d.docDate)}`,
+     `File Number: ${d.fileNumber}`,
+     `Bill To: ${d.debtorName}`,
+     `Due Date: ${pdfDateLabel(d.dueDate)}`,
+     `Minimum Due: ${pdfMoney(d.minimumDue||d.returnedAmount)}`,
+     `Account Balance: ${pdfMoney(d.currentBalance)}`,
+     `NOTICE: A recent payment in the amount of ${pdfMoney(d.returnedAmount)} was returned or not honored.`,
+     `Please submit replacement payment by ${pdfDateLabel(d.dueDate)} so it can be applied to file ${d.fileNumber}.`
+   ]]);
+ }
+ if(d.notes)sections.push(['ADDITIONAL NOTES', [d.notes]]);
+ if(d.disclaimer)sections.push(['DISCLOSURE', [d.disclaimer]]);
+ return sections;
 }
 function renderPdfDocPreview(){
  let d=pdfDocData();
- let rows=pdfRowsForDoc(d);
- let body=rows.map(([k,v])=>`<div class="docRow"><div class="docLabel">${esc(k)}</div><div>${esc(v||'—')}</div></div>`).join('');
- let terms='';
- if(d.docType==='Payoff Quote')terms=`The payoff amount to resolve this account is ${pdfMoney(d.currentBalance)} if paid by ${pdfDateLabel(d.dueDate)}.`;
- if(d.docType==='Settlement Offer')terms=`This account may be resolved for ${pdfMoney(d.settlementAmount)} if paid by ${pdfDateLabel(d.dueDate)}.`;
- if(d.docType==='Payment Agreement')terms=`The consumer agrees to make payment(s) toward the current account balance. Payment amount shown: ${pdfMoney(d.paymentAmount)}.`;
- if(d.docType==='Promise-to-Pay Confirmation')terms=`This confirms a promise to pay ${pdfMoney(d.paymentAmount)} by ${pdfDateLabel(d.dueDate)}.`;
- if(d.docType==='Payment Receipt')terms=`This receipt confirms a payment of ${pdfMoney(d.paymentAmount)}. Estimated balance after payment: ${pdfMoney(Math.max(0,d.currentBalance-d.paymentAmount))}.`;
- document.getElementById('pdfDocPreview').innerHTML=`<h2>${esc(d.docType)}</h2>
-   <div><b>${esc(d.companyName)}</b>${d.companyPhone?' • '+esc(d.companyPhone):''}${d.companyEmail?' • '+esc(d.companyEmail):''}</div>
-   <div style="color:#64748b;margin-bottom:10px">${esc(d.companyAddress||'')}</div>
-   ${body}
-   <h3>Terms</h3><div>${esc(terms)}</div>
-   ${d.paymentInstructions?`<h3>Payment Instructions</h3><div>${esc(d.paymentInstructions)}</div>`:''}
-   ${d.notes?`<h3>Notes</h3><div>${esc(d.notes)}</div>`:''}
-   <h3>Disclaimer</h3><div>${esc(d.disclaimer)}</div>`;
+ let sections=pdfTemplateSections(d);
+ let htmlPreview=`<h2>${esc(d.docType)}</h2>`;
+ sections.forEach(([title,lines])=>{
+   htmlPreview+=`<h3>${esc(title)}</h3>`;
+   (lines||[]).forEach(line=>{
+     htmlPreview+=`<div class="docRow"><div class="docLabel"></div><div>${esc(line||'')}</div></div>`;
+   });
+ });
+ document.getElementById('pdfDocPreview').innerHTML=htmlPreview;
 }
 async function fillPdfFromPaymentPlan(){
  let a=getCurrent(); if(!a)return;
  try{
    let plan=await loadPaymentPlanForAccount(a.id,true);
    if(!plan)return alert('No active payment plan found.');
-   document.getElementById('pdfDocType').value='Payment Agreement';
-   document.getElementById('pdfPaymentAmount').value=moneyNum(plan.amountEach||plan.paymentAmount||0).toFixed(2);
+   document.getElementById('pdfDocType').value='Stipulation - Payment Plan + Card Authorization';
+   document.getElementById('pdfInitialPayment').value=moneyNum(plan.paymentToday||plan.initialPayment||0).toFixed(2);
+   document.getElementById('pdfInstallmentAmount').value=moneyNum(plan.amountEach||plan.paymentAmount||0).toFixed(2);
+   document.getElementById('pdfPaymentCount').value=plan.numberOfPayments||plan.payments?.length||'';
+   document.getElementById('pdfFrequency').value=plan.frequency||'Monthly';
    document.getElementById('pdfSettlementAmount').value=moneyNum(plan.planTotal||0).toFixed(2);
    document.getElementById('pdfDocDueDate').value=(plan.payments&&plan.payments[0]?.dueDate)||plan.startDate||todayISO();
-   document.getElementById('pdfDocNotes').value=`Payment plan total: ${pdfMoney(plan.planTotal)}. Frequency: ${plan.frequency||'—'}. Future payments: ${plan.numberOfPayments||plan.payments?.length||'—'}. Remaining plan balance: ${pdfMoney(plan.remainingAmount)}.`;
+   document.getElementById('pdfDocNotes').value=`Active payment plan loaded. Plan total: ${pdfMoney(plan.planTotal)}. Remaining plan balance: ${pdfMoney(plan.remainingAmount)}.`;
    renderPdfDocPreview();
  }catch(e){alert('Could not load active payment plan: '+e.message)}
 }
@@ -2720,11 +2881,11 @@ async function fillPdfFromLatestPayment(){
    let rows=(await dbFetch(`/payments_ledger?account_id=eq.${a.id}&select=*&order=payment_date.desc,created_at.desc&limit=1`)).map(toCamel);
    if(!rows.length)return alert('No payment ledger entry found for this account.');
    let r=rows[0];
-   document.getElementById('pdfDocType').value='Payment Receipt';
-   document.getElementById('pdfPaymentAmount').value=moneyNum(r.amount).toFixed(2);
+   document.getElementById('pdfDocType').value=moneyNum(r.balanceAfter)<=0?'Billing Statement - Paid In Full':'Billing Statement - Payment Plan';
+   document.getElementById('pdfLastPaymentAmount').value=moneyNum(r.amount).toFixed(2);
+   document.getElementById('pdfLastPaymentDate').value=r.paymentDate||todayISO();
    document.getElementById('pdfPaymentMethod').value=r.paymentMethod||'Other';
-   document.getElementById('pdfDocDate').value=r.paymentDate||todayISO();
-   document.getElementById('pdfDocDueDate').value=r.paymentDate||todayISO();
+   document.getElementById('pdfCurrentBalance').value=moneyNum(r.balanceAfter).toFixed(2);
    document.getElementById('pdfDocNotes').value=`Receipt number: ${r.receiptNumber||'—'}. Balance before: ${pdfMoney(r.balanceBefore)}. Balance after: ${pdfMoney(r.balanceAfter)}. ${r.notes||''}`;
    renderPdfDocPreview();
  }catch(e){alert('Could not load latest payment: '+e.message)}
@@ -2792,19 +2953,15 @@ function makeSimplePdf(title,lines){
  return new Blob([pdf],{type:'application/pdf'});
 }
 function pdfDocumentLines(d){
- let rows=pdfRowsForDoc(d);
- let lines=[`## ${d.companyName}`, d.companyAddress||'', [d.companyPhone,d.companyEmail].filter(Boolean).join(' | '), '', `## ${d.docType}`];
- rows.forEach(([k,v])=>lines.push(`${k}: ${v||'—'}`));
- lines.push('', '## Terms');
- if(d.docType==='Payoff Quote')lines.push(`The payoff amount to resolve this account is ${pdfMoney(d.currentBalance)} if paid by ${pdfDateLabel(d.dueDate)}.`);
- if(d.docType==='Settlement Offer')lines.push(`This account may be resolved for ${pdfMoney(d.settlementAmount)} if paid by ${pdfDateLabel(d.dueDate)}. If payment is not received by the due date, the offer may expire and the full balance may remain due.`);
- if(d.docType==='Payment Agreement')lines.push(`The consumer agrees to make scheduled payment(s) toward the account. Payment amount: ${pdfMoney(d.paymentAmount)}. Current balance: ${pdfMoney(d.currentBalance)}.`);
- if(d.docType==='Promise-to-Pay Confirmation')lines.push(`This confirms a promise to pay ${pdfMoney(d.paymentAmount)} by ${pdfDateLabel(d.dueDate)}.`);
- if(d.docType==='Payment Receipt')lines.push(`This receipt confirms payment of ${pdfMoney(d.paymentAmount)} by ${d.paymentMethod}. Estimated balance after payment: ${pdfMoney(Math.max(0,d.currentBalance-d.paymentAmount))}.`);
- if(d.paymentInstructions){lines.push('', '## Payment Instructions', d.paymentInstructions);}
- if(d.notes){lines.push('', '## Notes', d.notes);}
- lines.push('', '## Disclaimer', d.disclaimer||'');
- lines.push('', 'Authorized By: '+(d.authorizedBy||''), 'Generated: '+new Date().toLocaleString());
+ let sections=pdfTemplateSections(d);
+ let lines=[];
+ sections.forEach(([title,content])=>{
+   lines.push('## '+title);
+   (content||[]).forEach(x=>lines.push(x));
+   lines.push('');
+ });
+ lines.push('Created By: '+(d.createdBy||''));
+ lines.push('Generated: '+new Date().toLocaleString());
  return lines;
 }
 function pdfFileName(d){
@@ -2812,32 +2969,41 @@ function pdfFileName(d){
  let type=d.docType.replace(/[^a-z0-9]+/gi,'_').toLowerCase();
  return `${type}_${safe}_${d.accountNumber||'account'}_${todayISO()}.pdf`;
 }
-async function saveGeneratedDocRecord(d,fileName){
+async function saveGeneratedDocRecord(d,fileName,downloaded){
  let a=getCurrent(); if(!a)return;
- let title=d.docType+' PDF';
+ let title=d.docType;
+ let note=`${downloaded?'Downloaded PDF and saved record':'Created document record'}: ${fileName||title}`;
  try{
-   await dbFetch('/account_docs',{method:'POST',body:JSON.stringify([{account_id:a.id,doc_title:title,doc_type:d.docType,doc_url:fileName,notes:`Generated PDF: ${fileName}`,generated_file_name:fileName,generated_doc_type:d.docType,generated_by_email:currentUser.email,generated_at:new Date().toISOString(),created_by_email:currentUser.email}])});
+   await dbFetch('/account_docs',{method:'POST',body:JSON.stringify([{account_id:a.id,doc_title:title,doc_type:d.docType,doc_url:fileName||'',notes:note,generated_file_name:fileName||'',generated_doc_type:d.docType,generated_by_email:currentUser.email,generated_at:new Date().toISOString(),created_by_email:currentUser.email}])});
  }catch(e){
-   try{await dbFetch('/account_docs',{method:'POST',body:JSON.stringify([{account_id:a.id,doc_title:title,doc_type:d.docType,doc_url:fileName,notes:`Generated PDF: ${fileName}`,created_by_email:currentUser.email}])});}catch(e2){}
+   try{await dbFetch('/account_docs',{method:'POST',body:JSON.stringify([{account_id:a.id,doc_title:title,doc_type:d.docType,doc_url:fileName||'',notes:note,created_by_email:currentUser.email}])});}catch(e2){}
  }
- try{await insertActivity(a.id,'PDF Generated',`${d.docType} generated: ${fileName}`)}catch(e){}
- if(typeof insertAudit==='function')try{await insertAudit('PDF Generated',`${d.docType} for ${nameOf(a)}: ${fileName}`,'account',a.id)}catch(e){}
+ try{await insertActivity(a.id,'Debtor Document Created',`${d.docType}${fileName?': '+fileName:''}`)}catch(e){}
+ if(typeof insertAudit==='function')try{await insertAudit('Debtor Document Created',`${d.docType} for ${nameOf(a)}${fileName?': '+fileName:''}`,'account',a.id)}catch(e){}
 }
 async function loadGeneratedDocsForCurrent(){
  let a=getCurrent(); if(!a)return;
  let docs=[];
- try{docs=(await dbFetch(`/account_docs?account_id=eq.${a.id}&select=*&order=created_at.desc&limit=10`)).map(toCamel).filter(d=>String(d.notes||'').includes('Generated PDF'))}catch(e){docs=[]}
+ try{docs=(await dbFetch(`/account_docs?account_id=eq.${a.id}&select=*&order=created_at.desc&limit=15`)).map(toCamel).filter(d=>String(d.notes||'').includes('document')||String(d.notes||'').includes('PDF'))}catch(e){docs=[]}
  pdfGeneratedDocsCache=docs;
  let box=document.getElementById('pdfGeneratedList'); if(!box)return;
- box.innerHTML=docs.map(d=>`<div class="pdfSavedItem"><div><div class="pdfSavedTitle">${esc(d.docTitle||'PDF')}</div><div class="pdfSavedMeta">${esc(d.docType||'')} • ${esc(String(d.createdAt||'').slice(0,19))}<br>${esc(d.docUrl||'')}</div></div><button class="outline" onclick="openAccountDocs()">View Docs</button></div>`).join('')||'<div class="pdfSavedItem"><div class="pdfSavedMeta">No generated PDF records yet.</div></div>';
+ box.innerHTML=docs.map(d=>`<div class="pdfSavedItem"><div><div class="pdfSavedTitle">${esc(d.docTitle||'Document')}</div><div class="pdfSavedMeta">${esc(d.docType||'')} • ${esc(String(d.createdAt||'').slice(0,19))}<br>${esc(d.docUrl||d.notes||'')}</div></div><button class="outline" onclick="openAccountDocs()">View Docs</button></div>`).join('')||'<div class="pdfSavedItem"><div class="pdfSavedMeta">No created document records yet.</div></div>';
+}
+async function saveDocumentRecordOnly(){
+ let a=getCurrent(); if(!a)return alert('No account selected.');
+ let d=pdfDocData();
+ await saveGeneratedDocRecord(d,'',false);
+ await loadGeneratedDocsForCurrent();
+ alert('Document record saved to this account.');
 }
 async function generateAccountPdf(){
  let a=getCurrent(); if(!a)return alert('No account selected.');
  let d=pdfDocData();
- if(d.docType==='Settlement Offer' && d.settlementAmount<=0)return alert('Enter settlement amount.');
- if((d.docType==='Payment Agreement'||d.docType==='Promise-to-Pay Confirmation'||d.docType==='Payment Receipt') && d.paymentAmount<=0)return alert('Enter payment amount.');
- if(d.settlementAmount>d.currentBalance && d.docType==='Settlement Offer')return alert('Settlement amount cannot be higher than current balance.');
- if(d.paymentAmount>d.currentBalance && d.docType!=='Payment Receipt')return alert('Payment amount cannot be higher than current balance.');
+ if(d.docType.includes('Settlement') && d.settlementAmount>d.currentBalance)return alert('Settlement amount cannot be higher than current balance.');
+ if(d.docType.includes('Payment Plan') && d.paymentCount>0 && d.installmentAmount>0){
+   let total=(d.initialPayment||0)+(d.installmentAmount*d.paymentCount);
+   if(total>d.currentBalance+0.01)return alert('Payment plan total cannot be more than current balance.');
+ }
  let lines=pdfDocumentLines(d);
  let blob=makeSimplePdf(d.docType,lines);
  let fileName=pdfFileName(d);
@@ -2845,9 +3011,9 @@ async function generateAccountPdf(){
  let link=document.createElement('a');
  link.href=url; link.download=fileName; document.body.appendChild(link); link.click(); link.remove();
  setTimeout(()=>URL.revokeObjectURL(url),3000);
- await saveGeneratedDocRecord(d,fileName);
+ await saveGeneratedDocRecord(d,fileName,true);
  await loadGeneratedDocsForCurrent();
- alert(d.docType+' PDF generated and saved to account docs.');
+ alert(d.docType+' PDF downloaded and saved to Account Docs.');
 }
 
 /* PAYMENT LEDGER + BROKEN PROMISE AUTOMATION */

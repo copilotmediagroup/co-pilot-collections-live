@@ -878,3 +878,12 @@ alter table account_docs add column if not exists generated_by_email text;
 alter table account_docs add column if not exists generated_at timestamptz;
 
 create index if not exists idx_account_docs_generated on account_docs(account_id, generated_at);
+
+
+-- DEBTOR DOCUMENT TEMPLATE GENERATOR SUPPORT
+alter table account_docs add column if not exists generated_file_name text;
+alter table account_docs add column if not exists generated_doc_type text;
+alter table account_docs add column if not exists generated_by_email text;
+alter table account_docs add column if not exists generated_at timestamptz;
+
+create index if not exists idx_account_docs_generated on account_docs(account_id, generated_at);
