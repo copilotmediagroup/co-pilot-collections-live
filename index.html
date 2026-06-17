@@ -1299,6 +1299,38 @@ main.center > *,
   object-fit:contain!important;
 }
 
+
+/* WATERMARK LOGO LETTER STYLE */
+.pdfPreviewPaper .letterPreview{
+  position:relative!important;
+  overflow:hidden!important;
+  min-height:860px!important;
+}
+.pdfPreviewPaper .letterPreview > *:not(.letterWatermark){
+  position:relative!important;
+  z-index:2!important;
+}
+.pdfPreviewPaper .letterWatermark{
+  position:absolute!important;
+  left:50%!important;
+  top:50%!important;
+  transform:translate(-50%,-50%)!important;
+  width:58%!important;
+  height:auto!important;
+  max-height:58%!important;
+  object-fit:contain!important;
+  opacity:.16!important;
+  z-index:1!important;
+  pointer-events:none!important;
+  user-select:none!important;
+}
+.pdfPreviewPaper .letterLogoRow{
+  display:none!important;
+}
+.logoHint::after{
+  content:" Watermark prints behind the words at about 16% visibility.";
+}
+
 </style>
 </head>
 <body>
@@ -1340,7 +1372,7 @@ main.center > *,
 
 <div class="app">
   <header class="topbar">
-    <div class="brand"><div class="logo">b</div><div><h1>Co Pilot Collections Manager</h1><p class="sub">LOGO UPLOAD FIX READY — accepts image files even when browser MIME type is blank and prints logo on letters.</p></div></div>
+    <div class="brand"><div class="logo">b</div><div><h1>Co Pilot Collections Manager</h1><p class="sub">WATERMARK LOGO LETTERS READY — logo sits behind text with transparency and correct aspect ratio.</p></div></div>
     <div class="headerSearch"><span class="mag">⌕</span><input id="globalSearch" placeholder="Search accounts..." oninput="document.getElementById('search').value=this.value;onQueueFilterChange()"><span class="hotkey">⌘ K</span></div>
     <div class="topActions">
       <button class="gray" onclick="openDocumentGenerator()">Letters</button>
@@ -1920,7 +1952,7 @@ main.center > *,
       <div class="logoManagerHead">
         <div>
           <b>Company Logo for Letters</b>
-          <div>Admin upload only. Logo is shared with employees and appears professionally on downloaded debtor letters.</div>
+          <div>Admin upload only. Logo is shared with employees and appears as a professional transparent watermark on downloaded debtor letters.</div>
         </div>
         <div class="logoManagerBtns">
           <input id="companyLogoUpload" type="file" accept="image/*" onchange="handleCompanyLogoUpload(event)" style="display:none">
@@ -1930,7 +1962,7 @@ main.center > *,
       </div>
       <div class="logoPreviewRow">
         <div id="companyLogoPreview" class="companyLogoPreview">No logo uploaded yet.</div>
-        <div class="logoHint">Best size: wide PNG/JPG logo. The app converts it for PDF use and places it in the upper-right letter header.</div>
+        <div class="logoHint">Best file: PNG or JPG logo. The app keeps the logo proportional and places it as a faint centered watermark behind the letter text.</div>
       </div>
     </div>
 
@@ -3076,7 +3108,7 @@ async function handleCompanyLogoUpload(event){
    await loadCompanyLogoSettings(true);
    updateCompanyLogoPreview();
    renderPdfDocPreview();
-   alert('Company logo uploaded successfully. Generate a new letter now and the logo will appear on the PDF.');
+   alert('Company logo uploaded successfully. Generate a new letter now and the logo will appear as a faint centered watermark behind the text.');
  }catch(e){
    alert(e.message||String(e));
  }
@@ -3480,7 +3512,7 @@ function renderPdfDocPreview(){
  let metaHtml=t.meta.map(([k,v])=>`<div><b>${esc(k)}:</b> ${esc(v||'—')}</div>`).join('');
  let bodyHtml=t.paragraphs.map(p=>`<p>${esc(p)}</p>`).join('');
  let postHtml=t.post.length?`<div class="letterDisclosure"><b>ADDITIONAL INFORMATION</b>${t.post.map(([k,v])=>`<div><b>${esc(k)}:</b> ${esc(v||'—')}</div>`).join('')}</div>`:'';
- let logoHtml=companyLogoSettings.dataUrl?`<div class="letterLogoRow"><img src="${companyLogoSettings.dataUrl}" alt="Company logo"></div>`:'';
+ let logoHtml=companyLogoSettings.dataUrl?`<img class="letterWatermark" src="${companyLogoSettings.dataUrl}" alt="Company watermark">`:'';
  document.getElementById('pdfDocPreview').innerHTML=`<div class="letterPreview">
    ${logoHtml}
    <div class="letterTitle">${esc(t.title)}</div>
@@ -3620,7 +3652,7 @@ async function makeSimplePdfWithLogo(title,lines){
  let logoBytes=companyLogoSettings.dataUrl?logoDataUrlBytes():null;
  if(!logoBytes||!logoBytes.length)return makeSimplePdf(title,lines);
 
- let pageLines=[],pages=[],lineLimit=34;
+ let pageLines=[],pages=[],lineLimit=38;
  lines.forEach(line=>{
    if(String(line||'').trim()===''){pageLines.push('');return;}
    let wraps=pdfWrapText(line,82);
@@ -3635,22 +3667,41 @@ async function makeSimplePdfWithLogo(title,lines){
  function add(parts){objects.push(Array.isArray(parts)?parts:[parts]);return objects.length;}
  let fontId=add("<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>");
  let boldId=add("<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >>");
- let imgW=companyLogoSettings.width||500,imgH=companyLogoSettings.height||160;
+
+ let imgW=companyLogoSettings.width||500;
+ let imgH=companyLogoSettings.height||160;
  let logoId=add([`<< /Type /XObject /Subtype /Image /Width ${imgW} /Height ${imgH} /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length ${logoBytes.length} >>\nstream\n`,logoBytes,`\nendstream`]);
+
+ // Transparent graphics state. Low opacity keeps letter text readable.
+ let gsId=add("<< /Type /ExtGState /ca 0.16 /CA 0.16 >>");
+
  let pageIds=[];
  pages.forEach((p,idx)=>{
-   let y=638,content=[];
-   let targetW=118;
-   let targetH=Math.min(54,targetW*(imgH/imgW));
-   let logoX=422,logoY=716;
-   content.push(`q ${targetW.toFixed(1)} 0 0 ${targetH.toFixed(1)} ${logoX} ${logoY} cm /Logo Do Q`);
+   let y=704,content=[];
+
+   // Centered watermark behind all text. Aspect ratio is preserved; never stretched.
+   let maxW=360;
+   let maxH=330;
+   let scale=Math.min(maxW/imgW,maxH/imgH);
+   let wmW=imgW*scale;
+   let wmH=imgH*scale;
+   let wmX=(612-wmW)/2;
+   let wmY=250;
+   // Shift tall logos slightly upward; wide logos sit naturally center.
+   if(wmH>220)wmY=230;
+   content.push(`q /GSwm gs ${wmW.toFixed(2)} 0 0 ${wmH.toFixed(2)} ${wmX.toFixed(2)} ${wmY.toFixed(2)} cm /Logo Do Q`);
+
    let titleText=idx===0?title:title+" - continued";
-   let approxWidth=Math.min(380, titleText.length*7.8);
+   let approxWidth=Math.min(420, titleText.length*8.5);
    let titleX=Math.max(72, 306-(approxWidth/2));
-   content.push(`BT /F2 16 Tf ${titleX.toFixed(0)} 690 Td (${pdfEscape(titleText)}) Tj ET`);
+   content.push(`BT /F2 17 Tf ${titleX.toFixed(0)} 742 Td (${pdfEscape(titleText)}) Tj ET`);
+
    p.forEach((line)=>{
      let raw=String(line||'');
-     if(raw.trim()===''){y-=13;return;}
+     if(raw.trim()===''){
+       y-=13;
+       return;
+     }
      let isHead=raw.startsWith('## ');
      let font=isHead?'/F2 11 Tf':'/F1 10 Tf';
      let clean=raw.replace(/^##\s*/,'');
@@ -3663,12 +3714,14 @@ async function makeSimplePdfWithLogo(title,lines){
        y-=15;
      }
    });
+
    content.push(`BT /F1 8 Tf 72 38 Td (Page ${idx+1} of ${pages.length}) Tj ET`);
    let stream=content.join("\n");
    let contentId=add(`<< /Length ${asciiBytes(stream).length} >>\nstream\n${stream}\nendstream`);
-   let pageId=add(`<< /Type /Page /Parent 0 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 ${fontId} 0 R /F2 ${boldId} 0 R >> /XObject << /Logo ${logoId} 0 R >> >> /Contents ${contentId} 0 R >>`);
+   let pageId=add(`<< /Type /Page /Parent 0 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 ${fontId} 0 R /F2 ${boldId} 0 R >> /XObject << /Logo ${logoId} 0 R >> /ExtGState << /GSwm ${gsId} 0 R >> >> /Contents ${contentId} 0 R >>`);
    pageIds.push(pageId);
  });
+
  let pagesId=add(`<< /Type /Pages /Kids [${pageIds.map(id=>id+" 0 R").join(" ")}] /Count ${pages.length} >>`);
  objects=objects.map(parts=>parts.map(p=>typeof p==='string'?p.replace("/Parent 0 0 R",`/Parent ${pagesId} 0 R`):p));
  let catalogId=add(`<< /Type /Catalog /Pages ${pagesId} 0 R >>`);
