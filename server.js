@@ -3,9 +3,9 @@ import { readFileSync, existsSync } from "node:fs";
 import { join, extname } from "node:path";
 
 const port = process.env.PORT || 5173;
-const root = existsSync(join(process.cwd(), "dist", "index.html"))
-  ? join(process.cwd(), "dist")
-  : process.cwd();
+const distRoot = join(process.cwd(), "dist");
+const publicRoot = join(process.cwd(), "public");
+const root = existsSync(join(distRoot, "index.html")) ? distRoot : process.cwd();
 
 const types = {
   ".html": "text/html; charset=utf-8",
@@ -24,6 +24,10 @@ const types = {
 http.createServer((req, res) => {
   let url = req.url === "/" ? "/index.html" : req.url.split("?")[0];
   let path = join(root, url);
+
+  if (!existsSync(path) && url === "/config.js") {
+    path = join(publicRoot, "config.js");
+  }
 
   if (!existsSync(path)) {
     path = join(root, "index.html");
