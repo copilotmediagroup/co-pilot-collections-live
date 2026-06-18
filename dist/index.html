@@ -1,6 +1,7 @@
 <!doctype html>
 <html>
 <head>
+<!-- LIVE_CLEAN_REPAIR_MARKER: https://bwvufgzbkaymffwxuuzr.supabase.co -->
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Co Pilot Collections Manager</title>
@@ -2312,6 +2313,478 @@ main.center > *,
   .qaStats{grid-template-columns:repeat(2,minmax(0,1fr))!important}
 }
 
+
+
+/* Tablet and small laptop */
+@media (max-width: 1100px) {
+  .app {
+    min-width: 0 !important;
+    width: 100% !important;
+  }
+
+  .topbar {
+    gap: 10px !important;
+    align-items: flex-start !important;
+    flex-wrap: wrap !important;
+    padding: 10px !important;
+  }
+
+  .brand {
+    min-width: 230px !important;
+    max-width: 100% !important;
+  }
+
+  .headerSearch {
+    order: 3 !important;
+    width: 100% !important;
+    flex: 1 1 100% !important;
+    max-width: none !important;
+  }
+
+  .topActions {
+    margin-left: auto !important;
+    display: flex !important;
+    gap: 6px !important;
+    flex-wrap: wrap !important;
+    justify-content: flex-end !important;
+  }
+
+  .topActions button {
+    padding: 8px 10px !important;
+    font-size: 12px !important;
+  }
+
+  .main,
+  .workspace,
+  .content,
+  .layout,
+  .dashboardLayout,
+  .accountLayout,
+  .queueLayout {
+    min-width: 0 !important;
+    max-width: 100% !important;
+  }
+
+  .stats,
+  .statGrid,
+  .dashStats,
+  .qaStats,
+  .cards,
+  .grid,
+  .summaryGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  table {
+    min-width: 760px;
+  }
+
+  .tableWrap,
+  .scrollWrap,
+  .dataTableWrap,
+  .resultsTableWrap {
+    max-width: 100% !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+}
+
+/* Phones */
+@media (max-width: 720px) {
+  body {
+    background: #f8fafc !important;
+  }
+
+  .landing,
+  .loginScreen,
+  #loginScreen {
+    min-height: 100dvh !important;
+    padding: 14px !important;
+    align-items: stretch !important;
+    justify-content: flex-start !important;
+  }
+
+  .landingGrid,
+  .landingShell,
+  .loginGrid,
+  .loginLayout {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 14px !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  .landingHero,
+  .landingLoginCard,
+  .loginBox,
+  .loginCard,
+  aside.loginBox,
+  .landingLoginCard {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    border-radius: 18px !important;
+    padding: 18px !important;
+  }
+
+  .landingHero h1,
+  .loginHero h1 {
+    font-size: 30px !important;
+    line-height: 1.05 !important;
+    letter-spacing: -1.2px !important;
+  }
+
+  .landingHero p,
+  .loginHero p {
+    font-size: 14px !important;
+    line-height: 1.45 !important;
+  }
+
+  .landingFeatures,
+  .featureGrid,
+  .landingCards {
+    grid-template-columns: 1fr !important;
+    gap: 10px !important;
+  }
+
+  .landingDemoBox {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 10px !important;
+  }
+
+  .landingDemoBox span {
+    min-width: 0 !important;
+  }
+
+  .landingDemoBox button {
+    width: 100% !important;
+  }
+
+  .loginActions {
+    flex-direction: column !important;
+    gap: 8px !important;
+  }
+
+  .loginActions button,
+  .demoLoginBtn {
+    width: 100% !important;
+    min-height: 46px !important;
+    font-size: 15px !important;
+  }
+
+  .landingLoginCard input,
+  .loginBox input,
+  .loginCard input,
+  input,
+  select,
+  textarea {
+    width: 100% !important;
+    min-height: 44px !important;
+    max-width: 100% !important;
+  }
+
+  .app {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+  }
+
+  .topbar {
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 20 !important;
+    width: 100% !important;
+    padding: 8px !important;
+    gap: 8px !important;
+    background: rgba(255,255,255,.96) !important;
+    backdrop-filter: blur(8px) !important;
+    border-bottom: 1px solid #e2e8f0 !important;
+  }
+
+  .brand {
+    width: calc(100% - 56px) !important;
+    min-width: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+  }
+
+  .brand h1 {
+    font-size: 14px !important;
+    line-height: 1.1 !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    max-width: 230px !important;
+  }
+
+  .brand .sub,
+  .brand p.sub {
+    font-size: 10px !important;
+    line-height: 1.15 !important;
+    max-width: 240px !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+
+  .logo,
+  .appBrandLogo {
+    width: 34px !important;
+    height: 34px !important;
+    min-width: 34px !important;
+    border-radius: 10px !important;
+    font-size: 14px !important;
+  }
+
+  .headerSearch {
+    order: 4 !important;
+    width: 100% !important;
+    flex: 1 1 100% !important;
+    min-width: 0 !important;
+    height: 42px !important;
+  }
+
+  .headerSearch input {
+    height: 42px !important;
+  }
+
+  .hotkey {
+    display: none !important;
+  }
+
+  .topActions {
+    order: 3 !important;
+    width: 100% !important;
+    display: grid !important;
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    gap: 6px !important;
+  }
+
+  .topActions button {
+    min-height: 38px !important;
+    padding: 7px 6px !important;
+    font-size: 11px !important;
+    border-radius: 10px !important;
+  }
+
+  .main,
+  .content,
+  .workspace,
+  .page,
+  .panel,
+  .card,
+  .accountCard,
+  .queuePanel,
+  .detailPanel {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+  }
+
+  .main,
+  .workspace,
+  .queueLayout,
+  .accountLayout,
+  .dashboardLayout {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 10px !important;
+    padding: 8px !important;
+  }
+
+  .sidebar,
+  .queueSidebar,
+  .leftRail,
+  .queueList,
+  .accountList {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    max-height: 260px !important;
+    overflow-y: auto !important;
+    border-radius: 14px !important;
+  }
+
+  .detailPanel,
+  .accountDetail,
+  .rightPanel,
+  .workPanel {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+  }
+
+  .stats,
+  .statGrid,
+  .dashStats,
+  .qaStats,
+  .cards,
+  .grid,
+  .summaryGrid,
+  .importGrid,
+  .formGrid,
+  .twoCol,
+  .threeCol,
+  .fourCol {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    gap: 8px !important;
+  }
+
+  .stat,
+  .statCard,
+  .miniCard,
+  .infoCard {
+    min-height: auto !important;
+    padding: 12px !important;
+  }
+
+  .toolbar,
+  .rowActions,
+  .actions,
+  .buttonRow,
+  .modalActions,
+  .formActions {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 8px !important;
+  }
+
+  .toolbar button,
+  .rowActions button,
+  .actions button,
+  .buttonRow button,
+  .modalActions button,
+  .formActions button {
+    width: 100% !important;
+    min-height: 42px !important;
+  }
+
+  .accountHeader,
+  .detailHeader,
+  .sectionHeader,
+  .modalHeader {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 8px !important;
+  }
+
+  .phoneGrid,
+  .phoneList,
+  .quickActions {
+    grid-template-columns: 1fr !important;
+    gap: 8px !important;
+  }
+
+  .phoneBtn,
+  .quickAction,
+  .callBtn {
+    width: 100% !important;
+    min-height: 44px !important;
+    font-size: 14px !important;
+  }
+
+  .modal,
+  .modalPanel,
+  .dialog,
+  .drawer,
+  .popupPanel {
+    width: calc(100vw - 20px) !important;
+    max-width: calc(100vw - 20px) !important;
+    max-height: calc(100dvh - 20px) !important;
+    margin: 10px !important;
+    border-radius: 16px !important;
+    overflow-y: auto !important;
+  }
+
+  .modalContent,
+  .modalBody,
+  .dialogBody {
+    max-height: calc(100dvh - 150px) !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+
+  table {
+    font-size: 12px !important;
+    min-width: 700px !important;
+  }
+
+  th, td {
+    padding: 8px !important;
+  }
+
+  .tableWrap,
+  .scrollWrap,
+  .dataTableWrap,
+  .resultsTableWrap,
+  .previewTable,
+  .employeeTableWrap {
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+
+  .importProgressBox,
+  .globalBusyCard {
+    width: calc(100vw - 24px) !important;
+    max-width: calc(100vw - 24px) !important;
+    border-radius: 16px !important;
+  }
+
+  .hiddenMobile {
+    display: none !important;
+  }
+}
+
+/* Very small phones */
+@media (max-width: 420px) {
+  .landingHero h1,
+  .loginHero h1 {
+    font-size: 26px !important;
+  }
+
+  .topActions {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  .brand h1 {
+    max-width: 190px !important;
+  }
+
+  .brand .sub,
+  .brand p.sub {
+    max-width: 190px !important;
+  }
+}
+
+
+/* PAYMENT PROMISE TRACKER */
+.paymentTrackerBox{max-width:1380px}
+.ptHero{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;border:1px solid #bfdbfe;background:#eff6ff;border-radius:16px;padding:14px;margin-bottom:12px}
+.ptHeroTitle{font-size:18px;font-weight:1000;color:#1e3a8a}.ptHeroSub{font-size:12px;font-weight:800;color:#475569;margin-top:4px;line-height:1.4}
+.ptStats{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:10px;margin:12px 0}
+.ptStat{border:1px solid #e2e8f0;background:#f8fafc;border-radius:14px;padding:10px}.ptStat.blue{background:#eff6ff}.ptStat.orange{background:#fff7ed}.ptStat.green{background:#f0fdf4}.ptStat.red{background:#fef2f2}.ptStat.purple{background:#faf5ff}
+.ptLabel{font-size:10px;text-transform:uppercase;font-weight:1000;color:#64748b}.ptValue{font-size:18px;font-weight:1000;color:#0f172a;margin-top:4px}
+.ptGrid{display:grid;grid-template-columns:410px minmax(0,1fr);gap:12px}.ptFormCard,.ptTableCard{border:1px solid #e2e8f0;background:#fff;border-radius:16px;padding:12px}
+.ptSectionTitle{font-weight:1000;color:#0f172a;margin-bottom:8px}.ptAccountPreview{border:1px solid #dbeafe;background:#f8fbff;border-radius:12px;padding:10px;font-size:12px;font-weight:850;color:#334155;margin-bottom:10px}
+.ptFormGrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.ptFormGrid label{display:block;font-size:11px;font-weight:1000;color:#334155;margin-bottom:5px}
+.ptFormGrid input,.ptFormGrid select,.ptFormGrid textarea,.ptToolbar select{width:100%;border:1px solid #cbd5e1;border-radius:10px;padding:10px;font:inherit;background:#fff}
+.ptFormGrid textarea{min-height:86px;resize:vertical}.ptWide{grid-column:1/-1}.ptSafeNote{margin:10px 0;border:1px solid #fed7aa;background:#fff7ed;color:#9a3412;border-radius:12px;padding:9px;font-size:12px;font-weight:850;line-height:1.35}
+.ptFullBtn{width:100%;min-height:44px}.ptToolbar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px}.ptToolbar .ptSectionTitle{margin-right:auto;margin-bottom:0}
+.ptTableWrap{border:1px solid #e2e8f0;border-radius:14px;overflow:auto;max-height:460px;background:#fff}.ptTableWrap.small{max-height:230px;margin-top:8px}
+.ptTable{width:100%;border-collapse:collapse;font-size:12px;min-width:850px}.ptTable th{position:sticky;top:0;z-index:1;background:#f8fafc;color:#334155;text-align:left;font-size:10px;text-transform:uppercase;padding:9px;border-bottom:1px solid #e2e8f0}.ptTable td{padding:8px 9px;border-bottom:1px solid #edf2f7;vertical-align:top}
+.ptPill{display:inline-flex;align-items:center;border-radius:999px;padding:4px 8px;font-size:10px;font-weight:1000;background:#f1f5f9;color:#334155;white-space:nowrap}.ptPill.green{background:#dcfce7;color:#166534}.ptPill.red{background:#fee2e2;color:#991b1b}.ptPill.orange{background:#fff7ed;color:#9a3412}.ptPill.blue{background:#dbeafe;color:#1d4ed8}.ptPill.purple{background:#f3e8ff;color:#7e22ce}
+.ptMethod{font-size:11px;color:#475569;font-weight:800;margin-top:3px}.ptActions{display:flex;gap:6px;flex-wrap:wrap}.ptActions button{min-height:30px;padding:6px 8px;font-size:11px;border-radius:9px}
+.ptEmployeeTotalsBox{margin-top:12px}.ptEmpty{padding:18px;text-align:center;color:#64748b;font-weight:850}
+@media(max-width:1150px){.ptStats{grid-template-columns:repeat(3,1fr)}.ptGrid{grid-template-columns:1fr}}
+@media(max-width:720px){.ptHero{flex-direction:column}.ptStats{grid-template-columns:1fr 1fr}.ptFormGrid{grid-template-columns:1fr}.ptToolbar{flex-direction:column;align-items:stretch}.ptToolbar .ptSectionTitle{margin-right:0}.ptTable{min-width:760px}.paymentTrackerBox{max-width:calc(100vw - 20px)!important}}
+
 </style>
   <meta property="og:image" content="https://bolt.new/static/og_default.png">
     <meta name="twitter:card" content="summary_large_image">
@@ -2379,7 +2852,7 @@ main.center > *,
 
 <div class="app">
   <header class="topbar">
-    <div class="brand"><div class="logo appBrandLogo" id="appBrandLogo">b</div><div><h1 id="appBrandName">Co Pilot Collections Manager</h1><p class="sub" id="appBrandSub">INLINE CONFIG PUBLISH FIX READY — live app has built-in Supabase config fallback.</p></div></div>
+    <div class="brand"><div class="logo appBrandLogo" id="appBrandLogo">b</div><div><h1 id="appBrandName">Co Pilot Collections Manager</h1><p class="sub" id="appBrandSub">LIVE CLEAN REPAIR READY — demo login code removed, live admin restored.</p></div></div>
     <div class="headerSearch"><span class="mag">⌕</span><input id="globalSearch" placeholder="Search phone, name, SSN, address..." oninput="handleSearchInput('global')"><span class="hotkey">⌘ K</span></div>
     <div class="topActions">
       <button class="gray helpBtn" onclick="openHelpModal()">Help</button>
@@ -2387,7 +2860,8 @@ main.center > *,
       <button class="gray adminOnly hidden" onclick="openLetterBodyEditor()">Bodies</button>
       <button class="gray adminOnly hidden qaBtn" onclick="openQaHealthModal()">QA</button>
       <button class="gray todayBtn" onclick="openTodayDashboard()">Today</button>
-      <button class="gray" onclick="openPaymentsDashboard()">Pay</button>
+      <button class="gray" onclick="openPaymentTracker()">Pay Desk</button>
+      <button class="gray" onclick="openPaymentsDashboard()">Ledger</button>
       <button class="gray" onclick="runBrokenPromiseAutomation(true)">Broken</button>
       <button class="gray" onclick="openDailyWorkQueue()">Queue</button>
       <button class="gray" onclick="openPromiseDashboard()">Promises</button>
@@ -2494,7 +2968,8 @@ main.center > *,
       </section>
       <section class="panel quickActions">
         <div class="panelTitle"><h3>Quick Actions</h3></div>
-        <div class="qaItem" onclick="openPaymentPlan()"><span class="qaLeft"><span class="qaIcon">💳</span>Payment Promise / Plan</span><span>›</span></div>
+        <div class="qaItem" onclick="openPaymentTrackerForCurrent()"><span class="qaLeft"><span class="qaIcon">🧾</span>Record Payment Promise</span><span>›</span></div>
+        <div class="qaItem" onclick="openPaymentPlan()"><span class="qaLeft"><span class="qaIcon">💳</span>Payment Plan Schedule</span><span>›</span></div>
         <div class="qaItem" onclick="openPaymentLedger()"><span class="qaLeft"><span class="qaIcon">💵</span>Record Payment / Ledger</span><span>›</span></div>
         <div class="qaItem" onclick="openDocumentGenerator()"><span class="qaLeft"><span class="qaIcon">🧾</span>Create Debtor Letter / PDF</span><span>›</span></div>
         <div class="qaItem" onclick="openFollowUpModal('Callback')"><span class="qaLeft"><span class="qaIcon">📅</span>Schedule Callback / Follow-Up</span><span>›</span></div>
@@ -3230,6 +3705,56 @@ main.center > *,
 </div></div>
 
 
+
+<div id="paymentTrackerModal" class="modal"><div class="modalbox powerBox paymentTrackerBox">
+  <div class="modalhead"><h2>Payment Promises & Admin Confirmation</h2><button class="gray" onclick="closeModal('paymentTrackerModal')">Close</button></div>
+  <div class="modalbody">
+    <div class="ptHero">
+      <div><div class="ptHeroTitle">Manual payment tracking — no card/ACH processing inside the app.</div><div class="ptHeroSub">Employees record payment promises using amount, date, method, and last 4 only. Admin processes in the outside merchant portal, then marks Paid, Failed, NSF, Canceled, or Rescheduled.</div></div>
+      <button class="outline" onclick="loadPaymentTracker()">Refresh</button>
+    </div>
+    <div class="ptStats">
+      <div class="ptStat blue"><div class="ptLabel">Promised</div><div class="ptValue" id="ptStatPromised">$0.00</div></div>
+      <div class="ptStat orange"><div class="ptLabel">Pending</div><div class="ptValue" id="ptStatPending">$0.00</div></div>
+      <div class="ptStat green"><div class="ptLabel">Paid</div><div class="ptValue" id="ptStatPaid">$0.00</div></div>
+      <div class="ptStat red"><div class="ptLabel">Failed / NSF</div><div class="ptValue" id="ptStatFailed">$0.00</div></div>
+      <div class="ptStat purple"><div class="ptLabel">Upcoming</div><div class="ptValue" id="ptStatUpcoming">0</div></div>
+      <div class="ptStat"><div class="ptLabel">Paid This Month</div><div class="ptValue" id="ptStatMonth">$0.00</div></div>
+    </div>
+    <div class="ptGrid">
+      <section class="ptFormCard">
+        <div class="ptSectionTitle">Record Payment Promise</div>
+        <div class="ptAccountPreview" id="ptAccountPreview">No account selected.</div>
+        <input type="hidden" id="ptAccountId">
+        <div class="ptFormGrid">
+          <div><label>Payment Type</label><select id="ptPaymentKind"><option>One-Time Payment</option><option>Payment Plan</option></select></div>
+          <div><label>Amount Per Payment</label><input id="ptAmount" type="number" step="0.01" min="0" placeholder="150.00"></div>
+          <div><label>First Payment Date</label><input id="ptDueDate" type="date"></div>
+          <div><label># of Payments</label><input id="ptCount" type="number" min="1" max="60" value="1"></div>
+          <div><label>Frequency</label><select id="ptFrequency"><option>One-Time</option><option>Weekly</option><option>Biweekly</option><option>Monthly</option></select></div>
+          <div><label>Method</label><select id="ptMethod"><option>Card</option><option>ACH</option><option>Zelle</option><option>Cash App</option><option>Check</option><option>Money Order</option><option>Other</option></select></div>
+          <div><label>Last 4 Only</label><input id="ptLast4" maxlength="4" inputmode="numeric" placeholder="1234"></div>
+          <div><label>Authorization</label><select id="ptAuthMethod"><option>Phone Authorization</option><option>Written Authorization</option><option>Email Authorization</option><option>Text Authorization</option><option>Verbal Promise Only</option></select></div>
+          <div class="ptWide"><label>Notes</label><textarea id="ptNotes" placeholder="Do not enter full card number, CVV, routing/account number, or full ACH details."></textarea></div>
+        </div>
+        <div class="ptSafeNote">Safe entry only: amount, date, method, and last 4. Owner/admin still processes payment in the outside processor portal.</div>
+        <button class="green ptFullBtn" onclick="savePaymentPromise()">Save Payment Promise</button>
+      </section>
+      <section class="ptTableCard">
+        <div class="ptToolbar">
+          <div class="ptSectionTitle">Payment Desk</div>
+          <select id="ptStatusFilter" onchange="renderPaymentTracker()"><option value="all">All Statuses</option><option>Pending Processing</option><option>Paid</option><option>Failed</option><option>NSF</option><option>Canceled</option><option>Rescheduled</option><option>Broken Promise</option></select>
+          <select id="ptDateFilter" onchange="renderPaymentTracker()"><option value="all">All Dates</option><option value="today">Today</option><option value="upcoming">Upcoming</option><option value="past">Past Due</option><option value="month">This Month</option></select>
+          <select id="ptEmployeeFilter" class="adminOnly hidden" onchange="renderPaymentTracker()"><option value="">All Employees</option></select>
+          <button class="outline" onclick="exportPaymentPromisesCSV()">Export</button>
+        </div>
+        <div class="ptTableWrap"><table class="ptTable"><thead><tr><th>Due</th><th>Debtor</th><th>Amount</th><th>Method</th><th>Employee</th><th>Status</th><th>Admin Action</th></tr></thead><tbody id="ptBody"></tbody></table></div>
+        <div class="ptEmployeeTotalsBox"><div class="ptSectionTitle">Employee Production</div><div class="ptTableWrap small"><table class="ptTable"><thead><tr><th>Employee</th><th>Pending</th><th>Paid</th><th>Failed/NSF</th><th>Paid Month</th></tr></thead><tbody id="ptEmployeeTotals"></tbody></table></div></div>
+      </section>
+    </div>
+  </div>
+</div></div>
+
 <script>
   // Inline fallback config for published Bolt/Vite builds.
   // This is the Supabase publishable key only, not the secret service-role key.
@@ -3240,19 +3765,52 @@ main.center > *,
 </script>
 <script src="/config.js"></script>
 <script>
+/* LIVE SAFETY LOCALSTORAGE CLEANUP */
+try{localStorage.removeItem('coPilotDemoRoleOverride')}catch(e){}
 const ADMIN_EMAIL='afinch2678@gmail.com';
+const ADMIN_EMAILS=[ADMIN_EMAIL].map(e=>e.toLowerCase());
+function isAdminEmail(email){return ADMIN_EMAILS.includes(String(email||'').toLowerCase().trim())}
+function isProtectedAdminEmail(email){return isAdminEmail(email)}
+function isAdminProfile(profile){
+  if(!profile)return false;
+  let role=String(profile.role||profile.userRole||'').toLowerCase();
+  let status=String(profile.approvalStatus||profile.approval_status||'').toLowerCase();
+  let approved=(profile.isApproved===true || profile.is_approved===true || status==='approved');
+  let active=(profile.isActive!==false && profile.is_active!==false);
+  return role==='admin' && approved && active;
+}
+
+function forceCurrentUserRole(profile=null){
+  let email=String(currentUser.email||'').toLowerCase().trim();
+  if(isAdminEmail(email)){
+    currentUser.isAdmin=true;
+    return 'admin';
+  }
+  if(isAdminProfile(profile)){
+    currentUser.isAdmin=true;
+    return 'admin';
+  }
+  currentUser.isAdmin=false;
+  return 'employee';
+}
+
+function clearOldDemoOverride(){
+  try{localStorage.removeItem('coPilotDemoRoleOverride')}catch(e){}
+}
+
 const URL_KEY='coPilotSupabaseUrl';
 const PUB_KEY='coPilotSupabasePublishableKey';
 const TOKEN_KEY='coPilotSupabaseAccessToken';
 const REFRESH_KEY='coPilotSupabaseRefreshToken';
 const EXP_KEY='coPilotSupabaseTokenExpiresAt';
+
 let accounts=[], appUsers=[], currentAccountId='', currentDisposition='', currentUser={email:'',isAdmin:false};
 const DISPOS=['No Answer','Left Voicemail','Promise to Pay','Disputed','Bad Number','Callback','Settled','DNC'];
 const FIELDS=["portfolio", "accountDescription", "clientAccountNumber", "accountId", "accountNumber", "issuerName", "firstName", "middleName", "lastName", "fullName", "ssn", "dob", "address", "address2", "city", "state", "zip", "employer", "occupation", "description", "email", "originalCreditor", "typeOfDebt", "originalBalance", "principal", "currentBalance", "openDate", "dateAccountOpened", "accountReceiveDate", "delinquencyDate", "chargeOffDate", "origLastPmtDate", "lastPaymentDate", "lastPaymentAmount", "bankRoutingNumber", "bankAccountNumber", "origEmployer", "origStoreName", "origStoreCity", "origStoreState", "origBankName", "origBankAcctLast4Digits", "origPrincipalBalance", "origOriginalLoanAmount", "origChargeOffBalance", "origLoanType", "origPrincipalLoanAmount", "origInterestAmount", "origReturnFee", "phone1", "phone1Type", "phone1LineType", "phone1Source", "phone1Note", "phone1Status", "phone2", "phone2Type", "phone2LineType", "phone2Source", "phone2Note", "phone2Status", "phone3", "phone3Type", "phone3LineType", "phone3Source", "phone3Note", "phone3Status", "phone4", "phone4Type", "phone4LineType", "phone4Source", "phone4Note", "phone4Status", "phone5", "phone5Type", "phone5LineType", "phone5Source", "phone5Note", "phone5Status", "phone6", "phone6Type", "phone6LineType", "phone6Source", "phone6Note", "phone6Status", "phone7", "phone7Type", "phone7LineType", "phone7Source", "phone7Note", "phone7Status", "phone8", "phone8Type", "phone8LineType", "phone8Source", "phone8Note", "phone8Status", "phone9", "phone9Type", "phone9LineType", "phone9Source", "phone9Note", "phone9Status", "phone10", "phone10Type", "phone10LineType", "phone10Source", "phone10Note", "phone10Status", "rawData", "status", "assignedToEmail", "assignedByEmail", "assignmentMethod"];
 const map={"portfolio": "portfolio", "accountDescription": "account_description", "clientAccountNumber": "client_account_number", "accountId": "source_account_id", "accountNumber": "account_number", "issuerName": "issuer_name", "firstName": "first_name", "middleName": "middle_name", "lastName": "last_name", "fullName": "full_name", "ssn": "ssn", "dob": "dob", "address": "address", "address2": "address2", "city": "city", "state": "state", "zip": "zip", "employer": "employer", "occupation": "occupation", "description": "description", "email": "email", "originalCreditor": "original_creditor", "typeOfDebt": "type_of_debt", "originalBalance": "original_balance", "principal": "principal", "currentBalance": "current_balance", "openDate": "open_date", "dateAccountOpened": "date_account_opened", "accountReceiveDate": "account_receive_date", "delinquencyDate": "delinquency_date", "chargeOffDate": "charge_off_date", "origLastPmtDate": "orig_last_pmt_date", "lastPaymentDate": "last_payment_date", "lastPaymentAmount": "last_payment_amount", "bankRoutingNumber": "bank_routing_number", "bankAccountNumber": "bank_account_number", "origEmployer": "orig_employer", "origStoreName": "orig_store_name", "origStoreCity": "orig_store_city", "origStoreState": "orig_store_state", "origBankName": "orig_bank_name", "origBankAcctLast4Digits": "orig_bank_acct_last4_digits", "origPrincipalBalance": "orig_principal_balance", "origOriginalLoanAmount": "orig_original_loan_amount", "origChargeOffBalance": "orig_chargeoff_balance", "origLoanType": "orig_loan_type", "origPrincipalLoanAmount": "orig_principal_loan_amount", "origInterestAmount": "orig_interest_amount", "origReturnFee": "orig_return_fee", "rawData": "raw_data", "status": "status", "disposition": "disposition", "lastContactNumber": "last_contact_number", "phone1": "phone1", "phone1Type": "phone1_type", "phone1LineType": "phone1_line_type", "phone1Source": "phone1_source", "phone1Note": "phone1_note", "phone1Status": "phone1_status", "phone2": "phone2", "phone2Type": "phone2_type", "phone2LineType": "phone2_line_type", "phone2Source": "phone2_source", "phone2Note": "phone2_note", "phone2Status": "phone2_status", "phone3": "phone3", "phone3Type": "phone3_type", "phone3LineType": "phone3_line_type", "phone3Source": "phone3_source", "phone3Note": "phone3_note", "phone3Status": "phone3_status", "phone4": "phone4", "phone4Type": "phone4_type", "phone4LineType": "phone4_line_type", "phone4Source": "phone4_source", "phone4Note": "phone4_note", "phone4Status": "phone4_status", "phone5": "phone5", "phone5Type": "phone5_type", "phone5LineType": "phone5_line_type", "phone5Source": "phone5_source", "phone5Note": "phone5_note", "phone5Status": "phone5_status", "phone6": "phone6", "phone6Type": "phone6_type", "phone6LineType": "phone6_line_type", "phone6Source": "phone6_source", "phone6Note": "phone6_note", "phone6Status": "phone6_status", "phone7": "phone7", "phone7Type": "phone7_type", "phone7LineType": "phone7_line_type", "phone7Source": "phone7_source", "phone7Note": "phone7_note", "phone7Status": "phone7_status", "phone8": "phone8", "phone8Type": "phone8_type", "phone8LineType": "phone8_line_type", "phone8Source": "phone8_source", "phone8Note": "phone8_note", "phone8Status": "phone8_status", "phone9": "phone9", "phone9Type": "phone9_type", "phone9LineType": "phone9_line_type", "phone9Source": "phone9_source", "phone9Note": "phone9_note", "phone9Status": "phone9_status", "phone10": "phone10", "phone10Type": "phone10_type", "phone10LineType": "phone10_line_type", "phone10Source": "phone10_source", "phone10Note": "phone10_note", "phone10Status": "phone10_status","assignedToEmail":"assigned_to_email","assignedByEmail":"assigned_by_email","assignedAt":"assigned_at","assignmentMethod":"assignment_method","assignmentGroupId":"assignment_group_id"};
 const reverse=Object.fromEntries(Object.entries(map).map(([k,v])=>[v,k]));
 function cfg(){
-  if(!window.CO_PILOT_SUPABASE_CONFIG)window.CO_PILOT_SUPABASE_CONFIG={url:"https://bwvufgzbkaymffwxuuzr.supabase.co",publishableKey:"sb_publishable_cvwkN3fOovsYvAvzXvrmRA_TKauXT_d"};
+  if(!window.CO_PILOT_SUPABASE_CONFIG)window.CO_PILOT_SUPABASE_CONFIG={url: "https://bwvufgzbkaymffwxuuzr.supabase.co",publishableKey: "sb_publishable_cvwkN3fOovsYvAvzXvrmRA_TKauXT_d"};
   return window.CO_PILOT_SUPABASE_CONFIG||{};
 }
 function url(){return String(cfg().url||localStorage.getItem(URL_KEY)||"https://bwvufgzbkaymffwxuuzr.supabase.co").replace(/\/$/,'')}
@@ -3302,10 +3860,11 @@ async function dbFetch(path,opt={}){
 }
 
 function applyRoleUI(){
+  forceCurrentUserRole();
   const badge=document.getElementById('roleBadge');
   if(badge){
     badge.textContent=currentUser.isAdmin?'Admin':'Employee';
-    badge.title=currentUser.email||'';
+    badge.title=(currentUser.email||'') + (isAdminEmail(currentUser.email)?' | hard admin email':'');
   }
   document.querySelectorAll('.adminOnly').forEach(el=>el.classList.toggle('hidden',!currentUser.isAdmin));
 }
@@ -3572,11 +4131,24 @@ function downloadDemoCSV(){
  URL.revokeObjectURL(a.href);
 }
 
+
+function whoami(){
+  let info={
+    email:currentUser.email||'',
+    isAdmin:currentUser.isAdmin,
+    isAdminEmail:isAdminEmail(currentUser.email),
+    adminEmails:ADMIN_EMAILS
+  };
+  console.log('Co Pilot role debug:',info);
+  alert('Role debug:\n'+JSON.stringify(info,null,2));
+}
+
 async function login(){
  try{
    clearLoginError();
    setLoginBusy(true,'Logging in...');
    let email=val('loginEmail').trim().toLowerCase(),password=val('loginPassword');
+   clearOldDemoOverride();
    if(!email||!password)throw new Error('Enter email and password.');
    let data=await authFetch('/auth/v1/token?grant_type=password',{email,password});
    storeSession(data);
@@ -3610,11 +4182,12 @@ async function signup(){
    if(!email||!password)throw new Error('Enter email and password.');
    if(password.length<6)throw new Error('Password must be at least 6 characters.');
    let data=await authFetch('/auth/v1/signup',{email,password});
-   currentUser={email,isAdmin:email===ADMIN_EMAIL};
+   currentUser={email,isAdmin:isAdminEmail(email)};
 
    if(data.access_token){
      storeSession(data);
      let profile=await upsertCurrentUser();
+     forceCurrentUserRole(profile);
      document.getElementById('loginScreen').classList.remove('open');
      if(currentUser.isAdmin || isUserApproved(profile)){
        document.getElementById('pendingScreen').classList.remove('open');
@@ -3650,6 +4223,7 @@ function clearSession(){
 }
 function logout(){
  clearSession();
+ clearOldDemoOverride();
  location.reload();
 }
 function jwtPayload(tok){
@@ -3730,22 +4304,23 @@ async function upsertCurrentUser(){
    let existing=await dbFetch('/app_users?email=eq.'+encodeURIComponent(currentUser.email)+'&select=*').catch(()=>[]);
    if(existing&&existing[0]){
      let profile=toCamel(existing[0]);
-     if(currentUser.isAdmin){
+     if(currentUser.isAdmin || isAdminEmail(currentUser.email)){
+       currentUser.isAdmin=true;
        let rows=await dbFetch('/app_users?email=eq.'+encodeURIComponent(currentUser.email),{
          method:'PATCH',
          body:JSON.stringify({role:'admin',approval_status:'approved',is_approved:true,is_active:true,last_seen_at:new Date().toISOString(),updated_at:new Date().toISOString()})
        }).catch(()=>null);
        return rows&&rows[0]?toCamel(rows[0]):{...profile,role:'admin',approvalStatus:'approved',isApproved:true,isActive:true};
      }
-     return profile;
+return profile;
    }
 
    let row={
      email:currentUser.email,
-     role:currentUser.isAdmin?'admin':'employee',
-     approval_status:currentUser.isAdmin?'approved':'pending',
-     is_approved:currentUser.isAdmin,
-     is_active:currentUser.isAdmin,
+     role:(currentUser.isAdmin || isAdminEmail(currentUser.email))?'admin':'employee',
+     approval_status:(currentUser.isAdmin || isAdminEmail(currentUser.email))?'approved':'pending',
+     is_approved:(currentUser.isAdmin || isAdminEmail(currentUser.email)),
+     is_active:(currentUser.isAdmin || isAdminEmail(currentUser.email)),
      created_at:new Date().toISOString(),
      updated_at:new Date().toISOString(),
      last_seen_at:new Date().toISOString()
@@ -3775,8 +4350,9 @@ async function boot(){
  try{
    clearLoginError();
    let user=await getUser();
-   currentUser={email:(user.email||'').toLowerCase(),isAdmin:(user.email||'').toLowerCase()===ADMIN_EMAIL};
+   currentUser={email:(user.email||'').toLowerCase(),isAdmin:isAdminEmail(user.email||'')};
    let profile=await upsertCurrentUser();
+   forceCurrentUserRole(profile);
 
    if(!isUserApproved(profile)){
      document.getElementById('loginScreen').classList.remove('open');
@@ -4320,7 +4896,7 @@ function employeeSuggestions(){
    let role=(u.role||'employee').toLowerCase();
    let approved=(u.isApproved===true || u.is_approved===true || u.approvalStatus==='approved' || u.approval_status==='approved');
    let active=(u.isActive!==false && u.is_active!==false);
-   if(email&&validEmail(email)&&email!==ADMIN_EMAIL&&role!=='admin'&&approved&&active)set.add(email);
+   if(email&&validEmail(email)&&!isAdminEmail(email)&&role!=='admin'&&approved&&active)set.add(email);
  });
  return [...set].sort();
 }
@@ -4516,7 +5092,7 @@ async function openEmployeeAdminModal(){
  await loadEmployeeAdminList();
 }
 function userApprovalStatus(u){
- if((u.email||'').toLowerCase()===ADMIN_EMAIL)return 'admin';
+ if(isProtectedAdminEmail((u.email||'').toLowerCase()))return 'admin';
  return (u.approvalStatus||u.approval_status||'pending').toLowerCase();
 }
 async function loadEmployeeAdminList(){
@@ -4541,7 +5117,7 @@ async function loadEmployeeAdminList(){
    let active=(u.isActive!==false && u.is_active!==false);
    let assignedCount=accounts.filter(a=>(a.assignedToEmail||'').toLowerCase()===email).length;
    let removedInfo=status==='removed'?`<div class="fireNote">Removed by: ${esc(u.removedByEmail||u.removed_by_email||'—')}<br>Removed at: ${esc(String(u.removedAt||u.removed_at||'').slice(0,19)||'—')}</div>`:'';
-   let actions=email===ADMIN_EMAIL
+   let actions=isProtectedAdminEmail(email)
      ? '<span class="muted">Admin account</span>'
      : `<div class="empActions">
           <button class="green" onclick="setEmployeeApproval('${esc(email)}','approved')">Approve</button>
@@ -4566,7 +5142,7 @@ async function loadEmployeeAdminList(){
 async function setEmployeeApproval(email,status){
  if(!currentUser.isAdmin)return alert('Admin only');
  email=String(email||'').toLowerCase();
- if(email===ADMIN_EMAIL)return alert('Cannot change admin approval.');
+ if(isProtectedAdminEmail(email))return alert('Cannot change admin approval.');
  let body={
    approval_status:status,
    is_approved:status==='approved',
@@ -4584,7 +5160,7 @@ async function setEmployeeApproval(email,status){
 async function toggleEmployeeActive(email,active){
  if(!currentUser.isAdmin)return alert('Admin only');
  email=String(email||'').toLowerCase();
- if(email===ADMIN_EMAIL)return alert('Cannot deactivate admin.');
+ if(isProtectedAdminEmail(email))return alert('Cannot deactivate admin.');
  await dbFetch('/app_users?email=eq.'+encodeURIComponent(email),{method:'PATCH',body:JSON.stringify({is_active:active,updated_at:new Date().toISOString()})});
  await loadEmployeeAdminList();
 }
@@ -4592,7 +5168,7 @@ async function toggleEmployeeActive(email,active){
 async function removeEmployeeFromSoftware(email){
  if(!currentUser.isAdmin)return alert('Admin only');
  email=String(email||'').toLowerCase();
- if(email===ADMIN_EMAIL)return alert('You cannot remove the admin account.');
+ if(isProtectedAdminEmail(email))return alert('You cannot remove the admin account.');
  let assigned=accounts.filter(a=>(a.assignedToEmail||'').toLowerCase()===email);
  let msg='Remove '+email+' from the software?\n\nThis will:\n- Block this employee from logging into the CRM\n- Remove them from assignment dropdowns\n- Mark them as Removed / Fired\n- Return '+assigned.length+' assigned account(s) back to unassigned queue';
  if(!confirm(msg))return;
@@ -4665,11 +5241,11 @@ function monitorEmployees(){
  let set=new Set();
  appUsers.forEach(u=>{
    let email=(u.email||'').toLowerCase();
-   if(email&&email!==ADMIN_EMAIL&&u.role!=='admin')set.add(email);
+   if(email&&!isAdminEmail(email)&&u.role!=='admin')set.add(email);
  });
  accounts.forEach(a=>{let e=(a.assignedToEmail||'').toLowerCase();if(e)set.add(e)});
- monitorData.activities.forEach(a=>{let e=(a.createdByEmail||'').toLowerCase();if(e&&e!==ADMIN_EMAIL)set.add(e)});
- monitorData.notes.forEach(n=>{let e=(n.createdByEmail||'').toLowerCase();if(e&&e!==ADMIN_EMAIL)set.add(e)});
+ monitorData.activities.forEach(a=>{let e=(a.createdByEmail||'').toLowerCase();if(e&&!isAdminEmail(e))set.add(e)});
+ monitorData.notes.forEach(n=>{let e=(n.createdByEmail||'').toLowerCase();if(e&&!isAdminEmail(e))set.add(e)});
  return [...set].filter(Boolean).sort();
 }
 function fillMonitorFilters(){
@@ -7424,6 +8000,33 @@ function clearBadLetterLocalCache(){
   alert('Bad local letter cache cleared. Refresh the app, then open Letters again.');
 }
 
+
+
+/* PAYMENT PROMISE TRACKER — manual admin confirmation, no processing */
+let paymentPromiseData=[];
+function promiseGroupId(){return 'PP-'+Date.now().toString(36).toUpperCase()+'-'+Math.random().toString(36).slice(2,6).toUpperCase()}
+function ptIsoAdd(start,frequency,step){let d=new Date(String(start||todayISO())+'T00:00:00');if(isNaN(d))d=new Date(todayISO()+'T00:00:00');let f=String(frequency||'One-Time').toLowerCase();if(step<=0)return d.toISOString().slice(0,10);if(f.includes('weekly')&&!f.includes('bi'))d.setDate(d.getDate()+7*step);else if(f.includes('bi'))d.setDate(d.getDate()+14*step);else if(f.includes('month'))d.setMonth(d.getMonth()+step);else d.setDate(d.getDate()+step);return d.toISOString().slice(0,10)}
+function ptAccountForRow(r){return accountById(r.accountId||r.account_id)}
+function ptRowAmount(r){return moneyNum(r.paymentAmount||r.payment_amount||r.amount||r.amountDue||r.amount_due)}
+function ptPaidAmount(r){return moneyNum(r.paidAmount||r.paid_amount)}
+function ptIsFailed(r){let s=String(r.status||'').toLowerCase();return s==='failed'||s==='nsf'||s==='broken promise'}
+function ptIsPaid(r){return String(r.status||'').toLowerCase()==='paid'}
+function ptIsPending(r){let s=String(r.status||'pending processing').toLowerCase();return ['pending processing','pending','scheduled','rescheduled'].includes(s)}
+function ptStatusClass(status){let s=String(status||'').toLowerCase();if(s==='paid')return 'green';if(s==='failed'||s==='nsf'||s==='broken promise')return 'red';if(s==='pending processing'||s==='pending'||s==='scheduled')return 'orange';if(s==='rescheduled')return 'purple';if(s==='canceled')return 'gray';return 'blue'}
+function ptSafeLast4(v){return String(v||'').replace(/\D/g,'').slice(-4)}
+function openPaymentTracker(){document.getElementById('paymentTrackerModal').classList.add('open');fillPaymentPromiseForm();loadPaymentTracker()}
+function openPaymentTrackerForCurrent(){let a=getCurrent();if(!a)return alert('No account selected.');document.getElementById('paymentTrackerModal').classList.add('open');fillPaymentPromiseForm(a);loadPaymentTracker()}
+function fillPaymentPromiseForm(a=getCurrent()){let box=document.getElementById('ptAccountPreview');if(!a){if(box)box.innerHTML='<b>No account selected.</b><br>Open an account first, then record a payment promise.';setVal('ptAccountId','');return}setVal('ptAccountId',a.id);if(box)box.innerHTML=`<b>${esc(nameOf(a))}</b><br>Account: ${esc(acctNo(a))} • Balance: ${money(accountBalance(a))} • Assigned: ${esc(currentAssignee(a)||'—')}`;setVal('ptAmount','');setVal('ptDueDate',todayISO());setVal('ptCount','1');setVal('ptFrequency','One-Time');setVal('ptMethod','Card');setVal('ptLast4','');setVal('ptAuthMethod','Phone Authorization');setVal('ptNotes','')}
+function paymentPromiseEmployeeOptions(rows){let sel=document.getElementById('ptEmployeeFilter');if(!sel)return;let keep=sel.value||'';let emps=[...new Set((rows||[]).map(r=>(r.employeeEmail||r.employee_email||r.createdByEmail||r.created_by_email||'').toLowerCase()).filter(Boolean))].sort();sel.innerHTML='<option value="">All Employees</option>'+emps.map(e=>`<option value="${esc(e)}">${esc(e)}</option>`).join('');sel.value=emps.includes(keep)?keep:''}
+async function loadPaymentTracker(){let rows=[];try{rows=(await dbFetch('/payment_promises?select=*&order=due_date.asc,created_at.desc&limit=50000')).map(toCamel)}catch(e){alert('Payment Tracker table is not ready yet. Run RUN_THIS_PAYMENT_TRACKER_SQL.sql in Supabase, then reload.');rows=[]}if(!currentUser.isAdmin){let email=(currentUser.email||'').toLowerCase();let allowedIds=new Set(accounts.map(a=>String(a.id)));rows=rows.filter(r=>allowedIds.has(String(r.accountId))||String(r.employeeEmail||r.createdByEmail||'').toLowerCase()===email)}paymentPromiseData=rows;paymentPromiseEmployeeOptions(rows);renderPaymentTracker()}
+function paymentPromiseFilteredRows(){let rows=[...paymentPromiseData];let status=document.getElementById('ptStatusFilter')?.value||'all';let dateFilter=document.getElementById('ptDateFilter')?.value||'all';let emp=document.getElementById('ptEmployeeFilter')?.value||'';let today=todayISO(),month=today.slice(0,7);if(status&&status!=='all')rows=rows.filter(r=>String(r.status||'Pending Processing')===status);if(dateFilter==='today')rows=rows.filter(r=>String(r.dueDate||'')===today);if(dateFilter==='upcoming')rows=rows.filter(r=>String(r.dueDate||'')>=today&&!ptIsPaid(r));if(dateFilter==='past')rows=rows.filter(r=>String(r.dueDate||'')<today&&!ptIsPaid(r));if(dateFilter==='month')rows=rows.filter(r=>String(r.dueDate||'').slice(0,7)===month||String(r.paidDate||'').slice(0,7)===month);if(emp)rows=rows.filter(r=>String(r.employeeEmail||r.createdByEmail||'').toLowerCase()===emp);return rows}
+function renderPaymentTracker(){let all=paymentPromiseData||[],today=todayISO(),month=today.slice(0,7);let promised=all.filter(r=>String(r.status||'')!=='Canceled').reduce((s,r)=>s+ptRowAmount(r),0);let pending=all.filter(ptIsPending).reduce((s,r)=>s+ptRowAmount(r),0);let paid=all.filter(ptIsPaid).reduce((s,r)=>s+(ptPaidAmount(r)||ptRowAmount(r)),0);let failed=all.filter(ptIsFailed).reduce((s,r)=>s+ptRowAmount(r),0);let upcoming=all.filter(r=>String(r.dueDate||'')>=today&&!ptIsPaid(r)&&String(r.status||'')!=='Canceled').length;let paidMonth=all.filter(r=>ptIsPaid(r)&&String(r.paidDate||r.processedAt||'').slice(0,7)===month).reduce((s,r)=>s+(ptPaidAmount(r)||ptRowAmount(r)),0);let vals=[money(promised),money(pending),money(paid),money(failed),String(upcoming),money(paidMonth)];['ptStatPromised','ptStatPending','ptStatPaid','ptStatFailed','ptStatUpcoming','ptStatMonth'].forEach((id,i)=>{let el=document.getElementById(id);if(el)el.textContent=vals[i]});let body=document.getElementById('ptBody');let rows=paymentPromiseFilteredRows();if(body)body.innerHTML=rows.map(paymentPromiseRow).join('')||'<tr><td colspan="7"><div class="ptEmpty">No payment promises found for this view.</div></td></tr>';renderPaymentEmployeeTotals()}
+function paymentPromiseRow(r){let a=ptAccountForRow(r),amt=ptRowAmount(r),status=r.status||'Pending Processing',employee=(r.employeeEmail||r.createdByEmail||'').toLowerCase(),method=`${r.paymentMethod||'—'}${r.methodLast4?' ending '+r.methodLast4:''}`,due=String(r.dueDate||''),overdue=due&&due<todayISO()&&!ptIsPaid(r)&&!['Canceled','Failed','NSF','Broken Promise'].includes(status),statusShow=overdue?'Past Due / Pending':status;let actions=currentUser.isAdmin?`<div class="ptActions"><button class="green" onclick="setPaymentPromiseStatus('${r.id}','Paid')">Paid</button><button class="red" onclick="setPaymentPromiseStatus('${r.id}','Failed')">Failed</button><button class="red" onclick="setPaymentPromiseStatus('${r.id}','NSF')">NSF</button><button class="outline" onclick="reschedulePaymentPromise('${r.id}')">Reschedule</button><button class="outline" onclick="setPaymentPromiseStatus('${r.id}','Canceled')">Cancel</button>${a?`<button class="outline" onclick="setAccountFromModal('${a.id}','paymentTrackerModal')">Open</button>`:''}</div>`:`<div class="ptMethod">Waiting for admin confirmation.</div>${a?`<button class="outline" onclick="setAccountFromModal('${a.id}','paymentTrackerModal')">Open</button>`:''}`;return `<tr class="${overdue?'brokenRow':''}"><td><b>${esc(due||'—')}</b><div class="ptMethod">${esc(r.paymentKind||'One-Time Payment')} ${r.scheduleIndex&&r.scheduleTotal?`#${r.scheduleIndex}/${r.scheduleTotal}`:''}</div></td><td><b>${esc(r.debtorName||a&&nameOf(a)||'Unknown')}</b><div class="ptMethod">Acct: ${esc(r.accountNumber||a&&acctNo(a)||'—')}</div></td><td><b>${money(amt)}</b><div class="ptMethod">Paid: ${money(ptPaidAmount(r))}</div></td><td>${esc(method)}<div class="ptMethod">${esc(r.authorizationMethod||'')}</div></td><td>${esc(employee||'—')}<div class="ptMethod">${esc(r.createdAt?String(r.createdAt).slice(0,10):'')}</div></td><td><span class="ptPill ${ptStatusClass(statusShow)}">${esc(statusShow)}</span>${r.adminNote?`<div class="ptMethod">${esc(r.adminNote)}</div>`:''}</td><td>${actions}</td></tr>`}
+function renderPaymentEmployeeTotals(){let body=document.getElementById('ptEmployeeTotals');if(!body)return;let mapEmp={};(paymentPromiseData||[]).forEach(r=>{let e=(r.employeeEmail||r.createdByEmail||'Unassigned').toLowerCase();if(!mapEmp[e])mapEmp[e]={pending:0,paid:0,failed:0,month:0};let amt=ptRowAmount(r),paidAmt=ptPaidAmount(r)||amt;if(ptIsPaid(r)){mapEmp[e].paid+=paidAmt;if(String(r.paidDate||r.processedAt||'').slice(0,7)===todayISO().slice(0,7))mapEmp[e].month+=paidAmt}else if(ptIsFailed(r)){mapEmp[e].failed+=amt}else if(ptIsPending(r)){mapEmp[e].pending+=amt}});let rows=Object.entries(mapEmp).sort((a,b)=>b[1].paid-a[1].paid);body.innerHTML=rows.map(([e,v])=>`<tr><td><b>${esc(e)}</b></td><td>${money(v.pending)}</td><td>${money(v.paid)}</td><td>${money(v.failed)}</td><td>${money(v.month)}</td></tr>`).join('')||'<tr><td colspan="5"><div class="ptEmpty">No employee payment activity yet.</div></td></tr>'}
+async function savePaymentPromise(){let a=getCurrent();let id=val('ptAccountId');if(id&&(!a||String(a.id)!==String(id)))a=accountById(id)||a;if(!a)return alert('Open an account first.');let amount=moneyNum(val('ptAmount')),due=val('ptDueDate')||todayISO(),count=Math.max(1,Math.min(60,parseInt(val('ptCount')||'1',10)||1)),frequency=val('ptFrequency')||'One-Time',kind=count>1?'Payment Plan':(val('ptPaymentKind')||'One-Time Payment'),method=val('ptMethod')||'Card',last4=ptSafeLast4(val('ptLast4')),auth=val('ptAuthMethod')||'Phone Authorization',notes=val('ptNotes');if(amount<=0)return alert('Enter a payment amount.');let gid=promiseGroupId(),rows=[];for(let i=0;i<count;i++)rows.push({account_id:a.id,promise_group_id:gid,schedule_index:i+1,schedule_total:count,debtor_name:nameOf(a),account_number:acctNo(a),payment_kind:kind,payment_amount:amount,total_amount:Number((amount*count).toFixed(2)),due_date:ptIsoAdd(due,frequency,i),payment_method:method,method_last4:last4,authorization_method:auth,status:'Pending Processing',employee_email:currentUser.email,assigned_to_email:currentAssignee(a),notes,created_by_email:currentUser.email,updated_at:new Date().toISOString()});await dbFetch('/payment_promises',{method:'POST',body:JSON.stringify(rows)});await dbFetch(`/accounts?id=eq.${a.id}`,{method:'PATCH',body:JSON.stringify({status:'Promise to Pay',disposition:'Promise to Pay',updated_at:new Date().toISOString()})}).catch(()=>{});await insertActivity(a.id,'Payment Promise Recorded',`${count} payment promise(s) recorded for ${money(amount)} each. First due ${due}. Method: ${method}${last4?' ending '+last4:''}.`);await insertAudit('Payment Promise Recorded',`${count} payment promise(s) for ${nameOf(a)} totaling ${money(amount*count)}`,'account',a.id);fillPaymentPromiseForm(a);await loadPaymentTracker();await loadAccounts()}
+async function setPaymentPromiseStatus(id,status){if(!currentUser.isAdmin)return alert('Admin only.');let r=(paymentPromiseData||[]).find(x=>String(x.id)===String(id));if(!r)return alert('Payment promise not found.');let note='';if(['Failed','NSF','Canceled'].includes(status))note=prompt('Admin note / reason:',status)||status;let body={status,admin_note:note,processed_by_email:currentUser.email,processed_at:new Date().toISOString(),updated_at:new Date().toISOString()};if(status==='Paid'){let amt=ptRowAmount(r);body.paid_amount=amt;body.paid_date=todayISO();let a=ptAccountForRow(r);if(a){let balBefore=accountBalance(a),balAfter=Math.max(0,Number((balBefore-amt).toFixed(2))),receipt=ledgerReceiptNo();await dbFetch('/payments_ledger',{method:'POST',body:JSON.stringify([{account_id:a.id,payment_date:todayISO(),amount:amt,payment_type:'Payment',payment_method:r.paymentMethod||'Other',status:'Completed',receipt_number:receipt,balance_before:balBefore,balance_after:balAfter,notes:'Admin marked payment promise paid. '+(r.notes||''),created_by_email:currentUser.email}])}).catch(()=>{});await dbFetch(`/accounts?id=eq.${a.id}`,{method:'PATCH',body:JSON.stringify({current_balance:balAfter,status:balAfter<=0?'Settled':a.status,disposition:balAfter<=0?'Settled':a.disposition,updated_at:new Date().toISOString()})}).catch(()=>{})}}await dbFetch('/payment_promises?id=eq.'+encodeURIComponent(id),{method:'PATCH',body:JSON.stringify(body)});await insertActivity(r.accountId,'Payment Promise '+status,`Admin marked promise ${status}: ${money(ptRowAmount(r))}. ${note}`.trim());await insertAudit('Payment Promise '+status,`Payment promise ${id} marked ${status}`,'payment_promises',id);if(['Failed','NSF','Broken Promise'].includes(status))await dbFetch('/follow_ups',{method:'POST',body:JSON.stringify([{account_id:r.accountId,follow_up_type:status+' Payment Follow-Up',due_date:todayISO(),status:'Open',assigned_to_email:r.employeeEmail||r.assignedToEmail||currentUser.email,reason:'Payment '+status,notes:'Created from Payment Tracker. '+note,created_by_email:currentUser.email}])}).catch(()=>{});await loadPaymentTracker();await loadAccounts()}
+async function reschedulePaymentPromise(id){if(!currentUser.isAdmin)return alert('Admin only.');let r=(paymentPromiseData||[]).find(x=>String(x.id)===String(id));if(!r)return alert('Payment promise not found.');let newDate=prompt('New payment date YYYY-MM-DD:',r.dueDate||todayISO());if(!newDate)return;if(!/^\d{4}-\d{2}-\d{2}$/.test(newDate))return alert('Use YYYY-MM-DD format.');await dbFetch('/payment_promises?id=eq.'+encodeURIComponent(id),{method:'PATCH',body:JSON.stringify({status:'Rescheduled',rescheduled_from:r.dueDate||null,due_date:newDate,processed_by_email:currentUser.email,processed_at:new Date().toISOString(),updated_at:new Date().toISOString()})});await insertActivity(r.accountId,'Payment Promise Rescheduled',`Payment promise moved from ${r.dueDate||'—'} to ${newDate}.`);await loadPaymentTracker()}
+function exportPaymentPromisesCSV(){let rows=paymentPromiseFilteredRows();let csv=['due_date,debtor,account,amount,method,last4,authorization,status,employee,processed_by,paid_date,paid_amount,notes'];rows.forEach(r=>{csv.push([r.dueDate,r.debtorName,r.accountNumber,ptRowAmount(r),r.paymentMethod,r.methodLast4,r.authorizationMethod,r.status,r.employeeEmail||r.createdByEmail,r.processedByEmail,r.paidDate,ptPaidAmount(r),r.notes].map(v=>`"${String(v??'').replace(/"/g,'""')}"`).join(','))});download('payment_promises_export.csv',csv.join('\n'),'text/csv')}
 
 boot();
 </script>
