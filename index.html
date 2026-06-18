@@ -1,6 +1,9 @@
 <!doctype html>
 <html>
 <head>
+<!-- LIVE_CHAT_ONLINE_COMPLETE_MARKER: centered badge + self-fix + online presence -->
+<!-- LIVE_CHAT_CENTER_BADGE_COMPLETE_MARKER: centered message unread badge + previous chat fixes -->
+<!-- LIVE_CHAT_BADGE_SELF_FIX_MARKER: unread badge self-message fix -->
 <!-- LIVE_FACEBOOK_STYLE_CHAT_MARKER: bottom popup team chat -->
 <!-- LIVE_SOLID_ICONS_MESSENGER_MARKER: solid sidebar icons + internal team messenger -->
 <!-- LIVE_LEADERBOARD_NAV_MARKER: clickable left nav + production leaderboard -->
@@ -3150,10 +3153,82 @@ main.center > *,
   .chatContact{min-width:188px}
 }
 
+
+/* CENTER READABLE CHAT BADGE */
+.navIcon[data-nav="messages"]{
+  position:relative!important;
+}
+.navIcon[data-nav="messages"] .msgUnreadBadge{
+  position:absolute!important;
+  top:50%!important;
+  left:50%!important;
+  right:auto!important;
+  bottom:auto!important;
+  transform:translate(-50%,-50%)!important;
+  min-width:24px!important;
+  height:24px!important;
+  padding:0 7px!important;
+  border-radius:999px!important;
+  background:#ef4444!important;
+  color:#fff!important;
+  border:2px solid #fff!important;
+  display:none;
+  align-items:center!important;
+  justify-content:center!important;
+  text-align:center!important;
+  font-size:12px!important;
+  font-weight:1000!important;
+  line-height:1!important;
+  z-index:50!important;
+  box-shadow:0 7px 18px rgba(239,68,68,.45)!important;
+  pointer-events:none!important;
+}
+.navIcon[data-nav="messages"].msgHasUnread .msgUnreadBadge{
+  display:flex!important;
+}
+.navIcon[data-nav="messages"] .msgUnreadBadge:empty{
+  display:none!important;
+}
+
+
+/* ONLINE STATUS COMPLETE FIX */
+.chatOnlineDot{
+  background:#22c55e!important;
+  box-shadow:0 0 0 3px rgba(34,197,94,.18),0 0 12px rgba(34,197,94,.8)!important;
+}
+.chatOnlineDot.off{
+  background:#94a3b8!important;
+  box-shadow:none!important;
+}
+.chatOnlineDot.live{
+  background:#22c55e!important;
+}
+.chatContactMeta .onlineText,
+.chatActiveSub .onlineText{
+  color:#16a34a!important;
+  font-weight:1000!important;
+}
+.chatContactMeta .offlineText,
+.chatActiveSub .offlineText{
+  color:#64748b!important;
+  font-weight:900!important;
+}
+.chatPresenceBanner{
+  border:1px solid #bbf7d0;
+  background:#f0fdf4;
+  color:#166534;
+  font-size:11px;
+  font-weight:900;
+  padding:7px 10px;
+  border-radius:12px;
+  margin:8px;
+  display:flex;
+  justify-content:space-between;
+  gap:8px;
+}
+.chatPresenceBanner b{font-weight:1000}
+
 </style>
-  <meta property="og:image" content="https://bolt.new/static/og_default.png">
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:image" content="https://bolt.new/static/og_default.png">
 </head>
 <body>
 <div id="loginScreen" class="loginScreen open">
@@ -3217,7 +3292,7 @@ main.center > *,
 
 <div class="app">
   <header class="topbar">
-    <div class="brand"><div class="logo appBrandLogo" id="appBrandLogo">b</div><div><h1 id="appBrandName">Co Pilot Collections Manager</h1><p class="sub" id="appBrandSub">LIVE FACEBOOK STYLE CHAT READY — bottom chat popup, unread badge, read receipts, typing status.</p></div></div>
+    <div class="brand"><div class="logo appBrandLogo" id="appBrandLogo">b</div><div><h1 id="appBrandName">Co Pilot Collections Manager</h1><p class="sub" id="appBrandSub">LIVE CHAT ONLINE COMPLETE — centered badge, self-fix, and reliable green online status.</p></div></div>
     <div class="headerSearch"><span class="mag">⌕</span><input id="globalSearch" placeholder="Search phone, name, SSN, address..." oninput="handleSearchInput('global')"><span class="hotkey">⌘ K</span></div>
     <div class="topActions">
       <button class="gray helpBtn" onclick="openHelpModal()">Help</button>
@@ -9034,6 +9109,460 @@ function playChatSound(){
   }catch(e){}
 }
 setInterval(()=>{if(token()&&currentUser.email)chatRefreshAll(false)},12000);
+
+
+/* CHAT BADGE SELF-FIX — prevents self-chat and fixes unread count */
+function chatSameEmail(a,b){return String(a||'').toLowerCase().trim()===String(b||'').toLowerCase().trim()}
+function chatIsSelf(email){return chatSameEmail(email, chatMe())}
+
+buildChatContacts = function(){
+  let me=chatMe();
+  let map={};
+  function add(email){
+    email=String(email||'').toLowerCase().trim();
+    if(!email || email===me)return;
+    if(!map[email]){
+      let u=(appUsers||[]).find(x=>String(x.email||'').toLowerCase().trim()===email);
+      map[email]={email,user:u,online:chatIsOnline(u),unread:0,lastMessageAt:'',lastPreview:''};
+    }
+  }
+
+  if(currentUser.isAdmin){
+    (appUsers||[]).forEach(u=>{
+      let email=String(u.email||'').toLowerCase().trim();
+      let active=(u.isActive!==false && u.is_active!==false);
+      let approved=(u.isApproved===true || u.is_approved===true || String(u.approvalStatus||u.approval_status||'').toLowerCase()==='approved');
+      if(email && active && approved)add(email);
+    });
+    (accounts||[]).forEach(a=>{
+      let email=String(a.assignedToEmail||a.assigned_to_email||'').toLowerCase().trim();
+      add(email);
+    });
+  }else{
+    (appUsers||[]).forEach(u=>{
+      let email=String(u.email||'').toLowerCase().trim();
+      let role=String(u.role||'').toLowerCase();
+      if(email && role==='admin')add(email);
+    });
+    add('afinch2678@gmail.com');
+  }
+
+  (chatAllMessages||[]).forEach(m=>{
+    let from=String(m.fromEmail||m.from_email||'').toLowerCase().trim();
+    let to=String(m.toEmail||m.to_email||'').toLowerCase().trim();
+    if(from===me && to!==me)add(to);
+    if(to===me && from!==me)add(from);
+  });
+
+  delete map[me];
+
+  Object.values(map).forEach(c=>{
+    let msgs=(chatAllMessages||[]).filter(m=>{
+      let from=String(m.fromEmail||m.from_email||'').toLowerCase().trim();
+      let to=String(m.toEmail||m.to_email||'').toLowerCase().trim();
+      return (from===me&&to===c.email)||(from===c.email&&to===me);
+    });
+    c.unread=msgs.filter(m=>{
+      let from=String(m.fromEmail||m.from_email||'').toLowerCase().trim();
+      let to=String(m.toEmail||m.to_email||'').toLowerCase().trim();
+      return to===me && from!==me && !m.readAt && !m.read_at && String(m.status||'Open')!=='Closed';
+    }).length;
+    let last=msgs[msgs.length-1];
+    if(last){
+      c.lastMessageAt=last.createdAt||last.created_at||'';
+      c.lastPreview=String(last.body||'').slice(0,70);
+    }
+  });
+
+  chatContactsData=Object.values(map).filter(c=>c.email!==me).sort((a,b)=>{
+    if(a.unread!==b.unread)return b.unread-a.unread;
+    if(a.online!==b.online)return a.online?-1:1;
+    return String(b.lastMessageAt||'').localeCompare(String(a.lastMessageAt||'')) || a.email.localeCompare(b.email);
+  });
+};
+
+renderChatContacts = function(){
+  let list=document.getElementById('chatContactList');
+  if(!list)return;
+  let q=String(document.getElementById('chatSearch')?.value||'').toLowerCase();
+  let rows=(chatContactsData||[]).filter(c=>c.email!==chatMe()).filter(c=>!q || c.email.includes(q) || chatName(c.email).toLowerCase().includes(q));
+  list.innerHTML=rows.map(c=>`
+    <div class="chatContact ${c.email===chatActiveEmail?'active':''} ${c.unread?'hasUnread':''}" onclick="selectChatContact('${esc(c.email)}')">
+      <div class="chatAvatar">${esc(chatInitials(c.email))}<span class="chatOnlineDot ${c.online?'':'off'}"></span></div>
+      <div class="chatContactMain">
+        <div class="chatContactName">${esc(chatName(c.email))}</div>
+        <div class="chatContactMeta">${esc(chatContactRole(c.email))} • ${c.online?'Online':'Offline'}${c.lastPreview?' • '+esc(c.lastPreview):''}</div>
+      </div>
+      <div class="chatContactUnread ${c.unread?'':'zero'}">${c.unread?c.unread>99?'99+':c.unread:''}</div>
+    </div>
+  `).join('')||'<div class="tmEmpty">No other employees/admin are available yet. Once staff are approved, they will show here.</div>';
+};
+
+totalUnreadChat = function(){
+  let me=chatMe();
+  return (chatAllMessages||[]).filter(m=>{
+    let from=String(m.fromEmail||m.from_email||'').toLowerCase().trim();
+    let to=String(m.toEmail||m.to_email||'').toLowerCase().trim();
+    return to===me && from!==me && !m.readAt && !m.read_at && String(m.status||'Open')!=='Closed';
+  }).length;
+};
+
+updateChatUnreadBadge = function(){
+  let n=totalUnreadChat();
+  document.querySelectorAll('[data-nav="messages"]').forEach(el=>{
+    let b=el.querySelector('.msgUnreadBadge');
+    if(!b){
+      b=document.createElement('span');
+      b.className='msgUnreadBadge';
+      el.appendChild(b);
+    }
+    el.classList.toggle('msgHasUnread',n>0);
+    b.textContent=n>0?(n>99?'99+':String(n)):'';
+  });
+  if(chatUnreadInitialized && n>chatLastUnreadCount)playChatSound();
+  chatUnreadInitialized=true;
+  chatLastUnreadCount=n;
+};
+
+openChatDock = async function(){
+  let dock=document.getElementById('chatDock');
+  if(!dock)return alert('Chat dock not found. Republish the latest package.');
+  dock.classList.add('open');
+  if(!chatAttachedAccountId && getCurrent()?.id)chatAttachedAccountId=getCurrent().id;
+  await chatRefreshAll(false);
+  if(chatIsSelf(chatActiveEmail))chatActiveEmail='';
+  if(!chatActiveEmail && chatContactsData[0])await selectChatContact(chatContactsData[0].email);
+  startChatPolling();
+};
+
+chatRefreshAll = async function(manual=false){
+  if(!token()||!currentUser.email)return;
+  await chatHeartbeat().catch(()=>{});
+  await loadAppUsers().catch(()=>{});
+  await loadChatMessages().catch(()=>{});
+  buildChatContacts();
+
+  if(chatIsSelf(chatActiveEmail))chatActiveEmail='';
+  if(document.getElementById('chatDock')?.classList.contains('open') && chatActiveEmail){
+    await markActiveChatRead();
+  }
+
+  buildChatContacts();
+  renderChatContacts();
+  if(chatActiveEmail)renderChatConversation();
+  updateChatUnreadBadge();
+};
+
+selectChatContact = async function(email){
+  email=String(email||'').toLowerCase().trim();
+  if(!email || chatIsSelf(email)){
+    alert('You cannot message yourself. Choose another employee or admin.');
+    return;
+  }
+  chatActiveEmail=email;
+  renderChatContacts();
+  renderChatConversation();
+  await markActiveChatRead();
+  updateChatUnreadBadge();
+  document.getElementById('chatInput')?.focus();
+};
+
+activeChatMessages = function(){
+  let me=chatMe(), other=String(chatActiveEmail||'').toLowerCase().trim();
+  if(!other || other===me)return [];
+  return (chatAllMessages||[]).filter(m=>{
+    let from=String(m.fromEmail||m.from_email||'').toLowerCase().trim();
+    let to=String(m.toEmail||m.to_email||'').toLowerCase().trim();
+    return (from===me&&to===other)||(from===other&&to===me);
+  });
+};
+
+sendChatMessage = async function(){
+  let input=document.getElementById('chatInput');
+  let body=String(input?.value||'').trim();
+  if(!chatActiveEmail)return alert('Select an employee/admin first.');
+  if(chatIsSelf(chatActiveEmail))return alert('You cannot send a message to yourself.');
+  if(!body)return;
+  let a=chatAttachedAccountId?accountById(chatAttachedAccountId):getCurrent();
+  let row={
+    account_id:a?.id||null,
+    account_name:a?nameOf(a):'',
+    account_number:a?acctNo(a):'',
+    from_email:currentUser.email,
+    to_email:chatActiveEmail,
+    message_type:'Direct Message',
+    priority:'Normal',
+    subject:'Direct Message',
+    body,
+    phone_number:a?normPhone(phones(a)[0]||''):'',
+    status:'Open',
+    created_by_email:currentUser.email,
+    updated_at:new Date().toISOString()
+  };
+  await dbFetch('/team_messages',{method:'POST',body:JSON.stringify([row])});
+  if(input)input.value='';
+  await setTyping(false);
+  await chatRefreshAll(false);
+};
+
+markActiveChatRead = async function(){
+  if(!chatActiveEmail || chatIsSelf(chatActiveEmail))return;
+  let now=Date.now();
+  if(now-chatLastReadPatch<350)return;
+  chatLastReadPatch=now;
+  let me=chatMe();
+  let unread=activeChatMessages().filter(m=>{
+    let from=String(m.fromEmail||m.from_email||'').toLowerCase().trim();
+    let to=String(m.toEmail||m.to_email||'').toLowerCase().trim();
+    return to===me && from!==me && !m.readAt && !m.read_at;
+  });
+  for(let m of unread){
+    await dbFetch('/team_messages?id=eq.'+encodeURIComponent(m.id),{
+      method:'PATCH',
+      body:JSON.stringify({read_at:new Date().toISOString(),status:'Read',updated_at:new Date().toISOString()})
+    }).catch(()=>{});
+    m.readAt=new Date().toISOString();
+    m.status='Read';
+  }
+};
+
+
+/* ONLINE STATUS COMPLETE FIX — real heartbeat presence */
+var chatPresenceData = [];
+var chatPresenceTimer = null;
+
+function presenceIsOnlineEmail(email){
+  email=String(email||'').toLowerCase().trim();
+  if(!email)return false;
+  if(email===chatMe())return true;
+  let p=(chatPresenceData||[]).find(x=>String(x.userEmail||x.user_email||'').toLowerCase().trim()===email);
+  if(p){
+    let last=p.lastSeenAt||p.last_seen_at||p.updatedAt||p.updated_at;
+    if(last && (Date.now()-new Date(last).getTime()) < 2.5*60*1000)return true;
+  }
+  let u=(appUsers||[]).find(x=>String(x.email||'').toLowerCase().trim()===email);
+  return chatIsOnlineFromAppUser(u);
+}
+function chatIsOnlineFromAppUser(u){
+  let t=u?.lastSeenAt||u?.last_seen_at;
+  if(!t)return false;
+  return (Date.now()-new Date(t).getTime()) < 10*60*1000;
+}
+chatIsOnline = function(u){
+  if(!u)return false;
+  let email=String(u.email||u.userEmail||u.user_email||'').toLowerCase().trim();
+  if(email)return presenceIsOnlineEmail(email);
+  return chatIsOnlineFromAppUser(u);
+};
+
+async function upsertPresence(){
+  if(!currentUser.email || !token())return;
+  let email=currentUser.email.toLowerCase().trim();
+  let payload={
+    user_email:email,
+    is_online:true,
+    current_page:'crm',
+    last_seen_at:new Date().toISOString(),
+    updated_at:new Date().toISOString()
+  };
+  try{
+    let rows=await dbFetch('/team_presence?user_email=eq.'+encodeURIComponent(email)+'&select=id').catch(()=>[]);
+    if(rows&&rows[0]){
+      await dbFetch('/team_presence?id=eq.'+rows[0].id,{method:'PATCH',body:JSON.stringify(payload)}).catch(()=>{});
+    }else{
+      await dbFetch('/team_presence',{method:'POST',body:JSON.stringify([payload])}).catch(()=>{});
+    }
+  }catch(e){}
+  try{
+    await dbFetch('/app_users?email=eq.'+encodeURIComponent(email),{
+      method:'PATCH',
+      body:JSON.stringify({last_seen_at:new Date().toISOString(),updated_at:new Date().toISOString(),is_active:true})
+    }).catch(()=>{});
+  }catch(e){}
+}
+async function loadPresence(){
+  try{
+    chatPresenceData=(await dbFetch('/team_presence?select=*&order=last_seen_at.desc&limit=500')).map(toCamel);
+  }catch(e){
+    chatPresenceData=[];
+  }
+}
+function startPresenceHeartbeat(){
+  if(chatPresenceTimer)return;
+  upsertPresence();
+  chatPresenceTimer=setInterval(()=>{if(token()&&currentUser.email)upsertPresence()},15000);
+}
+function stopPresenceHeartbeat(){
+  if(chatPresenceTimer){
+    clearInterval(chatPresenceTimer);
+    chatPresenceTimer=null;
+  }
+}
+window.addEventListener('beforeunload',()=>{
+  try{
+    let email=(currentUser.email||'').toLowerCase().trim();
+    if(!email||!url()||!pubKey()||!token())return;
+    // sendBeacon cannot add auth headers, so offline falls back automatically after timeout.
+  }catch(e){}
+});
+
+chatRefreshAll = async function(manual=false){
+  if(!token()||!currentUser.email)return;
+  startPresenceHeartbeat();
+  await upsertPresence().catch(()=>{});
+  await loadPresence().catch(()=>{});
+  await chatHeartbeat().catch(()=>{});
+  await loadAppUsers().catch(()=>{});
+  await loadChatMessages().catch(()=>{});
+  buildChatContacts();
+
+  if(chatIsSelf(chatActiveEmail))chatActiveEmail='';
+  if(document.getElementById('chatDock')?.classList.contains('open') && chatActiveEmail){
+    await markActiveChatRead();
+  }
+
+  buildChatContacts();
+  renderChatContacts();
+  if(chatActiveEmail)renderChatConversation();
+  updateChatUnreadBadge();
+  renderPresenceBanner();
+};
+
+function renderPresenceBanner(){
+  let head=document.querySelector('.chatContactsHead');
+  if(!head)return;
+  let existing=document.getElementById('chatPresenceBanner');
+  if(!existing){
+    existing=document.createElement('div');
+    existing.id='chatPresenceBanner';
+    existing.className='chatPresenceBanner';
+    head.insertAdjacentElement('afterend',existing);
+  }
+  let online=(chatContactsData||[]).filter(c=>presenceIsOnlineEmail(c.email)).length;
+  existing.innerHTML=`<span><b>${online}</b> online</span><span>You are online 🟢</span>`;
+}
+
+buildChatContacts = function(){
+  let me=chatMe();
+  let map={};
+  function add(email){
+    email=String(email||'').toLowerCase().trim();
+    if(!email || email===me)return;
+    if(!map[email]){
+      let u=(appUsers||[]).find(x=>String(x.email||'').toLowerCase().trim()===email);
+      map[email]={email,user:u,online:presenceIsOnlineEmail(email),unread:0,lastMessageAt:'',lastPreview:''};
+    }else{
+      map[email].online=presenceIsOnlineEmail(email);
+    }
+  }
+
+  if(currentUser.isAdmin){
+    (appUsers||[]).forEach(u=>{
+      let email=String(u.email||'').toLowerCase().trim();
+      let active=(u.isActive!==false && u.is_active!==false);
+      let approved=(u.isApproved===true || u.is_approved===true || String(u.approvalStatus||u.approval_status||'').toLowerCase()==='approved');
+      if(email && active && approved)add(email);
+    });
+    (accounts||[]).forEach(a=>{
+      let email=String(a.assignedToEmail||a.assigned_to_email||'').toLowerCase().trim();
+      add(email);
+    });
+  }else{
+    (appUsers||[]).forEach(u=>{
+      let email=String(u.email||'').toLowerCase().trim();
+      let role=String(u.role||'').toLowerCase();
+      if(email && role==='admin')add(email);
+    });
+    add('afinch2678@gmail.com');
+  }
+
+  (chatPresenceData||[]).forEach(p=>{
+    let email=String(p.userEmail||p.user_email||'').toLowerCase().trim();
+    add(email);
+  });
+
+  (chatAllMessages||[]).forEach(m=>{
+    let from=String(m.fromEmail||m.from_email||'').toLowerCase().trim();
+    let to=String(m.toEmail||m.to_email||'').toLowerCase().trim();
+    if(from===me && to!==me)add(to);
+    if(to===me && from!==me)add(from);
+  });
+
+  delete map[me];
+
+  Object.values(map).forEach(c=>{
+    let msgs=(chatAllMessages||[]).filter(m=>{
+      let from=String(m.fromEmail||m.from_email||'').toLowerCase().trim();
+      let to=String(m.toEmail||m.to_email||'').toLowerCase().trim();
+      return (from===me&&to===c.email)||(from===c.email&&to===me);
+    });
+    c.unread=msgs.filter(m=>{
+      let from=String(m.fromEmail||m.from_email||'').toLowerCase().trim();
+      let to=String(m.toEmail||m.to_email||'').toLowerCase().trim();
+      return to===me && from!==me && !m.readAt && !m.read_at && String(m.status||'Open')!=='Closed';
+    }).length;
+    let last=msgs[msgs.length-1];
+    if(last){
+      c.lastMessageAt=last.createdAt||last.created_at||'';
+      c.lastPreview=String(last.body||'').slice(0,70);
+    }
+    c.online=presenceIsOnlineEmail(c.email);
+  });
+
+  chatContactsData=Object.values(map).filter(c=>c.email!==me).sort((a,b)=>{
+    if(a.unread!==b.unread)return b.unread-a.unread;
+    if(a.online!==b.online)return a.online?-1:1;
+    return String(b.lastMessageAt||'').localeCompare(String(a.lastMessageAt||'')) || a.email.localeCompare(b.email);
+  });
+};
+
+renderChatContacts = function(){
+  let list=document.getElementById('chatContactList');
+  if(!list)return;
+  let q=String(document.getElementById('chatSearch')?.value||'').toLowerCase();
+  let rows=(chatContactsData||[]).filter(c=>c.email!==chatMe()).filter(c=>!q || c.email.includes(q) || chatName(c.email).toLowerCase().includes(q));
+  list.innerHTML=rows.map(c=>{
+    let online=presenceIsOnlineEmail(c.email);
+    return `
+    <div class="chatContact ${c.email===chatActiveEmail?'active':''} ${c.unread?'hasUnread':''}" onclick="selectChatContact('${esc(c.email)}')">
+      <div class="chatAvatar">${esc(chatInitials(c.email))}<span class="chatOnlineDot ${online?'live':'off'}"></span></div>
+      <div class="chatContactMain">
+        <div class="chatContactName">${esc(chatName(c.email))}</div>
+        <div class="chatContactMeta">${esc(chatContactRole(c.email))} • <span class="${online?'onlineText':'offlineText'}">${online?'Online':'Offline'}</span>${c.lastPreview?' • '+esc(c.lastPreview):''}</div>
+      </div>
+      <div class="chatContactUnread ${c.unread?'':'zero'}">${c.unread?c.unread>99?'99+':c.unread:''}</div>
+    </div>`;
+  }).join('')||'<div class="tmEmpty">No other employees/admin are available yet. Once staff are approved, they will show here.</div>';
+  renderPresenceBanner();
+};
+
+renderChatConversation = function(){
+  let msgs=activeChatMessages();
+  let box=document.getElementById('chatMessages');
+  let nameEl=document.getElementById('chatActiveName');
+  let statusEl=document.getElementById('chatActiveStatus');
+  let av=document.getElementById('chatActiveAvatar');
+  let btn=document.getElementById('chatSendBtn');
+  if(!box)return;
+  if(!chatActiveEmail){
+    box.innerHTML='<div class="chatEmpty">Pick a person to start a direct chat.</div>';
+    if(btn)btn.disabled=true;
+    return;
+  }
+  if(btn)btn.disabled=false;
+  if(nameEl)nameEl.textContent=chatName(chatActiveEmail);
+  let online=presenceIsOnlineEmail(chatActiveEmail);
+  let attached=chatAttachedAccountId?accountById(chatAttachedAccountId):null;
+  if(statusEl)statusEl.innerHTML=`${chatContactRole(chatActiveEmail)} • <span class="${online?'onlineText':'offlineText'}">${online?'Online':'Offline'}</span>${attached?' • Attached: '+esc(nameOf(attached)):''}`;
+  if(av){
+    av.innerHTML=`${esc(chatInitials(chatActiveEmail))}<span class="chatOnlineDot ${online?'live':'off'}"></span>`;
+  }
+  box.innerHTML=msgs.map(m=>chatMessageBubble(m)).join('')||'<div class="chatEmpty">No messages yet. Type below to start the conversation.</div>';
+  box.scrollTop=box.scrollHeight;
+  loadTypingStatus();
+};
+
+startPresenceHeartbeat();
 
 boot();
 </script>
