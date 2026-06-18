@@ -1,6 +1,5 @@
 // Co Pilot Collections Manager - Public Supabase Config
-// This file uses the Supabase publishable key only.
-// Do NOT put your sb_secret_ service role key here.
+// Publish-safe config. This is NOT the secret service-role key.
 
 window.CO_PILOT_SUPABASE_CONFIG = {
   url: "https://bwvufgzbkaymffwxuuzr.supabase.co",
