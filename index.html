@@ -1954,16 +1954,120 @@ main.center > *,
   }
 }
 
+
+/* ADMIN BRANDING SETTINGS */
+.appBrandLogo,
+.appBrandLogoSmall,
+.landingLogo{
+  overflow:hidden!important;
+}
+.appBrandLogo img,
+.appBrandLogoSmall img,
+.landingLogo img,
+#brandPreviewLogo img{
+  width:100%!important;
+  height:100%!important;
+  object-fit:contain!important;
+  display:block!important;
+}
+.brandSettingsBox{
+  max-width:900px!important;
+}
+.brandSettingsGrid{
+  display:grid;
+  grid-template-columns:minmax(0,1.05fr) minmax(260px,.8fr);
+  gap:16px;
+  align-items:start;
+}
+.brandSettingsForm label{
+  display:block;
+  margin-top:12px;
+  font-size:12px;
+  font-weight:1000;
+  color:#334155;
+}
+.brandSettingsForm input{
+  width:100%;
+  height:42px;
+  border:1px solid #dbe3ef;
+  border-radius:10px;
+  padding:0 12px;
+  font-weight:850;
+}
+.brandButtonRow{
+  display:flex;
+  gap:10px;
+  margin-top:12px;
+  flex-wrap:wrap;
+}
+.brandPreviewCard{
+  border:1px solid #dbe3ef;
+  border-radius:16px;
+  background:#f8fbff;
+  padding:14px;
+}
+.brandPreviewLabel{
+  font-size:11px;
+  color:#64748b;
+  font-weight:1000;
+  text-transform:uppercase;
+  margin-bottom:10px;
+}
+.brandPreviewBar{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  border-radius:16px;
+  padding:14px;
+  background:linear-gradient(90deg,#05225f,#07379a,#0b45c6);
+  color:white;
+  min-width:0;
+}
+.brandPreviewName{
+  font-size:17px;
+  font-weight:1000;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  max-width:300px;
+}
+.brandPreviewSub{
+  font-size:11px;
+  color:#bfdbfe;
+  margin-top:3px;
+  font-weight:850;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  max-width:300px;
+}
+.brandPreviewNote{
+  color:#64748b;
+  font-size:12px;
+  line-height:1.4;
+  font-weight:800;
+  margin-top:12px;
+}
+.saveStatus{
+  margin-top:10px;
+  font-size:12px;
+  font-weight:900;
+  min-height:16px;
+}
+.saveStatus.ok{color:#15803d}
+.saveStatus.err{color:#b91c1c}
+.saveStatus.busy{color:#1d4ed8}
+@media(max-width:850px){
+  .brandSettingsGrid{grid-template-columns:1fr}
+}
+
 </style>
-  <meta property="og:image" content="https://bolt.new/static/og_default.png">
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:image" content="https://bolt.new/static/og_default.png">
 </head>
 <body>
 <div id="loginScreen" class="loginScreen open">
   <div class="landingShell">
     <section class="landingHero">
-      <div class="landingBrand"><div class="landingLogo">b</div><div><b>Co Pilot Collections Manager</b><span>Private CRM for collection teams</span></div></div>
+      <div class="landingBrand"><div class="landingLogo" id="landingBrandLogo">b</div><div><b id="landingBrandName">Co Pilot Collections Manager</b><span id="landingBrandSub">Private CRM for collection teams</span></div></div>
       <h1>Work accounts, track promises, collect payments, and monitor your team from one clean system.</h1>
       <p class="landingLead">Built for small collection teams that need a simple collector workflow: import accounts, assign employees, work one debtor at a time, schedule callbacks, manage payment plans, generate branded letters, and track activity.</p>
       <div class="landingFeatures">
@@ -1982,7 +2086,7 @@ main.center > *,
     </section>
 
     <aside class="loginBox landingLoginCard">
-      <div class="loginMiniBrand"><div class="logo">b</div><div><h2>Login</h2><p>Admin or approved employee access.</p></div></div>
+      <div class="loginMiniBrand"><div class="logo appBrandLogoSmall" id="loginBrandLogo">b</div><div><h2>Login</h2><p>Admin or approved employee access.</p></div></div>
       <div id="loginError" class="error hidden"></div>
       <div id="connectionNotice" class="notice hidden"></div>
       <label>Email</label>
@@ -2021,7 +2125,7 @@ main.center > *,
 
 <div class="app">
   <header class="topbar">
-    <div class="brand"><div class="logo">b</div><div><h1>Co Pilot Collections Manager</h1><p class="sub">HELP ALIGNMENT FIX READY — checklist, modal spacing, and help buttons aligned cleanly.</p></div></div>
+    <div class="brand"><div class="logo appBrandLogo" id="appBrandLogo">b</div><div><h1 id="appBrandName">Co Pilot Collections Manager</h1><p class="sub" id="appBrandSub">BRANDING SETTINGS READY — admin can edit app name, subtitle, and navigation logo.</p></div></div>
     <div class="headerSearch"><span class="mag">⌕</span><input id="globalSearch" placeholder="Search phone, name, SSN, address..." oninput="document.getElementById('search').value=this.value;onQueueFilterChange()"><span class="hotkey">⌘ K</span></div>
     <div class="topActions">
       <button class="gray helpBtn" onclick="openHelpModal()">Help</button>
@@ -2035,6 +2139,7 @@ main.center > *,
       <button class="gray adminOnly hidden" onclick="openPermissionsModal()">Perms</button>
       <button class="gray adminOnly hidden" onclick="openEmployeeMonitorModal()">Monitor</button>
       <button class="gray adminOnly hidden" onclick="openEmployeeAdminModal()">Staff</button>
+      <button class="gray adminOnly hidden" onclick="openBrandingSettingsModal()">Brand</button>
       <button class="gray adminOnly hidden" onclick="openAssignModal()">Assign</button>
       <label class="fileBtn gray adminOnly hidden">Import<input type="file" accept=".csv" onchange="importCSV(event)"></label>
       <button class="purple adminOnly hidden" onclick="downloadTemplate()">Template</button>
@@ -2388,6 +2493,42 @@ main.center > *,
     <div class="helpActions">
       <button class="outline" onclick="downloadDemoCSV()">Download Demo CSV</button>
       <button class="gray" onclick="openTodayDashboard();closeModal('helpModal')">Open Today Dashboard</button>
+    </div>
+  </div>
+</div></div>
+
+
+<div id="brandingSettingsModal" class="modal"><div class="modalbox brandSettingsBox">
+  <div class="modalhead"><h2>App Branding Settings</h2><button class="gray" onclick="closeModal('brandingSettingsModal')">Close</button></div>
+  <div class="modalbody">
+    <div class="powerWarning">Admin can customize the app name, the small subtitle under the name, and the logo shown in the top-left navigation. This is separate from the letter watermark/logo.</div>
+    <div class="brandSettingsGrid">
+      <div class="brandSettingsForm">
+        <label>App / Client Name</label>
+        <input id="brandNameInput" placeholder="Example: Acme Collections CRM">
+        <label>Subtitle / Status Line</label>
+        <input id="brandSubInput" placeholder="Example: Private Collections CRM">
+        <div class="brandButtonRow">
+          <label class="fileBtn gray">Upload Navigation Logo<input type="file" accept="image/*,.png,.jpg,.jpeg,.webp,.gif,.bmp,.svg" onchange="handleAppBrandLogoUpload(event)"></label>
+          <button class="gray" onclick="removeAppBrandLogo()">Remove Logo</button>
+        </div>
+        <div class="brandButtonRow">
+          <button class="green" onclick="saveAppBrandSettings()">Save Branding</button>
+          <button class="outline" onclick="resetAppBrandDefaults()">Reset Defaults</button>
+        </div>
+        <div id="brandSaveStatus" class="saveStatus"></div>
+      </div>
+      <div class="brandPreviewCard">
+        <div class="brandPreviewLabel">Live Preview</div>
+        <div class="brandPreviewBar">
+          <div class="logo appBrandLogo" id="brandPreviewLogo">b</div>
+          <div>
+            <div class="brandPreviewName" id="brandPreviewName">Co Pilot Collections Manager</div>
+            <div class="brandPreviewSub" id="brandPreviewSub">Private Collections CRM</div>
+          </div>
+        </div>
+        <div class="brandPreviewNote">This is what clients/employees see in the top-left of the software.</div>
+      </div>
     </div>
   </div>
 </div></div>
@@ -2821,6 +2962,165 @@ function applyRoleUI(){
 }
 
 
+
+let appBrandSettings={
+  loaded:false,
+  name:'Co Pilot Collections Manager',
+  subtitle:'Private Collections CRM',
+  logoDataUrl:'',
+  width:0,
+  height:0
+};
+
+function appBrandFromLocalStorage(){
+  appBrandSettings.name=localStorage.getItem('appBrandName')||appBrandSettings.name||'Co Pilot Collections Manager';
+  appBrandSettings.subtitle=localStorage.getItem('appBrandSubtitle')||appBrandSettings.subtitle||'Private Collections CRM';
+  appBrandSettings.logoDataUrl=localStorage.getItem('appBrandLogoDataUrl')||'';
+  appBrandSettings.width=parseInt(localStorage.getItem('appBrandLogoWidth')||'0',10)||0;
+  appBrandSettings.height=parseInt(localStorage.getItem('appBrandLogoHeight')||'0',10)||0;
+}
+function setLogoEl(el,dataUrl,fallback='b'){
+  if(!el)return;
+  if(dataUrl){
+    el.innerHTML=`<img src="${dataUrl}" alt="App logo">`;
+  }else{
+    el.textContent=fallback;
+  }
+}
+function applyAppBranding(){
+  let name=appBrandSettings.name||'Co Pilot Collections Manager';
+  let sub=appBrandSettings.subtitle||'Private Collections CRM';
+  let logo=appBrandSettings.logoDataUrl||'';
+  let fallback=(name.trim()[0]||'b').toLowerCase();
+
+  let n=document.getElementById('appBrandName'); if(n)n.textContent=name;
+  let s=document.getElementById('appBrandSub'); if(s)s.textContent=sub;
+  setLogoEl(document.getElementById('appBrandLogo'),logo,fallback);
+
+  let ln=document.getElementById('landingBrandName'); if(ln)ln.textContent=name;
+  let ls=document.getElementById('landingBrandSub'); if(ls)ls.textContent=sub;
+  setLogoEl(document.getElementById('landingBrandLogo'),logo,fallback);
+  setLogoEl(document.getElementById('loginBrandLogo'),logo,fallback);
+
+  let pn=document.getElementById('brandPreviewName'); if(pn)pn.textContent=name;
+  let ps=document.getElementById('brandPreviewSub'); if(ps)ps.textContent=sub;
+  setLogoEl(document.getElementById('brandPreviewLogo'),logo,fallback);
+
+  let bi=document.getElementById('brandNameInput'); if(bi)bi.value=name;
+  let si=document.getElementById('brandSubInput'); if(si)si.value=sub;
+  document.title=name;
+}
+async function loadAppBrandSettings(force=false){
+  if(appBrandSettings.loaded&&!force){applyAppBranding();return appBrandSettings;}
+  appBrandSettings.loaded=true;
+  appBrandFromLocalStorage();
+  applyAppBranding();
+
+  // If logged in, pull shared branding from Supabase so employees see the admin settings too.
+  if(token()){
+    try{
+      let keys='app_brand_name,app_brand_subtitle,app_brand_logo_data_url,app_brand_logo_width,app_brand_logo_height';
+      let rows=(await dbFetch('/company_settings?select=setting_key,setting_value&setting_key=in.('+keys+')')).map(toCamel);
+      let map={}; rows.forEach(r=>map[r.settingKey]=r.settingValue);
+      if(map.app_brand_name)appBrandSettings.name=map.app_brand_name;
+      if(map.app_brand_subtitle)appBrandSettings.subtitle=map.app_brand_subtitle;
+      if(map.app_brand_logo_data_url)appBrandSettings.logoDataUrl=map.app_brand_logo_data_url;
+      if(map.app_brand_logo_width)appBrandSettings.width=parseInt(map.app_brand_logo_width||'0',10)||0;
+      if(map.app_brand_logo_height)appBrandSettings.height=parseInt(map.app_brand_logo_height||'0',10)||0;
+
+      localStorage.setItem('appBrandName',appBrandSettings.name||'');
+      localStorage.setItem('appBrandSubtitle',appBrandSettings.subtitle||'');
+      localStorage.setItem('appBrandLogoDataUrl',appBrandSettings.logoDataUrl||'');
+      localStorage.setItem('appBrandLogoWidth',appBrandSettings.width||'0');
+      localStorage.setItem('appBrandLogoHeight',appBrandSettings.height||'0');
+      applyAppBranding();
+    }catch(e){
+      console.warn('Brand settings load failed:',e);
+    }
+  }
+  return appBrandSettings;
+}
+function openBrandingSettingsModal(){
+  if(!currentUser.isAdmin)return alert('Admin only');
+  appBrandFromLocalStorage();
+  applyAppBranding();
+  document.getElementById('brandingSettingsModal').classList.add('open');
+  loadAppBrandSettings(true).then(()=>applyAppBranding()).catch(()=>{});
+}
+async function handleAppBrandLogoUpload(event){
+  try{
+    let file=event.target.files&&event.target.files[0];
+    if(!file)return;
+    let logo=await fileToLogoJpeg(file);
+    appBrandSettings.logoDataUrl=logo.dataUrl;
+    appBrandSettings.width=logo.width;
+    appBrandSettings.height=logo.height;
+    applyAppBranding();
+    let st=document.getElementById('brandSaveStatus');
+    if(st){st.className='saveStatus busy';st.textContent='Logo selected. Click Save Branding to store it.';}
+  }catch(e){
+    alert(e.message||String(e));
+  }finally{
+    if(event&&event.target)event.target.value='';
+  }
+}
+function removeAppBrandLogo(){
+  appBrandSettings.logoDataUrl='';
+  appBrandSettings.width=0;
+  appBrandSettings.height=0;
+  applyAppBranding();
+  let st=document.getElementById('brandSaveStatus');
+  if(st){st.className='saveStatus busy';st.textContent='Logo removed from preview. Click Save Branding to store this change.';}
+}
+function resetAppBrandDefaults(){
+  document.getElementById('brandNameInput').value='Co Pilot Collections Manager';
+  document.getElementById('brandSubInput').value='Private Collections CRM';
+  appBrandSettings.name='Co Pilot Collections Manager';
+  appBrandSettings.subtitle='Private Collections CRM';
+  appBrandSettings.logoDataUrl='';
+  appBrandSettings.width=0;
+  appBrandSettings.height=0;
+  applyAppBranding();
+}
+async function saveAppBrandSettings(){
+  let st=document.getElementById('brandSaveStatus');
+  function status(msg,cls=''){if(st){st.className='saveStatus '+cls;st.textContent=msg;}}
+  try{
+    if(!currentUser.isAdmin)return alert('Admin only');
+    appBrandSettings.name=(document.getElementById('brandNameInput').value||'Co Pilot Collections Manager').trim();
+    appBrandSettings.subtitle=(document.getElementById('brandSubInput').value||'Private Collections CRM').trim();
+    applyAppBranding();
+
+    localStorage.setItem('appBrandName',appBrandSettings.name);
+    localStorage.setItem('appBrandSubtitle',appBrandSettings.subtitle);
+    localStorage.setItem('appBrandLogoDataUrl',appBrandSettings.logoDataUrl||'');
+    localStorage.setItem('appBrandLogoWidth',appBrandSettings.width||'0');
+    localStorage.setItem('appBrandLogoHeight',appBrandSettings.height||'0');
+
+    status('Saving branding settings...','busy');
+    let rows=[
+      {setting_key:'app_brand_name',setting_value:appBrandSettings.name,updated_by_email:currentUser.email,updated_at:new Date().toISOString()},
+      {setting_key:'app_brand_subtitle',setting_value:appBrandSettings.subtitle,updated_by_email:currentUser.email,updated_at:new Date().toISOString()},
+      {setting_key:'app_brand_logo_data_url',setting_value:appBrandSettings.logoDataUrl||'',updated_by_email:currentUser.email,updated_at:new Date().toISOString()},
+      {setting_key:'app_brand_logo_width',setting_value:String(appBrandSettings.width||0),updated_by_email:currentUser.email,updated_at:new Date().toISOString()},
+      {setting_key:'app_brand_logo_height',setting_value:String(appBrandSettings.height||0),updated_by_email:currentUser.email,updated_at:new Date().toISOString()}
+    ];
+    await dbFetch('/company_settings?on_conflict=setting_key',{
+      method:'POST',
+      headers:{Prefer:'resolution=merge-duplicates,return=representation'},
+      body:JSON.stringify(rows)
+    });
+    try{await insertAudit('Branding Updated','Updated app name/subtitle/navigation logo','company_settings','app_branding')}catch(e){}
+    status('Branding saved. Employees will see this after refresh/login.','ok');
+    alert('Branding saved.');
+  }catch(e){
+    status('Save failed: '+(e.message||String(e)),'err');
+    alert('Branding save failed:\n\n'+(e.message||String(e))+'\n\nIf this is a database error, run RUN_THIS_BRANDING_SETTINGS_SQL.sql in Supabase SQL Editor, reload, and try again.');
+  }
+}
+loadAppBrandSettings(false).catch(()=>{});
+
+
 function setGlobalBusy(show,title='Working...',text='Please wait.'){
  let box=document.getElementById('globalBusy');
  if(!box)return;
@@ -3077,6 +3377,7 @@ async function boot(){
    document.getElementById('pendingScreen').classList.remove('open');
    document.getElementById('loginScreen').classList.remove('open');
    applyRoleUI();
+   await loadAppBrandSettings(true);
    await loadAccounts();
  }catch(e){
    let msg=e.message||String(e);
