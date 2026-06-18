@@ -1,6 +1,7 @@
 <!doctype html>
 <html>
 <head>
+<!-- LIVE_FACEBOOK_STYLE_CHAT_MARKER: bottom popup team chat -->
 <!-- LIVE_SOLID_ICONS_MESSENGER_MARKER: solid sidebar icons + internal team messenger -->
 <!-- LIVE_LEADERBOARD_NAV_MARKER: clickable left nav + production leaderboard -->
 <!-- LIVE_CLEAN_REPAIR_MARKER: https://bwvufgzbkaymffwxuuzr.supabase.co -->
@@ -2940,10 +2941,216 @@ main.center > *,
 @media(max-width:1050px){.tmGrid{grid-template-columns:1fr}}
 @media(max-width:650px){.tmHero{flex-direction:column}.tmFormGrid{grid-template-columns:1fr}.tmToolbar{flex-direction:column;align-items:stretch}.teamMessengerBox{max-width:calc(100vw - 20px)!important}}
 
+
+/* FACEBOOK STYLE TEAM CHAT */
+.navIcon{position:relative!important}
+.msgUnreadDot{display:none!important}
+.msgUnreadBadge{
+  position:absolute!important;
+  top:-5px!important;
+  right:-5px!important;
+  min-width:18px!important;
+  height:18px!important;
+  padding:0 5px!important;
+  border-radius:999px!important;
+  background:#ef4444!important;
+  color:#fff!important;
+  border:2px solid #fff!important;
+  display:none;
+  align-items:center!important;
+  justify-content:center!important;
+  font-size:10px!important;
+  font-weight:1000!important;
+  line-height:1!important;
+  box-shadow:0 5px 14px rgba(239,68,68,.35)!important;
+}
+.navIcon.msgHasUnread .msgUnreadBadge{display:flex!important}
+.chatDock{
+  position:fixed;
+  right:18px;
+  bottom:18px;
+  width:760px;
+  max-width:calc(100vw - 36px);
+  height:610px;
+  max-height:calc(100vh - 76px);
+  background:#fff;
+  border:1px solid #cbd5e1;
+  border-radius:22px;
+  box-shadow:0 30px 90px rgba(15,23,42,.35);
+  z-index:9999;
+  display:none;
+  overflow:hidden;
+}
+.chatDock.open{display:flex;flex-direction:column;animation:chatUp .16s ease-out}
+@keyframes chatUp{from{opacity:0;transform:translateY(22px) scale(.985)}to{opacity:1;transform:translateY(0) scale(1)}}
+.chatTop{
+  height:56px;
+  background:linear-gradient(135deg,#1d4ed8,#0f2f88);
+  color:#fff;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  padding:10px 12px;
+}
+.chatBrand{display:flex;align-items:center;gap:10px;min-width:0}
+.chatBrandIcon{
+  width:34px;height:34px;border-radius:12px;
+  display:grid;place-items:center;
+  background:rgba(255,255,255,.16);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.25);
+  font-size:19px;
+}
+.chatBrandText b{display:block;font-size:14px;line-height:1.1}
+.chatBrandText span{display:block;font-size:11px;color:#bfdbfe;font-weight:800;line-height:1.1;margin-top:2px}
+.chatTopActions{display:flex;align-items:center;gap:6px}
+.chatTopActions button{
+  width:32px;height:32px;border:0;border-radius:10px;
+  background:rgba(255,255,255,.14);color:#fff;font-weight:1000;cursor:pointer;
+}
+.chatBody{display:grid;grid-template-columns:245px minmax(0,1fr);min-height:0;flex:1;background:#f8fafc}
+.chatContacts{
+  border-right:1px solid #e2e8f0;
+  background:#fff;
+  min-height:0;
+  display:flex;
+  flex-direction:column;
+}
+.chatContactsHead{padding:10px;border-bottom:1px solid #e2e8f0}
+.chatContactsHead input{
+  width:100%;
+  border:1px solid #cbd5e1;
+  border-radius:999px;
+  padding:10px 12px;
+  font:inherit;
+  background:#f8fafc;
+}
+.chatContactList{overflow:auto;padding:8px;display:flex;flex-direction:column;gap:6px}
+.chatContact{
+  border:1px solid transparent;
+  background:#fff;
+  border-radius:14px;
+  padding:8px;
+  display:flex;
+  gap:9px;
+  align-items:center;
+  cursor:pointer;
+}
+.chatContact:hover,.chatContact.active{background:#eff6ff;border-color:#bfdbfe}
+.chatAvatar{
+  width:38px;height:38px;border-radius:999px;
+  display:grid;place-items:center;
+  color:#fff;
+  font-weight:1000;
+  background:linear-gradient(145deg,#2563eb,#1d4ed8);
+  position:relative;
+  flex:0 0 auto;
+}
+.chatOnlineDot{
+  position:absolute;right:0;bottom:0;width:11px;height:11px;border-radius:999px;background:#22c55e;border:2px solid #fff;
+}
+.chatOnlineDot.off{background:#94a3b8}
+.chatContactMain{min-width:0;flex:1}
+.chatContactName{font-size:12px;font-weight:1000;color:#0f172a;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.chatContactMeta{font-size:10.5px;font-weight:800;color:#64748b;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.chatContactUnread{
+  min-width:20px;height:20px;border-radius:999px;background:#ef4444;color:white;
+  display:none;align-items:center;justify-content:center;font-size:10px;font-weight:1000;padding:0 6px;
+}
+.chatContact.hasUnread .chatContactUnread{display:flex}
+.chatMain{display:flex;flex-direction:column;min-width:0;min-height:0}
+.chatActiveHead{
+  height:58px;background:#fff;border-bottom:1px solid #e2e8f0;
+  display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 12px;
+}
+.chatActivePerson{display:flex;align-items:center;gap:10px;min-width:0}
+.chatActiveTitle{font-size:14px;font-weight:1000;color:#0f172a;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.chatActiveSub{font-size:11px;color:#64748b;font-weight:800;margin-top:2px}
+.chatAttachAccount{
+  font-size:11px;font-weight:900;border:1px solid #cbd5e1;background:#f8fafc;border-radius:999px;padding:6px 10px;color:#334155;
+}
+.chatMessages{
+  flex:1;
+  overflow:auto;
+  padding:14px;
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+  background:linear-gradient(180deg,#f8fafc,#eef6ff);
+}
+.chatEmpty{
+  margin:auto;
+  text-align:center;
+  color:#64748b;
+  font-weight:850;
+  line-height:1.4;
+}
+.chatBubbleWrap{display:flex;flex-direction:column;max-width:78%}
+.chatBubbleWrap.mine{align-self:flex-end;align-items:flex-end}
+.chatBubbleWrap.theirs{align-self:flex-start;align-items:flex-start}
+.chatBubble{
+  padding:9px 11px;
+  border-radius:16px;
+  font-size:13px;
+  line-height:1.36;
+  font-weight:700;
+  white-space:pre-wrap;
+  word-break:break-word;
+}
+.chatBubbleWrap.mine .chatBubble{background:#1d4ed8;color:#fff;border-bottom-right-radius:5px}
+.chatBubbleWrap.theirs .chatBubble{background:#fff;color:#0f172a;border:1px solid #e2e8f0;border-bottom-left-radius:5px}
+.chatMetaLine{font-size:10px;color:#64748b;font-weight:800;margin-top:3px}
+.chatTyping{
+  min-height:20px;
+  padding:0 14px;
+  font-size:11px;
+  color:#64748b;
+  font-weight:900;
+  background:#eef6ff;
+}
+.chatInputBar{
+  background:#fff;
+  border-top:1px solid #e2e8f0;
+  padding:10px;
+  display:flex;
+  gap:8px;
+  align-items:flex-end;
+}
+.chatInputBar textarea{
+  flex:1;
+  min-height:42px;
+  max-height:112px;
+  resize:vertical;
+  border:1px solid #cbd5e1;
+  border-radius:14px;
+  padding:10px 12px;
+  font:inherit;
+}
+.chatInputBar button{
+  min-height:42px;
+  border:0;
+  border-radius:14px;
+  padding:0 16px;
+  background:#1d4ed8;
+  color:white;
+  font-weight:1000;
+  cursor:pointer;
+}
+.chatInputBar button:disabled{opacity:.45;cursor:not-allowed}
+@media(max-width:780px){
+  .chatDock{
+    right:0;left:0;bottom:0;
+    width:100vw;max-width:100vw;
+    height:82vh;max-height:82vh;
+    border-radius:22px 22px 0 0;
+  }
+  .chatBody{grid-template-columns:1fr}
+  .chatContacts{max-height:190px;border-right:0;border-bottom:1px solid #e2e8f0}
+  .chatContactList{display:flex;flex-direction:row;overflow-x:auto;overflow-y:hidden}
+  .chatContact{min-width:188px}
+}
+
 </style>
-  <meta property="og:image" content="https://bolt.new/static/og_default.png">
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:image" content="https://bolt.new/static/og_default.png">
 </head>
 <body>
 <div id="loginScreen" class="loginScreen open">
@@ -3007,7 +3214,7 @@ main.center > *,
 
 <div class="app">
   <header class="topbar">
-    <div class="brand"><div class="logo appBrandLogo" id="appBrandLogo">b</div><div><h1 id="appBrandName">Co Pilot Collections Manager</h1><p class="sub" id="appBrandSub">LIVE SOLID ICONS + MESSENGER READY — sidebar icons fixed and team messenger added.</p></div></div>
+    <div class="brand"><div class="logo appBrandLogo" id="appBrandLogo">b</div><div><h1 id="appBrandName">Co Pilot Collections Manager</h1><p class="sub" id="appBrandSub">LIVE FACEBOOK STYLE CHAT READY — bottom chat popup, unread badge, read receipts, typing status.</p></div></div>
     <div class="headerSearch"><span class="mag">⌕</span><input id="globalSearch" placeholder="Search phone, name, SSN, address..." oninput="handleSearchInput('global')"><span class="hotkey">⌘ K</span></div>
     <div class="topActions">
       <button class="gray helpBtn" onclick="openHelpModal()">Help</button>
@@ -3039,7 +3246,7 @@ main.center > *,
   <div class="main">
     <nav class="navRail">
       <button class="navIcon sky" title="Today Dashboard" onclick="openTodayDashboard()"><span class="navEmoji">🏠</span></button>
-      <button class="navIcon purple" data-nav="messages" title="Team Messenger / Call Transfer" onclick="openTeamMessenger()"><span class="navEmoji">💬</span><span class="msgUnreadDot"></span></button>
+      <button class="navIcon purple" data-nav="messages" title="Team Chat / Messenger" onclick="toggleChatDock()"><span class="navEmoji">💬</span><span class="msgUnreadBadge">0</span></button>
       <button class="navIcon gold" title="Collector Leaderboard" onclick="openLeaderboard()"><span class="navEmoji">🏆</span></button>
       <button class="navIcon money" title="Pay Desk" onclick="openPaymentTracker()"><span class="navEmoji">💵</span></button>
       <button class="navIcon green" title="Daily Work Queue" onclick="openDailyWorkQueue()"><span class="navEmoji">✅</span></button>
@@ -3128,7 +3335,7 @@ main.center > *,
         <div class="qaItem" onclick="openPaymentLedger()"><span class="qaLeft"><span class="qaIcon">💵</span>Record Payment / Ledger</span><span>›</span></div>
         <div class="qaItem" onclick="openDocumentGenerator()"><span class="qaLeft"><span class="qaIcon">🧾</span>Create Debtor Letter / PDF</span><span>›</span></div>
         <div class="qaItem" onclick="openFollowUpModal('Callback')"><span class="qaLeft"><span class="qaIcon">📅</span>Schedule Callback / Follow-Up</span><span>›</span></div>
-        <div class="qaItem" onclick="openTeamMessengerForCurrent('Call Transfer')"><span class="qaLeft"><span class="qaIcon">💬</span>Message / Transfer Call</span><span>›</span></div>
+        <div class="qaItem" onclick="openChatForCurrentAccount()"><span class="qaLeft"><span class="qaIcon">💬</span>Message / Transfer Call</span><span>›</span></div>
         <div class="qaItem" onclick="openCallResultModal()"><span class="qaLeft"><span class="qaIcon">☎</span>Log Call Result</span><span>›</span></div>
         <div class="qaItem" onclick="openDisputeModal()"><span class="qaLeft"><span class="qaIcon">⚠</span>Dispute Tracker</span><span>›</span></div>
         <div class="qaItem" onclick="openSettlementModal()"><span class="qaLeft"><span class="qaIcon">%</span>Settlement Offer</span><span>›</span></div>
@@ -3863,6 +4070,51 @@ main.center > *,
 
 
 
+
+
+<div id="chatDock" class="chatDock" aria-live="polite">
+  <div class="chatTop">
+    <div class="chatBrand">
+      <div class="chatBrandIcon">💬</div>
+      <div class="chatBrandText">
+        <b>Team Messenger</b>
+        <span>Online staff, direct messages, read receipts, call transfer notes</span>
+      </div>
+    </div>
+    <div class="chatTopActions">
+      <button title="Refresh" onclick="chatRefreshAll(true)">↻</button>
+      <button title="Close" onclick="closeChatDock()">×</button>
+    </div>
+  </div>
+  <div class="chatBody">
+    <aside class="chatContacts">
+      <div class="chatContactsHead">
+        <input id="chatSearch" placeholder="Search employees/admin..." oninput="renderChatContacts()">
+      </div>
+      <div id="chatContactList" class="chatContactList"></div>
+    </aside>
+    <main class="chatMain">
+      <div class="chatActiveHead">
+        <div class="chatActivePerson">
+          <div class="chatAvatar" id="chatActiveAvatar">?</div>
+          <div>
+            <div class="chatActiveTitle" id="chatActiveName">Select someone to message</div>
+            <div class="chatActiveSub" id="chatActiveStatus">Choose an employee or admin from the left.</div>
+          </div>
+        </div>
+        <button class="chatAttachAccount" onclick="attachCurrentAccountToChat()">Attach Current Account</button>
+      </div>
+      <div id="chatMessages" class="chatMessages">
+        <div class="chatEmpty">Pick a person to start a direct chat.</div>
+      </div>
+      <div id="chatTyping" class="chatTyping"></div>
+      <div class="chatInputBar">
+        <textarea id="chatInput" placeholder="Type a message..." oninput="chatInputTyping()" onkeydown="chatInputKeydown(event)"></textarea>
+        <button id="chatSendBtn" onclick="sendChatMessage()">Send</button>
+      </div>
+    </main>
+  </div>
+</div>
 
 <div id="teamMessengerModal" class="modal"><div class="modalbox powerBox teamMessengerBox">
   <div class="modalhead">
@@ -8472,6 +8724,313 @@ function renderLeaderboard(start,end){
     </tr>`;
   }).join('')||'<tr><td colspan="10"><div class="lbEmpty">No leaderboard activity for this range yet.</div></td></tr>';
 }
+
+
+/* FACEBOOK STYLE DIRECT CHAT */
+let chatContactsData=[];
+let chatAllMessages=[];
+let chatActiveEmail='';
+let chatAttachedAccountId='';
+let chatPollTimer=null;
+let chatUnreadInitialized=false;
+let chatLastUnreadCount=0;
+let chatLastTypingSent=0;
+let chatLastReadPatch=0;
+
+function chatMe(){return String(currentUser.email||'').toLowerCase()}
+function chatInitials(email){
+  let name=String(email||'?').split('@')[0].replace(/[._-]+/g,' ');
+  return name.split(/\s+/).filter(Boolean).slice(0,2).map(x=>x[0]).join('').toUpperCase()||'?';
+}
+function chatName(email){
+  let e=String(email||'');
+  let u=(appUsers||[]).find(x=>String(x.email||'').toLowerCase()===e.toLowerCase());
+  return u?.displayName || u?.fullName || e;
+}
+function chatIsOnline(u){
+  let t=u?.lastSeenAt||u?.last_seen_at;
+  if(!t)return false;
+  return (Date.now()-new Date(t).getTime()) < 10*60*1000;
+}
+function chatContactRole(email){
+  let e=String(email||'').toLowerCase();
+  let u=(appUsers||[]).find(x=>String(x.email||'').toLowerCase()===e);
+  if(isAdminEmail(e) || String(u?.role||'').toLowerCase()==='admin')return 'Admin';
+  return 'Employee';
+}
+function openTeamMessenger(){openChatDock()}
+function openTeamMessengerForCurrent(){openChatDock();attachCurrentAccountToChat()}
+function openChatForCurrentAccount(){openChatDock();attachCurrentAccountToChat()}
+function toggleChatDock(){
+  let el=document.getElementById('chatDock');
+  if(el?.classList.contains('open'))closeChatDock(); else openChatDock();
+}
+async function openChatDock(){
+  let dock=document.getElementById('chatDock');
+  if(!dock)return alert('Chat dock not found. Republish the latest package.');
+  dock.classList.add('open');
+  if(!chatAttachedAccountId && getCurrent()?.id)chatAttachedAccountId=getCurrent().id;
+  await chatRefreshAll(false);
+  if(!chatActiveEmail && chatContactsData[0])selectChatContact(chatContactsData[0].email);
+  startChatPolling();
+}
+function closeChatDock(){
+  document.getElementById('chatDock')?.classList.remove('open');
+}
+function startChatPolling(){
+  if(chatPollTimer)return;
+  chatPollTimer=setInterval(()=>{if(token()&&currentUser.email)chatRefreshAll(false)},3000);
+}
+async function chatHeartbeat(){
+  if(!currentUser.email)return;
+  await dbFetch('/app_users?email=eq.'+encodeURIComponent(currentUser.email),{
+    method:'PATCH',
+    body:JSON.stringify({last_seen_at:new Date().toISOString(),updated_at:new Date().toISOString()})
+  }).catch(()=>{});
+}
+async function chatRefreshAll(manual=false){
+  if(!token()||!currentUser.email)return;
+  await chatHeartbeat().catch(()=>{});
+  await loadAppUsers().catch(()=>{});
+  await loadChatMessages().catch(()=>{});
+  buildChatContacts();
+  renderChatContacts();
+  if(chatActiveEmail)renderChatConversation();
+  updateChatUnreadBadge();
+}
+async function loadChatMessages(){
+  let rows=[];
+  try{
+    rows=(await dbFetch('/team_messages?select=*&order=created_at.asc&limit=50000')).map(toCamel);
+  }catch(e){
+    rows=[];
+    if(document.getElementById('chatDock')?.classList.contains('open'))alert('Chat table is not ready yet. Run RUN_THIS_FACEBOOK_STYLE_CHAT_SQL.sql in Supabase, then reload.');
+  }
+  let me=chatMe();
+  if(!currentUser.isAdmin){
+    rows=rows.filter(r=>String(r.fromEmail||'').toLowerCase()===me || String(r.toEmail||'').toLowerCase()===me);
+  }
+  chatAllMessages=rows;
+}
+function buildChatContacts(){
+  let me=chatMe();
+  let map={};
+  function add(email){
+    email=String(email||'').toLowerCase().trim();
+    if(!email||email===me)return;
+    if(!map[email]){
+      let u=(appUsers||[]).find(x=>String(x.email||'').toLowerCase()===email);
+      map[email]={email,user:u,online:chatIsOnline(u),unread:0,lastMessageAt:'',lastPreview:''};
+    }
+  }
+  (appUsers||[]).forEach(u=>{
+    let email=String(u.email||'').toLowerCase();
+    let active=(u.isActive!==false && u.is_active!==false);
+    let approved=(u.isApproved===true || u.is_approved===true || String(u.approvalStatus||u.approval_status||'').toLowerCase()==='approved');
+    if(email && active && approved)add(email);
+  });
+  if(!currentUser.isAdmin)add('afinch2678@gmail.com');
+  chatAllMessages.forEach(m=>{
+    let from=String(m.fromEmail||'').toLowerCase(), to=String(m.toEmail||'').toLowerCase();
+    if(from===me)add(to);
+    if(to===me)add(from);
+  });
+  Object.values(map).forEach(c=>{
+    let msgs=chatAllMessages.filter(m=>{
+      let from=String(m.fromEmail||'').toLowerCase(), to=String(m.toEmail||'').toLowerCase();
+      return (from===me&&to===c.email)||(from===c.email&&to===me);
+    });
+    c.unread=msgs.filter(m=>String(m.toEmail||'').toLowerCase()===me && !m.readAt && !m.read_at && String(m.status||'Open')!=='Closed').length;
+    let last=msgs[msgs.length-1];
+    if(last){
+      c.lastMessageAt=last.createdAt||last.created_at||'';
+      c.lastPreview=String(last.body||'').slice(0,70);
+    }
+  });
+  chatContactsData=Object.values(map).sort((a,b)=>{
+    if(a.unread!==b.unread)return b.unread-a.unread;
+    if(a.online!==b.online)return a.online?-1:1;
+    return String(b.lastMessageAt||'').localeCompare(String(a.lastMessageAt||'')) || a.email.localeCompare(b.email);
+  });
+}
+function renderChatContacts(){
+  let list=document.getElementById('chatContactList');
+  if(!list)return;
+  let q=String(document.getElementById('chatSearch')?.value||'').toLowerCase();
+  let rows=chatContactsData.filter(c=>!q || c.email.includes(q) || chatName(c.email).toLowerCase().includes(q));
+  list.innerHTML=rows.map(c=>`
+    <div class="chatContact ${c.email===chatActiveEmail?'active':''} ${c.unread?'hasUnread':''}" onclick="selectChatContact('${esc(c.email)}')">
+      <div class="chatAvatar">${esc(chatInitials(c.email))}<span class="chatOnlineDot ${c.online?'':'off'}"></span></div>
+      <div class="chatContactMain">
+        <div class="chatContactName">${esc(chatName(c.email))}</div>
+        <div class="chatContactMeta">${esc(chatContactRole(c.email))} • ${c.online?'Online':'Offline'}${c.lastPreview?' • '+esc(c.lastPreview):''}</div>
+      </div>
+      <div class="chatContactUnread">${c.unread>99?'99+':c.unread}</div>
+    </div>
+  `).join('')||'<div class="tmEmpty">No employees/admin found yet.</div>';
+}
+async function selectChatContact(email){
+  chatActiveEmail=String(email||'').toLowerCase();
+  renderChatContacts();
+  renderChatConversation();
+  await markActiveChatRead();
+  updateChatUnreadBadge();
+  document.getElementById('chatInput')?.focus();
+}
+function attachCurrentAccountToChat(){
+  let a=getCurrent();
+  if(!a)return alert('No account selected.');
+  chatAttachedAccountId=a.id;
+  let sub=document.getElementById('chatActiveStatus');
+  if(sub && chatActiveEmail)sub.textContent=`Attached: ${nameOf(a)} • ${acctNo(a)}`;
+}
+function activeChatMessages(){
+  let me=chatMe(), other=chatActiveEmail;
+  return chatAllMessages.filter(m=>{
+    let from=String(m.fromEmail||'').toLowerCase(), to=String(m.toEmail||'').toLowerCase();
+    return (from===me&&to===other)||(from===other&&to===me);
+  });
+}
+function renderChatConversation(){
+  let msgs=activeChatMessages();
+  let box=document.getElementById('chatMessages');
+  let nameEl=document.getElementById('chatActiveName');
+  let statusEl=document.getElementById('chatActiveStatus');
+  let av=document.getElementById('chatActiveAvatar');
+  let btn=document.getElementById('chatSendBtn');
+  if(!box)return;
+  if(!chatActiveEmail){
+    box.innerHTML='<div class="chatEmpty">Pick a person to start a direct chat.</div>';
+    if(btn)btn.disabled=true;
+    return;
+  }
+  if(btn)btn.disabled=false;
+  if(nameEl)nameEl.textContent=chatName(chatActiveEmail);
+  let contact=chatContactsData.find(c=>c.email===chatActiveEmail);
+  let attached=chatAttachedAccountId?accountById(chatAttachedAccountId):null;
+  if(statusEl)statusEl.textContent=`${chatContactRole(chatActiveEmail)} • ${contact?.online?'Online':'Offline'}${attached?' • Attached: '+nameOf(attached):''}`;
+  if(av)av.textContent=chatInitials(chatActiveEmail);
+  box.innerHTML=msgs.map(m=>chatMessageBubble(m)).join('')||'<div class="chatEmpty">No messages yet. Type below to start the conversation.</div>';
+  box.scrollTop=box.scrollHeight;
+  loadTypingStatus();
+}
+function chatMessageBubble(m){
+  let mine=String(m.fromEmail||'').toLowerCase()===chatMe();
+  let seen=mine && (m.readAt||m.read_at);
+  let a=m.accountId?accountById(m.accountId):null;
+  let attach=a?` • ${esc(nameOf(a))}`:(m.accountName?` • ${esc(m.accountName)}`:'');
+  return `<div class="chatBubbleWrap ${mine?'mine':'theirs'}">
+    <div class="chatBubble">${esc(m.body||'')}</div>
+    <div class="chatMetaLine">${new Date(m.createdAt||m.created_at||Date.now()).toLocaleTimeString([], {hour:'numeric',minute:'2-digit'})}${attach}${seen?' • Seen':''}</div>
+  </div>`;
+}
+async function sendChatMessage(){
+  let input=document.getElementById('chatInput');
+  let body=String(input?.value||'').trim();
+  if(!chatActiveEmail)return alert('Select an employee/admin first.');
+  if(!body)return;
+  let a=chatAttachedAccountId?accountById(chatAttachedAccountId):getCurrent();
+  let row={
+    account_id:a?.id||null,
+    account_name:a?nameOf(a):'',
+    account_number:a?acctNo(a):'',
+    from_email:currentUser.email,
+    to_email:chatActiveEmail,
+    message_type:'Direct Message',
+    priority:'Normal',
+    subject:'Direct Message',
+    body,
+    phone_number:a?normPhone(phones(a)[0]||''):'',
+    status:'Open',
+    created_by_email:currentUser.email,
+    updated_at:new Date().toISOString()
+  };
+  await dbFetch('/team_messages',{method:'POST',body:JSON.stringify([row])});
+  if(input)input.value='';
+  await setTyping(false);
+  await chatRefreshAll(false);
+}
+function chatInputKeydown(e){
+  if(e.key==='Enter' && !e.shiftKey){
+    e.preventDefault();
+    sendChatMessage();
+  }
+}
+function chatInputTyping(){
+  let now=Date.now();
+  if(now-chatLastTypingSent>1100){
+    chatLastTypingSent=now;
+    setTyping(true);
+  }
+}
+async function setTyping(isTyping){
+  if(!chatActiveEmail||!currentUser.email)return;
+  let row={user_email:currentUser.email,to_email:chatActiveEmail,is_typing:isTyping,updated_at:new Date().toISOString()};
+  try{
+    let found=await dbFetch('/team_typing_status?user_email=eq.'+encodeURIComponent(currentUser.email)+'&to_email=eq.'+encodeURIComponent(chatActiveEmail)+'&select=*').catch(()=>[]);
+    if(found&&found[0]){
+      await dbFetch('/team_typing_status?id=eq.'+found[0].id,{method:'PATCH',body:JSON.stringify(row)});
+    }else{
+      await dbFetch('/team_typing_status',{method:'POST',body:JSON.stringify([row])});
+    }
+  }catch(e){}
+}
+async function loadTypingStatus(){
+  if(!chatActiveEmail)return;
+  let el=document.getElementById('chatTyping');
+  if(!el)return;
+  let rows=[];
+  try{
+    rows=(await dbFetch('/team_typing_status?to_email=eq.'+encodeURIComponent(currentUser.email)+'&user_email=eq.'+encodeURIComponent(chatActiveEmail)+'&select=*&limit=1')).map(toCamel);
+  }catch(e){rows=[]}
+  let r=rows[0];
+  let active=r?.isTyping && (Date.now()-new Date(r.updatedAt||r.updated_at).getTime()<5500);
+  el.textContent=active?`${chatName(chatActiveEmail)} is typing...`:'';
+}
+async function markActiveChatRead(){
+  if(!chatActiveEmail)return;
+  let now=Date.now();
+  if(now-chatLastReadPatch<700)return;
+  chatLastReadPatch=now;
+  let me=chatMe();
+  let unread=activeChatMessages().filter(m=>String(m.toEmail||'').toLowerCase()===me && !m.readAt && !m.read_at);
+  for(let m of unread){
+    await dbFetch('/team_messages?id=eq.'+encodeURIComponent(m.id),{method:'PATCH',body:JSON.stringify({read_at:new Date().toISOString(),status:'Read',updated_at:new Date().toISOString()})}).catch(()=>{});
+    m.readAt=new Date().toISOString();
+  }
+  buildChatContacts();
+  renderChatContacts();
+}
+function totalUnreadChat(){
+  let me=chatMe();
+  return (chatAllMessages||[]).filter(m=>String(m.toEmail||'').toLowerCase()===me && !m.readAt && !m.read_at && String(m.status||'Open')!=='Closed').length;
+}
+function updateChatUnreadBadge(){
+  let n=totalUnreadChat();
+  document.querySelectorAll('[data-nav="messages"]').forEach(el=>{
+    el.classList.toggle('msgHasUnread',n>0);
+    let b=el.querySelector('.msgUnreadBadge');
+    if(b)b.textContent=n>99?'99+':String(n);
+  });
+  if(chatUnreadInitialized && n>chatLastUnreadCount)playChatSound();
+  chatUnreadInitialized=true;
+  chatLastUnreadCount=n;
+}
+function playChatSound(){
+  try{
+    let C=window.AudioContext||window.webkitAudioContext;
+    if(!C)return;
+    let ctx=new C();
+    let o=ctx.createOscillator();
+    let g=ctx.createGain();
+    o.type='sine'; o.frequency.value=880;
+    g.gain.value=.05;
+    o.connect(g); g.connect(ctx.destination);
+    o.start();
+    setTimeout(()=>{o.stop();ctx.close()},120);
+  }catch(e){}
+}
+setInterval(()=>{if(token()&&currentUser.email)chatRefreshAll(false)},12000);
 
 boot();
 </script>
