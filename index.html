@@ -2074,10 +2074,21 @@ main.center > *,
   cursor:pointer!important;
 }
 
+
+/* SEARCH GLITCH / LAG FIX */
+.searchStatusMini{
+  font-size:10px!important;
+  font-weight:900!important;
+  color:#2563eb!important;
+  margin-top:4px!important;
+  min-height:12px!important;
+}
+.searchingPulse{
+  animation:searchPulse .8s ease-in-out infinite alternate;
+}
+@keyframes searchPulse{from{opacity:.45}to{opacity:1}}
+
 </style>
-  <meta property="og:image" content="https://bolt.new/static/og_default.png">
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:image" content="https://bolt.new/static/og_default.png">
 </head>
 <body>
 <div id="loginScreen" class="loginScreen open">
@@ -2141,8 +2152,8 @@ main.center > *,
 
 <div class="app">
   <header class="topbar">
-    <div class="brand"><div class="logo appBrandLogo" id="appBrandLogo">b</div><div><h1 id="appBrandName">Co Pilot Collections Manager</h1><p class="sub" id="appBrandSub">BRANDING BACKUP READY — admin can download and restore app branding safely.</p></div></div>
-    <div class="headerSearch"><span class="mag">⌕</span><input id="globalSearch" placeholder="Search phone, name, SSN, address..." oninput="document.getElementById('search').value=this.value;onQueueFilterChange()"><span class="hotkey">⌘ K</span></div>
+    <div class="brand"><div class="logo appBrandLogo" id="appBrandLogo">b</div><div><h1 id="appBrandName">Co Pilot Collections Manager</h1><p class="sub" id="appBrandSub">SEARCH LAG FIX READY — debounced search, cached phone search, and no full-page re-render while typing.</p></div></div>
+    <div class="headerSearch"><span class="mag">⌕</span><input id="globalSearch" placeholder="Search phone, name, SSN, address..." oninput="handleSearchInput('global')"><span class="hotkey">⌘ K</span></div>
     <div class="topActions">
       <button class="gray helpBtn" onclick="openHelpModal()">Help</button>
       <button class="gray" onclick="openDocumentGenerator()">Letters</button>
@@ -2183,7 +2194,7 @@ main.center > *,
       <div class="filters">
         <div><label>Portfolio</label><select id="portfolioFilter" onchange="onQueueFilterChange()"><option value="">All Portfolios</option></select></div>
         <div><label>Status</label><select id="statusFilter" onchange="onQueueFilterChange()"><option value="">All Statuses</option><option>New</option><option>Active</option><option>No Answer</option><option>Left Voicemail</option><option>Promise to Pay</option><option>Disputed</option><option>Callback</option><option>Settled</option><option>DNC</option><option>Bad Number</option><option>Closed</option></select></div>
-        <div><label>Search Queue</label><input id="search" placeholder="Phone number first, then name, SSN, address..." oninput="onQueueFilterChange()"></div>
+        <div><label>Search Queue</label><input id="search" placeholder="Phone number first, then name, SSN, address..." oninput="handleSearchInput('queue')"><div id="searchStatusMini" class="searchStatusMini"></div></div>
       </div>
       <div class="queueList" id="queueList"></div>
       <div class="remaining" id="remainingText">Showing queue</div>
@@ -3524,19 +3535,84 @@ function queue(){
  }
  return filtered;
 }
-function onQueueFilterChange(){
+let searchDebounceTimer=null;
+let searchRenderSeq=0;
+let lastFullRenderAccountId='';
+let lastPortfolioSignature='';
+let historyRenderTimer=null;
+
+function syncSearchInputs(source){
  let main=document.getElementById('search');
  let global=document.getElementById('globalSearch');
- if(main&&global&&document.activeElement===main)global.value=main.value;
- if(main&&global&&document.activeElement===global)main.value=global.value;
+ if(!main||!global)return;
+ if(source==='global')main.value=global.value;
+ else if(source==='queue')global.value=main.value;
+}
+function setSearchStatus(msg,busy=false){
+ let el=document.getElementById('searchStatusMini');
+ if(el){el.textContent=msg||'';el.classList.toggle('searchingPulse',!!busy);}
+}
+function handleSearchInput(source){
+ syncSearchInputs(source);
+ setSearchStatus('Searching...',true);
+ clearTimeout(searchDebounceTimer);
+ let seq=++searchRenderSeq;
+ searchDebounceTimer=setTimeout(()=>{
+   if(seq!==searchRenderSeq)return;
+   onQueueFilterChange();
+ },160);
+}
+function updateCenterProgressOnly(cur,q){
+ if(!cur)return;
+ let idx=q.findIndex(x=>x.id===cur.id)+1,total=q.length;
+ let pct=total?Math.round((idx/total)*100):0;
+ let cpt=document.getElementById('centerProgressTitle'); if(cpt)cpt.textContent=`${idx||1} of ${total} accounts`;
+ let cpf=document.getElementById('centerProgressFill'); if(cpf)cpf.style.width=pct+'%';
+ let old=document.getElementById('accountProgress'); if(old)old.textContent=`Account ${idx||1} of ${total}`;
+ let oldFill=document.getElementById('progressFill'); if(oldFill)oldFill.style.width=pct+'%';
+}
+function scheduleHistoryLoad(id){
+ clearTimeout(historyRenderTimer);
+ historyRenderTimer=setTimeout(()=>loadHistory(id),220);
+}
+function onQueueFilterChange(){
  let q=queue();
  if(q[0]&&!q.some(a=>a.id===currentAccountId))currentAccountId=q[0].id;
+ let cur=q.find(a=>a.id===currentAccountId)||q[0]||accounts[0];
+
+ // Fast search render: update only the queue list and progress while typing.
+ // Do not rebuild the whole account screen or reload history on every keystroke.
+ renderQueue(q,cur);
+ updateCenterProgressOnly(cur,q);
+
+ // Only fully refresh the account panel if search changed the selected account.
+ if(cur?.id && cur.id!==lastFullRenderAccountId){
+   renderCurrent(cur,q);
+   renderDispos(cur);
+   lastFullRenderAccountId=cur.id;
+   scheduleHistoryLoad(cur.id);
+ }
+ setSearchStatus(q.length?`${q.length} match${q.length===1?'':'es'}`:'No matches',false);
+}function setCurrent(id){
+ currentAccountId=id;
+ document.getElementById('agentNote').value='';
+ currentDisposition='';
+ lastFullRenderAccountId='';
  render();
-}function setCurrent(id){currentAccountId=id;document.getElementById('agentNote').value='';currentDisposition='';render();loadHistory(id)}function getCurrent(){return queue().find(a=>a.id===currentAccountId)||queue()[0]||accounts[0]}
+ scheduleHistoryLoad(id);
+}function getCurrent(){return queue().find(a=>a.id===currentAccountId)||queue()[0]||accounts[0]}
 function money(n){return Number(n||0).toLocaleString('en-US',{style:'currency',currency:'USD'})}function moneyNum(v){let n=Number(String(v??'').replace(/[^0-9.-]/g,''));return isNaN(n)?0:n}function accountBalance(a){return moneyNum(a?.currentBalance||a?.principal||a?.originalBalance)}function esc(s){return String(s??'').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;')}function normPhone(p){return String(p||'').replace(/\D/g,'')}function fmtPhone(p){let d=normPhone(p);return d.length===10?'('+d.slice(0,3)+') '+d.slice(3,6)+'-'+d.slice(6):(p||'')}function acctNo(a){return a?.accountNumber||a?.clientAccountNumber||a?.accountId||''}function nameOf(a){return a?.fullName||[a?.firstName,a?.middleName,a?.lastName].filter(Boolean).join(' ')||'Unknown Account'}function initials(a){return nameOf(a).split(/\s+/).filter(Boolean).slice(0,2).map(x=>x[0]).join('').toUpperCase()||'--'}function creditor(a){return a?.originalCreditor||a?.accountDescription||a?.portfolio||'—'}function phones(a){return[a?.phone1,a?.phone2,a?.phone3,a?.phone4,a?.phone5,a?.phone6,a?.phone7,a?.phone8,a?.phone9,a?.phone10].filter(p=>p&&normPhone(p).length>=10)}
 function rawObj(a){return a?.rawData||a?.raw_data||{}}
 
 function phoneSearchDigitsList(a){
+ if(!a)return [];
+ let cacheKey=[
+   a.phone1,a.phone2,a.phone3,a.phone4,a.phone5,a.phone6,a.phone7,a.phone8,a.phone9,a.phone10,
+   a.homePhone,a.cellPhone,a.mobilePhone,a.workPhone,
+   JSON.stringify(rawObj(a)||{})
+ ].join('|');
+ if(a.__phoneSearchCacheKey===cacheKey && Array.isArray(a.__phoneSearchDigits))return a.__phoneSearchDigits;
+
  let raw=rawObj(a)||{};
  let vals=[];
  ['phone1','phone2','phone3','phone4','phone5','phone6','phone7','phone8','phone9','phone10','homePhone','cellPhone','mobilePhone','workPhone'].forEach(k=>{
@@ -3558,22 +3634,36 @@ function phoneSearchDigitsList(a){
    }
  });
  let seen=new Set();
- return out.map(d=>d.length===11&&d.startsWith('1')?d.slice(1):d).filter(d=>{
+ let final=out.map(d=>d.length===11&&d.startsWith('1')?d.slice(1):d).filter(d=>{
    if(!d || d.length<7)return false;
    let key=d.slice(-10);
    if(seen.has(key))return false;
    seen.add(key);
    return true;
  });
+ a.__phoneSearchCacheKey=cacheKey;
+ a.__phoneSearchDigits=final;
+ return final;
 }
 function searchableAccountText(a){
+ if(!a)return '';
  let raw=rawObj(a)||{};
+ let cacheKey=[
+   nameOf(a), acctNo(a), a?.ssn, a?.address, a?.address2, a?.city, a?.state, a?.zip,
+   a?.email, creditor(a), a?.portfolio, a?.accountDescription, a?.issuerName,
+   a?.employer, a?.bankAccountNumber, a?.bankRoutingNumber,
+   JSON.stringify(raw||{})
+ ].join('|');
+ if(a.__searchTextCacheKey===cacheKey && a.__searchText)return a.__searchText;
  let important=[
    nameOf(a), acctNo(a), a?.ssn, a?.address, a?.address2, a?.city, a?.state, a?.zip,
    a?.email, creditor(a), a?.portfolio, a?.accountDescription, a?.issuerName,
    a?.employer, a?.bankAccountNumber, a?.bankRoutingNumber
  ];
- return (important.join(' ')+' '+FIELDS.map(k=>a?.[k]).join(' ')+' '+Object.keys(raw).join(' ')+' '+Object.values(raw).join(' ')).toLowerCase();
+ let txt=(important.join(' ')+' '+FIELDS.map(k=>a?.[k]).join(' ')+' '+Object.keys(raw).join(' ')+' '+Object.values(raw).join(' ')).toLowerCase();
+ a.__searchTextCacheKey=cacheKey;
+ a.__searchText=txt;
+ return txt;
 }
 function phoneSearchScore(a,q){
  q=String(q||'').trim().toLowerCase();
@@ -3792,13 +3882,30 @@ function renderMappedFields(a){
 }
 function render(){
  let q=queue(),cur=getCurrent();
- updatePortfolioFilter(accounts);
+ let portfolioSignature=accounts.map(a=>a.portfolio||a.accountDescription||'').join('|');
+ if(portfolioSignature!==lastPortfolioSignature){
+   updatePortfolioFilter(accounts);
+   lastPortfolioSignature=portfolioSignature;
+ }
  renderQueue(q,cur);
  renderCurrent(cur,q);
  if(cur)renderDispos(cur);
- if(cur)loadHistory(cur.id);
+ if(cur?.id){
+   lastFullRenderAccountId=cur.id;
+   scheduleHistoryLoad(cur.id);
+ }
 }
-function updatePortfolioFilter(all){let sel=document.getElementById('portfolioFilter'),v=sel.value,names=[...new Set(all.map(a=>a.portfolio||a.accountDescription).filter(Boolean))].sort();sel.innerHTML='<option value="">All Portfolios</option>'+names.map(n=>`<option>${esc(n)}</option>`).join('');sel.value=names.includes(v)?v:''}
+function updatePortfolioFilter(all){
+ let sel=document.getElementById('portfolioFilter');
+ if(!sel)return;
+ let v=sel.value;
+ let names=[...new Set(all.map(a=>a.portfolio||a.accountDescription).filter(Boolean))].sort();
+ let sig=names.join('|');
+ if(sel.dataset.sig===sig)return;
+ sel.dataset.sig=sig;
+ sel.innerHTML='<option value="">All Portfolios</option>'+names.map(n=>`<option>${esc(n)}</option>`).join('');
+ sel.value=names.includes(v)?v:'';
+}
 function renderQueue(q,cur){
  let idx=q.findIndex(a=>a.id===cur?.id);if(idx<0)idx=0;
  let start=Math.max(0,idx-1),next=q.slice(start,start+5);
