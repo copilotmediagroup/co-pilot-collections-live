@@ -2088,91 +2088,6 @@ main.center > *,
 }
 @keyframes searchPulse{from{opacity:.45}to{opacity:1}}
 
-
-/* LETTER AUTHORIZED BY + BODY TEMPLATE EDITOR */
-.miniFieldBtn{
-  margin-top:6px!important;
-  width:100%!important;
-  min-height:28px!important;
-  border:1px solid #bfdbfe!important;
-  background:#eff6ff!important;
-  color:#1d4ed8!important;
-  border-radius:8px!important;
-  font-size:11px!important;
-  font-weight:1000!important;
-  cursor:pointer!important;
-}
-.letterBodyBox{max-width:1080px!important}
-.letterTemplateGrid{
-  display:grid!important;
-  grid-template-columns:1fr 260px!important;
-  gap:12px!important;
-  margin:12px 0!important;
-}
-.letterTemplateGrid label,
-.letterTemplateLabel{
-  display:block!important;
-  color:#334155!important;
-  font-size:12px!important;
-  font-weight:1000!important;
-  margin-bottom:6px!important;
-}
-.letterTemplateGrid select{
-  width:100%!important;
-  height:42px!important;
-  border:1px solid #dbe3ef!important;
-  border-radius:10px!important;
-  padding:0 10px!important;
-  font-weight:850!important;
-}
-.letterTemplateStatus{
-  min-height:42px!important;
-  border:1px solid #dbe3ef!important;
-  background:#f8fafc!important;
-  border-radius:10px!important;
-  display:flex!important;
-  align-items:center!important;
-  padding:0 12px!important;
-  font-weight:1000!important;
-  color:#475569!important;
-}
-.letterTemplateStatus.custom{background:#f0fdf4!important;border-color:#bbf7d0!important;color:#166534!important}
-.letterTemplateBody{
-  width:100%!important;
-  min-height:310px!important;
-  resize:vertical!important;
-  border:1px solid #cbd5e1!important;
-  border-radius:12px!important;
-  padding:12px!important;
-  font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono",monospace!important;
-  font-size:13px!important;
-  line-height:1.45!important;
-  white-space:pre-wrap!important;
-}
-.placeholderHelp{
-  margin-top:10px!important;
-  background:#f8fafc!important;
-  border:1px solid #e2e8f0!important;
-  border-radius:12px!important;
-  padding:10px!important;
-  color:#475569!important;
-  font-size:12px!important;
-  line-height:1.9!important;
-  font-weight:800!important;
-}
-.placeholderHelp code{
-  background:#e0f2fe!important;
-  color:#075985!important;
-  border:1px solid #bae6fd!important;
-  padding:2px 5px!important;
-  border-radius:6px!important;
-  margin-right:4px!important;
-  font-weight:1000!important;
-}
-@media(max-width:800px){
-  .letterTemplateGrid{grid-template-columns:1fr!important}
-}
-
 </style>
   <meta property="og:image" content="https://bolt.new/static/og_default.png">
     <meta name="twitter:card" content="summary_large_image">
@@ -2240,7 +2155,7 @@ main.center > *,
 
 <div class="app">
   <header class="topbar">
-    <div class="brand"><div class="logo appBrandLogo" id="appBrandLogo">b</div><div><h1 id="appBrandName">Co Pilot Collections Manager</h1><p class="sub" id="appBrandSub">LETTER SETTINGS READY — default Authorized By plus admin-editable letter bodies.</p></div></div>
+    <div class="brand"><div class="logo appBrandLogo" id="appBrandLogo">b</div><div><h1 id="appBrandName">Co Pilot Collections Manager</h1><p class="sub" id="appBrandSub">SEARCH LAG FIX READY — debounced search, cached phone search, and no full-page re-render while typing.</p></div></div>
     <div class="headerSearch"><span class="mag">⌕</span><input id="globalSearch" placeholder="Search phone, name, SSN, address..." oninput="handleSearchInput('global')"><span class="hotkey">⌘ K</span></div>
     <div class="topActions">
       <button class="gray helpBtn" onclick="openHelpModal()">Help</button>
@@ -2921,41 +2836,6 @@ main.center > *,
 
 
 
-
-<div id="letterBodyEditorModal" class="modal"><div class="modalbox letterBodyBox">
-  <div class="modalhead"><h2>Edit Letter Body Templates</h2><button class="gray" onclick="closeModal('letterBodyEditorModal')">Close</button></div>
-  <div class="modalbody">
-    <div class="pdfDocWarning">
-      Admin can edit the body paragraphs for each letter type. Use placeholders like {{debtorName}}, {{currentBalance}}, {{dueDate}}, {{accountNumber}}, {{originalCreditor}}, and {{authorizedBy}}. Separate paragraphs with a blank line.
-    </div>
-    <div class="letterTemplateGrid">
-      <div>
-        <label>Letter Type</label>
-        <select id="letterTemplateType" onchange="loadLetterBodyTemplateIntoEditor()"></select>
-      </div>
-      <div>
-        <label>Template Status</label>
-        <div id="letterTemplateStatus" class="letterTemplateStatus">System default</div>
-      </div>
-    </div>
-    <label class="letterTemplateLabel">Body Text</label>
-    <textarea id="letterTemplateBody" class="letterTemplateBody" placeholder="Enter letter body..."></textarea>
-    <div class="placeholderHelp">
-      Available placeholders:
-      <code>{{debtorName}}</code> <code>{{accountNumber}}</code> <code>{{fileNumber}}</code> <code>{{originalCreditor}}</code>
-      <code>{{currentBalance}}</code> <code>{{settlementAmount}}</code> <code>{{dueDate}}</code> <code>{{docDate}}</code>
-      <code>{{initialPayment}}</code> <code>{{installmentAmount}}</code> <code>{{frequency}}</code> <code>{{paymentMethod}}</code>
-      <code>{{cardMask}}</code> <code>{{lastPaymentAmount}}</code> <code>{{lastPaymentDate}}</code> <code>{{minimumDue}}</code>
-      <code>{{returnedAmount}}</code> <code>{{authorizedBy}}</code>
-    </div>
-    <div class="pdfDocActions">
-      <button class="green" onclick="saveLetterBodyTemplate()">Save Body Template</button>
-      <button class="outline" onclick="resetLetterBodyTemplate()">Reset This Letter to System Default</button>
-      <button class="gray" onclick="loadLetterBodyTemplateIntoEditor()">Reload</button>
-    </div>
-  </div>
-</div></div>
-
 <div id="documentGeneratorModal" class="modal"><div class="modalbox pdfDocBox">
   <div class="modalhead"><h2>Debtor Document Generator</h2><button class="gray" onclick="closeModal('documentGeneratorModal')">Close</button></div>
   <div class="modalbody">
@@ -3001,11 +2881,7 @@ main.center > *,
       <div><label>File / Case Number</label><input id="pdfFileNumber" oninput="renderPdfDocPreview()"></div>
       <div><label>Original Creditor</label><input id="pdfOriginalCreditor" oninput="renderPdfDocPreview()"></div>
       <div><label>Account Number</label><input id="pdfAccountNumber" oninput="renderPdfDocPreview()"></div>
-      <div>
-        <label>Authorized By</label>
-        <input id="pdfAuthorizedBy" oninput="renderPdfDocPreview()" placeholder="Co Pilot Collections Manager">
-        <button type="button" class="miniFieldBtn adminOnly" onclick="savePdfAuthorizedByDefault()">Save as Default</button>
-      </div>
+      <div><label>Authorized By</label><input id="pdfAuthorizedBy" oninput="renderPdfDocPreview()" placeholder="Employee / manager"></div>
 
       <div><label>Current Balance</label><input id="pdfCurrentBalance" type="number" step="0.01" oninput="renderPdfDocPreview()"></div>
       <div><label>Settlement / PIF Amount</label><input id="pdfSettlementAmount" type="number" step="0.01" oninput="renderPdfDocPreview()"></div>
@@ -3031,7 +2907,6 @@ main.center > *,
       <button class="outline" onclick="fillPdfFromPaymentPlan()">Use Active Payment Plan</button>
       <button class="outline" onclick="fillPdfFromLatestPayment()">Use Latest Payment</button>
       <button class="gray" onclick="renderPdfDocPreview()">Refresh Preview</button>
-      <button class="outline adminOnly" onclick="openLetterBodyEditor()">Edit Letter Bodies</button>
       <button class="outline" onclick="saveDocumentRecordOnly()">Save Record Only</button>
       <button class="green" onclick="generateAccountPdf()">Download PDF + Save</button>
     </div>
@@ -3596,7 +3471,6 @@ async function boot(){
    document.getElementById('loginScreen').classList.remove('open');
    applyRoleUI();
    await loadAppBrandSettings(true);
-   await loadPdfLetterSettings(true);
    await loadAccounts();
  }catch(e){
    let msg=e.message||String(e);
@@ -5088,217 +4962,6 @@ function pdfDateLabel(d){
  try{return typeof powerDateLabel==='function'?powerDateLabel(d):String(d||'—')}catch(e){return String(d||'—')}
 }
 function pdfMoney(v){return moneyNum(v).toLocaleString(undefined,{style:'currency',currency:'USD'});}
-
-const PDF_DEFAULT_AUTHORIZED_BY='Co Pilot Collections Manager';
-let pdfLetterSettings={
-  loaded:false,
-  authorizedByDefault:PDF_DEFAULT_AUTHORIZED_BY,
-  templates:{}
-};
-
-function pdfLetterDocTypes(){
- let sel=document.getElementById('pdfDocType');
- if(sel)return [...sel.options].map(o=>o.value);
- return [
-  'Stipulation - Paid In Full + Card Authorization',
-  'Stipulation - Payment Plan + Card Authorization',
-  'Release of Liability',
-  'Standard Mailer',
-  'Assignment / Notification of Debt',
-  'Billing Statement - Paid In Full',
-  'Billing Statement - Payment Plan',
-  'Demand Letter',
-  'NSF / Returned Payment Statement'
- ];
-}
-function loadPdfLetterSettingsFromLocal(){
- pdfLetterSettings.authorizedByDefault=localStorage.getItem('pdfAuthorizedByDefault')||PDF_DEFAULT_AUTHORIZED_BY;
- try{pdfLetterSettings.templates=JSON.parse(localStorage.getItem('pdfLetterTemplatesJson')||'{}')||{}}catch(e){pdfLetterSettings.templates={}}
-}
-async function loadPdfLetterSettings(force=false){
- if(pdfLetterSettings.loaded&&!force)return pdfLetterSettings;
- pdfLetterSettings.loaded=true;
- loadPdfLetterSettingsFromLocal();
- if(token()){
-   try{
-     let keys='pdf_authorized_by_default,pdf_letter_templates_json';
-     let rows=(await dbFetch('/company_settings?select=setting_key,setting_value&setting_key=in.('+keys+')')).map(toCamel);
-     let map={}; rows.forEach(r=>map[r.settingKey]=r.settingValue);
-     if(map.pdf_authorized_by_default)pdfLetterSettings.authorizedByDefault=map.pdf_authorized_by_default;
-     if(map.pdf_letter_templates_json){
-       try{pdfLetterSettings.templates=JSON.parse(map.pdf_letter_templates_json)||{}}catch(e){}
-     }
-     localStorage.setItem('pdfAuthorizedByDefault',pdfLetterSettings.authorizedByDefault||PDF_DEFAULT_AUTHORIZED_BY);
-     localStorage.setItem('pdfLetterTemplatesJson',JSON.stringify(pdfLetterSettings.templates||{}));
-   }catch(e){console.warn('Letter settings load failed:',e)}
- }
- return pdfLetterSettings;
-}
-function getPdfAuthorizedByDefault(){
- return (pdfLetterSettings.authorizedByDefault||localStorage.getItem('pdfAuthorizedByDefault')||PDF_DEFAULT_AUTHORIZED_BY).trim()||PDF_DEFAULT_AUTHORIZED_BY;
-}
-async function savePdfAuthorizedByDefault(silent=false){
- try{
-   if(!currentUser.isAdmin){
-     if(!silent)alert('Admin only.');
-     return false;
-   }
-   let v=(val('pdfAuthorizedBy')||PDF_DEFAULT_AUTHORIZED_BY).trim()||PDF_DEFAULT_AUTHORIZED_BY;
-   pdfLetterSettings.authorizedByDefault=v;
-   localStorage.setItem('pdfAuthorizedByDefault',v);
-   await savePdfLetterSettingsToDatabase();
-   if(!silent)alert('Authorized By default saved. New letters will use: '+v);
-   return true;
- }catch(e){
-   if(!silent)alert('Could not save Authorized By default:\n\n'+(e.message||String(e))+'\n\nIf this is a database error, run RUN_THIS_LETTER_SETTINGS_SQL.sql in Supabase SQL Editor.');
-   return false;
- }
-}
-async function savePdfLetterSettingsToDatabase(){
- if(!currentUser.isAdmin)throw new Error('Admin only');
- let rows=[
-  {setting_key:'pdf_authorized_by_default',setting_value:getPdfAuthorizedByDefault(),updated_by_email:currentUser.email,updated_at:new Date().toISOString()},
-  {setting_key:'pdf_letter_templates_json',setting_value:JSON.stringify(pdfLetterSettings.templates||{}),updated_by_email:currentUser.email,updated_at:new Date().toISOString()}
- ];
- await dbFetch('/company_settings?on_conflict=setting_key',{
-   method:'POST',
-   headers:{Prefer:'resolution=merge-duplicates,return=representation'},
-   body:JSON.stringify(rows)
- });
- try{await insertAudit('Letter Settings Updated','Updated Authorized By default or letter body templates','company_settings','letter_settings')}catch(e){}
-}
-function pdfSystemDefaultTemplate(docType){
- let m={
-  'Demand Letter':`Our records indicate the above account remains unresolved. The total amount currently claimed due is {{currentBalance}}.
-
-Please submit payment or contact the account representative by {{dueDate}} to discuss resolution options.
-
-If you believe this account is inaccurate or disputed, notify the account representative so the matter can be reviewed.`,
-  'Assignment / Notification of Debt':`The purpose of this communication is to notify you that the account identified above has been assigned, sold, or transferred for servicing or collection.
-
-The amount currently claimed due is {{currentBalance}}.
-
-Please direct account questions or payments according to the instructions provided by the account representative so payments can be accurately applied.`,
-  'Standard Mailer':`Attached is information which pertains to your account. This information may be sensitive, and you should keep a copy for your records.
-
-If you have questions or concerns, please contact the representative handling your account.`,
-  'Release of Liability':`In consideration of account #{{accountNumber}}, and upon receipt and clearance of the agreed payment amount of {{settlementAmount}}, the account holder releases {{debtorName}} from further liability on the above account.
-
-This release applies to claims or demands related to the account identified above through the date of this release.`,
-  'Billing Statement - Paid In Full':`Thank you for your recent payment of {{lastPaymentAmount}}. This payment was received and applied to the account identified above.
-
-Your account is now paid in full. We appreciate your prompt attention toward this financial obligation.`,
-  'Billing Statement - Payment Plan':`Thank you for your recent payment of {{lastPaymentAmount}}{{lastPaymentDateText}}.
-
-Your next payment of {{installmentAmount}} is due by {{dueDate}}.`,
-  'NSF / Returned Payment Statement':`Notice: a recent payment in the amount of {{returnedAmount}} was returned or not honored.
-
-Please submit replacement payment by {{dueDate}} so it can be applied to the account identified above.`,
-  'Stipulation - Paid In Full + Card Authorization':`The parties agree to compromise the indebtedness on this account. The accepted paid-in-full amount is {{settlementAmount}} if received by {{dueDate}}.
-
-Upon receipt and clearance of the agreed amount, the account will be considered satisfied in full and no further collection activity will continue on this account.
-
-Payment method authorized: {{paymentMethod}}. Authorized card or account reference: {{cardMask}}.`,
-  'Stipulation - Payment Plan + Card Authorization':`The parties agree to resolve the account through a scheduled payment arrangement.
-
-If a scheduled payment is missed or returned, the agreement may be reviewed and the remaining balance may become due according to the account terms.
-
-Payment method authorized: {{paymentMethod}}. Authorized card or account reference: {{cardMask}}.`
- };
- return m[docType]||`This document concerns the account identified above.
-
-Please review the account information and contact the account representative if you have questions.`;
-}
-function pdfTemplateValueMap(d){
- let lastDate=d.lastPaymentDate?` received on ${pdfDateLabel(d.lastPaymentDate)}`:'';
- return {
-  debtorName:d.debtorName||'Consumer',
-  accountNumber:d.accountNumber||'',
-  fileNumber:d.fileNumber||'',
-  originalCreditor:d.originalCreditor||'—',
-  currentBalance:pdfMoney(d.currentBalance),
-  settlementAmount:pdfMoney(d.settlementAmount||d.currentBalance),
-  initialPayment:pdfMoney(d.initialPayment),
-  installmentAmount:pdfMoney(d.installmentAmount||d.minimumDue),
-  frequency:d.frequency||'',
-  paymentMethod:d.paymentMethod||'',
-  cardMask:d.cardMask||'XXXX-XXXX-XXXX-____',
-  docDate:pdfDateLabel(d.docDate),
-  dueDate:pdfDateLabel(d.dueDate),
-  lastPaymentAmount:pdfMoney(d.lastPaymentAmount||d.settlementAmount||d.currentBalance),
-  lastPaymentDate:d.lastPaymentDate?pdfDateLabel(d.lastPaymentDate):'',
-  lastPaymentDateText:lastDate,
-  minimumDue:pdfMoney(d.minimumDue||d.installmentAmount),
-  returnedAmount:pdfMoney(d.returnedAmount),
-  authorizedBy:d.authorizedBy||getPdfAuthorizedByDefault()
- };
-}
-function fillPdfLetterTemplate(text,d){
- let map=pdfTemplateValueMap(d);
- return String(text||'').replace(/\{\{\s*([a-zA-Z0-9_]+)\s*\}\}/g,(all,key)=>map[key]!==undefined?map[key]:all);
-}
-function templateToParagraphs(text,d){
- return fillPdfLetterTemplate(text,d).split(/\n\s*\n/g).map(p=>p.trim()).filter(Boolean);
-}
-function applyLetterBodyTemplateOverride(docType,d,paragraphs){
- let custom=(pdfLetterSettings.templates||{})[docType];
- if(custom && String(custom).trim())return templateToParagraphs(custom,d);
- return paragraphs;
-}
-async function openLetterBodyEditor(){
- if(!currentUser.isAdmin)return alert('Admin only.');
- await loadPdfLetterSettings(true);
- let sel=document.getElementById('letterTemplateType');
- sel.innerHTML=pdfLetterDocTypes().map(t=>`<option>${esc(t)}</option>`).join('');
- sel.value=val('pdfDocType')||pdfLetterDocTypes()[0];
- loadLetterBodyTemplateIntoEditor();
- document.getElementById('letterBodyEditorModal').classList.add('open');
-}
-function loadLetterBodyTemplateIntoEditor(){
- let type=val('letterTemplateType')||pdfLetterDocTypes()[0];
- let custom=(pdfLetterSettings.templates||{})[type];
- let body=document.getElementById('letterTemplateBody');
- let status=document.getElementById('letterTemplateStatus');
- body.value=custom!==undefined?custom:pdfSystemDefaultTemplate(type);
- status.textContent=custom!==undefined?'Custom body saved for this letter':'System default body';
- status.classList.toggle('custom',custom!==undefined);
-}
-async function saveLetterBodyTemplate(){
- try{
-   if(!currentUser.isAdmin)return alert('Admin only.');
-   let type=val('letterTemplateType');
-   let body=(document.getElementById('letterTemplateBody').value||'').trim();
-   if(!type)return alert('Choose a letter type.');
-   if(!body)return alert('Body cannot be blank. Use Reset if you want the system default.');
-   pdfLetterSettings.templates=pdfLetterSettings.templates||{};
-   pdfLetterSettings.templates[type]=body;
-   localStorage.setItem('pdfLetterTemplatesJson',JSON.stringify(pdfLetterSettings.templates));
-   await savePdfLetterSettingsToDatabase();
-   loadLetterBodyTemplateIntoEditor();
-   if(val('pdfDocType')===type)renderPdfDocPreview();
-   alert('Letter body template saved for: '+type);
- }catch(e){
-   alert('Could not save letter body:\n\n'+(e.message||String(e))+'\n\nIf this is a database error, run RUN_THIS_LETTER_SETTINGS_SQL.sql in Supabase SQL Editor.');
- }
-}
-async function resetLetterBodyTemplate(){
- try{
-   if(!currentUser.isAdmin)return alert('Admin only.');
-   let type=val('letterTemplateType');
-   if(!confirm('Reset this letter body back to the system default?'))return;
-   pdfLetterSettings.templates=pdfLetterSettings.templates||{};
-   delete pdfLetterSettings.templates[type];
-   localStorage.setItem('pdfLetterTemplatesJson',JSON.stringify(pdfLetterSettings.templates));
-   await savePdfLetterSettingsToDatabase();
-   loadLetterBodyTemplateIntoEditor();
-   if(val('pdfDocType')===type)renderPdfDocPreview();
-   alert('Letter body reset to system default for: '+type);
- }catch(e){
-   alert('Could not reset letter body:\n\n'+(e.message||String(e)));
- }
-}
-
-
 function pdfGetAccountOriginalCreditor(a){
  return a?.originalCreditor||a?.origCreditor||a?.creditor||a?.issuerName||a?.portfolio||a?.sourceFile||'';
 }
@@ -5336,7 +4999,6 @@ function pdfDocTypeChanged(){
 async function openDocumentGenerator(){
  let a=getCurrent(); if(!a)return alert('No account selected.');
  await loadCompanyLogoSettings(true);
- await loadPdfLetterSettings(true);
  let bal=accountBalance(a);
  document.getElementById('pdfDocType').value='Stipulation - Paid In Full + Card Authorization';
  document.getElementById('pdfDocDate').value=todayISO();
@@ -5344,7 +5006,7 @@ async function openDocumentGenerator(){
  document.getElementById('pdfFileNumber').value=pdfGetFileNumber(a);
  document.getElementById('pdfOriginalCreditor').value=pdfGetAccountOriginalCreditor(a);
  document.getElementById('pdfAccountNumber').value=acctNo(a);
- document.getElementById('pdfAuthorizedBy').value=getPdfAuthorizedByDefault();
+ document.getElementById('pdfAuthorizedBy').value=currentUser.email||'';
  document.getElementById('pdfCurrentBalance').value=bal.toFixed(2);
  document.getElementById('pdfSettlementAmount').value=bal.toFixed(2);
  document.getElementById('pdfInitialPayment').value='';
@@ -5380,7 +5042,7 @@ function pdfDocData(){
    docType,
    docDate:val('pdfDocDate')||todayISO(),
    dueDate:val('pdfDocDueDate')||addDaysISO(todayISO(),10),
-   authorizedBy:val('pdfAuthorizedBy')||getPdfAuthorizedByDefault(),
+   authorizedBy:val('pdfAuthorizedBy')||currentUser.email||'',
    debtorName:nameOf(a),
    accountNumber:val('pdfAccountNumber')||acctNo(a),
    fileNumber:val('pdfFileNumber')||pdfGetFileNumber(a),
@@ -5554,7 +5216,7 @@ function pdfProfessionalTemplate(d){
    ['File/Account Number', accountNumber]
  ];
  let salutation=`Dear ${d.debtorName||'Consumer'};`;
- let closingName=d.authorizedBy||getPdfAuthorizedByDefault();
+ let closingName=d.authorizedBy||'Collections agency';
  let paragraphs=[];
  let post=[];
 
@@ -5654,7 +5316,6 @@ function pdfProfessionalTemplate(d){
    ];
  }
 
- paragraphs=applyLetterBodyTemplateOverride(docType,d,paragraphs);
  if(d.notes)paragraphs.push(d.notes);
 
  return {
@@ -5969,7 +5630,6 @@ async function loadGeneratedDocsForCurrent(){
 async function saveDocumentRecordOnly(){
  let a=getCurrent(); if(!a)return alert('No account selected.');
  let d=pdfDocData();
- if(currentUser.isAdmin)await savePdfAuthorizedByDefault(true);
  await saveGeneratedDocRecord(d,'',false);
  await loadGeneratedDocsForCurrent();
  alert('Document record saved to this account.');
@@ -5977,7 +5637,6 @@ async function saveDocumentRecordOnly(){
 async function generateAccountPdf(){
  let a=getCurrent(); if(!a)return alert('No account selected.');
  let d=pdfDocData();
- if(currentUser.isAdmin)await savePdfAuthorizedByDefault(true);
  if(d.docType.includes('Settlement') && d.settlementAmount>d.currentBalance)return alert('Settlement amount cannot be higher than current balance.');
  if(d.docType.includes('Payment Plan') && d.paymentCount>0 && d.installmentAmount>0){
    let total=(d.initialPayment||0)+(d.installmentAmount*d.paymentCount);
