@@ -1,6 +1,7 @@
 <!doctype html>
 <html>
 <head>
+<!-- LIVE_SOLID_ICONS_MESSENGER_MARKER: solid sidebar icons + internal team messenger -->
 <!-- LIVE_LEADERBOARD_NAV_MARKER: clickable left nav + production leaderboard -->
 <!-- LIVE_CLEAN_REPAIR_MARKER: https://bwvufgzbkaymffwxuuzr.supabase.co -->
   <meta charset="UTF-8">
@@ -2841,6 +2842,104 @@ main.center > *,
   .leaderboardBox{max-width:calc(100vw - 20px)!important}
 }
 
+
+/* SOLID SIDEBAR ICONS + TEAM MESSENGER */
+.navRail{
+  gap:9px!important;
+  padding:10px 6px!important;
+}
+.navRail .navIcon{
+  width:38px!important;
+  height:38px!important;
+  min-width:38px!important;
+  min-height:38px!important;
+  border:1px solid rgba(255,255,255,.24)!important;
+  border-radius:13px!important;
+  display:grid!important;
+  place-items:center!important;
+  cursor:pointer!important;
+  font-size:19px!important;
+  line-height:1!important;
+  padding:0!important;
+  margin:0!important;
+  background:linear-gradient(145deg,#1d4ed8,#0f2f88)!important;
+  color:#fff!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.25),0 10px 18px rgba(15,23,42,.23)!important;
+  overflow:hidden!important;
+  filter:saturate(1.1)!important;
+}
+.navRail .navIcon.active,
+.navRail .navIcon:hover{
+  background:linear-gradient(145deg,#2563eb,#1d4ed8)!important;
+  transform:translateY(-1px)!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.30),0 14px 24px rgba(15,23,42,.30)!important;
+}
+.navRail .navIcon:active{
+  transform:translateY(0)!important;
+}
+.navRail .navIcon .navEmoji{
+  width:26px!important;
+  height:26px!important;
+  display:grid!important;
+  place-items:center!important;
+  font-size:20px!important;
+  line-height:1!important;
+}
+.navRail .navIcon.green{background:linear-gradient(145deg,#16a34a,#166534)!important}
+.navRail .navIcon.gold{background:linear-gradient(145deg,#f59e0b,#b45309)!important}
+.navRail .navIcon.money{background:linear-gradient(145deg,#22c55e,#15803d)!important}
+.navRail .navIcon.purple{background:linear-gradient(145deg,#8b5cf6,#5b21b6)!important}
+.navRail .navIcon.sky{background:linear-gradient(145deg,#0ea5e9,#075985)!important}
+.navRail .navIcon.red{background:linear-gradient(145deg,#ef4444,#991b1b)!important}
+.navRail .navIcon.dark{background:linear-gradient(145deg,#334155,#0f172a)!important}
+.msgUnreadDot{
+  position:absolute;
+  top:5px;
+  right:5px;
+  width:9px;
+  height:9px;
+  border-radius:999px;
+  background:#ef4444;
+  border:2px solid #fff;
+  display:none;
+}
+.navIcon.msgHasUnread .msgUnreadDot{display:block}
+.teamMessengerBox{max-width:1220px}
+.tmHero{
+  display:flex;align-items:flex-start;justify-content:space-between;gap:12px;
+  border:1px solid #bfdbfe;background:#eff6ff;border-radius:16px;padding:14px;margin-bottom:12px
+}
+.tmTitle{font-size:19px;font-weight:1000;color:#1e3a8a}
+.tmSub{font-size:12px;font-weight:800;color:#475569;margin-top:4px;line-height:1.4}
+.tmGrid{display:grid;grid-template-columns:390px minmax(0,1fr);gap:12px}
+.tmCard{border:1px solid #e2e8f0;background:#fff;border-radius:16px;padding:12px}
+.tmSectionTitle{font-weight:1000;color:#0f172a;margin-bottom:8px}
+.tmFormGrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.tmFormGrid label{display:block;font-size:11px;font-weight:1000;color:#334155;margin-bottom:5px}
+.tmFormGrid input,.tmFormGrid select,.tmFormGrid textarea{width:100%;border:1px solid #cbd5e1;border-radius:10px;padding:10px;font:inherit;background:#fff}
+.tmFormGrid textarea{min-height:92px;resize:vertical}.tmWide{grid-column:1/-1}
+.tmAccountBox{border:1px solid #dbeafe;background:#f8fbff;border-radius:12px;padding:10px;font-size:12px;font-weight:850;color:#334155;margin-bottom:10px}
+.tmSafeNote{margin:10px 0;border:1px solid #bbf7d0;background:#f0fdf4;color:#166534;border-radius:12px;padding:9px;font-size:12px;font-weight:850;line-height:1.35}
+.tmFullBtn{width:100%;min-height:44px}
+.tmToolbar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px}
+.tmToolbar .tmSectionTitle{margin-right:auto;margin-bottom:0}
+.tmToolbar select{border:1px solid #cbd5e1;border-radius:10px;padding:10px;background:#fff;font:inherit}
+.tmList{display:flex;flex-direction:column;gap:8px;max-height:560px;overflow:auto;padding-right:3px}
+.tmItem{border:1px solid #e2e8f0;background:#f8fafc;border-radius:14px;padding:10px}
+.tmItem.unread{border-color:#93c5fd;background:#eff6ff}
+.tmItem.closed{opacity:.72;background:#f8fafc}
+.tmItemTop{display:flex;align-items:flex-start;justify-content:space-between;gap:8px}
+.tmSubject{font-weight:1000;color:#0f172a}
+.tmMeta{font-size:11px;color:#64748b;font-weight:800;margin-top:3px;line-height:1.35}
+.tmBody{font-size:12px;color:#334155;font-weight:750;margin-top:8px;line-height:1.4;white-space:pre-wrap}
+.tmPill{display:inline-flex;align-items:center;border-radius:999px;padding:4px 8px;font-size:10px;font-weight:1000;background:#e0e7ff;color:#3730a3;white-space:nowrap}
+.tmPill.red{background:#fee2e2;color:#991b1b}.tmPill.green{background:#dcfce7;color:#166534}.tmPill.orange{background:#fff7ed;color:#9a3412}.tmPill.gray{background:#f1f5f9;color:#334155}
+.tmActions{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+.tmActions button{min-height:30px;padding:6px 8px;font-size:11px;border-radius:9px}
+.tmEmpty{padding:20px;text-align:center;color:#64748b;font-weight:850}
+@media(max-width:1050px){.tmGrid{grid-template-columns:1fr}}
+@media(max-width:650px){.tmHero{flex-direction:column}.tmFormGrid{grid-template-columns:1fr}.tmToolbar{flex-direction:column;align-items:stretch}.teamMessengerBox{max-width:calc(100vw - 20px)!important}}
+
 </style>
   <meta property="og:image" content="https://bolt.new/static/og_default.png">
     <meta name="twitter:card" content="summary_large_image">
@@ -2908,7 +3007,7 @@ main.center > *,
 
 <div class="app">
   <header class="topbar">
-    <div class="brand"><div class="logo appBrandLogo" id="appBrandLogo">b</div><div><h1 id="appBrandName">Co Pilot Collections Manager</h1><p class="sub" id="appBrandSub">LIVE LEADERBOARD NAV READY — clickable sidebar icons and daily leaderboard.</p></div></div>
+    <div class="brand"><div class="logo appBrandLogo" id="appBrandLogo">b</div><div><h1 id="appBrandName">Co Pilot Collections Manager</h1><p class="sub" id="appBrandSub">LIVE SOLID ICONS + MESSENGER READY — sidebar icons fixed and team messenger added.</p></div></div>
     <div class="headerSearch"><span class="mag">⌕</span><input id="globalSearch" placeholder="Search phone, name, SSN, address..." oninput="handleSearchInput('global')"><span class="hotkey">⌘ K</span></div>
     <div class="topActions">
       <button class="gray helpBtn" onclick="openHelpModal()">Help</button>
@@ -2939,14 +3038,14 @@ main.center > *,
 
   <div class="main">
     <nav class="navRail">
-      <button class="navIcon" title="Today Dashboard" onclick="openTodayDashboard()">⌂</button>
-      <button class="navIcon active" title="Queue / Accounts" onclick="focusQueue()">👥</button>
-      <button class="navIcon" title="Collector Leaderboard" onclick="openLeaderboard()">🏆</button>
-      <button class="navIcon" title="Pay Desk" onclick="openPaymentTracker()">💵</button>
-      <button class="navIcon" title="Daily Work Queue" onclick="openDailyWorkQueue()">☑</button>
-      <button class="navIcon" title="Letters / Documents" onclick="openDocumentGenerator()">▤</button>
+      <button class="navIcon sky" title="Today Dashboard" onclick="openTodayDashboard()"><span class="navEmoji">🏠</span></button>
+      <button class="navIcon purple" data-nav="messages" title="Team Messenger / Call Transfer" onclick="openTeamMessenger()"><span class="navEmoji">💬</span><span class="msgUnreadDot"></span></button>
+      <button class="navIcon gold" title="Collector Leaderboard" onclick="openLeaderboard()"><span class="navEmoji">🏆</span></button>
+      <button class="navIcon money" title="Pay Desk" onclick="openPaymentTracker()"><span class="navEmoji">💵</span></button>
+      <button class="navIcon green" title="Daily Work Queue" onclick="openDailyWorkQueue()"><span class="navEmoji">✅</span></button>
+      <button class="navIcon sky" title="Letters / Documents" onclick="openDocumentGenerator()"><span class="navEmoji">📄</span></button>
       <div class="navSpacer"></div>
-      <button class="navIcon adminOnly hidden" title="Brand Settings" onclick="openBrandingSettingsModal()">⚙</button>
+      <button class="navIcon dark adminOnly hidden" title="Brand Settings" onclick="openBrandingSettingsModal()"><span class="navEmoji">⚙️</span></button>
     </nav>
     <aside class="sidebar panel">
       <div class="sideHead"><h2>Queue</h2><button class="outline" onclick="loadAccounts()">↻</button></div>
@@ -3029,6 +3128,7 @@ main.center > *,
         <div class="qaItem" onclick="openPaymentLedger()"><span class="qaLeft"><span class="qaIcon">💵</span>Record Payment / Ledger</span><span>›</span></div>
         <div class="qaItem" onclick="openDocumentGenerator()"><span class="qaLeft"><span class="qaIcon">🧾</span>Create Debtor Letter / PDF</span><span>›</span></div>
         <div class="qaItem" onclick="openFollowUpModal('Callback')"><span class="qaLeft"><span class="qaIcon">📅</span>Schedule Callback / Follow-Up</span><span>›</span></div>
+        <div class="qaItem" onclick="openTeamMessengerForCurrent('Call Transfer')"><span class="qaLeft"><span class="qaIcon">💬</span>Message / Transfer Call</span><span>›</span></div>
         <div class="qaItem" onclick="openCallResultModal()"><span class="qaLeft"><span class="qaIcon">☎</span>Log Call Result</span><span>›</span></div>
         <div class="qaItem" onclick="openDisputeModal()"><span class="qaLeft"><span class="qaIcon">⚠</span>Dispute Tracker</span><span>›</span></div>
         <div class="qaItem" onclick="openSettlementModal()"><span class="qaLeft"><span class="qaIcon">%</span>Settlement Offer</span><span>›</span></div>
@@ -3762,6 +3862,84 @@ main.center > *,
 
 
 
+
+
+<div id="teamMessengerModal" class="modal"><div class="modalbox powerBox teamMessengerBox">
+  <div class="modalhead">
+    <h2>Team Messenger / Call Transfer Notes</h2>
+    <button class="gray" onclick="closeModal('teamMessengerModal')">Close</button>
+  </div>
+  <div class="modalbody">
+    <div class="tmHero">
+      <div>
+        <div class="tmTitle">Message employees or admin without picking up the phone</div>
+        <div class="tmSub">Use this for call transfers, payment questions, account questions, approval requests, and internal notes tied to an account.</div>
+      </div>
+      <button class="outline" onclick="loadTeamMessages()">Refresh</button>
+    </div>
+
+    <div class="tmGrid">
+      <section class="tmCard">
+        <div class="tmSectionTitle">Send Message</div>
+        <div class="tmAccountBox" id="tmAccountPreview">No account selected.</div>
+        <input type="hidden" id="tmAccountId">
+        <div class="tmFormGrid">
+          <div>
+            <label>To</label>
+            <select id="tmToEmail"></select>
+          </div>
+          <div>
+            <label>Type</label>
+            <select id="tmType">
+              <option>Call Transfer</option>
+              <option>Payment Question</option>
+              <option>Account Question</option>
+              <option>Admin Approval</option>
+              <option>General Message</option>
+            </select>
+          </div>
+          <div>
+            <label>Priority</label>
+            <select id="tmPriority">
+              <option>Normal</option>
+              <option>Urgent</option>
+              <option>Low</option>
+            </select>
+          </div>
+          <div>
+            <label>Phone / Callback #</label>
+            <input id="tmPhone" placeholder="Optional">
+          </div>
+          <div class="tmWide">
+            <label>Subject</label>
+            <input id="tmSubject" placeholder="Example: Transfer call for payment approval">
+          </div>
+          <div class="tmWide">
+            <label>Message</label>
+            <textarea id="tmBody" placeholder="Type the message. Example: Debtor is on the line and wants to make a payment. Please call/confirm."></textarea>
+          </div>
+        </div>
+        <div class="tmSafeNote">This is internal communication only. Do not send full card numbers, CVV, full routing/account numbers, or sensitive payment data.</div>
+        <button class="green tmFullBtn" onclick="sendTeamMessage()">Send Message</button>
+      </section>
+
+      <section class="tmCard">
+        <div class="tmToolbar">
+          <div class="tmSectionTitle">Inbox / Sent</div>
+          <select id="tmFilter" onchange="renderTeamMessages()">
+            <option value="open">Open</option>
+            <option value="unread">Unread</option>
+            <option value="sent">Sent By Me</option>
+            <option value="all">All</option>
+            <option value="closed">Closed</option>
+          </select>
+          <button class="outline" onclick="loadTeamMessages()">Refresh</button>
+        </div>
+        <div id="teamMessagesList" class="tmList"></div>
+      </section>
+    </div>
+  </div>
+</div></div>
 
 <div id="leaderboardModal" class="modal"><div class="modalbox powerBox leaderboardBox">
   <div class="modalhead">
