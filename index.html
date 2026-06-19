@@ -3318,62 +3318,6 @@ main.center > *,
 .noteDeleteBtn:hover{filter:brightness(.97)}
 #roleBadge{max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 
-
-/* RINGCENTRAL WEB PHONE LIVE INTEGRATION */
-.rcLiveBox{
-  margin-top:10px;
-  padding:10px;
-  border-radius:14px;
-  border:1px solid #bfdbfe;
-  background:linear-gradient(180deg,#eff6ff,#ffffff);
-}
-.rcLiveTitle{
-  font-size:12px;
-  font-weight:1000;
-  color:#1e3a8a;
-  display:flex;
-  justify-content:space-between;
-  gap:8px;
-  align-items:center;
-}
-.rcLiveStatus{
-  font-size:11px;
-  color:#475569;
-  font-weight:850;
-  line-height:1.25;
-  margin:6px 0 8px;
-}
-.rcBtnRow{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:7px;
-}
-.rcBtn{
-  border:0;
-  border-radius:10px;
-  padding:8px 7px;
-  font-size:11px;
-  font-weight:1000;
-  cursor:pointer;
-}
-.rcPrimary{
-  background:#2563eb;
-  color:#fff;
-}
-.rcSecondary{
-  background:#e0e7ff;
-  color:#1e3a8a;
-}
-.rcMini{
-  font-size:10px;
-  color:#64748b;
-  font-weight:800;
-  margin-top:7px;
-}
-.phoneChip.rcReady{
-  cursor:pointer;
-}
-
 </style>
 </head>
 <body>
@@ -3552,16 +3496,7 @@ main.center > *,
     <aside class="right">
       <section class="panel softphone">
         <div class="softTop"><b>Softphone</b><span class="connected">● Connected</span></div>
-        <div class="ready"><b>RingCentral Ready</b><br><span id="lastDialed">Click a number to dial with RingCentral</span></div>
-        <div class="rcLiveBox">
-          <div class="rcLiveTitle"><span>RingCentral Web Phone</span><span id="rcLiveBadge">● Ready</span></div>
-          <div class="rcLiveStatus" id="rcLiveStatus">Opens inside this browser. Log in to RingCentral once when prompted.</div>
-          <div class="rcBtnRow">
-            <button class="rcBtn rcPrimary" onclick="openRingCentralPhone()">Open Phone</button>
-            <button class="rcBtn rcSecondary" onclick="rcDialSelected()">Dial Selected</button>
-          </div>
-          <div class="rcMini">No desktop app needed. Uses RingCentral Embeddable web phone.</div>
-        </div>
+        <div class="ready"><b>Ready to call</b><br><span id="lastDialed">Click a number to dial</span></div>
         <div class="dialer"><div class="keys"><button class="key">1</button><button class="key">2<br><small>ABC</small></button><button class="key">3<br><small>DEF</small></button><button class="key">4<br><small>GHI</small></button><button class="key">5<br><small>JKL</small></button><button class="key">6<br><small>MNO</small></button><button class="key">7<br><small>PQRS</small></button><button class="key">8<br><small>TUV</small></button><button class="key">9<br><small>WXYZ</small></button><button class="key">*</button><button class="key">0</button><button class="key">#</button></div><div class="callBox"><div>No active call</div><div class="callNumber" id="callNumber">—</div><button class="green" onclick="callPrimary()">Call</button><br><br><button class="red" onclick="endCall()">End Call</button></div></div>
       </section>
       <section class="panel quickActions">
@@ -10503,115 +10438,6 @@ if(!window.CO_PILOT_NAME_SAVE_ALL_NOTES_DELETE_FIX){
     let el=document.getElementById('loginName'), p=localStorage.getItem('coPilotPendingDisplayName')||'';
     if(el&&p&&!el.value)el.value=p;
   });
-}
-
-
-/* RINGCENTRAL WEB PHONE LIVE INTEGRATION */
-if(!window.CO_PILOT_RINGCENTRAL_LIVE_PHONE){
-  window.CO_PILOT_RINGCENTRAL_LIVE_PHONE=true;
-  window.CO_PILOT_RINGCENTRAL_CLIENT_ID="cHhGAjEYxxIcEsJFRkHcBd";
-  window.rcSelectedNumber='';
-
-  function rcSetStatus(msg){
-    let el=document.getElementById('rcLiveStatus');
-    if(el)el.textContent=msg;
-    let ld=document.getElementById('lastDialed');
-    if(ld)ld.textContent=msg;
-  }
-
-  function loadRingCentralAdapter(){
-    if(document.getElementById('rc-embeddable-adapter-script'))return;
-    var rcs=document.createElement('script');
-    rcs.id='rc-embeddable-adapter-script';
-    rcs.src='https://apps.ringcentral.com/integration/ringcentral-embeddable/2.x/adapter.js?clientId='+encodeURIComponent(window.CO_PILOT_RINGCENTRAL_CLIENT_ID);
-    rcs.async=true;
-    rcs.onload=function(){rcSetStatus('RingCentral web phone loaded. Sign in when prompted.');};
-    rcs.onerror=function(){rcSetStatus('RingCentral failed to load. Check browser/network permissions.');};
-    var first=document.getElementsByTagName('script')[0];
-    first.parentNode.insertBefore(rcs,first);
-  }
-
-  window.openRingCentralPhone=function(){
-    loadRingCentralAdapter();
-    setTimeout(function(){
-      try{
-        if(window.RCAdapter&&typeof RCAdapter.show==='function')RCAdapter.show();
-        if(window.RCAdapter&&typeof RCAdapter.open==='function')RCAdapter.open();
-      }catch(e){console.warn('RingCentral open fallback',e);}
-    },600);
-    rcSetStatus('Opening RingCentral phone...');
-  };
-
-  window.rcDialNumber=function(raw){
-    let p=normPhone(raw||'');
-    if(!p)return alert('No phone number found.');
-    window.rcSelectedNumber=p;
-    let display=fmtPhone(p);
-    let cn=document.getElementById('callNumber'); if(cn)cn.textContent=display;
-    rcSetStatus('Dialing '+display+' with RingCentral...');
-    try{ let a=getCurrent(); if(a)recordDial(a.id,p); }catch(e){}
-    loadRingCentralAdapter();
-    setTimeout(function(){
-      try{
-        if(window.RCAdapter&&typeof RCAdapter.clickToCall==='function'){
-          RCAdapter.clickToCall(p,true);
-          return;
-        }
-        let frame=document.querySelector('#rc-widget-adapter-frame');
-        if(frame&&frame.contentWindow){
-          frame.contentWindow.postMessage({type:'rc-adapter-new-call',phoneNumber:p,to:p},'*');
-          return;
-        }
-        window.location.href='tel:'+p;
-      }catch(e){
-        console.warn('RingCentral dial failed',e);
-        window.location.href='tel:'+p;
-      }
-    },900);
-  };
-
-  window.rcDialSelected=function(){
-    let p=window.rcSelectedNumber||phones(getCurrent())[0]||'';
-    rcDialNumber(p);
-  };
-
-  renderPhones=function(a){
-    let ps=phones(a).map(p=>normPhone(p)).filter(p=>p.length>=10);
-    let seen=new Set();
-    ps=ps.filter(p=>{let key=p.slice(-10); if(seen.has(key))return false; seen.add(key); return true;}).slice(0,6);
-    let box=document.getElementById('phoneGrid');
-    if(!box)return;
-    box.innerHTML=ps.map((p,i)=>`<a class="phoneChip rcReady" href="javascript:void(0)" onclick="rcDialNumber('${normPhone(p)}')"><div class="phoneIcon">☎</div><div><div class="phoneNum">${fmtPhone(p)}</div><div class="phoneType">${i===0?'Primary':i===1?'Mobile':'Alternate'} · RingCentral</div></div></a>`).join('')||'<div class="muted">No phone numbers on this account.</div>';
-  };
-
-  callPrimary=function(){
-    let p=phones(getCurrent())[0];
-    if(p)rcDialNumber(p);
-    else alert('No primary phone number on this account.');
-  };
-
-  endCall=function(){
-    try{
-      let frame=document.querySelector('#rc-widget-adapter-frame');
-      if(frame&&frame.contentWindow)frame.contentWindow.postMessage({type:'rc-adapter-control-call',callAction:'hangup'},'*');
-    }catch(e){console.warn(e);}
-    rcSetStatus('Call ended / hangup sent');
-    let cn=document.getElementById('callNumber'); if(cn)cn.textContent='—';
-  };
-
-  window.addEventListener('message',function(e){
-    try{
-      let d=e.data||{};
-      if(!d.type)return;
-      if(String(d.type).includes('rc-')){
-        if(d.type==='rc-login-status-notify')rcSetStatus(d.loggedIn?'RingCentral connected':'RingCentral login needed');
-        if(d.type==='rc-call-ring-notify')rcSetStatus('Incoming RingCentral call');
-        if(d.type==='rc-call-end-notify')rcSetStatus('RingCentral call ended');
-      }
-    }catch(err){}
-  });
-
-  loadRingCentralAdapter();
 }
 
 boot();
