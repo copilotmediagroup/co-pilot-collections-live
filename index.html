@@ -3322,6 +3322,156 @@ main.center > *,
 </head>
 <body>
   <script>
+/* CO_PILOT_RINGCENTRAL_EXTENSION_ONLY_V5 - DISABLE EMBEDDED LOGIN */
+(function () {
+  window.CO_PILOT_RINGCENTRAL_EXTENSION_ONLY_V5 = true;
+
+  function cleanPhone(value) {
+    var n = String(value || "").replace(/\D/g, "");
+    if (n.length === 10) n = "1" + n;
+    if (n.length === 11 && n[0] === "1") return "+" + n;
+    return n ? "+" + n : "";
+  }
+
+  function phoneFromElement(el) {
+    if (!el) return "";
+    var num = el.querySelector(".phoneNum");
+    return cleanPhone(num ? num.textContent : el.textContent);
+  }
+
+  function setStatus(number) {
+    var msg = number
+      ? "Opening RingCentral extension for " + number
+      : "RingCentral extension mode. Click a phone number.";
+
+    var last = document.getElementById("lastDialed");
+    if (last) last.textContent = msg;
+
+    var rc = document.getElementById("rcLiveStatus");
+    if (rc) rc.textContent = "Extension mode only. No embedded RingCentral login.";
+
+    var callNumber = document.getElementById("callNumber");
+    if (callNumber && number) callNumber.textContent = number;
+  }
+
+  function removeEmbeddedRingCentral() {
+    document
+      .querySelectorAll(
+        '#rc-widget-adapter-frame, iframe[src*="ringcentral"], script[src*="ringcentral-embeddable"]'
+      )
+      .forEach(function (el) {
+        try {
+          el.remove();
+        } catch (e) {}
+      });
+
+    document.querySelectorAll(".rcLiveBox").forEach(function (box) {
+      box.style.display = "none";
+    });
+  }
+
+  function dialWithExtension(raw) {
+    var number = cleanPhone(raw);
+
+    if (!number) {
+      alert("No phone number found.");
+      return;
+    }
+
+    window.rcSelectedNumber = number;
+    setStatus(number);
+    removeEmbeddedRingCentral();
+
+    try {
+      navigator.clipboard.writeText(number);
+    } catch (e) {}
+
+    var link = document.createElement("a");
+    link.href = "tel:" + number;
+    link.style.display = "none";
+    link.textContent = number;
+    document.body.appendChild(link);
+    link.click();
+
+    setTimeout(function () {
+      try {
+        link.remove();
+      } catch (e) {}
+    }, 1000);
+  }
+
+  window.openRingCentralPhone = function () {
+    removeEmbeddedRingCentral();
+    setStatus("");
+    alert("Use the RingCentral Chrome extension/web app. This CRM is now sending calls by real tel: links.");
+  };
+
+  window.rcDialNumber = dialWithExtension;
+
+  window.rcDialSelected = function () {
+    var number = window.rcSelectedNumber || "";
+    if (!number) {
+      var first = document.querySelector(".phoneChip .phoneNum") || document.querySelector(".phoneNum");
+      number = first ? first.textContent : "";
+    }
+    dialWithExtension(number);
+  };
+
+  window.callPrimary = function () {
+    var first = document.querySelector(".phoneChip .phoneNum") || document.querySelector(".phoneNum");
+    dialWithExtension(first ? first.textContent : "");
+  };
+
+  window.endCall = function () {
+    setStatus("");
+  };
+
+  function rewire() {
+    removeEmbeddedRingCentral();
+
+    document.querySelectorAll(".phoneChip").forEach(function (chip) {
+      var number = phoneFromElement(chip);
+      if (!number) return;
+
+      chip.setAttribute("href", "tel:" + number);
+      chip.setAttribute("data-ringcentral-extension-number", number);
+      chip.style.cursor = "pointer";
+
+      chip.onclick = function (event) {
+        event.preventDefault();
+        event.stopPropagation();
+        dialWithExtension(number);
+      };
+    });
+
+    Array.from(document.querySelectorAll("button")).forEach(function (btn) {
+      var text = String(btn.textContent || "").trim().toLowerCase();
+
+      if (text === "call" || text === "dial selected") {
+        btn.onclick = function (event) {
+          event.preventDefault();
+          event.stopPropagation();
+          window.callPrimary();
+        };
+      }
+
+      if (text === "open phone") {
+        btn.onclick = function (event) {
+          event.preventDefault();
+          event.stopPropagation();
+          window.openRingCentralPhone();
+        };
+      }
+    });
+
+    setStatus(window.rcSelectedNumber || "");
+  }
+
+  document.addEventListener("DOMContentLoaded", rewire);
+  setInterval(rewire, 1000);
+})();
+</script>
+  <script>
 /* CO_PILOT_RINGCENTRAL_EXTENSION_TEL_LINK_V4 */
 (function () {
   window.CO_PILOT_RINGCENTRAL_EXTENSION_TEL_LINK_V4 = true;
