@@ -10442,5 +10442,256 @@ if(!window.CO_PILOT_NAME_SAVE_ALL_NOTES_DELETE_FIX){
 
 boot();
 </script>
+  <script>
+/* LIVE RINGCENTRAL WEB PHONE PATCH - INDEX.HTML ONLY */
+(function () {
+  if (window.CO_PILOT_RINGCENTRAL_LIVE_PHONE) return;
+
+  window.CO_PILOT_RINGCENTRAL_LIVE_PHONE = true;
+  window.CO_PILOT_RINGCENTRAL_CLIENT_ID = "cHhGAjEYxxIcEsJFRkHcBd";
+  window.rcSelectedNumber = "";
+
+  function rcDigits(value) {
+    return String(value || "").replace(/\D/g, "");
+  }
+
+  function rcFormat(value) {
+    var n = rcDigits(value);
+    if (n.length === 11 && n[0] === "1") n = n.slice(1);
+    if (n.length === 10) {
+      return "(" + n.slice(0, 3) + ") " + n.slice(3, 6) + "-" + n.slice(6);
+    }
+    return n || value || "";
+  }
+
+  function rcSetStatus(message) {
+    var status = document.getElementById("rcLiveStatus");
+    if (status) status.textContent = message;
+
+    var lastDialed = document.getElementById("lastDialed");
+    if (lastDialed) lastDialed.textContent = message;
+  }
+
+  function loadRingCentralAdapter() {
+    if (document.getElementById("rc-embeddable-adapter-script")) return;
+
+    var script = document.createElement("script");
+    script.id = "rc-embeddable-adapter-script";
+    script.src =
+      "https://apps.ringcentral.com/integration/ringcentral-embeddable/2.x/adapter.js?clientId=" +
+      encodeURIComponent(window.CO_PILOT_RINGCENTRAL_CLIENT_ID);
+    script.async = true;
+
+    script.onload = function () {
+      rcSetStatus("RingCentral loaded. Sign in when prompted.");
+    };
+
+    script.onerror = function () {
+      rcSetStatus("RingCentral failed to load. Check browser/network permissions.");
+    };
+
+    document.head.appendChild(script);
+  }
+
+  window.openRingCentralPhone = function () {
+    loadRingCentralAdapter();
+    rcSetStatus("Opening RingCentral phone...");
+
+    setTimeout(function () {
+      try {
+        if (window.RCAdapter && typeof window.RCAdapter.show === "function") {
+          window.RCAdapter.show();
+        }
+
+        if (window.RCAdapter && typeof window.RCAdapter.open === "function") {
+          window.RCAdapter.open();
+        }
+      } catch (error) {
+        console.warn("RingCentral open fallback:", error);
+      }
+    }, 700);
+  };
+
+  window.rcDialNumber = function (rawNumber) {
+    var number = rcDigits(rawNumber);
+
+    if (!number) {
+      alert("No phone number found.");
+      return;
+    }
+
+    window.rcSelectedNumber = number;
+
+    var displayNumber = rcFormat(number);
+    var callNumber = document.getElementById("callNumber");
+    if (callNumber) callNumber.textContent = displayNumber;
+
+    rcSetStatus("Dialing " + displayNumber + " with RingCentral...");
+
+    try {
+      if (typeof getCurrent === "function" && typeof recordDial === "function") {
+        var account = getCurrent();
+        if (account) recordDial(account.id, number);
+      }
+    } catch (error) {
+      console.warn("Could not record dial:", error);
+    }
+
+    loadRingCentralAdapter();
+
+    setTimeout(function () {
+      try {
+        if (window.RCAdapter && typeof window.RCAdapter.clickToCall === "function") {
+          window.RCAdapter.clickToCall(number, true);
+          return;
+        }
+
+        var frame = document.querySelector("#rc-widget-adapter-frame");
+        if (frame && frame.contentWindow) {
+          frame.contentWindow.postMessage(
+            {
+              type: "rc-adapter-new-call",
+              phoneNumber: number,
+              to: number
+            },
+            "*"
+          );
+          return;
+        }
+
+        window.location.href = "tel:" + number;
+      } catch (error) {
+        console.warn("RingCentral dial failed:", error);
+        window.location.href = "tel:" + number;
+      }
+    }, 900);
+  };
+
+  window.rcDialSelected = function () {
+    var number = window.rcSelectedNumber;
+
+    if (!number) {
+      var firstPhone = document.querySelector(".phoneNum");
+      number = firstPhone ? firstPhone.textContent : "";
+    }
+
+    window.rcDialNumber(number);
+  };
+
+  window.rcHangupRingCentral = function () {
+    try {
+      var frame = document.querySelector("#rc-widget-adapter-frame");
+      if (frame && frame.contentWindow) {
+        frame.contentWindow.postMessage(
+          {
+            type: "rc-adapter-control-call",
+            callAction: "hangup"
+          },
+          "*"
+        );
+      }
+    } catch (error) {
+      console.warn("RingCentral hangup failed:", error);
+    }
+
+    rcSetStatus("Call ended / hangup sent.");
+
+    var callNumber = document.getElementById("callNumber");
+    if (callNumber) callNumber.textContent = "—";
+  };
+
+  function attachRingCentralUI() {
+    loadRingCentralAdapter();
+
+    var readyBox = document.querySelector(".softphone .ready");
+    if (readyBox) {
+      readyBox.innerHTML =
+        '<b>RingCentral Ready</b><br><span id="lastDialed">Open phone, then click a number</span>';
+    }
+
+    var softphone = document.querySelector(".softphone");
+
+    if (softphone && !document.getElementById("rcOpenBtn")) {
+      var box = document.createElement("div");
+      box.className = "rcLiveBox";
+      box.style.cssText =
+        "margin-top:10px;padding:10px;border:1px solid #bfdbfe;border-radius:14px;background:#eff6ff;";
+
+      box.innerHTML =
+        '<div style="font-size:12px;font-weight:1000;color:#1e3a8a;display:flex;justify-content:space-between;gap:8px;align-items:center;">' +
+        '<span>RingCentral Web Phone</span><span>● Ready</span></div>' +
+        '<div id="rcLiveStatus" style="font-size:11px;color:#475569;font-weight:850;line-height:1.25;margin:6px 0 8px;">Browser phone. Sign in once when prompted.</div>' +
+        '<div style="display:grid;grid-template-columns:1fr 1fr;gap:7px;">' +
+        '<button id="rcOpenBtn" onclick="openRingCentralPhone()" style="border:0;border-radius:10px;padding:8px 7px;font-size:11px;font-weight:1000;cursor:pointer;background:#2563eb;color:#fff;">Open Phone</button>' +
+        '<button onclick="rcDialSelected()" style="border:0;border-radius:10px;padding:8px 7px;font-size:11px;font-weight:1000;cursor:pointer;background:#e0e7ff;color:#1e3a8a;">Dial Selected</button>' +
+        "</div>" +
+        '<div style="font-size:10px;color:#64748b;font-weight:800;margin-top:7px;">No desktop app needed.</div>';
+
+      var ready = document.querySelector(".softphone .ready");
+      if (ready && ready.parentNode) {
+        ready.parentNode.insertBefore(box, ready.nextSibling);
+      } else {
+        softphone.appendChild(box);
+      }
+    }
+
+    document.querySelectorAll(".phoneChip").forEach(function (phoneChip) {
+      phoneChip.classList.add("rcReady");
+      phoneChip.style.cursor = "pointer";
+
+      phoneChip.onclick = function (event) {
+        event.preventDefault();
+        window.rcDialNumber(phoneChip.textContent);
+      };
+    });
+  }
+
+  if (typeof renderPhones === "function") {
+    var oldRenderPhones = renderPhones;
+
+    renderPhones = function (account) {
+      oldRenderPhones(account);
+      setTimeout(attachRingCentralUI, 50);
+    };
+  }
+
+  if (typeof callPrimary === "function") {
+    callPrimary = function () {
+      var firstPhone = document.querySelector(".phoneNum");
+      window.rcDialNumber(firstPhone ? firstPhone.textContent : "");
+    };
+  }
+
+  if (typeof endCall === "function") {
+    endCall = function () {
+      window.rcHangupRingCentral();
+    };
+  }
+
+  window.addEventListener("message", function (event) {
+    try {
+      var data = event.data || {};
+      if (!data.type) return;
+
+      if (String(data.type).indexOf("rc-") !== -1) {
+        if (data.type === "rc-login-status-notify") {
+          rcSetStatus(data.loggedIn ? "RingCentral connected." : "RingCentral login needed.");
+        }
+
+        if (data.type === "rc-call-ring-notify") {
+          rcSetStatus("Incoming RingCentral call.");
+        }
+
+        if (data.type === "rc-call-end-notify") {
+          rcSetStatus("RingCentral call ended.");
+        }
+      }
+    } catch (error) {}
+  });
+
+  document.addEventListener("DOMContentLoaded", attachRingCentralUI);
+  setTimeout(attachRingCentralUI, 800);
+})();
+</script>
 </body>
 </html>
