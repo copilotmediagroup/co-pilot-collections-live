@@ -3558,7 +3558,7 @@ button {
       <button class="gray adminOnly hidden" onclick="openAuditLog()">Audit</button>
       <button class="gray adminOnly hidden" onclick="openPermissionsModal()">Perms</button>
       <button class="gray adminOnly hidden" onclick="openEmployeeMonitorModal()">Monitor</button>
-      <button class="gray adminOnly hidden" onclick="openAdminReports()">Reports</button>
+      <button class="gray adminOnly hidden" onclick="return cpcmOpenReportsNow(event)">Reports</button>
       <button class="gray" onclick="openComplianceGuard()">Guard</button>
       <button class="gray adminOnly hidden" onclick="openEmployeeAdminModal()">Staff</button>
       <button class="gray adminOnly hidden" onclick="openBrandingSettingsModal()">Brand</button>
@@ -3578,7 +3578,7 @@ button {
       <button class="navIcon sky" title="Today Dashboard" onclick="openTodayDashboard()"><span class="navEmoji">🏠</span></button>
       <button class="navIcon purple" data-nav="messages" title="Team Chat / Messenger" onclick="toggleChatDock()"><span class="navEmoji">💬</span><span class="msgUnreadBadge">0</span></button>
       <button class="navIcon gold" title="Collector Leaderboard" onclick="openLeaderboard()"><span class="navEmoji">🏆</span></button>
-      <button class="navIcon purple adminOnly hidden" title="Admin Reports" onclick="openAdminReports()"><span class="navEmoji">📊</span></button>
+      <button class="navIcon purple adminOnly hidden" title="Admin Reports" onclick="return cpcmOpenReportsNow(event)"><span class="navEmoji">📊</span></button>
       <button class="navIcon red" title="Compliance Guard" onclick="openComplianceGuard()"><span class="navEmoji">🛡️</span></button>
       <button class="navIcon sky" title="Call Intelligence" onclick="openContactIntelligence()"><span class="navEmoji">☎</span></button>
       <button class="navIcon money" title="Pay Desk" onclick="openPaymentTracker()"><span class="navEmoji">💵</span></button>
@@ -11231,6 +11231,139 @@ function exportContactIntelligenceCSV(){let calls=filteredContactCalls();let row
     if(typeof oldCloseModal === 'function') return oldCloseModal.apply(this, arguments);
     var el=byId(id); if(el) el.classList.remove('open');
   };
+})();
+
+
+
+/* REPORTS_HARD_CLICK_FIX_MARKER: hard-wired reports open; prevents delayed report/compliance stacking */
+(function(){
+  var ADMIN_EMAIL = 'afinch2678@gmail.com';
+  var openToken = 0;
+  var modalIds = ['adminReportsModal','complianceGuardModal','leaderboardModal','paymentTrackerModal','paymentsDashboardModal','todayDashboardModal','dailyWorkQueueModal','promiseDashboardModal','employeeMonitorModal','employeeAdminModal','brandingSettingsModal','auditModal','permissionsModal','documentGeneratorModal','paymentPlanModal','callOutcomeModal'];
+  function byId(id){ return document.getElementById(id); }
+  function lc(v){ return String(v||'').toLowerCase().trim(); }
+  function hideBusy(){ try{ var b=byId('globalBusy'); if(b){ b.classList.add('hidden'); b.style.display='none'; b.style.zIndex=''; } }catch(e){} }
+  function roleText(){ try{ return byId('roleBadge') ? byId('roleBadge').textContent || '' : ''; }catch(e){ return ''; } }
+  function getEmail(){
+    try{ if(typeof currentUser !== 'undefined' && currentUser && currentUser.email) return lc(currentUser.email); }catch(e){}
+    try{ if(window.currentUser && window.currentUser.email) return lc(window.currentUser.email); }catch(e){}
+    try{ if(window.authUser && window.authUser.email) return lc(window.authUser.email); }catch(e){}
+    return '';
+  }
+  function adminOK(){
+    var email = getEmail();
+    if(email === ADMIN_EMAIL) return true;
+    try{ if(typeof currentUser !== 'undefined' && currentUser && (currentUser.isAdmin === true || lc(currentUser.role)==='admin')) return true; }catch(e){}
+    try{ if(window.currentUser && (window.currentUser.isAdmin === true || lc(window.currentUser.role)==='admin')) return true; }catch(e){}
+    try{ if(typeof isAdminEmail === 'function' && isAdminEmail(email)) return true; }catch(e){}
+    if(/admin/i.test(roleText())) return true;
+    return false;
+  }
+  function installStyle(){
+    if(byId('reportsHardClickStyle')) return;
+    var st=document.createElement('style');
+    st.id='reportsHardClickStyle';
+    st.textContent = '#adminReportsModal.reportsHardOpen{display:flex!important;align-items:center!important;justify-content:center!important;z-index:2147483600!important;opacity:1!important;visibility:visible!important;}#adminReportsModal.reportsHardOpen .modalbox{position:relative!important;z-index:2147483601!important;max-height:92vh!important;}body.reportsHardBody #globalBusy{display:none!important;}';
+    document.head.appendChild(st);
+  }
+  function setNotice(msg){ try{ var n=byId('reportNotice'); if(n) n.textContent = msg; }catch(e){} }
+  function closeEverythingExceptReports(){
+    modalIds.forEach(function(id){
+      var m=byId(id);
+      if(!m || id==='adminReportsModal') return;
+      m.classList.remove('open','cpcmReportsDirectOpen','reportsHardOpen');
+      m.style.display='';
+      m.style.zIndex='';
+    });
+    try{ Array.prototype.slice.call(document.querySelectorAll('.modal.open')).forEach(function(m){ if(m.id!=='adminReportsModal'){ m.classList.remove('open'); m.style.display=''; m.style.zIndex=''; } }); }catch(e){}
+    hideBusy();
+  }
+  function hardOpenReports(evt){
+    if(evt){ evt.preventDefault(); evt.stopPropagation(); if(evt.stopImmediatePropagation) evt.stopImmediatePropagation(); }
+    try{
+      if(!adminOK()){ alert('Admin only. You are signed in, but this session is not being recognized as Admin. Refresh and log in as '+ADMIN_EMAIL+'.'); return false; }
+      installStyle();
+      closeEverythingExceptReports();
+      var modal=byId('adminReportsModal');
+      if(!modal){ alert('Reports panel was not found. Reload the app and try again.'); return false; }
+      openToken++;
+      document.body.classList.add('reportsHardBody','reportsOpenFix','cpcmReportsDirectBody');
+      modal.classList.add('open','reportsHardOpen','cpcmReportsDirectOpen');
+      modal.style.display='flex';
+      modal.style.visibility='visible';
+      modal.style.opacity='1';
+      modal.style.zIndex='2147483600';
+      setNotice('Reports opened. Loading report data...');
+      hideBusy();
+      var token=openToken;
+      setTimeout(function(){
+        if(token!==openToken) return;
+        try{ if(typeof buildAdminReportFilters==='function') buildAdminReportFilters(); }catch(e){ console.warn('Report filter setup failed',e); }
+        try{
+          var rs=byId('reportStart'), re=byId('reportEnd');
+          if((!rs || !rs.value) || (!re || !re.value)){ if(typeof setAdminReportRange==='function') setAdminReportRange('today'); }
+        }catch(e){}
+        hideBusy();
+        try{
+          var loader = (typeof window.loadAdminReports==='function') ? window.loadAdminReports : (typeof loadAdminReports==='function' ? loadAdminReports : null);
+          if(loader){
+            var p=loader();
+            hideBusy();
+            if(p && typeof p.then==='function'){
+              var slow=setTimeout(function(){ hideBusy(); if(token===openToken) setNotice('Reports are open. Data is taking longer than normal; click Refresh inside Reports if needed.'); }, 6000);
+              p.then(function(){ clearTimeout(slow); hideBusy(); if(token===openToken) setNotice('Reports loaded. Blank sections mean no matching records were found.'); })
+               .catch(function(e){ clearTimeout(slow); console.warn('Reports load failed',e); hideBusy(); if(token===openToken) setNotice('Reports opened, but one or more data sections could not load. Click Refresh or check SQL tables.'); });
+            }else{
+              setNotice('Reports loaded. Blank sections mean no matching records were found.');
+            }
+          }else{
+            setNotice('Reports opened, but the report loader was not found. Reload the app and try again.');
+          }
+        }catch(e){ console.warn('Reports hard open load failed',e); hideBusy(); setNotice('Reports opened, but data loading hit an error. Click Refresh or reload.'); }
+      }, 10);
+    }catch(e){ console.warn('Hard reports open failed',e); alert('Could not open Reports: '+(e.message||e)); hideBusy(); }
+    return false;
+  }
+  function isReportsButton(el){
+    var b = el && el.closest ? el.closest('button') : null;
+    if(!b) return false;
+    var txt=(b.textContent||'').replace(/\s+/g,' ').trim();
+    var title=b.getAttribute('title')||'';
+    var oc=b.getAttribute('onclick')||'';
+    return /^reports$/i.test(txt) || /admin reports/i.test(title) || /openAdminReports|hardOpenReports|cpcmOpenReportsNow/.test(oc);
+  }
+  function wire(){
+    try{
+      Array.prototype.slice.call(document.querySelectorAll('button')).forEach(function(b){
+        var txt=(b.textContent||'').replace(/\s+/g,' ').trim();
+        var title=b.getAttribute('title')||'';
+        var oc=b.getAttribute('onclick')||'';
+        if(/^reports$/i.test(txt) || /admin reports/i.test(title) || /openAdminReports/.test(oc)){
+          b.setAttribute('onclick','return cpcmOpenReportsNow(event)');
+          b.onclick = hardOpenReports;
+        }
+      });
+    }catch(e){ console.warn('Reports hard wire failed',e); }
+  }
+  document.addEventListener('click', function(e){ if(isReportsButton(e.target)) hardOpenReports(e); }, true);
+  window.cpcmOpenReportsNow = hardOpenReports;
+  window.directOpenAdminReports = hardOpenReports;
+  window.openAdminReports = hardOpenReports;
+  var oldClose=window.closeModal;
+  window.closeModal=function(id){
+    if(id==='adminReportsModal'){
+      openToken++;
+      var m=byId('adminReportsModal'); if(m){ m.classList.remove('open','reportsHardOpen','cpcmReportsDirectOpen'); m.style.display=''; m.style.visibility=''; m.style.opacity=''; m.style.zIndex=''; }
+      document.body.classList.remove('reportsHardBody','reportsOpenFix','cpcmReportsDirectBody');
+      hideBusy();
+      return false;
+    }
+    if(typeof oldClose==='function') return oldClose.apply(this,arguments);
+    var el=byId(id); if(el) el.classList.remove('open');
+  };
+  // Keep the Reports buttons hard-wired even if the app re-renders role/admin buttons after login.
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', wire); else wire();
+  [250,750,1500,3000,5000].forEach(function(ms){ setTimeout(wire,ms); });
 })();
 
 </script>
