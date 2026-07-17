@@ -1,4 +1,6 @@
-REPORTS NAV GLITCH FIX PACKAGE
+REPORTS TEMPORARILY REMOVED STABLE BUILD
+
+This package removes/hides the Reports buttons to stop the Bolt preview freeze and modal stacking glitch. Payment Plan admin controls are preserved. No new SQL is required for this rollback/stabilization build.
 
 Co Pilot Collections Manager - LIVE Package
 
@@ -57,6 +59,3 @@ PAYMENT PLAN UI + ADMIN LOCK UPDATE
 - Employees can view payment plans only.
 - Only Admin can create, edit, save, or delete payment plans.
 - No new SQL is required for the UI/admin-lock update if the previous payment save SQL was already run.
-
-
-Added: Reports opens instantly, closes other panels first, does not hide behind the loading overlay, and Compliance/other panels no longer stack with Reports. No new SQL required.
