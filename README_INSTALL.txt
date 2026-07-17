@@ -48,3 +48,10 @@ CALL LOGGING + CONTACT INTELLIGENCE
 PAYMENT SAVE FIX INCLUDED:
 If notes, payment promises, or payment plans do not save, run this SQL in the matching Supabase project and refresh the app:
 SQL_TO_RUN_IN_SUPABASE/RUN_THIS_PROMISE_AUTOMATION_AND_CALL_INTELLIGENCE_SQL.sql
+
+
+PAYMENT PLAN UI + ADMIN LOCK UPDATE
+- Redesigned the account Payment Plan card into a cleaner professional summary + progress + schedule table layout.
+- Employees can view payment plans only.
+- Only Admin can create, edit, save, or delete payment plans.
+- No new SQL is required for the UI/admin-lock update if the previous payment save SQL was already run.

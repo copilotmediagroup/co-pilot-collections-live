@@ -9644,72 +9644,6 @@ function exportAdminReportsPDF(){
   let html=`<!doctype html><html><head><title>Co Pilot Admin Reports</title><style>body{font-family:Arial,sans-serif;color:#0f172a;padding:24px}h1{margin:0 0 4px}h2{margin-top:22px;border-bottom:1px solid #ddd;padding-bottom:6px}table{width:100%;border-collapse:collapse;font-size:12px;margin-top:8px}th,td{border:1px solid #ddd;padding:6px;text-align:left}th{background:#f1f5f9}.money{font-weight:bold;color:#166534}.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.card{border:1px solid #ddd;border-radius:10px;padding:10px}.label{font-size:10px;color:#64748b;text-transform:uppercase}.value{font-size:18px;font-weight:bold}</style></head><body><h1>Co Pilot Admin Reports</h1><div>${esc(adminReportData.rangeText)}</div><div class="grid"><div class="card"><div class="label">Collected</div><div class="value">${money(adminReportData.summary.collected)}</div></div><div class="card"><div class="label">Promises Created</div><div class="value">${money(adminReportData.summary.promised)}</div></div><div class="card"><div class="label">Liquidation</div><div class="value">${(adminReportData.summary.liquidation||0).toFixed(2)}%</div></div></div>${reportTableHtmlForPrint('Collector Ranking',['Collector','Collected','Promises','Kept','Broken','Calls','Contact %','RPC %'],(adminReportData.collectors||[]).map(r=>[r.email,money(r.collected),money(r.promised),money(r.kept),money(r.broken),r.calls,(r.calls?r.contacts/r.calls*100:0).toFixed(1)+'%',(r.calls?r.rpc/r.calls*100:0).toFixed(1)+'%']))}${reportTableHtmlForPrint('Portfolio Performance',['Portfolio','Accounts','Placed','Current','Collected','Promises','Liquidation'],(adminReportData.portfolios||[]).map(p=>[p.portfolio,p.accounts,money(p.placed),money(p.current),money(p.collected),money(p.promised),p.placed?(p.collected/p.placed*100).toFixed(2)+'%':'0%']))}
 
 
-
-
-/* PAYMENT PLAN ADMIN BUTTON VISIBILITY FIX */
-(function(){
-  function cpPlanAdmin(){
-    try{
-      let email=String((window.currentUser&&currentUser.email)||'').toLowerCase().trim();
-      return !!(window.currentUser && (currentUser.isAdmin || String(currentUser.role||'').toLowerCase()==='admin' || email==='afinch2678@gmail.com' || (typeof isAdminEmail==='function' && isAdminEmail(email))));
-    }catch(e){return false;}
-  }
-  window.cpPlanAdmin = cpPlanAdmin;
-  window.deleteCurrentPaymentPlan = async function(){
-    let a=(typeof getCurrent==='function'?getCurrent():null);
-    if(!a)return alert('No account selected.');
-    let plan=null;
-    try{plan=await loadPaymentPlanForAccount(a.id,true);}catch(e){plan=null;}
-    if(!plan)return alert('No payment plan found on this account.');
-    if(typeof deletePaymentPlan==='function')return deletePaymentPlan(String(plan.id),String(a.id));
-    alert('Delete function not loaded yet. Refresh and try again.');
-  };
-  const oldRenderPlanButtons = window.renderPaymentPlanSummary;
-  window.renderPaymentPlanSummary = async function(accountId){
-    if(typeof oldRenderPlanButtons==='function') await oldRenderPlanButtons.apply(this,arguments);
-    setTimeout(()=>{
-      try{
-        let el=document.getElementById('paymentPlanPanel');
-        if(!el || !accountId || !cpPlanAdmin())return;
-        if(el.querySelector('#planAdminActionBar'))return;
-        let plan=(window.paymentPlanCache&&paymentPlanCache[accountId])||null;
-        if(!plan || !plan.id)return;
-        let bar=document.createElement('div');
-        bar.id='planAdminActionBar';
-        bar.className='planProActions';
-        bar.style.cssText='margin-top:12px;justify-content:flex-start;border-top:1px solid #e2e8f0;padding-top:12px;';
-        bar.innerHTML='<button class="outline" onclick="openPaymentPlan()">Edit Payment Plan</button><button class="red" onclick="deleteCurrentPaymentPlan()">Delete Payment Plan</button><span class="planProViewOnly">Admin controls visible</span>';
-        let header=el.querySelector('.planProHeader')||el.querySelector('.planTop')||el.firstElementChild;
-        if(header && header.parentNode){ header.parentNode.insertBefore(bar, header.nextSibling); }
-        else { el.appendChild(bar); }
-      }catch(e){console.warn('Payment plan admin button visibility patch failed',e)}
-    },0);
-  };
-  const oldOpenPlanButtons = window.openPaymentPlan;
-  window.openPaymentPlan = async function(){
-    let result;
-    if(typeof oldOpenPlanButtons==='function') result = await oldOpenPlanButtons.apply(this,arguments);
-    setTimeout(async()=>{
-      try{
-        let modal=document.getElementById('paymentPlanModal');
-        if(!modal)return;
-        let actions=modal.querySelector('.payActions');
-        if(!actions || actions.querySelector('#modalDeletePaymentPlanBtn'))return;
-        if(cpPlanAdmin()){
-          let btn=document.createElement('button');
-          btn.id='modalDeletePaymentPlanBtn';
-          btn.className='red';
-          btn.type='button';
-          btn.textContent='Delete Existing Plan';
-          btn.onclick=()=>window.deleteCurrentPaymentPlan();
-          actions.appendChild(btn);
-        }
-      }catch(e){console.warn('Payment plan modal admin button patch failed',e)}
-    },0);
-    return result;
-  };
-})();
-
 </body></html>`;
   let w=window.open('','_blank');
   if(!w){download('co-pilot-admin-reports.html',html,'text/html');return alert('Popup blocked. Downloaded an HTML report you can print to PDF.')}
@@ -9724,7 +9658,7 @@ function reportTableHtmlForPrint(title,heads,rows){return `<h2>${esc(title)}</h2
   const ppMoney = (v)=> (typeof money==='function'?money(v):('$'+(Number(v||0).toFixed(2))));
   const ppMoneyNum = (v)=> (typeof moneyNum==='function'?moneyNum(v):(Number(String(v||'').replace(/[^0-9.-]/g,''))||0));
   const ppToday = ()=> (typeof todayISO==='function'?todayISO():new Date().toISOString().slice(0,10));
-  function ppIsAdmin(){try{let email=String((window.currentUser&&currentUser.email)||'').toLowerCase().trim();return !!(window.currentUser&&(currentUser.isAdmin||String(currentUser.role||'').toLowerCase()==='admin'||email==='afinch2678@gmail.com'||(typeof isAdminEmail==='function'&&isAdminEmail(email))));}catch(e){return false}}
+  function ppIsAdmin(){return !!(window.currentUser && currentUser.isAdmin)}
   function ppStatusText(s){return String(s||'Scheduled').trim()||'Scheduled'}
   function ppDisplayPayStatus(p){
     let s=ppStatusText(p?.status);
@@ -10942,70 +10876,99 @@ function exportContactIntelligenceCSV(){let calls=filteredContactCalls();let row
 
 </script>
 
-
-/* PAYMENT PLAN ADMIN BUTTON VISIBILITY FIX */
+<script>
 (function(){
   function cpPlanAdmin(){
     try{
-      let email=String((window.currentUser&&currentUser.email)||'').toLowerCase().trim();
-      return !!(window.currentUser && (currentUser.isAdmin || String(currentUser.role||'').toLowerCase()==='admin' || email==='afinch2678@gmail.com' || (typeof isAdminEmail==='function' && isAdminEmail(email))));
-    }catch(e){return false;}
+      var u = window.currentUser || {};
+      var email = String(u.email || '').toLowerCase().trim();
+      var role = String(u.role || '').toLowerCase().trim();
+      return !!(u && (u.isAdmin || role === 'admin' || email === 'afinch2678@gmail.com' || (typeof window.isAdminEmail === 'function' && window.isAdminEmail(email))));
+    }catch(e){ return false; }
   }
   window.cpPlanAdmin = cpPlanAdmin;
+
   window.deleteCurrentPaymentPlan = async function(){
-    let a=(typeof getCurrent==='function'?getCurrent():null);
-    if(!a)return alert('No account selected.');
-    let plan=null;
-    try{plan=await loadPaymentPlanForAccount(a.id,true);}catch(e){plan=null;}
-    if(!plan)return alert('No payment plan found on this account.');
-    if(typeof deletePaymentPlan==='function')return deletePaymentPlan(String(plan.id),String(a.id));
-    alert('Delete function not loaded yet. Refresh and try again.');
+    var a = (typeof window.getCurrent === 'function' ? window.getCurrent() : null);
+    if(!a) return alert('No account selected.');
+    if(!cpPlanAdmin()) return alert('Only admin can delete payment plans.');
+    var plan = null;
+    try{
+      plan = await window.loadPaymentPlanForAccount(a.id, true);
+    }catch(e){ plan = null; }
+    if(!plan || !plan.id) return alert('No payment plan found on this account.');
+    if(!confirm('Delete this payment plan? This cannot be undone.')) return;
+    if(typeof window.deletePaymentPlan === 'function'){
+      return window.deletePaymentPlan(String(plan.id), String(a.id));
+    }
+    try{
+      await window.dbFetch('/payment_plan_payments?plan_id=eq.' + encodeURIComponent(plan.id), {method:'DELETE'}).catch(function(){});
+      await window.dbFetch('/payment_plan_payments?payment_plan_id=eq.' + encodeURIComponent(plan.id), {method:'DELETE'}).catch(function(){});
+      await window.dbFetch('/payment_plans?id=eq.' + encodeURIComponent(plan.id), {method:'DELETE'});
+      if(typeof window.sfInsertActivity === 'function') await window.sfInsertActivity(a.id, 'Payment Plan Deleted', 'Admin deleted payment plan.').catch(function(){});
+      if(typeof window.loadAccounts === 'function') await window.loadAccounts().catch(function(){});
+      if(typeof window.render === 'function') window.render();
+      alert('Payment plan deleted.');
+    }catch(e){
+      alert('Delete failed: ' + (e && e.message ? e.message : e));
+    }
   };
-  const oldRenderPlanButtons = window.renderPaymentPlanSummary;
+
+  function addAdminPlanButtons(accountId){
+    try{
+      var el = document.getElementById('paymentPlanPanel');
+      if(!el || !cpPlanAdmin()) return;
+      if(el.querySelector('#planAdminActionBar')) return;
+      var cache = window.paymentPlanCache || {};
+      var plan = accountId ? cache[accountId] : null;
+      if(!plan || !plan.id) return;
+      var bar = document.createElement('div');
+      bar.id = 'planAdminActionBar';
+      bar.className = 'planProActions';
+      bar.style.cssText = 'margin-top:12px;display:flex;gap:10px;align-items:center;justify-content:flex-start;border-top:1px solid #e2e8f0;padding-top:12px;flex-wrap:wrap;';
+      bar.innerHTML = '<button class="outline" type="button" onclick="openPaymentPlan()">Edit Payment Plan</button><button class="red" type="button" onclick="deleteCurrentPaymentPlan()">Delete Payment Plan</button><span class="planProViewOnly">Admin controls</span>';
+      var header = el.querySelector('.planProHeader') || el.querySelector('.planTop') || el.firstElementChild;
+      if(header && header.parentNode) header.parentNode.insertBefore(bar, header.nextSibling);
+      else el.appendChild(bar);
+    }catch(e){ console.warn('Payment plan admin button visibility patch failed', e); }
+  }
+
+  var oldRenderPlanButtons = window.renderPaymentPlanSummary;
   window.renderPaymentPlanSummary = async function(accountId){
-    if(typeof oldRenderPlanButtons==='function') await oldRenderPlanButtons.apply(this,arguments);
-    setTimeout(()=>{
-      try{
-        let el=document.getElementById('paymentPlanPanel');
-        if(!el || !accountId || !cpPlanAdmin())return;
-        if(el.querySelector('#planAdminActionBar'))return;
-        let plan=(window.paymentPlanCache&&paymentPlanCache[accountId])||null;
-        if(!plan || !plan.id)return;
-        let bar=document.createElement('div');
-        bar.id='planAdminActionBar';
-        bar.className='planProActions';
-        bar.style.cssText='margin-top:12px;justify-content:flex-start;border-top:1px solid #e2e8f0;padding-top:12px;';
-        bar.innerHTML='<button class="outline" onclick="openPaymentPlan()">Edit Payment Plan</button><button class="red" onclick="deleteCurrentPaymentPlan()">Delete Payment Plan</button><span class="planProViewOnly">Admin controls visible</span>';
-        let header=el.querySelector('.planProHeader')||el.querySelector('.planTop')||el.firstElementChild;
-        if(header && header.parentNode){ header.parentNode.insertBefore(bar, header.nextSibling); }
-        else { el.appendChild(bar); }
-      }catch(e){console.warn('Payment plan admin button visibility patch failed',e)}
-    },0);
+    if(typeof oldRenderPlanButtons === 'function') await oldRenderPlanButtons.apply(this, arguments);
+    setTimeout(function(){ addAdminPlanButtons(accountId); }, 0);
   };
-  const oldOpenPlanButtons = window.openPaymentPlan;
+
+  var oldOpenPlanButtons = window.openPaymentPlan;
   window.openPaymentPlan = async function(){
-    let result;
-    if(typeof oldOpenPlanButtons==='function') result = await oldOpenPlanButtons.apply(this,arguments);
-    setTimeout(async()=>{
+    var result;
+    if(typeof oldOpenPlanButtons === 'function') result = await oldOpenPlanButtons.apply(this, arguments);
+    setTimeout(function(){
       try{
-        let modal=document.getElementById('paymentPlanModal');
-        if(!modal)return;
-        let actions=modal.querySelector('.payActions');
-        if(!actions || actions.querySelector('#modalDeletePaymentPlanBtn'))return;
-        if(cpPlanAdmin()){
-          let btn=document.createElement('button');
-          btn.id='modalDeletePaymentPlanBtn';
-          btn.className='red';
-          btn.type='button';
-          btn.textContent='Delete Existing Plan';
-          btn.onclick=()=>window.deleteCurrentPaymentPlan();
-          actions.appendChild(btn);
-        }
-      }catch(e){console.warn('Payment plan modal admin button patch failed',e)}
-    },0);
+        var modal = document.getElementById('paymentPlanModal');
+        if(!modal || !cpPlanAdmin()) return;
+        var actions = modal.querySelector('.payActions');
+        if(!actions || actions.querySelector('#modalDeletePaymentPlanBtn')) return;
+        var btn = document.createElement('button');
+        btn.id = 'modalDeletePaymentPlanBtn';
+        btn.className = 'red';
+        btn.type = 'button';
+        btn.textContent = 'Delete Existing Plan';
+        btn.onclick = function(){ window.deleteCurrentPaymentPlan(); };
+        actions.appendChild(btn);
+      }catch(e){ console.warn('Payment plan modal admin button patch failed', e); }
+    }, 0);
     return result;
   };
+
+  setTimeout(function(){
+    try{
+      var a = (typeof window.getCurrent === 'function' ? window.getCurrent() : null);
+      if(a && a.id) addAdminPlanButtons(a.id);
+    }catch(e){}
+  }, 800);
 })();
 
+</script>
 </body>
 </html>
