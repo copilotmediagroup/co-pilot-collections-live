@@ -31,3 +31,8 @@ Important:
 COMPLIANCE GUARD UPDATE:
 - Run SQL_TO_RUN_IN_SUPABASE/RUN_THIS_COMPLIANCE_GUARD_SQL.sql in the matching LIVE Supabase project.
 - The app now adds Compliance Guard / Call Rules: DNC, cease & desist, disputed/frozen, bankruptcy, deceased, attorney represented, wrong number, manager review, consent, call-window checks, daily call limit warnings, and admin override logging.
+
+PROMISE AUTOMATION + COLLECTOR ALERTS UPDATE
+1. Run SQL_TO_RUN_IN_SUPABASE/RUN_THIS_PROMISE_AUTOMATION_ALERTS_SQL.sql in the matching LIVE Supabase project.
+2. Upload this ZIP only to the LIVE GitHub repo.
+3. In the app, use Alerts or Broken to auto-detect missed promises, create follow-ups, update broken promise status, and export collector alerts.

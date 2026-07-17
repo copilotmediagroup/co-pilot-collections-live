@@ -1,4 +1,5 @@
 <!doctype html>
+<!-- LIVE_PROMISE_AUTOMATION_ALERTS_MARKER: promise automation + collector alerts -->
 <html>
 <head>
 <!-- LIVE_COMPLIANCE_GUARD_MARKER: compliance guard + call rules -->
@@ -3353,6 +3354,13 @@ button {
 @media(max-width:1450px){.complianceGrid{grid-template-columns:repeat(2,1fr)}.complianceChecklist,.complianceRuleList{grid-template-columns:repeat(2,1fr)}.complianceHalf{grid-column:span 1}}
 @media(max-width:850px){.complianceGrid,.complianceChecklist,.complianceRuleList{grid-template-columns:1fr}.complianceHalf{grid-column:1/-1}}
 
+
+
+/* PROMISE AUTOMATION + COLLECTOR ALERTS */
+.alertBadge{display:inline-flex;align-items:center;justify-content:center;min-width:17px;height:17px;border-radius:999px;background:#dc2626;color:white;font-size:10px;font-weight:1000;margin-left:4px;padding:0 5px;vertical-align:middle;box-shadow:0 0 0 2px rgba(255,255,255,.25)}
+.navAlertWrap{position:relative}.navAlertBadge{position:absolute;right:-3px;top:-4px;min-width:16px;height:16px;border-radius:999px;background:#dc2626;color:#fff;font-size:9px;font-weight:1000;display:flex;align-items:center;justify-content:center;padding:0 4px;border:2px solid #06245d}
+.alertBox{max-width:1280px}.alertHero{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;background:linear-gradient(135deg,#0f172a,#1d4ed8);color:#fff;border-radius:16px;padding:16px;margin-bottom:12px}.alertHeroTitle{font-size:20px;font-weight:1000;margin-bottom:4px}.alertHeroSub{font-size:13px;color:#dbeafe;line-height:1.35}.alertStats{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin:12px 0}.alertStat{border:1px solid #e2e8f0;border-radius:13px;background:#f8fbff;padding:10px}.alertStatLabel{font-size:10px;text-transform:uppercase;font-weight:900;color:#64748b;margin-bottom:4px}.alertStatValue{font-size:18px;font-weight:1000;color:#0f172a}.alertCard{border:1px solid #e2e8f0;border-radius:14px;background:#fff;padding:12px;margin-bottom:10px;box-shadow:0 2px 10px rgba(15,23,42,.035)}.alertCard.critical{border-left:5px solid #dc2626;background:#fff7f7}.alertCard.warning{border-left:5px solid #f59e0b;background:#fffbeb}.alertCard.info{border-left:5px solid #2563eb;background:#eff6ff}.alertCard.success{border-left:5px solid #16a34a;background:#f0fdf4}.alertTop{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}.alertTitle{font-weight:1000;color:#0f172a;font-size:15px}.alertMeta{font-size:12px;color:#475569;line-height:1.45;margin-top:5px}.alertPill{display:inline-block;border-radius:999px;padding:4px 8px;font-size:11px;font-weight:900;background:#eef2ff;color:#1d4ed8}.alertPill.critical{background:#fee2e2;color:#991b1b}.alertPill.warning{background:#fff7ed;color:#9a3412}.alertPill.info{background:#dbeafe;color:#1d4ed8}.alertPill.success{background:#dcfce7;color:#166534}.alertActions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.alertActions button{height:32px;border-radius:8px;padding:0 10px;font-size:11px}.automationNotice{background:#eff6ff;border:1px solid #bfdbfe;color:#1e3a8a;border-radius:12px;padding:10px;font-size:12px;font-weight:850;margin:10px 0}.automationNotice.redish{background:#fff1f2;border-color:#fecdd3;color:#991b1b}.automationNotice.greenish{background:#f0fdf4;border-color:#bbf7d0;color:#166534}.alertDueNow{font-weight:1000;color:#dc2626}.alertDueToday{font-weight:1000;color:#b45309}.alertDueSoon{font-weight:1000;color:#1d4ed8}@media(max-width:1450px){.alertStats{grid-template-columns:repeat(2,1fr)}}@media(max-width:850px){.alertHero{display:block}.alertStats{grid-template-columns:1fr}}
+
 </style>
 </head>
 <body>
@@ -3422,9 +3430,10 @@ button {
       <button class="gray todayBtn" onclick="openTodayDashboard()">Today</button>
       <button class="gray" onclick="openPaymentTracker()">Pay Desk</button>
       <button class="gray" onclick="openPaymentsDashboard()">Ledger</button>
-      <button class="gray" onclick="runBrokenPromiseAutomation(true)">Broken</button>
+      <button class="gray" onclick="runPromiseAutomation(true,true)">Broken</button>
       <button class="gray" onclick="openDailyWorkQueue()">Queue</button>
       <button class="gray" onclick="openPromiseDashboard()">Promises</button>
+      <button class="gray" onclick="openCollectorAlerts()">Alerts <span id="collectorAlertBadge" class="alertBadge hidden">0</span></button>
       <button class="gray adminOnly hidden" onclick="openAuditLog()">Audit</button>
       <button class="gray adminOnly hidden" onclick="openPermissionsModal()">Perms</button>
       <button class="gray adminOnly hidden" onclick="openEmployeeMonitorModal()">Monitor</button>
@@ -3452,6 +3461,7 @@ button {
       <button class="navIcon red" title="Compliance Guard" onclick="openComplianceGuard()"><span class="navEmoji">🛡️</span></button>
       <button class="navIcon money" title="Pay Desk" onclick="openPaymentTracker()"><span class="navEmoji">💵</span></button>
       <button class="navIcon green" title="Daily Work Queue" onclick="openDailyWorkQueue()"><span class="navEmoji">✅</span></button>
+      <button class="navIcon orange navAlertWrap" title="Collector Alerts" onclick="openCollectorAlerts()"><span class="navEmoji">🔔</span><span id="collectorAlertNavBadge" class="navAlertBadge hidden">0</span></button>
       <button class="navIcon sky" title="Letters / Documents" onclick="openDocumentGenerator()"><span class="navEmoji">📄</span></button>
       <div class="navSpacer"></div>
       <button class="navIcon dark adminOnly hidden" title="Brand Settings" onclick="openBrandingSettingsModal()"><span class="navEmoji">⚙️</span></button>
@@ -4059,6 +4069,18 @@ button {
     <div class="powerToolbar"><div class="powerTabs"><button class="powerTab active" id="promTabDue" onclick="renderPromiseDashboard('due')">Due Today</button><button class="powerTab" id="promTabOverdue" onclick="renderPromiseDashboard('overdue')">Overdue / Broken</button><button class="powerTab" id="promTabUpcoming" onclick="renderPromiseDashboard('upcoming')">Upcoming</button><button class="powerTab" id="promTabAll" onclick="renderPromiseDashboard('all')">All</button></div><button class="outline" onclick="loadPromiseDashboard()">Refresh</button></div>
     <div class="powerStats"><div class="powerStat"><div class="powerStatLabel">Due Today</div><div class="powerStatValue" id="promiseDueToday">0</div></div><div class="powerStat"><div class="powerStatLabel">Overdue</div><div class="powerStatValue" id="promiseOverdue">0</div></div><div class="powerStat"><div class="powerStatLabel">Upcoming</div><div class="powerStatValue" id="promiseUpcoming">0</div></div><div class="powerStat"><div class="powerStatLabel">Promised Due</div><div class="powerStatValue" id="promiseDueAmount">$0.00</div></div><div class="powerStat"><div class="powerStatLabel">Paid</div><div class="powerStatValue" id="promisePaidAmount">$0.00</div></div><div class="powerStat"><div class="powerStatLabel">Broken</div><div class="powerStatValue" id="promiseBroken">0</div></div></div>
     <div id="promiseDashboardList" class="powerList"></div>
+  </div>
+</div></div>
+
+
+<div id="collectorAlertsModal" class="modal"><div class="modalbox powerBox alertBox">
+  <div class="modalhead"><h2>Promise Automation + Collector Alerts</h2><button class="gray" onclick="closeModal('collectorAlertsModal')">Close</button></div>
+  <div class="modalbody">
+    <div class="alertHero"><div><div class="alertHeroTitle">Collector command alerts</div><div class="alertHeroSub">Auto-detect broken promises, promises due today, upcoming promises, payment activity, high-balance follow-ups, and accounts that need fast action.</div></div><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="green" onclick="runPromiseAutomation(true,true)">Run Automation</button><button class="outline" onclick="exportCollectorAlertsCSV()">Export CSV</button></div></div>
+    <div id="promiseAutomationNotice" class="automationNotice">Automation checks payment promises and payment plan schedules. Run the SQL file once so alerts can also save to Supabase.</div>
+    <div class="alertStats"><div class="alertStat"><div class="alertStatLabel">Open Alerts</div><div class="alertStatValue" id="alertStatOpen">0</div></div><div class="alertStat"><div class="alertStatLabel">Broken Promises</div><div class="alertStatValue" id="alertStatBroken">0</div></div><div class="alertStat"><div class="alertStatLabel">Due Today</div><div class="alertStatValue" id="alertStatDueToday">0</div></div><div class="alertStat"><div class="alertStatLabel">Upcoming</div><div class="alertStatValue" id="alertStatUpcoming">0</div></div><div class="alertStat"><div class="alertStatLabel">High Balance</div><div class="alertStatValue" id="alertStatHighBalance">0</div></div></div>
+    <div class="powerToolbar"><div class="powerTabs"><button class="powerTab active" id="alertTabAll" onclick="renderCollectorAlerts('all')">All</button><button class="powerTab" id="alertTabBroken" onclick="renderCollectorAlerts('broken')">Broken</button><button class="powerTab" id="alertTabToday" onclick="renderCollectorAlerts('today')">Due Today</button><button class="powerTab" id="alertTabUpcoming" onclick="renderCollectorAlerts('upcoming')">Upcoming</button><button class="powerTab" id="alertTabHigh" onclick="renderCollectorAlerts('high')">High Balance</button></div><button class="outline" onclick="loadCollectorAlerts()">Refresh</button></div>
+    <div id="collectorAlertsList" class="powerList"></div>
   </div>
 </div></div>
 
@@ -5231,7 +5253,9 @@ async function loadAccounts(){
    if(!currentUser.isAdmin)accounts=accounts.filter(a=>(a.assignedToEmail||'').toLowerCase()===currentUser.email);
    if(!currentAccountId&&accounts[0])currentAccountId=accounts[0].id;
    if(currentAccountId&&!accounts.some(a=>a.id===currentAccountId))currentAccountId=accounts[0]?.id||'';
-   if(typeof runBrokenPromiseAutomation==='function')runBrokenPromiseAutomation(false).catch(()=>{});
+   if(typeof runPromiseAutomation==='function')runPromiseAutomation(false,false).catch(()=>{});
+   else if(typeof runBrokenPromiseAutomation==='function')runBrokenPromiseAutomation(false).catch(()=>{});
+   if(typeof refreshCollectorAlertBadge==='function')refreshCollectorAlertBadge().catch(()=>{});
    render();
  }catch(e){
    alert('Could not load accounts:\n\n'+friendlyError(e.message||String(e)));
@@ -8087,6 +8111,76 @@ async function runBrokenPromiseAutomation(showAlert=false){
  if(showAlert)alert(rows.length?('Broken promise check complete. Flagged '+rows.length+' missed payment(s).'):'No broken promises found.');
 }
 
+
+/* Promise Automation + Collector Alerts */
+let collectorAlertData={alerts:[],tab:'all'};
+function paStatusText(r){return String(r?.status||'').trim()||'Pending Processing'}
+function paIsPaid(r){return ['paid','completed','settled'].includes(paStatusText(r).toLowerCase())||moneyNum(r?.paidAmount||r?.amountPaid)>0}
+function paIsClosed(r){return ['paid','completed','settled','canceled','cancelled'].includes(paStatusText(r).toLowerCase())}
+function paIsBrokenStatus(r){return ['broken promise','failed','nsf','past due / pending'].includes(paStatusText(r).toLowerCase())}
+function paAmount(r){return moneyNum(r?.paymentAmount||r?.amountDue||r?.totalAmount||0)}
+function paPaid(r){return moneyNum(r?.paidAmount||r?.amountPaid||0)}
+function paDue(r){return String(r?.dueDate||r?.due_date||'').slice(0,10)}
+function paAccountId(r){return r?.accountId||r?.account_id||''}
+function paEmployee(r,a){return (r?.employeeEmail||r?.assignedToEmail||r?.createdByEmail||a?.assignedToEmail||'').toLowerCase()}
+function paAccount(r){return accountById(paAccountId(r))}
+function paAlertKey(x){return [x.type||'',x.sourceTable||'',x.sourceId||'',x.accountId||'',x.dueDate||''].join('|')}
+function paResolvedKeys(){try{return JSON.parse(localStorage.getItem('cpcmResolvedCollectorAlerts')||'[]')}catch(e){return[]}}
+function paSetResolvedKey(k){let arr=paResolvedKeys();if(!arr.includes(k)){arr.push(k);localStorage.setItem('cpcmResolvedCollectorAlerts',JSON.stringify(arr.slice(-500)))}}
+function paAllowedAlert(x){if(currentUser?.isAdmin)return true;let e=(currentUser?.email||'').toLowerCase();return !x.assignedToEmail || String(x.assignedToEmail).toLowerCase()===e || accounts.some(a=>String(a.id)===String(x.accountId)&&String(a.assignedToEmail||'').toLowerCase()===e)}
+function paSeverityClass(sev){sev=String(sev||'info').toLowerCase();return sev==='critical'?'critical':sev==='warning'?'warning':sev==='success'?'success':'info'}
+function paDueLabel(d){if(!d)return 'No date';if(isPastISO(d))return 'Overdue '+d;if(isTodayISO(d))return 'Due today';if(isFutureISO(d))return 'Due '+d;return d}
+function paDueClass(d){if(!d)return '';return isPastISO(d)?'alertDueNow':isTodayISO(d)?'alertDueToday':'alertDueSoon'}
+async function createCollectorAlert(row){
+ try{
+   await dbFetch('/collector_alerts',{method:'POST',body:JSON.stringify([{account_id:row.accountId||null,alert_type:row.type||'General',severity:row.severity||'info',title:row.title||'Collector Alert',message:row.message||'',due_date:row.dueDate||null,status:'Open',assigned_to_email:row.assignedToEmail||'',created_by_email:currentUser?.email||'',source_table:row.sourceTable||'',source_id:String(row.sourceId||'')}])});
+ }catch(e){/* optional table not installed yet or duplicate alert */}
+}
+async function fetchManualPromises(){try{return (await dbFetch('/payment_promises?select=*&order=due_date.asc&limit=50000')).map(toCamel)}catch(e){return[]}}
+async function fetchPlanPayments(){try{return (await dbFetch('/payment_plan_payments?select=*&order=due_date.asc&limit=50000')).map(toCamel)}catch(e){return[]}}
+async function runPromiseAutomation(showAlert=false,reloadAfter=false){
+ let today=todayISO();let flagged=0,alertsMade=0;
+ if(typeof runBrokenPromiseAutomation==='function')await runBrokenPromiseAutomation(false).catch(()=>{});
+ let manual=await fetchManualPromises();
+ if(!currentUser?.isAdmin){let allowed=new Set(accounts.map(a=>String(a.id)));manual=manual.filter(r=>allowed.has(String(paAccountId(r)))||paEmployee(r,paAccount(r))===(currentUser.email||'').toLowerCase())}
+ let broken=manual.filter(r=>paDue(r)&&paDue(r)<today&&!paIsPaid(r)&&!paIsClosed(r)&&!paIsBrokenStatus(r));
+ for(let r of broken){
+   let a=paAccount(r);let amt=paAmount(r)-paPaid(r);let note='Auto-flagged missed payment promise due '+paDue(r)+'.';
+   try{await dbFetch('/payment_promises?id=eq.'+encodeURIComponent(r.id),{method:'PATCH',body:JSON.stringify({status:'Broken Promise',admin_note:note,processed_by_email:currentUser?.email||'',processed_at:new Date().toISOString(),updated_at:new Date().toISOString()})});flagged++;}catch(e){}
+   if(a){await dbFetch(`/accounts?id=eq.${a.id}`,{method:'PATCH',body:JSON.stringify({status:'Broken Promise',disposition:'Broken Promise',updated_at:new Date().toISOString()})}).catch(()=>{});}
+   await insertActivity(paAccountId(r),'Broken Promise',`Missed manual payment promise automatically flagged: ${money(amt)} due ${paDue(r)}.`).catch(()=>{});
+   await dbFetch('/follow_ups',{method:'POST',body:JSON.stringify([{account_id:paAccountId(r),follow_up_type:'Broken Promise Follow-Up',due_date:today,status:'Open',assigned_to_email:paEmployee(r,a)||currentUser?.email||'',reason:'Missed manual payment promise',notes:'Automatically created from Promise Automation.',created_by_email:currentUser?.email||''}])}).catch(()=>{});
+   await createCollectorAlert({type:'Broken Promise',severity:'critical',title:'Broken promise needs follow-up',message:`${a?nameOf(a):r.debtorName||'Account'} missed ${money(amt)} due ${paDue(r)}.`,dueDate:today,accountId:paAccountId(r),assignedToEmail:paEmployee(r,a),sourceTable:'payment_promises',sourceId:r.id});alertsMade++;
+ }
+ if(flagged&&typeof insertAudit==='function')await insertAudit('Promise Automation','Flagged '+flagged+' manual payment promise(s) as broken.','payment_promises','').catch(()=>{});
+ if(showAlert){alert((flagged||alertsMade)?`Promise automation complete. Flagged ${flagged} broken promise(s).`:'Promise automation complete. No new broken promises found.');}
+ if(reloadAfter&&flagged)await loadAccounts();
+ if(document.getElementById('collectorAlertsModal')?.classList.contains('open'))await loadCollectorAlerts(false);
+ await refreshCollectorAlertBadge().catch(()=>{});
+}
+function computedAlertFromManualPromise(r){let a=paAccount(r);let due=paDue(r);let amt=Math.max(0,paAmount(r)-paPaid(r));let status=paStatusText(r);let type='Upcoming Promise',sev='info',title='Upcoming payment promise';if(paIsBrokenStatus(r)||due<todayISO()){type='Broken Promise';sev='critical';title='Broken promise needs follow-up'}else if(isTodayISO(due)){type='Promise Due Today';sev='warning';title='Promise due today'}else if(due<=addDaysISO(todayISO(),7)){type='Upcoming Promise';sev='info';title='Upcoming promise this week'}else{return null}return {key:'manual:'+r.id,type,severity:sev,title,message:`${a?nameOf(a):r.debtorName||'Account'} • ${money(amt)} • ${paDueLabel(due)} • Status: ${status}`,dueDate:due,accountId:paAccountId(r),assignedToEmail:paEmployee(r,a),sourceTable:'payment_promises',sourceId:r.id,accountName:a?nameOf(a):(r.debtorName||'Unknown'),accountNumber:a?acctNo(a):(r.accountNumber||'—')};}
+function computedAlertFromPlanPayment(p){let a=paAccount(p);let due=paDue(p);let amt=Math.max(0,moneyNum(p.amountDue)-moneyNum(p.amountPaid));let type='Upcoming Plan Payment',sev='info',title='Upcoming plan payment';if(paIsPaid(p)||paIsClosed(p))return null;if(paIsBrokenStatus(p)||due<todayISO()){type='Broken Promise';sev='critical';title='Broken payment plan promise'}else if(isTodayISO(due)){type='Promise Due Today';sev='warning';title='Plan payment due today'}else if(due<=addDaysISO(todayISO(),7)){type='Upcoming Promise';sev='info';title='Upcoming plan payment this week'}else{return null}return {key:'plan:'+p.id,type,severity:sev,title,message:`${a?nameOf(a):'Account'} • ${money(amt)} • ${paDueLabel(due)} • Status: ${paStatusText(p)}`,dueDate:due,accountId:paAccountId(p),assignedToEmail:a?.assignedToEmail||currentUser?.email||'',sourceTable:'payment_plan_payments',sourceId:p.id,accountName:a?nameOf(a):'Unknown',accountNumber:a?acctNo(a):'—'};}
+function computedHighBalanceAlerts(){let threshold=2500;return accounts.filter(ownsAccount).filter(a=>accountBalance(a)>=threshold&&!['Settled','Closed'].includes(a.status||'')).sort((a,b)=>accountBalance(b)-accountBalance(a)).slice(0,25).map(a=>({key:'high:'+a.id,type:'High Balance',severity:'info',title:'High-balance account needs attention',message:`${nameOf(a)} • ${money(accountBalance(a))} balance • Status: ${a.status||'New'}`,dueDate:todayISO(),accountId:a.id,assignedToEmail:a.assignedToEmail||'',sourceTable:'accounts',sourceId:a.id,accountName:nameOf(a),accountNumber:acctNo(a)}));}
+async function loadCollectorAlerts(runAuto=true){
+ if(runAuto)await runPromiseAutomation(false,false).catch(()=>{});
+ let manual=await fetchManualPromises();let plan=await fetchPlanPayments();let alerts=[];
+ manual.map(computedAlertFromManualPromise).filter(Boolean).forEach(x=>alerts.push(x));
+ plan.map(computedAlertFromPlanPayment).filter(Boolean).forEach(x=>alerts.push(x));
+ computedHighBalanceAlerts().forEach(x=>alerts.push(x));
+ try{let dbRows=(await dbFetch('/collector_alerts?select=*&status=eq.Open&order=created_at.desc&limit=50000')).map(toCamel);dbRows.forEach(r=>alerts.push({key:'db:'+r.id,id:r.id,type:r.alertType||r.alert_type||'Alert',severity:r.severity||'info',title:r.title||'Collector Alert',message:r.message||'',dueDate:String(r.dueDate||'').slice(0,10),accountId:r.accountId||'',assignedToEmail:r.assignedToEmail||'',sourceTable:r.sourceTable||'',sourceId:r.sourceId||'',accountName:accountById(r.accountId)?nameOf(accountById(r.accountId)):'',accountNumber:accountById(r.accountId)?acctNo(accountById(r.accountId)):''}));document.getElementById('promiseAutomationNotice')?.classList.add('greenish');}catch(e){document.getElementById('promiseAutomationNotice')?.classList.remove('greenish')}
+ let resolved=new Set(paResolvedKeys());let seen=new Set();alerts=alerts.filter(a=>paAllowedAlert(a)).filter(a=>{let k=paAlertKey(a);if(resolved.has(a.key)||resolved.has(k))return false;if(seen.has(k))return false;seen.add(k);return true;});
+ alerts.sort((a,b)=>{let rank={critical:0,warning:1,info:2,success:3};let ra=rank[paSeverityClass(a.severity)]??2;let rb=rank[paSeverityClass(b.severity)]??2;return (ra-rb)||String(a.dueDate||'9999').localeCompare(String(b.dueDate||'9999'));});
+ collectorAlertData.alerts=alerts;renderCollectorAlerts(collectorAlertData.tab||'all');refreshCollectorAlertBadgeFromData();
+}
+function refreshCollectorAlertBadgeFromData(){let n=(collectorAlertData.alerts||[]).length;['collectorAlertBadge','collectorAlertNavBadge'].forEach(id=>{let el=document.getElementById(id);if(el){el.textContent=n>99?'99+':String(n);el.classList.toggle('hidden',n<=0);}})}
+async function refreshCollectorAlertBadge(){if(!currentUser?.email)return;let manual=await fetchManualPromises();let plan=await fetchPlanPayments();let n=0;let today=todayISO(),week=addDaysISO(today,7);manual.forEach(r=>{let a=paAccount(r),d=paDue(r);if(paAllowedAlert({accountId:paAccountId(r),assignedToEmail:paEmployee(r,a)})&&!paIsPaid(r)&&!paIsClosed(r)&&d&&d<=week)n++;});plan.forEach(p=>{let a=paAccount(p),d=paDue(p);if(paAllowedAlert({accountId:paAccountId(p),assignedToEmail:a?.assignedToEmail||''})&&!paIsPaid(p)&&!paIsClosed(p)&&d&&d<=week)n++;});accounts.filter(ownsAccount).forEach(a=>{if(accountBalance(a)>=2500&&!['Settled','Closed'].includes(a.status||''))n++;});['collectorAlertBadge','collectorAlertNavBadge'].forEach(id=>{let el=document.getElementById(id);if(el){el.textContent=n>99?'99+':String(n);el.classList.toggle('hidden',n<=0);}})}
+async function openCollectorAlerts(){document.getElementById('collectorAlertsModal')?.classList.add('open');collectorAlertData.tab='all';await loadCollectorAlerts(true)}
+function renderCollectorAlerts(tab='all'){collectorAlertData.tab=tab;['All','Broken','Today','Upcoming','High'].forEach(t=>document.getElementById('alertTab'+t)?.classList.toggle('active',tab.toLowerCase()===t.toLowerCase()));let rows=collectorAlertData.alerts||[];let broken=rows.filter(a=>/broken/i.test(a.type));let today=rows.filter(a=>isTodayISO(a.dueDate));let upcoming=rows.filter(a=>/upcoming/i.test(a.type));let high=rows.filter(a=>/high balance/i.test(a.type));let set=(id,v)=>{let el=document.getElementById(id);if(el)el.textContent=String(v)};set('alertStatOpen',rows.length);set('alertStatBroken',broken.length);set('alertStatDueToday',today.length);set('alertStatUpcoming',upcoming.length);set('alertStatHighBalance',high.length);let list=tab==='broken'?broken:tab==='today'?today:tab==='upcoming'?upcoming:tab==='high'?high:rows;let box=document.getElementById('collectorAlertsList');if(box)box.innerHTML=list.map(collectorAlertCard).join('')||'<div class="powerEmpty">No collector alerts for this view.</div>';}
+function collectorAlertCard(a){let sev=paSeverityClass(a.severity);let acct=a.accountName||accountById(a.accountId)&&nameOf(accountById(a.accountId))||'Unknown Account';let acctNoText=a.accountNumber||accountById(a.accountId)&&acctNo(accountById(a.accountId))||'—';return `<div class="alertCard ${sev}"><div class="alertTop"><div><div class="alertTitle">${esc(a.title||a.type||'Collector Alert')}</div><div class="alertMeta"><b>${esc(acct)}</b> • Acct: ${esc(acctNoText)}<br><span class="${paDueClass(a.dueDate)}">${esc(paDueLabel(a.dueDate))}</span> • Assigned: ${esc(a.assignedToEmail||'—')}<br>${esc(a.message||'')}</div></div><span class="alertPill ${sev}">${esc(a.type||'Alert')}</span></div><div class="alertActions">${a.accountId?`<button class="outline" onclick="setAccountFromModal('${a.accountId}','collectorAlertsModal')">Open Account</button>`:''}<button class="green" onclick="resolveCollectorAlert('${esc(String(a.key||paAlertKey(a))).replace(/'/g,'&#39;')}','${esc(String(a.id||'')).replace(/'/g,'&#39;')}')">Clear</button></div></div>`}
+async function resolveCollectorAlert(key,id){if(key)paSetResolvedKey(key);if(id){await dbFetch('/collector_alerts?id=eq.'+encodeURIComponent(id),{method:'PATCH',body:JSON.stringify({status:'Resolved',resolved_at:new Date().toISOString(),resolved_by_email:currentUser?.email||''})}).catch(()=>{});}await loadCollectorAlerts(false)}
+function exportCollectorAlertsCSV(){let rows=collectorAlertData.alerts||[];let csv=['type,severity,due_date,account,account_number,assigned_to,message'];rows.forEach(a=>csv.push([a.type,a.severity,a.dueDate,a.accountName||accountById(a.accountId)&&nameOf(accountById(a.accountId))||'',a.accountNumber||accountById(a.accountId)&&acctNo(accountById(a.accountId))||'',a.assignedToEmail,a.message].map(v=>`"${String(v??'').replace(/"/g,'""')}"`).join(',')));download('collector_alerts_export.csv',csv.join('\n'),'text/csv')}
+setTimeout(()=>{if(typeof refreshCollectorAlertBadge==='function')refreshCollectorAlertBadge().catch(()=>{})},2500);
+
 let paymentPlanCache={};
 let paymentScheduleDraft=[];
 function todayISO(){return new Date().toISOString().slice(0,10)}
@@ -9034,6 +9128,19 @@ async function savePaymentPromise(){let a=getCurrent();let id=val('ptAccountId')
 async function setPaymentPromiseStatus(id,status){if(!currentUser.isAdmin)return alert('Admin only.');let r=(paymentPromiseData||[]).find(x=>String(x.id)===String(id));if(!r)return alert('Payment promise not found.');let note='';if(['Failed','NSF','Canceled'].includes(status))note=prompt('Admin note / reason:',status)||status;let body={status,admin_note:note,processed_by_email:currentUser.email,processed_at:new Date().toISOString(),updated_at:new Date().toISOString()};if(status==='Paid'){let amt=ptRowAmount(r);body.paid_amount=amt;body.paid_date=todayISO();let a=ptAccountForRow(r);if(a){let balBefore=accountBalance(a),balAfter=Math.max(0,Number((balBefore-amt).toFixed(2))),receipt=ledgerReceiptNo();await dbFetch('/payments_ledger',{method:'POST',body:JSON.stringify([{account_id:a.id,payment_date:todayISO(),amount:amt,payment_type:'Payment',payment_method:r.paymentMethod||'Other',status:'Completed',receipt_number:receipt,balance_before:balBefore,balance_after:balAfter,notes:'Admin marked payment promise paid. '+(r.notes||''),created_by_email:currentUser.email}])}).catch(()=>{});await dbFetch(`/accounts?id=eq.${a.id}`,{method:'PATCH',body:JSON.stringify({current_balance:balAfter,status:balAfter<=0?'Settled':a.status,disposition:balAfter<=0?'Settled':a.disposition,updated_at:new Date().toISOString()})}).catch(()=>{})}}await dbFetch('/payment_promises?id=eq.'+encodeURIComponent(id),{method:'PATCH',body:JSON.stringify(body)});await insertActivity(r.accountId,'Payment Promise '+status,`Admin marked promise ${status}: ${money(ptRowAmount(r))}. ${note}`.trim());await insertAudit('Payment Promise '+status,`Payment promise ${id} marked ${status}`,'payment_promises',id);if(['Failed','NSF','Broken Promise'].includes(status))await dbFetch('/follow_ups',{method:'POST',body:JSON.stringify([{account_id:r.accountId,follow_up_type:status+' Payment Follow-Up',due_date:todayISO(),status:'Open',assigned_to_email:r.employeeEmail||r.assignedToEmail||currentUser.email,reason:'Payment '+status,notes:'Created from Payment Tracker. '+note,created_by_email:currentUser.email}])}).catch(()=>{});await loadPaymentTracker();await loadAccounts()}
 async function reschedulePaymentPromise(id){if(!currentUser.isAdmin)return alert('Admin only.');let r=(paymentPromiseData||[]).find(x=>String(x.id)===String(id));if(!r)return alert('Payment promise not found.');let newDate=prompt('New payment date YYYY-MM-DD:',r.dueDate||todayISO());if(!newDate)return;if(!/^\d{4}-\d{2}-\d{2}$/.test(newDate))return alert('Use YYYY-MM-DD format.');await dbFetch('/payment_promises?id=eq.'+encodeURIComponent(id),{method:'PATCH',body:JSON.stringify({status:'Rescheduled',rescheduled_from:r.dueDate||null,due_date:newDate,processed_by_email:currentUser.email,processed_at:new Date().toISOString(),updated_at:new Date().toISOString()})});await insertActivity(r.accountId,'Payment Promise Rescheduled',`Payment promise moved from ${r.dueDate||'—'} to ${newDate}.`);await loadPaymentTracker()}
 function exportPaymentPromisesCSV(){let rows=paymentPromiseFilteredRows();let csv=['due_date,debtor,account,amount,method,last4,authorization,status,employee,processed_by,paid_date,paid_amount,notes'];rows.forEach(r=>{csv.push([r.dueDate,r.debtorName,r.accountNumber,ptRowAmount(r),r.paymentMethod,r.methodLast4,r.authorizationMethod,r.status,r.employeeEmail||r.createdByEmail,r.processedByEmail,r.paidDate,ptPaidAmount(r),r.notes].map(v=>`"${String(v??'').replace(/"/g,'""')}"`).join(','))});download('payment_promises_export.csv',csv.join('\n'),'text/csv')}
+
+
+// Promise automation hooks for Pay Desk actions
+if(typeof savePaymentPromise==='function' && !window.__cpcmSavePromiseAutomationWrapped){
+  window.__cpcmSavePromiseAutomationWrapped=true;
+  const __cpcmOriginalSavePaymentPromise=savePaymentPromise;
+  savePaymentPromise=async function(){await __cpcmOriginalSavePaymentPromise.apply(this,arguments);await runPromiseAutomation(false,false).catch(()=>{});await refreshCollectorAlertBadge().catch(()=>{});};
+}
+if(typeof setPaymentPromiseStatus==='function' && !window.__cpcmSetPromiseStatusWrapped){
+  window.__cpcmSetPromiseStatusWrapped=true;
+  const __cpcmOriginalSetPaymentPromiseStatus=setPaymentPromiseStatus;
+  setPaymentPromiseStatus=async function(id,status){await __cpcmOriginalSetPaymentPromiseStatus.apply(this,arguments);let sev=status==='Paid'?'success':(['Failed','NSF','Broken Promise'].includes(status)?'critical':'info');let r=(paymentPromiseData||[]).find(x=>String(x.id)===String(id));let a=r?ptAccountForRow(r):null;if(r)await createCollectorAlert({type:'Payment '+status,severity:sev,title:'Payment promise marked '+status,message:`${a?nameOf(a):r.debtorName||'Account'} • ${money(ptRowAmount(r))} marked ${status}.`,dueDate:todayISO(),accountId:r.accountId,assignedToEmail:r.employeeEmail||r.assignedToEmail||'',sourceTable:'payment_promises',sourceId:id});await runPromiseAutomation(false,false).catch(()=>{});await refreshCollectorAlertBadge().catch(()=>{});};
+}
 
 
 /* LEADERBOARD + CLICKABLE LEFT NAV */
