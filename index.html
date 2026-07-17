@@ -1,4 +1,5 @@
 <!doctype html>
+<!-- LIVE_CALL_INTELLIGENCE_MARKER: call logging + contact intelligence -->
 <!-- LIVE_PROMISE_AUTOMATION_ALERTS_MARKER: promise automation + collector alerts -->
 <html>
 <head>
@@ -3361,6 +3362,46 @@ button {
 .navAlertWrap{position:relative}.navAlertBadge{position:absolute;right:-3px;top:-4px;min-width:16px;height:16px;border-radius:999px;background:#dc2626;color:#fff;font-size:9px;font-weight:1000;display:flex;align-items:center;justify-content:center;padding:0 4px;border:2px solid #06245d}
 .alertBox{max-width:1280px}.alertHero{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;background:linear-gradient(135deg,#0f172a,#1d4ed8);color:#fff;border-radius:16px;padding:16px;margin-bottom:12px}.alertHeroTitle{font-size:20px;font-weight:1000;margin-bottom:4px}.alertHeroSub{font-size:13px;color:#dbeafe;line-height:1.35}.alertStats{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin:12px 0}.alertStat{border:1px solid #e2e8f0;border-radius:13px;background:#f8fbff;padding:10px}.alertStatLabel{font-size:10px;text-transform:uppercase;font-weight:900;color:#64748b;margin-bottom:4px}.alertStatValue{font-size:18px;font-weight:1000;color:#0f172a}.alertCard{border:1px solid #e2e8f0;border-radius:14px;background:#fff;padding:12px;margin-bottom:10px;box-shadow:0 2px 10px rgba(15,23,42,.035)}.alertCard.critical{border-left:5px solid #dc2626;background:#fff7f7}.alertCard.warning{border-left:5px solid #f59e0b;background:#fffbeb}.alertCard.info{border-left:5px solid #2563eb;background:#eff6ff}.alertCard.success{border-left:5px solid #16a34a;background:#f0fdf4}.alertTop{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}.alertTitle{font-weight:1000;color:#0f172a;font-size:15px}.alertMeta{font-size:12px;color:#475569;line-height:1.45;margin-top:5px}.alertPill{display:inline-block;border-radius:999px;padding:4px 8px;font-size:11px;font-weight:900;background:#eef2ff;color:#1d4ed8}.alertPill.critical{background:#fee2e2;color:#991b1b}.alertPill.warning{background:#fff7ed;color:#9a3412}.alertPill.info{background:#dbeafe;color:#1d4ed8}.alertPill.success{background:#dcfce7;color:#166534}.alertActions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.alertActions button{height:32px;border-radius:8px;padding:0 10px;font-size:11px}.automationNotice{background:#eff6ff;border:1px solid #bfdbfe;color:#1e3a8a;border-radius:12px;padding:10px;font-size:12px;font-weight:850;margin:10px 0}.automationNotice.redish{background:#fff1f2;border-color:#fecdd3;color:#991b1b}.automationNotice.greenish{background:#f0fdf4;border-color:#bbf7d0;color:#166534}.alertDueNow{font-weight:1000;color:#dc2626}.alertDueToday{font-weight:1000;color:#b45309}.alertDueSoon{font-weight:1000;color:#1d4ed8}@media(max-width:1450px){.alertStats{grid-template-columns:repeat(2,1fr)}}@media(max-width:850px){.alertHero{display:block}.alertStats{grid-template-columns:1fr}}
 
+
+
+/* CALL LOGGING + CONTACT INTELLIGENCE */
+.callInsightPanel{grid-column:1/-1;padding:13px 15px;border-radius:16px;background:#fff;border:1px solid #dbe3ef;box-shadow:0 2px 10px rgba(15,23,42,.035)}
+.callInsightTop{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}
+.callInsightTitle{font-size:15px;font-weight:1000;color:#0f172a}
+.callInsightGrid{display:grid;grid-template-columns:repeat(6,1fr);gap:8px}
+.callInsightStat{border:1px solid #e2e8f0;border-radius:12px;background:#f8fbff;padding:9px;min-width:0}
+.callInsightLabel{font-size:10px;text-transform:uppercase;font-weight:900;color:#64748b;margin-bottom:4px;letter-spacing:.03em}
+.callInsightValue{font-size:13px;font-weight:1000;color:#0f172a;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.callModalBox{max-width:1120px}
+.callOutcomeGrid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.callOutcomeGrid label{font-size:12px;font-weight:900;color:#334155;display:block;margin-bottom:5px}
+.callOutcomeGrid input,.callOutcomeGrid select,.callOutcomeGrid textarea{width:100%;border:1px solid #cbd5e1;border-radius:10px;padding:10px;font:inherit;background:#fff}
+.callOutcomeGrid textarea{min-height:88px;resize:vertical}
+.callWide{grid-column:1/-1}.callHalf{grid-column:span 2}
+.callOutcomeNotice{border:1px solid #bfdbfe;background:#eff6ff;color:#1e3a8a;border-radius:12px;padding:10px;font-size:12px;font-weight:850;margin:10px 0}
+.callOutcomeNotice.warn{background:#fff7ed;border-color:#fed7aa;color:#9a3412}.callOutcomeNotice.block{background:#fee2e2;border-color:#fecaca;color:#991b1b}
+.callOutcomePreview{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:10px 0}
+.callPreviewCard{border:1px solid #e2e8f0;background:#f8fbff;border-radius:12px;padding:10px}
+.callPreviewLabel{font-size:10px;font-weight:900;color:#64748b;text-transform:uppercase;margin-bottom:4px}
+.callPreviewValue{font-size:14px;font-weight:1000;color:#0f172a}
+.contactIntelBox{max-width:1420px}
+.contactIntelHero{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;background:linear-gradient(135deg,#0f172a,#1d4ed8);color:#fff;border-radius:16px;padding:16px;margin-bottom:12px}
+.contactIntelTitle{font-size:21px;font-weight:1000;margin-bottom:4px}.contactIntelSub{font-size:13px;color:#dbeafe;line-height:1.35}
+.contactIntelFilters{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:12px 0;align-items:end}
+.contactIntelFilters label{font-size:11px;font-weight:900;color:#334155;margin-bottom:4px}.contactIntelFilters input,.contactIntelFilters select{height:40px;padding:8px 10px}
+.contactIntelStats{display:grid;grid-template-columns:repeat(8,1fr);gap:10px;margin:12px 0}
+.contactIntelStat{border:1px solid #e2e8f0;border-radius:13px;background:#f8fbff;padding:10px}
+.contactIntelStatLabel{font-size:10px;text-transform:uppercase;font-weight:900;color:#64748b;letter-spacing:.03em;margin-bottom:4px}.contactIntelStatValue{font-size:18px;font-weight:1000;color:#0f172a}
+.contactIntelGrid{display:grid;grid-template-columns:1.05fr .95fr;gap:12px}.contactIntelPanel{border:1px solid #e2e8f0;border-radius:14px;background:#fff;padding:12px;min-width:0}
+.contactIntelPanel h3{margin:0 0 10px;font-size:16px}.contactTableWrap{border:1px solid #e2e8f0;border-radius:12px;overflow:auto;max-height:420px;background:#fff}
+.contactTable{width:100%;border-collapse:collapse;font-size:12px}.contactTable th{position:sticky;top:0;background:#f8fafc;text-align:left;padding:9px;border-bottom:1px solid #e2e8f0;color:#334155;font-size:10px;text-transform:uppercase;z-index:1}.contactTable td{padding:8px 9px;border-bottom:1px solid #edf2f8;vertical-align:top}
+.callResultPill{display:inline-block;border-radius:999px;padding:4px 8px;font-size:11px;font-weight:900;background:#eef2ff;color:#1d4ed8}.callResultPill.good{background:#dcfce7;color:#166534}.callResultPill.warn{background:#fff7ed;color:#9a3412}.callResultPill.bad{background:#fee2e2;color:#991b1b}.callResultPill.gray{background:#f1f5f9;color:#334155}
+.callbackCard{border:1px solid #e2e8f0;border-radius:13px;background:#f8fbff;padding:10px;margin-bottom:8px}.callbackCard.overdue{border-left:5px solid #dc2626;background:#fff7f7}.callbackCard.today{border-left:5px solid #f59e0b;background:#fffbeb}
+.callbackTitle{font-weight:1000;color:#0f172a}.callbackMeta{font-size:12px;color:#475569;margin-top:4px;line-height:1.35}
+.contactEmpty{border:1px dashed #cbd5e1;background:#f8fafc;color:#64748b;border-radius:14px;padding:18px;text-align:center;font-weight:800}
+@media(max-width:1450px){.contactIntelStats{grid-template-columns:repeat(4,1fr)}.contactIntelFilters{grid-template-columns:repeat(2,1fr)}.contactIntelGrid{grid-template-columns:1fr}.callInsightGrid{grid-template-columns:repeat(3,1fr)}.callOutcomeGrid,.callOutcomePreview{grid-template-columns:repeat(2,1fr)}.callHalf{grid-column:span 1}}
+@media(max-width:850px){.contactIntelHero{display:block}.contactIntelStats,.contactIntelFilters,.callInsightGrid,.callOutcomeGrid,.callOutcomePreview{grid-template-columns:1fr}.callHalf{grid-column:1/-1}}
+
 </style>
 </head>
 <body>
@@ -3420,7 +3461,7 @@ button {
 
 <div class="app">
   <header class="topbar">
-    <div class="brand"><div class="logo appBrandLogo" id="appBrandLogo">b</div><div><h1 id="appBrandName">Co Pilot Collections Manager</h1><p class="sub" id="appBrandSub">LIVE — Collections CRM with chat, online status, payment desk, and admin reports.</p></div></div>
+    <div class="brand"><div class="logo appBrandLogo" id="appBrandLogo">b</div><div><h1 id="appBrandName">Co Pilot Collections Manager</h1><p class="sub" id="appBrandSub">Call logging, contact intelligence, compliance guard, reports, promises, and online team chat.</p></div></div>
     <div class="headerSearch"><span class="mag">⌕</span><input id="globalSearch" placeholder="Search phone, name, SSN, address..." oninput="handleSearchInput('global')"><span class="hotkey">⌘ K</span></div>
     <div class="topActions">
       <button class="gray helpBtn" onclick="openHelpModal()">Help</button>
@@ -3434,6 +3475,7 @@ button {
       <button class="gray" onclick="openDailyWorkQueue()">Queue</button>
       <button class="gray" onclick="openPromiseDashboard()">Promises</button>
       <button class="gray" onclick="openCollectorAlerts()">Alerts <span id="collectorAlertBadge" class="alertBadge hidden">0</span></button>
+      <button class="gray" onclick="openContactIntelligence()">Calls</button>
       <button class="gray adminOnly hidden" onclick="openAuditLog()">Audit</button>
       <button class="gray adminOnly hidden" onclick="openPermissionsModal()">Perms</button>
       <button class="gray adminOnly hidden" onclick="openEmployeeMonitorModal()">Monitor</button>
@@ -3459,6 +3501,7 @@ button {
       <button class="navIcon gold" title="Collector Leaderboard" onclick="openLeaderboard()"><span class="navEmoji">🏆</span></button>
       <button class="navIcon purple adminOnly hidden" title="Admin Reports" onclick="openAdminReports()"><span class="navEmoji">📊</span></button>
       <button class="navIcon red" title="Compliance Guard" onclick="openComplianceGuard()"><span class="navEmoji">🛡️</span></button>
+      <button class="navIcon sky" title="Call Intelligence" onclick="openContactIntelligence()"><span class="navEmoji">☎</span></button>
       <button class="navIcon money" title="Pay Desk" onclick="openPaymentTracker()"><span class="navEmoji">💵</span></button>
       <button class="navIcon green" title="Daily Work Queue" onclick="openDailyWorkQueue()"><span class="navEmoji">✅</span></button>
       <button class="navIcon orange navAlertWrap" title="Collector Alerts" onclick="openCollectorAlerts()"><span class="navEmoji">🔔</span><span id="collectorAlertNavBadge" class="navAlertBadge hidden">0</span></button>
@@ -3527,7 +3570,9 @@ button {
         </div>
       </section>
 
-      <section class="panel phonePanel"><div class="panelTitle"><h3>Phone Numbers</h3><button class="outline" onclick="renderPhones(getCurrent())">Refresh Numbers</button></div><div class="phoneGrid" id="phoneGrid"></div></section>
+      <section class="panel phonePanel"><div class="panelTitle"><h3>Phone Numbers</h3><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="outline" onclick="openContactIntelligence()">Call Intel</button><button class="outline" onclick="renderPhones(getCurrent())">Refresh Numbers</button></div></div><div class="phoneGrid" id="phoneGrid"></div></section>
+
+      <section class="callInsightPanel" id="callInsightPanel"></section>
 
       <section class="panel dispoPanel"><div class="panelTitle"><h3>Disposition / Status</h3><span class="muted" id="selectedDisposition">Select one</span></div><div class="dispoGrid" id="dispoGrid"></div></section>
 
@@ -3551,6 +3596,7 @@ button {
         <div class="qaItem" onclick="openFollowUpModal('Callback')"><span class="qaLeft"><span class="qaIcon">📅</span>Schedule Callback / Follow-Up</span><span>›</span></div>
         <div class="qaItem" onclick="openChatForCurrentAccount()"><span class="qaLeft"><span class="qaIcon">💬</span>Message / Transfer Call</span><span>›</span></div>
         <div class="qaItem" onclick="openCallResultModal()"><span class="qaLeft"><span class="qaIcon">☎</span>Log Call Result</span><span>›</span></div>
+        <div class="qaItem" onclick="openContactIntelligence()"><span class="qaLeft"><span class="qaIcon">📞</span>Open Call Intelligence</span><span>›</span></div>
         <div class="qaItem" onclick="openDisputeModal()"><span class="qaLeft"><span class="qaIcon">⚠</span>Dispute Tracker</span><span>›</span></div>
         <div class="qaItem" onclick="openSettlementModal()"><span class="qaLeft"><span class="qaIcon">%</span>Settlement Offer</span><span>›</span></div>
         <div class="qaItem" onclick="openContactUpdate()"><span class="qaLeft"><span class="qaIcon">✎</span>Update Contact Info</span><span>›</span></div>
@@ -4084,7 +4130,35 @@ button {
   </div>
 </div></div>
 
-<div id="callResultModal" class="modal"><div class="modalbox"><div class="modalhead"><h2>Log Call Result</h2><button class="gray" onclick="closeModal('callResultModal')">Close</button></div><div class="modalbody"><div class="powerGrid"><div><label>Phone Number</label><input id="callResultPhone"></div><div><label>Result</label><select id="callResultStatus"><option>No Answer</option><option>Left Voicemail</option><option>Promise to Pay</option><option>Callback</option><option>Bad Number</option><option>Wrong Number</option><option>Disputed</option><option>Settled</option><option>DNC</option></select></div><div><label>Duration Seconds</label><input id="callDuration" type="number" min="0" value="0"></div><div><label>Callback Date if Needed</label><input id="callCallbackDate" type="date"></div><div class="powerWide"><label>Call Notes</label><textarea id="callResultNotes"></textarea></div></div><div style="text-align:right;margin-top:12px"><button class="green" onclick="saveCallResult()">Save Call Result</button></div></div></div></div>
+
+<div id="callResultModal" class="modal"><div class="modalbox callModalBox">
+  <div class="modalhead"><h2>Log Call Outcome</h2><button class="gray" onclick="closeModal('callResultModal')">Close</button></div>
+  <div class="modalbody">
+    <div id="callOutcomeNotice" class="callOutcomeNotice">Log what happened on the call. This updates activity, reports, callback queue, and contact intelligence.</div>
+    <div class="callOutcomePreview">
+      <div class="callPreviewCard"><div class="callPreviewLabel">Account</div><div class="callPreviewValue" id="callOutcomeAccount">—</div></div>
+      <div class="callPreviewCard"><div class="callPreviewLabel">Phone</div><div class="callPreviewValue" id="callOutcomePhonePreview">—</div></div>
+      <div class="callPreviewCard"><div class="callPreviewLabel">Last Result</div><div class="callPreviewValue" id="callOutcomeLastResult">—</div></div>
+      <div class="callPreviewCard"><div class="callPreviewLabel">Next Call</div><div class="callPreviewValue" id="callOutcomeNextCall">—</div></div>
+    </div>
+    <div class="callOutcomeGrid">
+      <div><label>Phone Number</label><input id="callResultPhone"></div>
+      <div><label>Direction</label><select id="callDirection"><option>Outbound</option><option>Inbound</option></select></div>
+      <div><label>Result</label><select id="callResultStatus" onchange="syncCallOutcomeFields()"><option>No Answer</option><option>Left Voicemail</option><option>Wrong Number</option><option>Right Party Contact</option><option>Promise to Pay</option><option>Refused to Pay</option><option>Dispute</option><option>Call Back</option><option>Settled</option><option>DNC</option></select></div>
+      <div><label>Duration Seconds</label><input id="callDuration" type="number" min="0" value="0"></div>
+      <div><label>Answered By / Contact</label><input id="callAnsweredBy" placeholder="Debtor, spouse, wrong party..."></div>
+      <div><label>Next Call Date</label><input id="callCallbackDate" type="date"></div>
+      <div><label>Next Call Time</label><input id="callCallbackTime" type="time"></div>
+      <div><label>Outcome Category</label><select id="callOutcomeCategory"><option>No Contact</option><option>Contact</option><option>Right Party Contact</option><option>Promise</option><option>Dispute</option><option>Bad Number</option><option>DNC</option><option>Closed</option></select></div>
+      <div class="callWide"><label>Call Notes</label><textarea id="callResultNotes" placeholder="What happened on the call? Include callback time, promise details, wrong number info, refusal reason, dispute reason, or settlement details."></textarea></div>
+    </div>
+    <div style="text-align:right;margin-top:12px;display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap">
+      <button class="outline" onclick="openContactIntelligence()">Open Call Intelligence</button>
+      <button class="green" onclick="saveCallResult()">Save Call Outcome</button>
+    </div>
+  </div>
+</div></div>
+</div>
 
 <div id="disputeModal" class="modal"><div class="modalbox"><div class="modalhead"><h2>Dispute Tracker</h2><button class="gray" onclick="closeModal('disputeModal')">Close</button></div><div class="modalbody"><div class="powerGrid"><div class="powerHalf"><label>Dispute Reason</label><input id="disputeReason" placeholder="Not mine, amount wrong, fraud, paid already..."></div><div><label>Date Received</label><input id="disputeDate" type="date"></div><div><label>Status</label><select id="disputeStatus"><option>Open</option><option>Docs Needed</option><option>Under Review</option><option>Resolved</option><option>Closed</option></select></div><div><label>Proof Requested?</label><select id="proofRequested"><option>No</option><option>Yes</option></select></div><div><label>Account Frozen?</label><select id="accountFrozen"><option>Yes</option><option>No</option></select></div><div><label>Follow-Up Date</label><input id="disputeFollowUp" type="date"></div><div class="powerWide"><label>Documents Needed</label><input id="docsNeeded" placeholder="Contract, statement, payment history..."></div><div class="powerWide"><label>Notes</label><textarea id="disputeNotes"></textarea></div></div><div style="text-align:right;margin-top:12px"><button class="green" onclick="saveDispute()">Save Dispute</button></div></div></div></div>
 
@@ -4616,6 +4690,39 @@ button {
       <section class="reportSection full"><div class="reportSectionHead"><h3>Portfolio Performance</h3><span>Placed balance, current balance, collected, promises, liquidation</span></div><div class="reportTableWrap"><table class="reportTable"><thead><tr><th>Portfolio</th><th>Accounts</th><th>Placed Balance</th><th>Current Balance</th><th>Collected</th><th>Promises</th><th>Broken</th><th>Liquidation</th></tr></thead><tbody id="reportPortfolioBody"></tbody></table></div></section>
       <section class="reportSection"><div class="reportSectionHead"><h3>Employee Activity</h3><span>Calls, notes, dispositions, promises</span></div><div class="reportTableWrap"><table class="reportTable"><thead><tr><th>Employee</th><th>Calls</th><th>Notes</th><th>Status Updates</th><th>Promises</th><th>Accounts Worked</th></tr></thead><tbody id="reportEmployeeBody"></tbody></table></div></section>
       <section class="reportSection"><div class="reportSectionHead"><h3>Recent Confirmed Payments</h3><span>Latest payments in selected range</span></div><div class="reportTableWrap"><table class="reportTable"><thead><tr><th>Date</th><th>Debtor</th><th>Amount</th><th>Method</th><th>Collector</th></tr></thead><tbody id="reportPaymentsBody"></tbody></table></div></section>
+    </div>
+  </div>
+</div></div>
+
+
+<div id="contactIntelligenceModal" class="modal"><div class="modalbox contactIntelBox">
+  <div class="modalhead"><h2>Call Logging + Contact Intelligence</h2><button class="gray" onclick="closeModal('contactIntelligenceModal')">Close</button></div>
+  <div class="modalbody">
+    <div class="contactIntelHero">
+      <div><div class="contactIntelTitle">☎ Contact Intelligence</div><div class="contactIntelSub">Tracks calls, contacts, right-party contacts, callbacks, wrong numbers, voicemails, collector performance, and recent call activity.</div></div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end"><button class="outline" onclick="loadContactIntelligence()">Refresh</button><button class="green" onclick="exportContactIntelligenceCSV()">Export CSV</button></div>
+    </div>
+    <div class="contactIntelFilters">
+      <div><label>Range</label><select id="contactRange" onchange="loadContactIntelligence()"><option value="today">Today</option><option value="week">This Week</option><option value="month">This Month</option><option value="all">All Time</option><option value="custom">Custom</option></select></div>
+      <div><label>Start</label><input id="contactStartDate" type="date" onchange="loadContactIntelligence()"></div>
+      <div><label>End</label><input id="contactEndDate" type="date" onchange="loadContactIntelligence()"></div>
+      <div><label>Employee</label><select id="contactEmployeeFilter" onchange="renderContactIntelligence()"><option value="">All Employees</option></select></div>
+    </div>
+    <div class="contactIntelStats">
+      <div class="contactIntelStat"><div class="contactIntelStatLabel">Calls</div><div class="contactIntelStatValue" id="ciCalls">0</div></div>
+      <div class="contactIntelStat"><div class="contactIntelStatLabel">Contacts</div><div class="contactIntelStatValue" id="ciContacts">0</div></div>
+      <div class="contactIntelStat"><div class="contactIntelStatLabel">Contact Rate</div><div class="contactIntelStatValue" id="ciContactRate">0%</div></div>
+      <div class="contactIntelStat"><div class="contactIntelStatLabel">RPC</div><div class="contactIntelStatValue" id="ciRpc">0</div></div>
+      <div class="contactIntelStat"><div class="contactIntelStatLabel">RPC Rate</div><div class="contactIntelStatValue" id="ciRpcRate">0%</div></div>
+      <div class="contactIntelStat"><div class="contactIntelStatLabel">Promises</div><div class="contactIntelStatValue" id="ciPromises">0</div></div>
+      <div class="contactIntelStat"><div class="contactIntelStatLabel">Callbacks</div><div class="contactIntelStatValue" id="ciCallbacks">0</div></div>
+      <div class="contactIntelStat"><div class="contactIntelStatLabel">Bad Numbers</div><div class="contactIntelStatValue" id="ciBadNumbers">0</div></div>
+    </div>
+    <div class="contactIntelGrid">
+      <div class="contactIntelPanel"><h3>Collector Call Report</h3><div class="contactTableWrap"><table class="contactTable"><thead><tr><th>Employee</th><th>Calls</th><th>Contacts</th><th>RPC</th><th>Contact %</th><th>RPC %</th><th>Promises</th><th>Voicemail</th><th>Wrong #</th></tr></thead><tbody id="ciEmployeeBody"></tbody></table></div></div>
+      <div class="contactIntelPanel"><h3>Callback Queue</h3><div id="ciCallbackQueue"></div></div>
+      <div class="contactIntelPanel"><h3>Recent Call Activity</h3><div class="contactTableWrap"><table class="contactTable"><thead><tr><th>Time</th><th>Account</th><th>Phone</th><th>Result</th><th>Employee</th><th>Notes</th></tr></thead><tbody id="ciRecentBody"></tbody></table></div></div>
+      <div class="contactIntelPanel"><h3>Wrong / Bad Number Review</h3><div class="contactTableWrap"><table class="contactTable"><thead><tr><th>Account</th><th>Phone</th><th>Result</th><th>Employee</th><th>When</th></tr></thead><tbody id="ciBadNumberBody"></tbody></table></div></div>
     </div>
   </div>
 </div></div>
@@ -5716,6 +5823,7 @@ function renderCurrent(a,q){
  renderAllImportedFields(a);
  renderComplianceBanner(a);
  renderPaymentPlanSummary(a.id);
+ renderCallInsight(a);
  renderPhones(a);
  renderDispos(a);
 }
@@ -5724,7 +5832,7 @@ function renderPhones(a){
  let seen=new Set();
  ps=ps.filter(p=>{let key=p.slice(-10); if(seen.has(key))return false; seen.add(key); return true;}).slice(0,6);
  let blocked=phoneIsBlocked(a);
- document.getElementById('phoneGrid').innerHTML=ps.map((p,i)=>`<a class="phoneChip ${blocked?'blocked':''}" href="#" onclick="event.preventDefault(); return dialPhone('${a.id}','${normPhone(p)}')"><div class="phoneIcon">☎</div><div><div class="phoneNum">${fmtPhone(p)}</div><div class="phoneType">${i===0?'Primary':i===1?'Mobile':'Alternate'}</div>${blocked?'<div class="callBlockedNote">Compliance review required</div>':''}</div></a>`).join('')||'<div class="muted">No phone numbers on this account.</div>'
+ document.getElementById('phoneGrid').innerHTML=ps.map((p,i)=>`<a class="phoneChip ${blocked?'blocked':''}" href="tel:${normPhone(p)}" data-ringcentral-extension-number="${normPhone(p)}" onclick="event.preventDefault(); return dialPhone('${a.id}','${normPhone(p)}')"><div class="phoneIcon">☎</div><div><div class="phoneNum">${fmtPhone(p)}</div><div class="phoneType">${i===0?'Primary':i===1?'Mobile':'Alternate'}</div>${blocked?'<div class="callBlockedNote">Compliance review required</div>':''}</div></a>`).join('')||'<div class="muted">No phone numbers on this account.</div>'
 }
 function renderDispos(a){document.getElementById('selectedDisposition').textContent=currentDisposition||a?.disposition||'Select one';document.getElementById('dispoGrid').innerHTML=DISPOS.map(d=>`<button class="dispo ${d==='Disputed'?'orangeText':['Promise to Pay','Settled'].includes(d)?'greenText':['Bad Number','DNC'].includes(d)?'redText':d==='Callback'?'purpleText':''} ${(currentDisposition||a?.disposition)===d?'selected':''}" onclick="selectDisposition('${d}')">${d}</button>`).join('')}
 async function selectDisposition(d){let cur=getCurrent();if(!cur)return;currentDisposition=d;let old=cur.status,newStatus=d==='Disputed'?'Disputed':d;let body={status:newStatus,disposition:d,updated_at:new Date().toISOString()};if(d==='DNC')body.do_not_call=true;if(d==='Disputed')body.disputed_flag=true;if(d==='Bad Number')body.wrong_number_flag=true;let updated;try{updated=(await dbFetch(`/accounts?id=eq.${cur.id}`,{method:'PATCH',body:JSON.stringify(body)}))[0]}catch(e){delete body.do_not_call;delete body.disputed_flag;delete body.wrong_number_flag;updated=(await dbFetch(`/accounts?id=eq.${cur.id}`,{method:'PATCH',body:JSON.stringify(body)}))[0]}await insertActivity(cur.id,'Status Updated','Disposition set to '+d,'',old,newStatus);await insertAudit('Status Updated','Disposition set to '+d,'account',cur.id);let i=accounts.findIndex(a=>a.id===cur.id);if(i>=0)accounts[i]=toCamel(updated);render();if(d==='Callback')openFollowUpModal('Callback');if(d==='Disputed')openDisputeModal();if(d==='Promise to Pay')openPaymentPlan();}
@@ -10219,6 +10327,42 @@ renderChatConversation = function(){
 startPresenceHeartbeat();
 
 boot();
+
+
+/* CALL LOGGING + CONTACT INTELLIGENCE */
+let lastDialContext={accountId:'',phone:'',startedAt:null};
+let contactIntelData={calls:[],callbacks:[],start:'',end:'',loaded:false};
+function callResultNorm(v){return String(v||'').trim()}
+function callResultLower(v){return callResultNorm(v).toLowerCase()}
+function isContactOutcome(result){let r=callResultLower(result);return ['right party contact','promise to pay','refused to pay','dispute','call back','settled','dnc'].includes(r)}
+function isRpcOutcome(result){let r=callResultLower(result);return ['right party contact','promise to pay','refused to pay','dispute','settled'].includes(r)}
+function isPromiseOutcome(result){return callResultLower(result)==='promise to pay'}
+function isCallbackOutcome(result){return callResultLower(result)==='call back'}
+function isWrongNumberOutcome(result){let r=callResultLower(result);return r==='wrong number'||r==='bad number'}
+function callOutcomeCategory(result){let r=callResultLower(result);if(isPromiseOutcome(r))return 'Promise';if(isRpcOutcome(r))return 'Right Party Contact';if(r==='dispute')return 'Dispute';if(isWrongNumberOutcome(r))return 'Bad Number';if(r==='dnc')return 'DNC';if(r==='settled')return 'Closed';if(isContactOutcome(r))return 'Contact';return 'No Contact'}
+function callStatusForResult(result){let r=callResultNorm(result);if(r==='Wrong Number')return 'Bad Number';if(r==='Dispute')return 'Disputed';if(r==='Call Back')return 'Callback';if(r==='Right Party Contact')return 'RPC';return r}
+function callPillClass(result){let r=callResultLower(result);if(['promise to pay','right party contact','settled'].includes(r))return 'good';if(['call back','left voicemail'].includes(r))return 'warn';if(['wrong number','bad number','dnc','dispute','refused to pay'].includes(r))return 'bad';return 'gray'}
+function callDateRange(){let range=document.getElementById('contactRange')?.value||'today';let now=new Date();let s=new Date(now),e=new Date(now);if(range==='week'){let day=s.getDay();s.setDate(s.getDate()-day);e=new Date()}else if(range==='month'){s=new Date(now.getFullYear(),now.getMonth(),1);e=new Date()}else if(range==='all'){return {start:'',end:''}}else if(range==='custom'){return {start:val('contactStartDate'),end:val('contactEndDate')}}s.setHours(0,0,0,0);e.setHours(23,59,59,999);return {start:s.toISOString().slice(0,10),end:e.toISOString().slice(0,10)}}
+function callDateOnly(v){let d=String(v||'').slice(0,10);return /^\d{4}-\d{2}-\d{2}$/.test(d)?d:''}
+function callTs(v){let t=Date.parse(v||'');return isNaN(t)?0:t}
+function contactSetText(id,text){let el=document.getElementById(id);if(el)el.textContent=text}
+function renderCallInsight(a){let box=document.getElementById('callInsightPanel');if(!box)return;if(!a){box.innerHTML='<div class="callInsightTop"><div><div class="callInsightTitle">☎ Call Intelligence</div><div class="hint">No account selected.</div></div></div>';return}let last=a.lastCalledAt||a.last_called_at||'';let next=a.nextCallAt||a.next_call_at||'';let result=a.lastCallResult||a.last_call_result||a.lastCallOutcome||a.last_call_outcome||a.disposition||'—';let callCount=Number(a.callCount||a.call_count||0),contacts=Number(a.contactCount||a.contact_count||0),rpc=Number(a.rpcCount||a.rpc_count||0);box.innerHTML=`<div class="callInsightTop"><div><div class="callInsightTitle">☎ Call Intelligence</div><div class="hint">Auto-updates when call outcomes are saved.</div></div><button class="outline" onclick="openContactIntelligence()">Open Calls</button></div><div class="callInsightGrid"><div class="callInsightStat"><div class="callInsightLabel">Last Called</div><div class="callInsightValue">${esc(last?new Date(last).toLocaleString():'Never')}</div></div><div class="callInsightStat"><div class="callInsightLabel">Last Result</div><div class="callInsightValue">${esc(result)}</div></div><div class="callInsightStat"><div class="callInsightLabel">Next Call</div><div class="callInsightValue">${esc(next?new Date(next).toLocaleString():'—')}</div></div><div class="callInsightStat"><div class="callInsightLabel">Calls</div><div class="callInsightValue">${callCount}</div></div><div class="callInsightStat"><div class="callInsightLabel">Contacts</div><div class="callInsightValue">${contacts}</div></div><div class="callInsightStat"><div class="callInsightLabel">RPC</div><div class="callInsightValue">${rpc}</div></div></div>`}
+function syncCallOutcomeFields(){let result=val('callResultStatus')||'No Answer';let cat=callOutcomeCategory(result);let el=document.getElementById('callOutcomeCategory');if(el)el.value=cat;let notice=document.getElementById('callOutcomeNotice');if(notice){notice.className='callOutcomeNotice';let msg='Log what happened on the call. This updates activity, reports, callback queue, and contact intelligence.';if(result==='Promise to Pay')msg='Promise to Pay selected. Save the outcome, then create/update the payment promise or payment plan.';if(result==='Dispute'){msg='Dispute selected. Saving will mark this account disputed and open the dispute tracker.';notice.classList.add('warn')}if(result==='Wrong Number'){msg='Wrong Number selected. Saving will mark this number/account as bad number for compliance protection.';notice.classList.add('block')}if(result==='DNC'){msg='DNC selected. Saving will mark this account Do Not Call.';notice.classList.add('block')}notice.textContent=msg}}
+function openCallResultModal(opts={}){let a=getCurrent();if(opts.accountId)a=accountById(opts.accountId)||a;if(!a)return alert('No account selected.');let phone=normPhone(opts.phone||lastDialContext.phone||a.lastContactNumber||phones(a)[0]||'');document.getElementById('callResultPhone').value=phone;document.getElementById('callDirection').value=opts.direction||'Outbound';document.getElementById('callResultStatus').value=opts.defaultResult||'No Answer';document.getElementById('callDuration').value=opts.durationSeconds||'0';document.getElementById('callAnsweredBy').value='';document.getElementById('callCallbackDate').value='';document.getElementById('callCallbackTime').value='';document.getElementById('callResultNotes').value=opts.auto?'Auto-opened after phone click. Add call result notes here.':'';contactSetText('callOutcomeAccount',`${nameOf(a)} · ${acctNo(a)||'—'}`);contactSetText('callOutcomePhonePreview',phone?fmtPhone(phone):'—');contactSetText('callOutcomeLastResult',a.lastCallResult||a.last_call_result||a.disposition||'—');contactSetText('callOutcomeNextCall',(a.nextCallAt||a.next_call_at)?new Date(a.nextCallAt||a.next_call_at).toLocaleString():'—');syncCallOutcomeFields();document.getElementById('callResultModal').classList.add('open')}
+async function recordDial(id,phone){phone=normPhone(phone);lastDialContext={accountId:id,phone,startedAt:new Date()};document.getElementById('callNumber').textContent=fmtPhone(phone);document.getElementById('lastDialed').textContent='Dialing '+fmtPhone(phone);await dbFetch(`/accounts?id=eq.${id}`,{method:'PATCH',body:JSON.stringify({last_contact_number:phone,last_called_at:new Date().toISOString(),updated_at:new Date().toISOString()})}).catch(async()=>{await dbFetch(`/accounts?id=eq.${id}`,{method:'PATCH',body:JSON.stringify({last_contact_number:phone,updated_at:new Date().toISOString()})}).catch(()=>{})});await insertActivity(id,'Outbound Call','Clicked phone number '+fmtPhone(phone),phone);await insertAudit('Outbound Call','Clicked phone '+fmtPhone(phone),'account',id);setTimeout(()=>{try{let cur=getCurrent();if(cur&&String(cur.id)===String(id)&&!document.getElementById('callResultModal')?.classList.contains('open'))openCallResultModal({accountId:id,phone,auto:true})}catch(e){}},1500)}
+async function dialPhone(id,phone){let a=accountById(id)||getCurrent();if(!a)return false;phone=normPhone(phone);let ok=await complianceCheckBeforeCall(a,phone);if(!ok)return false;window.location.href='tel:'+phone;await recordDial(id,phone);return false}
+async function callPrimary(){let a=getCurrent();let p=phones(a)[0];if(p)await dialPhone(a.id,normPhone(p));else alert('No phone number on this account.')}
+function endCall(){document.getElementById('lastDialed').textContent='Call ended — log the outcome';document.getElementById('callNumber').textContent='—';if(lastDialContext.accountId)setTimeout(()=>openCallResultModal({accountId:lastDialContext.accountId,phone:lastDialContext.phone}),250)}
+async function complianceCheckBeforeCallResultSave(a,result,phone){let r=complianceRules(a);let hard=r.hard||[];if(hard.length&&!currentUser.isAdmin){let ok=confirm('This account has compliance restrictions:\n\n'+hard.map(x=>'• '+x.label).join('\n')+'\n\nSave this call outcome for audit/history anyway?');if(!ok)return false;await insertActivity(a.id,'Compliance Review','Call outcome saved on restricted account: '+hard.map(x=>x.label).join(', '),phone).catch(()=>{})}return true}
+async function saveCallResult(){let a=getCurrent();if(!a)return;let result=val('callResultStatus')||'No Answer',phone=normPhone(val('callResultPhone')),duration=Number(val('callDuration')||0),notes=val('callResultNotes'),direction=val('callDirection')||'Outbound',answeredBy=val('callAnsweredBy'),category=val('callOutcomeCategory')||callOutcomeCategory(result);let nextDate=val('callCallbackDate'),nextTime=val('callCallbackTime')||'09:00';let nextAt=nextDate?new Date(nextDate+'T'+nextTime+':00').toISOString():null;let ok=await complianceCheckBeforeCallResultSave(a,result,phone);if(!ok)return;let flags={is_contact:isContactOutcome(result),is_rpc:isRpcOutcome(result),is_promise:isPromiseOutcome(result),is_callback:isCallbackOutcome(result),is_wrong_number:isWrongNumberOutcome(result)};let callRow={account_id:a.id,phone_number:phone,call_result:result,disposition:callStatusForResult(result),direction,outcome_category:category,duration_seconds:duration,answered_by:answeredBy,...flags,next_call_at:nextAt,account_balance_snapshot:accountBalance(a),call_source:'Co Pilot CRM',notes,result_at:new Date().toISOString(),created_by_email:currentUser.email};try{await dbFetch('/call_results',{method:'POST',body:JSON.stringify([callRow])})}catch(e){await dbFetch('/call_results',{method:'POST',body:JSON.stringify([{account_id:a.id,phone_number:phone,call_result:result,disposition:callStatusForResult(result),duration_seconds:duration,notes,created_by_email:currentUser.email}])}).catch(()=>{})}let newStatus=callStatusForResult(result);let patch={status:newStatus,disposition:newStatus,last_contact_number:phone,last_called_at:new Date().toISOString(),last_call_result:result,last_call_outcome:category,next_call_at:nextAt,call_count:Number(a.callCount||a.call_count||0)+1,contact_count:Number(a.contactCount||a.contact_count||0)+(flags.is_contact?1:0),rpc_count:Number(a.rpcCount||a.rpc_count||0)+(flags.is_rpc?1:0),voicemail_count:Number(a.voicemailCount||a.voicemail_count||0)+(result==='Left Voicemail'?1:0),no_answer_count:Number(a.noAnswerCount||a.no_answer_count||0)+(result==='No Answer'?1:0),wrong_number_count:Number(a.wrongNumberCount||a.wrong_number_count||0)+(flags.is_wrong_number?1:0),refused_count:Number(a.refusedCount||a.refused_count||0)+(result==='Refused to Pay'?1:0),updated_at:new Date().toISOString()};if(result==='DNC')patch.do_not_call=true;if(result==='Dispute')patch.disputed_flag=true;if(flags.is_wrong_number)patch.wrong_number_flag=true;let updated=null;try{updated=(await dbFetch(`/accounts?id=eq.${a.id}`,{method:'PATCH',body:JSON.stringify(patch)}))[0]}catch(e){let fallback={status:newStatus,disposition:newStatus,last_contact_number:phone,updated_at:new Date().toISOString()};if(result==='DNC')fallback.do_not_call=true;if(result==='Dispute')fallback.disputed_flag=true;if(flags.is_wrong_number)fallback.wrong_number_flag=true;try{updated=(await dbFetch(`/accounts?id=eq.${a.id}`,{method:'PATCH',body:JSON.stringify(fallback)}))[0]}catch(e2){delete fallback.do_not_call;delete fallback.disputed_flag;delete fallback.wrong_number_flag;updated=(await dbFetch(`/accounts?id=eq.${a.id}`,{method:'PATCH',body:JSON.stringify(fallback)}).catch(()=>[a]))[0]}}await insertActivity(a.id,'Call Result',`${result} ${phone?fmtPhone(phone):''}${duration?` · ${duration}s`:''}. ${notes}`.trim(),phone,a.status||a.disposition,newStatus);if(nextAt){await dbFetch('/follow_ups',{method:'POST',body:JSON.stringify([{account_id:a.id,follow_up_type:'Callback',due_date:nextDate,status:'Open',assigned_to_email:currentAssignee(a),reason:'Callback from call outcome',notes:`${nextTime} - ${notes}`,created_by_email:currentUser.email}])}).catch(()=>{})}await insertAudit('Call Result',`${result} for ${nameOf(a)}`,'account',a.id);let i=accounts.findIndex(x=>x.id===a.id);if(i>=0&&updated)accounts[i]=toCamel(updated);closeModal('callResultModal');render();if(result==='Promise to Pay')setTimeout(()=>{if(confirm('Open Pay Desk / Payment Promise now?'))openPaymentTrackerForCurrent()},150);if(result==='Dispute')setTimeout(()=>openDisputeModal(),150);if(document.getElementById('contactIntelligenceModal')?.classList.contains('open'))loadContactIntelligence()}
+function fillContactEmployeeFilter(calls){let sel=document.getElementById('contactEmployeeFilter');if(!sel)return;let keep=sel.value;let emps=[...new Set(calls.map(c=>String(c.createdByEmail||c.created_by_email||'').toLowerCase()).filter(Boolean))].sort();sel.innerHTML='<option value="">All Employees</option>'+emps.map(e=>`<option value="${esc(e)}">${esc(e)}</option>`).join('');sel.value=emps.includes(keep)?keep:''}
+async function openContactIntelligence(){document.getElementById('contactIntelligenceModal').classList.add('open');let r=document.getElementById('contactRange');if(r&&!r.value)r.value='today';await loadContactIntelligence()}
+async function loadContactIntelligence(){let range=callDateRange();contactIntelData.start=range.start;contactIntelData.end=range.end;let qs='?select=*&order=created_at.desc&limit=50000';if(range.start)qs+='&created_at=gte.'+encodeURIComponent(range.start+'T00:00:00');if(range.end)qs+='&created_at=lte.'+encodeURIComponent(range.end+'T23:59:59');let calls=[];try{calls=await dbFetch('/call_results'+qs)}catch(e){calls=[]}calls=(calls||[]).map(toCamel);if(!currentUser.isAdmin)calls=calls.filter(c=>String(c.createdByEmail||'').toLowerCase()===String(currentUser.email||'').toLowerCase());let callbacks=[];try{callbacks=await dbFetch('/follow_ups?select=*&status=eq.Open&follow_up_type=eq.Callback&order=due_date.asc&limit=5000')}catch(e){callbacks=[]}callbacks=(callbacks||[]).map(toCamel);if(!currentUser.isAdmin)callbacks=callbacks.filter(c=>String(c.assignedToEmail||c.createdByEmail||'').toLowerCase()===String(currentUser.email||'').toLowerCase());contactIntelData={calls,callbacks,start:range.start,end:range.end,loaded:true};fillContactEmployeeFilter(calls);renderContactIntelligence()}
+function filteredContactCalls(){let emp=String(document.getElementById('contactEmployeeFilter')?.value||'').toLowerCase();let calls=contactIntelData.calls||[];if(emp)calls=calls.filter(c=>String(c.createdByEmail||'').toLowerCase()===emp);return calls}
+function callAccount(c){return accountById(c.accountId||c.account_id)}
+function renderContactIntelligence(){let calls=filteredContactCalls();let contacts=calls.filter(c=>c.isContact===true||c.is_contact===true||isContactOutcome(c.callResult||c.call_result));let rpc=calls.filter(c=>c.isRpc===true||c.is_rpc===true||isRpcOutcome(c.callResult||c.call_result));let promises=calls.filter(c=>c.isPromise===true||c.is_promise===true||isPromiseOutcome(c.callResult||c.call_result));let bad=calls.filter(c=>c.isWrongNumber===true||c.is_wrong_number===true||isWrongNumberOutcome(c.callResult||c.call_result));let callbacks=(contactIntelData.callbacks||[]);contactSetText('ciCalls',calls.length);contactSetText('ciContacts',contacts.length);contactSetText('ciContactRate',calls.length?(contacts.length/calls.length*100).toFixed(1)+'%':'0%');contactSetText('ciRpc',rpc.length);contactSetText('ciRpcRate',calls.length?(rpc.length/calls.length*100).toFixed(1)+'%':'0%');contactSetText('ciPromises',promises.length);contactSetText('ciCallbacks',callbacks.length);contactSetText('ciBadNumbers',bad.length);let em={};calls.forEach(c=>{let e=String(c.createdByEmail||'Unassigned').toLowerCase();if(!em[e])em[e]={email:e,calls:0,contacts:0,rpc:0,promises:0,voicemail:0,bad:0};let r=c.callResult||c.call_result;em[e].calls++;if(isContactOutcome(r)||c.isContact||c.is_contact)em[e].contacts++;if(isRpcOutcome(r)||c.isRpc||c.is_rpc)em[e].rpc++;if(isPromiseOutcome(r)||c.isPromise||c.is_promise)em[e].promises++;if(r==='Left Voicemail')em[e].voicemail++;if(isWrongNumberOutcome(r)||c.isWrongNumber||c.is_wrong_number)em[e].bad++});let empRows=Object.values(em).sort((a,b)=>b.contacts-a.contacts||b.calls-a.calls);let eb=document.getElementById('ciEmployeeBody');if(eb)eb.innerHTML=empRows.map(e=>`<tr><td><b>${esc(e.email)}</b></td><td>${e.calls}</td><td>${e.contacts}</td><td>${e.rpc}</td><td>${e.calls?(e.contacts/e.calls*100).toFixed(1):'0'}%</td><td>${e.calls?(e.rpc/e.calls*100).toFixed(1):'0'}%</td><td>${e.promises}</td><td>${e.voicemail}</td><td>${e.bad}</td></tr>`).join('')||'<tr><td colspan="9"><div class="contactEmpty">No call results found.</div></td></tr>';let cb=document.getElementById('ciCallbackQueue');if(cb){let today=todayISO();cb.innerHTML=callbacks.slice(0,50).map(f=>{let a=accountById(f.accountId||f.account_id);let due=callDateOnly(f.dueDate||f.due_date);let cls=due<today?'overdue':due===today?'today':'';return `<div class="callbackCard ${cls}"><div class="callbackTitle">${esc(a?nameOf(a):'Unknown Account')} · ${esc(due||'No date')}</div><div class="callbackMeta">${esc(f.reason||'Callback')}<br>${esc(f.assignedToEmail||f.assigned_to_email||'Unassigned')} · ${esc(f.notes||'')}</div></div>`}).join('')||'<div class="contactEmpty">No open callbacks.</div>'}let rb=document.getElementById('ciRecentBody');if(rb)rb.innerHTML=calls.slice(0,100).map(c=>{let a=callAccount(c);let r=c.callResult||c.call_result||'—';return `<tr><td>${esc(new Date(c.createdAt||c.created_at||Date.now()).toLocaleString())}</td><td><b>${esc(a?nameOf(a):'Unknown')}</b><div class="callbackMeta">${esc(a?acctNo(a):'')}</div></td><td>${esc(fmtPhone(c.phoneNumber||c.phone_number||''))}</td><td><span class="callResultPill ${callPillClass(r)}">${esc(r)}</span></td><td>${esc(c.createdByEmail||c.created_by_email||'')}</td><td>${esc(c.notes||'')}</td></tr>`}).join('')||'<tr><td colspan="6"><div class="contactEmpty">No recent calls.</div></td></tr>';let bb=document.getElementById('ciBadNumberBody');if(bb)bb.innerHTML=bad.slice(0,100).map(c=>{let a=callAccount(c);let r=c.callResult||c.call_result||'Wrong Number';return `<tr><td><b>${esc(a?nameOf(a):'Unknown')}</b><div class="callbackMeta">${esc(a?acctNo(a):'')}</div></td><td>${esc(fmtPhone(c.phoneNumber||c.phone_number||''))}</td><td><span class="callResultPill bad">${esc(r)}</span></td><td>${esc(c.createdByEmail||c.created_by_email||'')}</td><td>${esc(callDateOnly(c.createdAt||c.created_at)||'')}</td></tr>`}).join('')||'<tr><td colspan="5"><div class="contactEmpty">No bad number results in this range.</div></td></tr>'}
+function exportContactIntelligenceCSV(){let calls=filteredContactCalls();let rows=[['created_at','account_name','account_number','phone','result','category','direction','duration_seconds','is_contact','is_rpc','is_promise','next_call_at','employee','notes']];calls.forEach(c=>{let a=callAccount(c);rows.push([c.createdAt||c.created_at||'',a?nameOf(a):'',a?acctNo(a):'',c.phoneNumber||c.phone_number||'',c.callResult||c.call_result||'',c.outcomeCategory||c.outcome_category||callOutcomeCategory(c.callResult||c.call_result),c.direction||'',c.durationSeconds||c.duration_seconds||0,!!(c.isContact||c.is_contact),!!(c.isRpc||c.is_rpc),!!(c.isPromise||c.is_promise),c.nextCallAt||c.next_call_at||'',c.createdByEmail||c.created_by_email||'',c.notes||''])});download('co-pilot-call-intelligence.csv',rows.map(r=>r.map(csvEscape).join(',')).join('\n'),'text/csv')}
+
 </script>
 </body>
 </html>
