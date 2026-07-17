@@ -1,5 +1,3 @@
-REPORTS NO-FREEZE FIX PACKAGE
-
 REPORTS NAV GLITCH FIX PACKAGE
 
 Co Pilot Collections Manager - LIVE Package
