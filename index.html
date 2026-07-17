@@ -11072,6 +11072,167 @@ function exportContactIntelligenceCSV(){let calls=filteredContactCalls();let row
   };
 })();
 
+
+
+/* REPORTS_DIRECT_CLICK_FIX_MARKER: direct report button listener opens modal instantly and bypasses stale nav handlers */
+(function(){
+  var REPORT_ADMIN_EMAIL = 'afinch2678@gmail.com';
+  var reportOpenCounter = 0;
+  var reportModals = ['complianceGuardModal','leaderboardModal','paymentTrackerModal','paymentsDashboardModal','todayDashboardModal','dailyWorkQueueModal','promiseDashboardModal','employeeMonitorModal','employeeAdminModal','brandingSettingsModal','auditModal','permissionsModal','documentGeneratorModal','paymentPlanModal','callOutcomeModal'];
+
+  function byId(id){ return document.getElementById(id); }
+  function lc(v){ return String(v||'').toLowerCase().trim(); }
+  function safeCurrentUser(){
+    var u = {};
+    try{ if(typeof currentUser !== 'undefined' && currentUser) u = currentUser; }catch(e){}
+    try{ if(window.currentUser && Object.keys(window.currentUser).length) u = Object.assign({},u,window.currentUser); }catch(e){}
+    return u || {};
+  }
+  function isVisible(el){
+    if(!el) return false;
+    if(el.classList && el.classList.contains('hidden')) return false;
+    var s = window.getComputedStyle ? window.getComputedStyle(el) : null;
+    return !s || (s.display !== 'none' && s.visibility !== 'hidden' && Number(s.opacity||1) !== 0);
+  }
+  function reportsAdminAllowed(){
+    try{
+      var u = safeCurrentUser();
+      var email = lc(u.email || (window.authUser && window.authUser.email) || '');
+      if(email === REPORT_ADMIN_EMAIL) return true;
+      if(u.isAdmin === true || u.role === 'admin') return true;
+      if(typeof isAdminEmail === 'function' && isAdminEmail(email)) return true;
+    }catch(e){}
+    try{
+      var rb = byId('roleBadge');
+      if(rb && /admin/i.test(rb.textContent||'')) return true;
+    }catch(e){}
+    try{
+      // The Reports button is adminOnly and hidden for employees. If it is visible, trust the app's own role rendering.
+      var buttons = Array.prototype.slice.call(document.querySelectorAll('button[onclick*="openAdminReports"], button[title*="Admin Reports"]'));
+      if(buttons.some(function(b){ return isVisible(b); })) return true;
+    }catch(e){}
+    return false;
+  }
+  function installReportsDirectStyle(){
+    if(byId('reportsDirectClickFixStyle')) return;
+    var style=document.createElement('style');
+    style.id='reportsDirectClickFixStyle';
+    style.textContent = [
+      '#adminReportsModal.cpcmReportsDirectOpen{display:flex!important;align-items:center!important;justify-content:center!important;z-index:2147483000!important;}',
+      '#adminReportsModal.cpcmReportsDirectOpen .modalbox{position:relative!important;z-index:2147483001!important;}',
+      'body.cpcmReportsDirectBody #globalBusy{display:none!important;}',
+      '#adminReportsModal .reportNotice{min-height:18px;}'
+    ].join('\n');
+    document.head.appendChild(style);
+  }
+  function setNotice(msg){
+    try{ var n=byId('reportNotice'); if(n) n.textContent = msg; }catch(e){}
+  }
+  function hideBusy(){
+    try{ var b=byId('globalBusy'); if(b){ b.classList.add('hidden'); b.style.display='none'; } }catch(e){}
+  }
+  function closeOtherPanels(){
+    try{
+      reportModals.forEach(function(id){ var m=byId(id); if(m){ m.classList.remove('open','cpcmReportsDirectOpen'); m.style.zIndex=''; if(id !== 'adminReportsModal') m.style.display=''; }});
+      Array.prototype.slice.call(document.querySelectorAll('.modal.open')).forEach(function(m){ if(m.id !== 'adminReportsModal'){ m.classList.remove('open'); m.style.zIndex=''; }});
+    }catch(e){}
+    hideBusy();
+  }
+  function showReportsModal(){
+    installReportsDirectStyle();
+    closeOtherPanels();
+    var modal = byId('adminReportsModal');
+    if(!modal){ alert('Reports panel was not found. Reload the app and try again.'); return false; }
+    document.body.classList.add('cpcmReportsDirectBody','reportsOpenFix');
+    modal.classList.add('open','cpcmReportsDirectOpen');
+    modal.style.display = 'flex';
+    modal.style.zIndex = '2147483000';
+    setNotice('Reports opened. Loading admin report data now...');
+    return true;
+  }
+  function directOpenReports(evt){
+    try{
+      if(evt){ evt.preventDefault(); evt.stopPropagation(); if(evt.stopImmediatePropagation) evt.stopImmediatePropagation(); }
+      if(!reportsAdminAllowed()){ alert('Admin only. You are not being recognized as Admin yet. Refresh the app, then log back in as afinch2678@gmail.com.'); return false; }
+      if(!showReportsModal()) return false;
+      var token = ++reportOpenCounter;
+      setTimeout(function(){
+        if(token !== reportOpenCounter) return;
+        try{ if(typeof buildAdminReportFilters === 'function') buildAdminReportFilters(); }catch(e){ console.warn('Report filter build failed',e); }
+        try{
+          var rs=byId('reportStart'), re=byId('reportEnd');
+          if((!rs || !rs.value) || (!re || !re.value)){
+            if(typeof setAdminReportRange === 'function') setAdminReportRange('today');
+          }
+        }catch(e){}
+        hideBusy();
+        var done=false;
+        setTimeout(function(){
+          if(done) return;
+          hideBusy();
+          setNotice('Reports are still open. Data is taking longer than expected; click Refresh inside Reports if a section stays blank.');
+        }, 8000);
+        try{
+          var loader = (typeof loadAdminReports === 'function') ? loadAdminReports : window.loadAdminReports;
+          if(typeof loader === 'function'){
+            var p = loader();
+            if(p && typeof p.then === 'function'){
+              p.then(function(){ done=true; hideBusy(); if(token===reportOpenCounter) setNotice('Reports loaded. Empty sections mean no matching records were found for this range.'); })
+               .catch(function(e){ done=true; console.warn('Reports load failed',e); hideBusy(); setNotice('Reports opened, but one or more tables could not load. Confirm the latest SQL was run, then click Refresh.'); });
+            }else{
+              done=true; hideBusy(); setNotice('Reports loaded. Empty sections mean no matching records were found for this range.');
+            }
+          }else{
+            done=true; hideBusy(); setNotice('Reports opened, but the report loader was not found. Reload the app and try again.');
+          }
+        }catch(e){
+          done=true; console.warn('Reports direct open failed',e); hideBusy(); setNotice('Reports opened, but data loading hit an error. Click Refresh or reload the app.');
+        }
+      }, 20);
+      return false;
+    }catch(e){ console.warn('Direct Reports button failed',e); alert('Could not open Reports: '+(e.message||e)); hideBusy(); return false; }
+  }
+
+  window.directOpenAdminReports = directOpenReports;
+  window.openAdminReports = directOpenReports;
+
+  function isReportsTrigger(node){
+    var btn = node && node.closest ? node.closest('button') : null;
+    if(!btn) return false;
+    var onclick = btn.getAttribute('onclick') || '';
+    var title = btn.getAttribute('title') || '';
+    var txt = (btn.textContent || '').replace(/\s+/g,' ').trim();
+    return onclick.indexOf('openAdminReports') !== -1 || /admin reports/i.test(title) || /^reports$/i.test(txt);
+  }
+  function wireReportsButtons(){
+    try{
+      Array.prototype.slice.call(document.querySelectorAll('button[onclick*="openAdminReports"], button[title*="Admin Reports"]')).forEach(function(btn){
+        btn.setAttribute('onclick','return directOpenAdminReports(event)');
+        btn.onclick = directOpenReports;
+      });
+    }catch(e){}
+  }
+  document.addEventListener('click', function(e){
+    if(isReportsTrigger(e.target)) directOpenReports(e);
+  }, true);
+  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', wireReportsButtons); else wireReportsButtons();
+  setTimeout(wireReportsButtons, 500);
+  setTimeout(wireReportsButtons, 1500);
+
+  var oldCloseModal = window.closeModal;
+  window.closeModal = function(id){
+    if(id === 'adminReportsModal'){
+      reportOpenCounter++;
+      var m=byId('adminReportsModal'); if(m){ m.classList.remove('open','cpcmReportsDirectOpen'); m.style.display=''; m.style.zIndex=''; }
+      document.body.classList.remove('cpcmReportsDirectBody','reportsOpenFix');
+      hideBusy();
+      return false;
+    }
+    if(typeof oldCloseModal === 'function') return oldCloseModal.apply(this, arguments);
+    var el=byId(id); if(el) el.classList.remove('open');
+  };
+})();
+
 </script>
 </body>
 </html>
