@@ -9480,7 +9480,7 @@ function renderLeaderboard(start,end){
 /* ADMIN REPORTING DASHBOARD */
 let adminReportData={loaded:false,summary:{},collectors:[],portfolios:[],employees:[],payments:[],rangeText:''};
 function openAdminReports(){
-  if(!currentUser.isAdmin)return alert('Admin only.');
+  if(!(currentUser && (currentUser.isAdmin || (typeof isAdminEmail==='function' && isAdminEmail(currentUser.email)))))return alert('Admin only.');
   document.getElementById('adminReportsModal').classList.add('open');
   buildAdminReportFilters();
   if(!document.getElementById('reportStart').value || !document.getElementById('reportEnd').value){
@@ -10977,6 +10977,7 @@ function exportContactIntelligenceCSV(){let calls=filteredContactCalls();let row
 
 
 
+/* REPORTS_ADMIN_EMAIL_FIX_MARKER: reports uses hard-admin email and current session role, not window.currentUser */
 /* REPORTS MODAL INSTANT OPEN + STACKING FIX */
 (function(){
   var modalIds = ['complianceGuardModal','adminReportsModal','leaderboardModal','paymentTrackerModal','paymentsDashboardModal','todayDashboardModal','dailyWorkQueueModal','promiseDashboardModal','employeeMonitorModal','employeeAdminModal','brandingSettingsModal','auditModal','permissionsModal','documentGeneratorModal','paymentPlanModal','callOutcomeModal'];
@@ -11028,7 +11029,7 @@ function exportContactIntelligenceCSV(){let calls=filteredContactCalls();let row
 
   window.openAdminReports = function(){
     try{
-      if(!window.currentUser || !currentUser.isAdmin) return alert('Admin only.');
+      if(!(currentUser && (currentUser.isAdmin || (typeof isAdminEmail==='function' && isAdminEmail(currentUser.email))))) return alert('Admin only.');
       closeModalsExcept('adminReportsModal');
       var modal=reportModal();
       if(!modal) return alert('Reports panel was not found. Reload the app and try again.');
