@@ -48,18 +48,18 @@ on public.team_presence for update
 to authenticated
 using (
   lower(coalesce(user_email,'')) = lower(coalesce(auth.jwt() ->> 'email',''))
-  or lower(coalesce(auth.jwt() ->> 'email','')) in ('afinch2678@gmail.com')
+  or lower(coalesce(auth.jwt() ->> 'email','')) in ('afinch2678@gmail.com','demo-admin@copilotdemo.com')
 )
 with check (
   lower(coalesce(user_email,'')) = lower(coalesce(auth.jwt() ->> 'email',''))
-  or lower(coalesce(auth.jwt() ->> 'email','')) in ('afinch2678@gmail.com')
+  or lower(coalesce(auth.jwt() ->> 'email','')) in ('afinch2678@gmail.com','demo-admin@copilotdemo.com')
 );
 
 create policy team_presence_delete
 on public.team_presence for delete
 to authenticated
 using (
-  lower(coalesce(auth.jwt() ->> 'email','')) in ('afinch2678@gmail.com')
+  lower(coalesce(auth.jwt() ->> 'email','')) in ('afinch2678@gmail.com','demo-admin@copilotdemo.com')
 );
 
 notify pgrst, 'reload schema';

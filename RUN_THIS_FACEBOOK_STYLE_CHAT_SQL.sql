@@ -79,7 +79,7 @@ drop policy if exists team_typing_delete on public.team_typing_status;
 create policy team_messages_select
 on public.team_messages for select to authenticated
 using (
-  lower(coalesce(auth.jwt() ->> 'email','')) in ('afinch2678@gmail.com')
+  lower(coalesce(auth.jwt() ->> 'email','')) in ('afinch2678@gmail.com','demo-admin@copilotdemo.com')
   or lower(coalesce(from_email,'')) = lower(coalesce(auth.jwt() ->> 'email',''))
   or lower(coalesce(to_email,'')) = lower(coalesce(auth.jwt() ->> 'email',''))
 );
@@ -91,24 +91,24 @@ with check (auth.role() = 'authenticated');
 create policy team_messages_update
 on public.team_messages for update to authenticated
 using (
-  lower(coalesce(auth.jwt() ->> 'email','')) in ('afinch2678@gmail.com')
+  lower(coalesce(auth.jwt() ->> 'email','')) in ('afinch2678@gmail.com','demo-admin@copilotdemo.com')
   or lower(coalesce(from_email,'')) = lower(coalesce(auth.jwt() ->> 'email',''))
   or lower(coalesce(to_email,'')) = lower(coalesce(auth.jwt() ->> 'email',''))
 )
 with check (
-  lower(coalesce(auth.jwt() ->> 'email','')) in ('afinch2678@gmail.com')
+  lower(coalesce(auth.jwt() ->> 'email','')) in ('afinch2678@gmail.com','demo-admin@copilotdemo.com')
   or lower(coalesce(from_email,'')) = lower(coalesce(auth.jwt() ->> 'email',''))
   or lower(coalesce(to_email,'')) = lower(coalesce(auth.jwt() ->> 'email',''))
 );
 
 create policy team_messages_delete
 on public.team_messages for delete to authenticated
-using (lower(coalesce(auth.jwt() ->> 'email','')) in ('afinch2678@gmail.com'));
+using (lower(coalesce(auth.jwt() ->> 'email','')) in ('afinch2678@gmail.com','demo-admin@copilotdemo.com'));
 
 create policy team_typing_select
 on public.team_typing_status for select to authenticated
 using (
-  lower(coalesce(auth.jwt() ->> 'email','')) in ('afinch2678@gmail.com')
+  lower(coalesce(auth.jwt() ->> 'email','')) in ('afinch2678@gmail.com','demo-admin@copilotdemo.com')
   or lower(coalesce(user_email,'')) = lower(coalesce(auth.jwt() ->> 'email',''))
   or lower(coalesce(to_email,'')) = lower(coalesce(auth.jwt() ->> 'email',''))
 );
@@ -120,18 +120,18 @@ with check (auth.role() = 'authenticated');
 create policy team_typing_update
 on public.team_typing_status for update to authenticated
 using (
-  lower(coalesce(auth.jwt() ->> 'email','')) in ('afinch2678@gmail.com')
+  lower(coalesce(auth.jwt() ->> 'email','')) in ('afinch2678@gmail.com','demo-admin@copilotdemo.com')
   or lower(coalesce(user_email,'')) = lower(coalesce(auth.jwt() ->> 'email',''))
   or lower(coalesce(to_email,'')) = lower(coalesce(auth.jwt() ->> 'email',''))
 )
 with check (
-  lower(coalesce(auth.jwt() ->> 'email','')) in ('afinch2678@gmail.com')
+  lower(coalesce(auth.jwt() ->> 'email','')) in ('afinch2678@gmail.com','demo-admin@copilotdemo.com')
   or lower(coalesce(user_email,'')) = lower(coalesce(auth.jwt() ->> 'email',''))
   or lower(coalesce(to_email,'')) = lower(coalesce(auth.jwt() ->> 'email',''))
 );
 
 create policy team_typing_delete
 on public.team_typing_status for delete to authenticated
-using (lower(coalesce(auth.jwt() ->> 'email','')) in ('afinch2678@gmail.com'));
+using (lower(coalesce(auth.jwt() ->> 'email','')) in ('afinch2678@gmail.com','demo-admin@copilotdemo.com'));
 
 notify pgrst, 'reload schema';
