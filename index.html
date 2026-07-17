@@ -9526,7 +9526,17 @@ function reportIsBrokenPromise(r){let st=reportStatus(r),due=reportDate(r.dueDat
 function reportCallResult(r){return String(r.callResult||r.call_result||r.actionText||r.action_text||'').toLowerCase()}
 function reportIsContact(r){let x=reportCallResult(r);return Boolean(x&&!/no answer|voicemail|left message|bad number|wrong number|busy|dialed|clicked phone/.test(x))}
 function reportIsRpc(r){let x=reportCallResult(r);return /right party|rpc|spoke|promise|settled|payment|callback|disputed|connected/.test(x)}
-async function reportFetch(path){try{let rows=await dbFetch(path);return (rows||[]).map(toCamel)}catch(e){return []}}
+async function reportFetch(path){
+  try{
+    path=String(path||'').replace(/limit=50000/g,'limit=3000');
+    let timeout=new Promise((_,reject)=>setTimeout(()=>reject(new Error('Report query timed out')),9000));
+    let rows=await Promise.race([dbFetch(path),timeout]);
+    return (rows||[]).map(toCamel);
+  }catch(e){
+    console.warn('Report source skipped:',path,e?.message||e);
+    return [];
+  }
+}
 function reportSetText(id,v){let el=document.getElementById(id);if(el)el.textContent=v}
 function reportAddEmp(map,email){email=String(email||'Unassigned').toLowerCase();if(!map[email])map[email]={email,collected:0,promised:0,promiseCount:0,kept:0,keptCount:0,broken:0,brokenCount:0,calls:0,contacts:0,rpc:0,notes:0,statusUpdates:0,accounts:new Set(),activity:0};return map[email]}
 function reportAddPortfolio(map,name){name=name||'Unassigned Portfolio';if(!map[name])map[name]={portfolio:name,accounts:0,placed:0,current:0,collected:0,promised:0,broken:0};return map[name]}
@@ -9698,7 +9708,7 @@ function reportTableHtmlForPrint(title,heads,rows){return `<h2>${esc(title)}</h2
   window.renderPaymentPlanEmpty=function(){
     let el=document.getElementById('paymentPlanPanel'); if(!el)return;
     let admin=ppIsAdmin();
-    el.innerHTML=`<div class="planProEmpty"><div class="planProEmptyMain"><div class="planProEmptyIcon">💳</div><div><div class="planProEmptyTitle">Payment Plan</div><div class="planProEmptyText">No active payment plan on this account.${admin?' Create one when the debtor agrees to scheduled payments.':' Admin must create or modify payment plans.'}</div></div></div><div class="planProActions">${admin?'<button class="green" onclick="openPaymentPlan()">Create Payment Plan</button>':'<span class="planProViewOnly">View Only</span>'}</div></div>`;
+    el.innerHTML=`<div class="planProEmpty"><div class="planProEmptyMain"><div class="planProEmptyIcon">💳</div><div><div class="planProEmptyTitle">Payment Plan</div><div class="planProEmptyText">No active payment plan on this account. ${admin?'Admin can create, edit, or delete plans.':'Employees can create the first payment plan, but only Admin can modify or delete it after it is saved.'}</div></div></div><div class="planProActions"><button class="green" onclick="openPaymentPlan()">Create Payment Plan</button></div></div>`;
   };
 
   window.renderPaymentPlanLoading=function(){
@@ -9759,24 +9769,34 @@ function reportTableHtmlForPrint(title,heads,rows){return `<h2>${esc(title)}</h2
         <div class="planProBox"><div class="planProProgressTop"><div><div class="planProBoxTitle">Collection Progress</div><div class="planProSub">Paid against plan total</div></div><div class="planProProgressPct">${pct.toFixed(0)}%</div></div><div class="planProProgressBar"><div class="planProProgressFill" style="width:${pct.toFixed(2)}%"></div></div><div class="planProProgressMeta"><div class="planProMetaPill"><b>${ppMoney(total)}</b><span>Total</span></div><div class="planProMetaPill"><b>${ppMoney(paid)}</b><span>Paid</span></div><div class="planProMetaPill"><b>${ppMoney(remaining)}</b><span>Left</span></div></div></div>
       </div>
       ${ppPlanTable(payments)}
-      <div class="planProFooterNote">Payment plan terms are locked for employees. Only Admin can create, edit, or delete the plan. Employees can view the schedule and continue working the account.</div>
+      <div class="planProFooterNote">Payment plan terms are locked after creation for employees. Employees can create a new plan only when no plan exists; only Admin can edit or delete an existing plan.</div>
     </div>`;
   };
 
   const oldOpenPaymentPlan = window.openPaymentPlan;
   window.openPaymentPlan=async function(){
-    if(!ppIsAdmin())return alert('Admin only: employees can view payment plans, but cannot create, modify, or delete them.');
+    let a=(typeof getCurrent==='function'?getCurrent():null);
+    if(!a)return alert('No account selected.');
+    let existing=null;
+    try{ existing=await loadPaymentPlanForAccount(a.id,true); }catch(e){ existing=null; }
+    if(existing && !ppIsAdmin())return alert('Employees can create a payment plan when none exists, but only Admin can modify an existing payment plan.');
     let modal=document.getElementById('paymentPlanModal');
     if(modal && !modal.querySelector('.planProAdminLock')){
       let body=modal.querySelector('.modalbody');
-      if(body)body.insertAdjacentHTML('afterbegin','<div class="planProAdminLock">Admin only: payment plan terms, schedule changes, and deletion are restricted to admin users.</div>');
+      if(body)body.insertAdjacentHTML('afterbegin','<div class="planProAdminLock" id="planProPermissionNote">Permission rule: employees may create the first payment plan. Only Admin can edit or delete an existing payment plan.</div>');
     }
+    let note=document.getElementById('planProPermissionNote');
+    if(note)note.textContent=existing?'Admin mode: editing an existing payment plan.':'New plan mode: employees can create this plan. After it is saved, only Admin can edit or delete it.';
     if(typeof oldOpenPaymentPlan==='function')return oldOpenPaymentPlan.apply(this,arguments);
   };
 
   const oldSavePaymentPlan = window.savePaymentPlan;
   window.savePaymentPlan=async function(){
-    if(!ppIsAdmin())return alert('Admin only: employees cannot save or modify payment plans.');
+    let a=(typeof getCurrent==='function'?getCurrent():null);
+    if(!a)return alert('No account selected.');
+    let existing=null;
+    try{ existing=await loadPaymentPlanForAccount(a.id,true); }catch(e){ existing=null; }
+    if(existing && !ppIsAdmin())return alert('Employees cannot modify an existing payment plan. Ask Admin to edit or delete the plan.');
     if(typeof oldSavePaymentPlan==='function')return oldSavePaymentPlan.apply(this,arguments);
   };
 
@@ -9805,6 +9825,30 @@ function reportTableHtmlForPrint(title,heads,rows){return `<h2>${esc(title)}</h2
   });
 })();
 
+
+
+/* REPORTS LOADING SAFETY PATCH */
+(function(){
+  const oldLoadReports = window.loadAdminReports;
+  window.loadAdminReports = async function(){
+    let safety=setTimeout(()=>{try{setGlobalBusy(false)}catch(e){};let n=document.getElementById('reportNotice');if(n)n.textContent='Reports are taking longer than expected. Showing any data that could be loaded; try Refresh again if needed.';},12000);
+    try{
+      if(typeof oldLoadReports==='function'){
+        await oldLoadReports.apply(this,arguments);
+      }
+      let n=document.getElementById('reportNotice');
+      if(n && adminReportData && adminReportData.loaded)n.textContent='Reports loaded. Some sections may be blank if the matching tables do not have records yet.';
+    }catch(e){
+      console.warn('Admin reports failed',e);
+      try{adminReportData={loaded:true,rangeText:'—',summary:{collected:0,collectedToday:0,collectedWeek:0,collectedMonth:0,promised:0,promiseCount:0,kept:0,keptCount:0,broken:0,brokenCount:0,placed:0,liquidation:0,callCount:0,contacts:0,rpc:0,contactRate:0,rpcRate:0,accountsWorked:0,employeeActivity:0,topCollector:'—'},collectors:[],portfolios:[],employees:[],payments:[]}; renderAdminReports();}catch(x){}
+      let n=document.getElementById('reportNotice');
+      if(n)n.textContent='Reports could not read one or more data tables yet. The dashboard is still open; run the latest SQL if sections stay blank.';
+    }finally{
+      clearTimeout(safety);
+      try{setGlobalBusy(false)}catch(e){}
+    }
+  };
+})();
 
 /* FACEBOOK STYLE DIRECT CHAT */
 let chatContactsData=[];
