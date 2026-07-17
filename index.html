@@ -9633,7 +9633,15 @@ function exportAdminReportsPDF(){
   if(!adminReportData.loaded)return alert('Load reports first.');
   let html=`<!doctype html><html><head><title>Co Pilot Admin Reports</title><style>body{font-family:Arial,sans-serif;color:#0f172a;padding:24px}h1{margin:0 0 4px}h2{margin-top:22px;border-bottom:1px solid #ddd;padding-bottom:6px}table{width:100%;border-collapse:collapse;font-size:12px;margin-top:8px}th,td{border:1px solid #ddd;padding:6px;text-align:left}th{background:#f1f5f9}.money{font-weight:bold;color:#166534}.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.card{border:1px solid #ddd;border-radius:10px;padding:10px}.label{font-size:10px;color:#64748b;text-transform:uppercase}.value{font-size:18px;font-weight:bold}</style></head><body><h1>Co Pilot Admin Reports</h1><div>${esc(adminReportData.rangeText)}</div><div class="grid"><div class="card"><div class="label">Collected</div><div class="value">${money(adminReportData.summary.collected)}</div></div><div class="card"><div class="label">Promises Created</div><div class="value">${money(adminReportData.summary.promised)}</div></div><div class="card"><div class="label">Liquidation</div><div class="value">${(adminReportData.summary.liquidation||0).toFixed(2)}%</div></div></div>${reportTableHtmlForPrint('Collector Ranking',['Collector','Collected','Promises','Kept','Broken','Calls','Contact %','RPC %'],(adminReportData.collectors||[]).map(r=>[r.email,money(r.collected),money(r.promised),money(r.kept),money(r.broken),r.calls,(r.calls?r.contacts/r.calls*100:0).toFixed(1)+'%',(r.calls?r.rpc/r.calls*100:0).toFixed(1)+'%']))}${reportTableHtmlForPrint('Portfolio Performance',['Portfolio','Accounts','Placed','Current','Collected','Promises','Liquidation'],(adminReportData.portfolios||[]).map(p=>[p.portfolio,p.accounts,money(p.placed),money(p.current),money(p.collected),money(p.promised),p.placed?(p.collected/p.placed*100).toFixed(2)+'%':'0%']))}
 
-<script>
+
+</body></html>`;
+  let w=window.open('','_blank');
+  if(!w){download('co-pilot-admin-reports.html',html,'text/html');return alert('Popup blocked. Downloaded an HTML report you can print to PDF.')}
+  w.document.write(html);w.document.close();setTimeout(()=>w.print(),500);
+}
+function reportTableHtmlForPrint(title,heads,rows){return `<h2>${esc(title)}</h2><table><thead><tr>${heads.map(h=>`<th>${esc(h)}</th>`).join('')}</tr></thead><tbody>${rows.map(r=>`<tr>${r.map(v=>`<td>${esc(v)}</td>`).join('')}</tr>`).join('')||`<tr><td colspan="${heads.length}">No data</td></tr>`}</tbody></table>`}
+
+
 /* PAYMENT PLAN UI REDESIGN + ADMIN-ONLY EDIT/DELETE LOCK */
 (function(){
   const ppEsc = (v)=> (typeof esc==='function'?esc(v):String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])));
@@ -9796,14 +9804,6 @@ function exportAdminReportsPDF(){
     setTimeout(()=>{try{if(currentAccountId)renderPaymentPlanSummary(currentAccountId)}catch(e){}},800);
   });
 })();
-</script>
-
-</body></html>`;
-  let w=window.open('','_blank');
-  if(!w){download('co-pilot-admin-reports.html',html,'text/html');return alert('Popup blocked. Downloaded an HTML report you can print to PDF.')}
-  w.document.write(html);w.document.close();setTimeout(()=>w.print(),500);
-}
-function reportTableHtmlForPrint(title,heads,rows){return `<h2>${esc(title)}</h2><table><thead><tr>${heads.map(h=>`<th>${esc(h)}</th>`).join('')}</tr></thead><tbody>${rows.map(r=>`<tr>${r.map(v=>`<td>${esc(v)}</td>`).join('')}</tr>`).join('')||`<tr><td colspan="${heads.length}">No data</td></tr>`}</tbody></table>`}
 
 
 /* FACEBOOK STYLE DIRECT CHAT */
