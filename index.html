@@ -1,10 +1,10 @@
 <!doctype html>
-<!-- REPORTS_REMOVED_STABLE_MARKER: Reports button disabled/removed to stop modal freeze; payment plan admin controls preserved -->
 <!-- PAYMENT_PROMISE_PLAN_SAVE_FIX_MARKER: payment promise, payment plan, and notes save repair -->
 <!-- LIVE_CALL_INTELLIGENCE_MARKER: call logging + contact intelligence -->
 <!-- LIVE_PROMISE_AUTOMATION_ALERTS_MARKER: promise automation + collector alerts -->
 <html>
 <head>
+<!-- LIVE_REPORTS_CLEAN_DIRECT_FIX_MARKER -->
 <!-- LIVE_COMPLIANCE_GUARD_MARKER: compliance guard + call rules -->
 <!-- LIVE_REPORTING_CLEAN_PACKAGE_MARKER: clean live package + admin reports -->
 <!-- LIVE_REPORTING_CLEAN_PACKAGE_MARKER: clean live package + admin reports -->
@@ -3482,6 +3482,12 @@ button {
 .planProHeader .planProActions{display:flex!important;gap:10px!important;align-items:center!important;justify-content:flex-end!important;flex-wrap:wrap!important}
 .planProHeader .planProActions .red{background:#dc2626!important;color:#fff!important}
 .planProHeader .planProActions .outline{background:#fff!important;color:#1d4ed8!important;border:1px solid #bfdbfe!important}
+
+/* REPORTS_CLEAN_DIRECT_FIX_MARKER: direct modal open, no delayed stacking */
+body.reportsCleanDirectOpen #adminReportsModal.open{display:flex!important;align-items:center!important;justify-content:center!important;z-index:2147483000!important;visibility:visible!important;opacity:1!important;}
+body.reportsCleanDirectOpen #adminReportsModal .modalbox{position:relative!important;z-index:2147483001!important;max-height:92vh!important;}
+body.reportsCleanDirectOpen #globalBusy{display:none!important;}
+
 </style>
 </head>
 <body>
@@ -3559,6 +3565,7 @@ button {
       <button class="gray adminOnly hidden" onclick="openAuditLog()">Audit</button>
       <button class="gray adminOnly hidden" onclick="openPermissionsModal()">Perms</button>
       <button class="gray adminOnly hidden" onclick="openEmployeeMonitorModal()">Monitor</button>
+      <button class="gray adminOnly hidden" onclick="return openAdminReports(event)">Reports</button>
       <button class="gray" onclick="openComplianceGuard()">Guard</button>
       <button class="gray adminOnly hidden" onclick="openEmployeeAdminModal()">Staff</button>
       <button class="gray adminOnly hidden" onclick="openBrandingSettingsModal()">Brand</button>
@@ -3578,6 +3585,7 @@ button {
       <button class="navIcon sky" title="Today Dashboard" onclick="openTodayDashboard()"><span class="navEmoji">🏠</span></button>
       <button class="navIcon purple" data-nav="messages" title="Team Chat / Messenger" onclick="toggleChatDock()"><span class="navEmoji">💬</span><span class="msgUnreadBadge">0</span></button>
       <button class="navIcon gold" title="Collector Leaderboard" onclick="openLeaderboard()"><span class="navEmoji">🏆</span></button>
+      <button class="navIcon purple adminOnly hidden" title="Admin Reports" onclick="return openAdminReports(event)"><span class="navEmoji">📊</span></button>
       <button class="navIcon red" title="Compliance Guard" onclick="openComplianceGuard()"><span class="navEmoji">🛡️</span></button>
       <button class="navIcon sky" title="Call Intelligence" onclick="openContactIntelligence()"><span class="navEmoji">☎</span></button>
       <button class="navIcon money" title="Pay Desk" onclick="openPaymentTracker()"><span class="navEmoji">💵</span></button>
@@ -6025,9 +6033,16 @@ async function dialPhone(id,phone){
   return false;
 }
 function openComplianceGuard(){
+  // Close Reports immediately so Compliance never stacks under/behind a delayed Reports modal.
+  try{
+    let r=document.getElementById('adminReportsModal');
+    if(r){r.classList.remove('open');r.style.display='';r.style.zIndex='';r.style.visibility='';r.style.opacity='';}
+    document.body.classList.remove('reportsCleanDirectOpen','reportsHardBody','reportsOpenFix','cpcmReportsDirectBody');
+  }catch(e){}
   let a=getCurrent();
   if(!a)return alert('Open an account first.');
-  document.getElementById('complianceGuardModal').classList.add('open');
+  let m=document.getElementById('complianceGuardModal');
+  if(m){m.classList.add('open');m.style.zIndex='2147482500';}
   fillComplianceForm(a);
 }
 function fillComplianceForm(a){
@@ -9476,10 +9491,62 @@ function renderLeaderboard(start,end){
 }
 
 
-/* ADMIN REPORTING DASHBOARD - TEMPORARILY DISABLED */
+/* ADMIN REPORTING DASHBOARD */
 let adminReportData={loaded:false,summary:{},collectors:[],portfolios:[],employees:[],payments:[],rangeText:''};
-function openAdminReports(){
-  alert('Reports are temporarily disabled in this stable build. Use Monitor, Pay Desk, Ledger, Promises, Calls, and Alerts while Reports is rebuilt clean.');
+function openAdminReports(evt){
+  if(evt){
+    try{ evt.preventDefault(); evt.stopPropagation(); if(evt.stopImmediatePropagation)evt.stopImmediatePropagation(); }catch(e){}
+  }
+  let adminEmail='afinch2678@gmail.com';
+  let email='';
+  try{email=String((currentUser&&currentUser.email)||'').toLowerCase().trim();}catch(e){}
+  let role='';
+  try{role=String((currentUser&&currentUser.role)||'').toLowerCase().trim();}catch(e){}
+  let roleBadge='';
+  try{roleBadge=String(document.getElementById('roleBadge')?.textContent||'').toLowerCase();}catch(e){}
+  let allowed=false;
+  try{allowed=!!(currentUser && (currentUser.isAdmin || role==='admin' || email===adminEmail || (typeof isAdminEmail==='function' && isAdminEmail(email))));}catch(e){}
+  if(!allowed && roleBadge.includes('admin')) allowed=true;
+  if(!allowed)return alert('Admin only. Refresh and log in as '+adminEmail+'.');
+
+  let modal=document.getElementById('adminReportsModal');
+  if(!modal)return alert('Reports panel was not found. Reload the app and try again.');
+
+  // Hard close every other large modal first so Reports never waits behind Compliance or another window.
+  ['complianceGuardModal','leaderboardModal','paymentTrackerModal','paymentsDashboardModal','todayDashboardModal','dailyWorkQueueModal','promiseDashboardModal','employeeMonitorModal','employeeAdminModal','brandingSettingsModal','auditModal','permissionsModal','documentGeneratorModal','paymentPlanModal','callOutcomeModal'].forEach(id=>{
+    let el=document.getElementById(id);
+    if(el){el.classList.remove('open');el.style.display='';el.style.zIndex='';}
+  });
+  document.querySelectorAll('.modal.open').forEach(el=>{if(el.id!=='adminReportsModal'){el.classList.remove('open');el.style.display='';el.style.zIndex='';}});
+  try{let busy=document.getElementById('globalBusy');if(busy){busy.classList.add('hidden');busy.style.display='none';}}catch(e){}
+
+  document.body.classList.add('reportsCleanDirectOpen');
+  modal.classList.add('open');
+  modal.style.display='flex';
+  modal.style.alignItems='center';
+  modal.style.justifyContent='center';
+  modal.style.zIndex='2147483000';
+  modal.style.visibility='visible';
+  modal.style.opacity='1';
+  let notice=document.getElementById('reportNotice');
+  if(notice)notice.textContent='Reports opened. Loading report data now...';
+
+  setTimeout(()=>{
+    try{if(typeof buildAdminReportFilters==='function')buildAdminReportFilters();}catch(e){console.warn('Report filter setup failed',e)}
+    try{
+      let rs=document.getElementById('reportStart'),re=document.getElementById('reportEnd');
+      if((!rs||!rs.value)||(!re||!re.value)){if(typeof setAdminReportRange==='function')setAdminReportRange('today');}
+    }catch(e){}
+    try{let busy=document.getElementById('globalBusy');if(busy){busy.classList.add('hidden');busy.style.display='none';}}catch(e){}
+    try{
+      let p=(typeof loadAdminReports==='function')?loadAdminReports():null;
+      if(p&&typeof p.then==='function'){
+        let slow=setTimeout(()=>{try{let n=document.getElementById('reportNotice');if(n)n.textContent='Reports are open. Data is taking longer than normal; click Refresh inside Reports if needed.';let busy=document.getElementById('globalBusy');if(busy){busy.classList.add('hidden');busy.style.display='none';}}catch(e){}},6000);
+        p.then(()=>{clearTimeout(slow);try{let n=document.getElementById('reportNotice');if(n)n.textContent='Reports loaded. Blank sections mean no matching records were found.';let busy=document.getElementById('globalBusy');if(busy){busy.classList.add('hidden');busy.style.display='none';}}catch(e){}})
+         .catch(err=>{clearTimeout(slow);console.warn('Reports load failed',err);try{let n=document.getElementById('reportNotice');if(n)n.textContent='Reports opened, but one or more sections could not load. Click Refresh or confirm the latest SQL was run.';let busy=document.getElementById('globalBusy');if(busy){busy.classList.add('hidden');busy.style.display='none';}}catch(e){}});
+      }
+    }catch(e){console.warn('Reports open/load error',e);if(notice)notice.textContent='Reports opened, but data loading hit an error. Click Refresh inside Reports.';}
+  },30);
   return false;
 }
 function setAdminReportRange(range){
@@ -10967,6 +11034,38 @@ function exportContactIntelligenceCSV(){let calls=filteredContactCalls();let row
       if(a && a.id) addAdminPlanButtons(a.id);
     }catch(e){}
   }, 800);
+})();
+
+
+
+
+
+/* REPORTS_CLEAN_DIRECT_BOOTSTRAP: force both Reports buttons to use the direct open function */
+(function(){
+  function isReportsButton(b){
+    if(!b)return false;
+    var text=(b.textContent||'').replace(/\s+/g,' ').trim();
+    var title=b.getAttribute('title')||'';
+    var oc=b.getAttribute('onclick')||'';
+    return /^Reports$/i.test(text)||/Admin Reports/i.test(title)||/openAdminReports|cpcmOpenReportsNow|directOpenAdminReports/.test(oc);
+  }
+  function wireReports(){
+    try{
+      document.querySelectorAll('button').forEach(function(b){
+        if(isReportsButton(b)){
+          b.setAttribute('onclick','return openAdminReports(event)');
+          b.onclick=function(e){return openAdminReports(e)};
+        }
+      });
+    }catch(e){}
+  }
+  document.addEventListener('click',function(e){
+    var b=e.target&&e.target.closest?e.target.closest('button'):null;
+    if(isReportsButton(b))return openAdminReports(e);
+  },true);
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',wireReports);else wireReports();
+  try{new MutationObserver(wireReports).observe(document.documentElement,{childList:true,subtree:true,attributes:true,attributeFilter:['class','onclick','title']});}catch(e){}
+  [250,750,1500,3000,6000,10000].forEach(function(ms){setTimeout(wireReports,ms)});
 })();
 
 </script>
