@@ -16,6 +16,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Co Pilot Collections Manager</title>
   <style>
+/* PAYMENT_PLAN_UI_ADMIN_LOCK_MARKER */
     *{box-sizing:border-box}
     :root{--blue:#1d4ed8;--dark:#0f172a;--muted:#64748b;--line:#dbe3ef;--bg:#eef3f9;--green:#16a34a;--red:#dc2626;--purple:#7c3aed}
     body{margin:0;font-family:Arial,Helvetica,sans-serif;background:var(--bg);color:var(--dark);height:100vh;overflow:hidden}
@@ -3402,6 +3403,77 @@ button {
 .contactEmpty{border:1px dashed #cbd5e1;background:#f8fafc;color:#64748b;border-radius:14px;padding:18px;text-align:center;font-weight:800}
 @media(max-width:1450px){.contactIntelStats{grid-template-columns:repeat(4,1fr)}.contactIntelFilters{grid-template-columns:repeat(2,1fr)}.contactIntelGrid{grid-template-columns:1fr}.callInsightGrid{grid-template-columns:repeat(3,1fr)}.callOutcomeGrid,.callOutcomePreview{grid-template-columns:repeat(2,1fr)}.callHalf{grid-column:span 1}}
 @media(max-width:850px){.contactIntelHero{display:block}.contactIntelStats,.contactIntelFilters,.callInsightGrid,.callOutcomeGrid,.callOutcomePreview{grid-template-columns:1fr}.callHalf{grid-column:1/-1}}
+
+
+
+/* PAYMENT PLAN PROFESSIONAL UI + ADMIN LOCK */
+.paymentPlanPanel{
+  display:block!important;
+  align-items:initial!important;
+  justify-content:initial!important;
+  gap:0!important;
+  padding:0!important;
+  border:0!important;
+  box-shadow:none!important;
+  background:transparent!important;
+}
+.planProCard{
+  width:100%!important;
+  background:#fff!important;
+  border:1px solid #dbe3ef!important;
+  border-radius:18px!important;
+  box-shadow:0 7px 24px rgba(15,23,42,.07)!important;
+  padding:16px!important;
+  overflow:hidden!important;
+}
+.planProHeader{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;margin-bottom:14px;flex-wrap:wrap}
+.planProEyebrow{font-size:10px;font-weight:1000;letter-spacing:.08em;text-transform:uppercase;color:#64748b;margin-bottom:3px}
+.planProTitleRow{display:flex;align-items:center;gap:9px;flex-wrap:wrap}
+.planProTitle{font-size:18px;font-weight:1000;color:#0f172a;letter-spacing:-.02em}
+.planProSub{font-size:12px;font-weight:800;color:#64748b;line-height:1.35;margin-top:4px}
+.planProActions{display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:flex-end}
+.planProActions button{height:34px!important;padding:0 11px!important;border-radius:10px!important;font-size:12px!important}
+.planProStatus{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:6px 10px;font-size:11px;font-weight:1000;border:1px solid #bbf7d0;background:#dcfce7;color:#166534;white-space:nowrap}
+.planProStatus.broken{border-color:#fecaca;background:#fee2e2;color:#991b1b}
+.planProStatus.cancelled{border-color:#cbd5e1;background:#f1f5f9;color:#334155}
+.planProStatus.completed{border-color:#bfdbfe;background:#dbeafe;color:#1d4ed8}
+.planProViewOnly{border:1px solid #dbeafe;background:#eff6ff;color:#1d4ed8;border-radius:999px;padding:6px 10px;font-size:11px;font-weight:1000;white-space:nowrap}
+.planProKpis{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:9px;margin-bottom:14px}
+.planProKpi{border:1px solid #e2e8f0;background:#f8fbff;border-radius:14px;padding:10px 11px;min-width:0}
+.planProKpiLabel{font-size:9px;font-weight:1000;color:#64748b;text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.planProKpiValue{font-size:14px;font-weight:1000;color:#0f172a;line-height:1.15;overflow-wrap:anywhere}
+.planProKpiValue.primary{font-size:16px;color:#1d4ed8}
+.planProBody{display:grid;grid-template-columns:1.1fr .9fr;gap:12px;margin-bottom:14px}
+.planProBox{border:1px solid #e2e8f0;border-radius:15px;background:#fff;padding:12px;min-width:0}
+.planProBoxTitle{font-size:12px;font-weight:1000;color:#0f172a;margin-bottom:9px}
+.planProTermsGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+.planProTerm{background:#f8fafc;border:1px solid #edf2f8;border-radius:11px;padding:8px;min-width:0}
+.planProTermLabel{font-size:9px;font-weight:1000;color:#64748b;text-transform:uppercase;margin-bottom:4px}
+.planProTermValue{font-size:12px;font-weight:900;color:#0f172a;overflow-wrap:anywhere}
+.planProProgressTop{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px}
+.planProProgressPct{font-size:24px;font-weight:1000;color:#1d4ed8;letter-spacing:-.04em}
+.planProProgressBar{height:10px;background:#e2e8f0;border-radius:999px;overflow:hidden;margin:8px 0 10px}
+.planProProgressFill{height:100%;background:#2563eb;border-radius:999px;min-width:0;transition:width .2s ease}
+.planProProgressMeta{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.planProMetaPill{background:#f8fafc;border:1px solid #edf2f8;border-radius:10px;padding:7px;text-align:center}
+.planProMetaPill b{display:block;font-size:12px;color:#0f172a}.planProMetaPill span{font-size:9px;font-weight:900;color:#64748b;text-transform:uppercase}
+.planProTableWrap{border:1px solid #e2e8f0;border-radius:15px;overflow:auto;background:#fff;max-height:330px}
+.planProTable{width:100%;border-collapse:separate;border-spacing:0;font-size:12px;min-width:720px}
+.planProTable th{position:sticky;top:0;background:#f8fafc;color:#334155;text-align:left;font-size:10px;font-weight:1000;text-transform:uppercase;letter-spacing:.05em;padding:9px 10px;border-bottom:1px solid #e2e8f0;z-index:1}
+.planProTable td{padding:10px;border-bottom:1px solid #edf2f8;vertical-align:middle;color:#0f172a;font-weight:800}
+.planProTable tr:last-child td{border-bottom:0}
+.planProDue{font-weight:1000;color:#0f172a}.planProSmall{font-size:11px;color:#64748b;font-weight:800;margin-top:2px}
+.planStatusPill{display:inline-flex;align-items:center;justify-content:center;border-radius:999px;padding:5px 9px;font-size:10px;font-weight:1000;white-space:nowrap;border:1px solid #bfdbfe;background:#eff6ff;color:#1d4ed8}
+.planStatusPill.paid{border-color:#bbf7d0;background:#dcfce7;color:#166534}.planStatusPill.partial{border-color:#fed7aa;background:#fff7ed;color:#9a3412}.planStatusPill.missed,.planStatusPill.broken{border-color:#fecaca;background:#fee2e2;color:#991b1b}.planStatusPill.cancelled{border-color:#cbd5e1;background:#f1f5f9;color:#334155}
+.planProFooterNote{margin-top:10px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:9px 11px;font-size:11px;font-weight:800;color:#475569;line-height:1.4}
+.planProEmpty{display:flex;align-items:center;justify-content:space-between;gap:12px;background:#fff;border:1px dashed #cbd5e1;border-radius:18px;padding:18px;box-shadow:0 5px 18px rgba(15,23,42,.04);flex-wrap:wrap}
+.planProEmptyIcon{width:42px;height:42px;border-radius:13px;background:#eff6ff;color:#1d4ed8;display:grid;place-items:center;font-size:20px;flex:0 0 auto}
+.planProEmptyMain{display:flex;align-items:center;gap:12px;min-width:260px;flex:1}
+.planProEmptyTitle{font-size:17px;font-weight:1000;color:#0f172a}.planProEmptyText{font-size:12px;font-weight:800;color:#64748b;margin-top:3px}
+.planProAdminLock{background:#fff7ed;border:1px solid #fed7aa;color:#9a3412;border-radius:12px;padding:10px;font-size:12px;font-weight:900;margin-bottom:12px}
+.paymentModalBox .modalhead h2::after{content:' — Admin Only';font-size:12px;font-weight:900;color:#64748b;margin-left:8px}
+@media(max-width:1500px){.planProKpis{grid-template-columns:repeat(4,minmax(0,1fr))}.planProBody{grid-template-columns:1fr}.planProProgressMeta{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:900px){.planProKpis,.planProTermsGrid,.planProProgressMeta{grid-template-columns:1fr}.planProHeader{display:block}.planProActions{justify-content:flex-start;margin-top:10px}.planProEmptyMain{min-width:0}}
 
 </style>
 </head>
@@ -9559,7 +9631,174 @@ function csvEscape(v){return `"${String(v??'').replace(/"/g,'""')}"`}
 function exportAdminReportsCSV(){if(!adminReportData.loaded)return alert('Load reports first.');let csv=adminReportCsvRows().map(r=>r.map(csvEscape).join(',')).join('\\n');download('co-pilot-admin-reports.csv',csv,'text/csv')}
 function exportAdminReportsPDF(){
   if(!adminReportData.loaded)return alert('Load reports first.');
-  let html=`<!doctype html><html><head><title>Co Pilot Admin Reports</title><style>body{font-family:Arial,sans-serif;color:#0f172a;padding:24px}h1{margin:0 0 4px}h2{margin-top:22px;border-bottom:1px solid #ddd;padding-bottom:6px}table{width:100%;border-collapse:collapse;font-size:12px;margin-top:8px}th,td{border:1px solid #ddd;padding:6px;text-align:left}th{background:#f1f5f9}.money{font-weight:bold;color:#166534}.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.card{border:1px solid #ddd;border-radius:10px;padding:10px}.label{font-size:10px;color:#64748b;text-transform:uppercase}.value{font-size:18px;font-weight:bold}</style></head><body><h1>Co Pilot Admin Reports</h1><div>${esc(adminReportData.rangeText)}</div><div class="grid"><div class="card"><div class="label">Collected</div><div class="value">${money(adminReportData.summary.collected)}</div></div><div class="card"><div class="label">Promises Created</div><div class="value">${money(adminReportData.summary.promised)}</div></div><div class="card"><div class="label">Liquidation</div><div class="value">${(adminReportData.summary.liquidation||0).toFixed(2)}%</div></div></div>${reportTableHtmlForPrint('Collector Ranking',['Collector','Collected','Promises','Kept','Broken','Calls','Contact %','RPC %'],(adminReportData.collectors||[]).map(r=>[r.email,money(r.collected),money(r.promised),money(r.kept),money(r.broken),r.calls,(r.calls?r.contacts/r.calls*100:0).toFixed(1)+'%',(r.calls?r.rpc/r.calls*100:0).toFixed(1)+'%']))}${reportTableHtmlForPrint('Portfolio Performance',['Portfolio','Accounts','Placed','Current','Collected','Promises','Liquidation'],(adminReportData.portfolios||[]).map(p=>[p.portfolio,p.accounts,money(p.placed),money(p.current),money(p.collected),money(p.promised),p.placed?(p.collected/p.placed*100).toFixed(2)+'%':'0%']))}</body></html>`;
+  let html=`<!doctype html><html><head><title>Co Pilot Admin Reports</title><style>body{font-family:Arial,sans-serif;color:#0f172a;padding:24px}h1{margin:0 0 4px}h2{margin-top:22px;border-bottom:1px solid #ddd;padding-bottom:6px}table{width:100%;border-collapse:collapse;font-size:12px;margin-top:8px}th,td{border:1px solid #ddd;padding:6px;text-align:left}th{background:#f1f5f9}.money{font-weight:bold;color:#166534}.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.card{border:1px solid #ddd;border-radius:10px;padding:10px}.label{font-size:10px;color:#64748b;text-transform:uppercase}.value{font-size:18px;font-weight:bold}</style></head><body><h1>Co Pilot Admin Reports</h1><div>${esc(adminReportData.rangeText)}</div><div class="grid"><div class="card"><div class="label">Collected</div><div class="value">${money(adminReportData.summary.collected)}</div></div><div class="card"><div class="label">Promises Created</div><div class="value">${money(adminReportData.summary.promised)}</div></div><div class="card"><div class="label">Liquidation</div><div class="value">${(adminReportData.summary.liquidation||0).toFixed(2)}%</div></div></div>${reportTableHtmlForPrint('Collector Ranking',['Collector','Collected','Promises','Kept','Broken','Calls','Contact %','RPC %'],(adminReportData.collectors||[]).map(r=>[r.email,money(r.collected),money(r.promised),money(r.kept),money(r.broken),r.calls,(r.calls?r.contacts/r.calls*100:0).toFixed(1)+'%',(r.calls?r.rpc/r.calls*100:0).toFixed(1)+'%']))}${reportTableHtmlForPrint('Portfolio Performance',['Portfolio','Accounts','Placed','Current','Collected','Promises','Liquidation'],(adminReportData.portfolios||[]).map(p=>[p.portfolio,p.accounts,money(p.placed),money(p.current),money(p.collected),money(p.promised),p.placed?(p.collected/p.placed*100).toFixed(2)+'%':'0%']))}
+
+<script>
+/* PAYMENT PLAN UI REDESIGN + ADMIN-ONLY EDIT/DELETE LOCK */
+(function(){
+  const ppEsc = (v)=> (typeof esc==='function'?esc(v):String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])));
+  const ppMoney = (v)=> (typeof money==='function'?money(v):('$'+(Number(v||0).toFixed(2))));
+  const ppMoneyNum = (v)=> (typeof moneyNum==='function'?moneyNum(v):(Number(String(v||'').replace(/[^0-9.-]/g,''))||0));
+  const ppToday = ()=> (typeof todayISO==='function'?todayISO():new Date().toISOString().slice(0,10));
+  function ppIsAdmin(){return !!(window.currentUser && currentUser.isAdmin)}
+  function ppStatusText(s){return String(s||'Scheduled').trim()||'Scheduled'}
+  function ppDisplayPayStatus(p){
+    let s=ppStatusText(p?.status);
+    if(/^paid$/i.test(s))return 'Paid';
+    if(/^partial$/i.test(s))return 'Partial';
+    if(/cancel/i.test(s))return 'Cancelled';
+    if(/broken/i.test(s))return 'Broken';
+    let due=String(p?.dueDate||p?.due_date||'').slice(0,10);
+    if(due && due<ppToday() && !/^paid$/i.test(s))return 'Missed';
+    return s;
+  }
+  function ppStatusClass(s){
+    s=String(s||'scheduled').toLowerCase();
+    if(s.includes('paid'))return 'paid';
+    if(s.includes('partial'))return 'partial';
+    if(s.includes('miss')||s.includes('broken')||s.includes('failed')||s.includes('nsf'))return 'missed';
+    if(s.includes('cancel'))return 'cancelled';
+    return 'scheduled';
+  }
+  function ppPlanStatusClass(s){
+    s=String(s||'active').toLowerCase();
+    if(s.includes('complete'))return 'completed';
+    if(s.includes('broken'))return 'broken';
+    if(s.includes('cancel'))return 'cancelled';
+    return 'active';
+  }
+  function ppPlanPaid(plan){return (plan?.payments||[]).reduce((sum,p)=>sum+ppMoneyNum(p.amountPaid||p.amount_paid),0)}
+  function ppNext(payments){
+    let t=ppToday();
+    return (payments||[]).find(p=>!['paid','cancelled','canceled'].includes(ppDisplayPayStatus(p).toLowerCase()) && String(p.dueDate||p.due_date||'')>=t)
+      || (payments||[]).find(p=>!['paid','cancelled','canceled'].includes(ppDisplayPayStatus(p).toLowerCase())) || null;
+  }
+  function ppRegular(payments){
+    let p=(payments||[]).find(x=>!['Paid','Cancelled'].includes(ppDisplayPayStatus(x)) && ppMoneyNum(x.amountDue||x.amount_due)>0) || (payments||[]).find(x=>ppMoneyNum(x.amountDue||x.amount_due)>0);
+    return p?ppMoneyNum(p.amountDue||p.amount_due):0;
+  }
+  function ppDateRange(payments){
+    let dates=(payments||[]).map(p=>String(p.dueDate||p.due_date||'').slice(0,10)).filter(Boolean).sort();
+    if(!dates.length)return '—';
+    return dates[0]===dates[dates.length-1]?dates[0]:(dates[0]+' → '+dates[dates.length-1]);
+  }
+  function ppPlanTable(payments){
+    if(!payments || !payments.length)return '<div class="planProFooterNote">No scheduled payments have been added yet.</div>';
+    return `<div class="planProTableWrap"><table class="planProTable"><thead><tr><th>#</th><th>Due Date</th><th>Amount Due</th><th>Amount Paid</th><th>Paid Date</th><th>Status</th></tr></thead><tbody>${payments.map((p,i)=>{let status=ppDisplayPayStatus(p),cls=ppStatusClass(status),due=String(p.dueDate||p.due_date||'').slice(0,10)||'—';return `<tr><td>${i+1}</td><td><div class="planProDue">${ppEsc(due)}</div><div class="planProSmall">Scheduled payment</div></td><td>${ppMoney(p.amountDue||p.amount_due||p.amount||0)}</td><td>${ppMoney(p.amountPaid||p.amount_paid||0)}</td><td>${ppEsc(String(p.paidDate||p.paid_date||p.paymentDate||p.payment_date||'—').slice(0,10))}</td><td><span class="planStatusPill ${cls}">${ppEsc(status)}</span></td></tr>`}).join('')}</tbody></table></div>`;
+  }
+
+  window.renderPaymentPlanEmpty=function(){
+    let el=document.getElementById('paymentPlanPanel'); if(!el)return;
+    let admin=ppIsAdmin();
+    el.innerHTML=`<div class="planProEmpty"><div class="planProEmptyMain"><div class="planProEmptyIcon">💳</div><div><div class="planProEmptyTitle">Payment Plan</div><div class="planProEmptyText">No active payment plan on this account.${admin?' Create one when the debtor agrees to scheduled payments.':' Admin must create or modify payment plans.'}</div></div></div><div class="planProActions">${admin?'<button class="green" onclick="openPaymentPlan()">Create Payment Plan</button>':'<span class="planProViewOnly">View Only</span>'}</div></div>`;
+  };
+
+  window.renderPaymentPlanLoading=function(){
+    let el=document.getElementById('paymentPlanPanel'); if(!el)return;
+    el.innerHTML=`<div class="planProEmpty"><div class="planProEmptyMain"><div class="planProEmptyIcon">💳</div><div><div class="planProEmptyTitle">Payment Plan</div><div class="planProEmptyText">Checking active payment plan...</div></div></div></div>`;
+  };
+
+  window.renderPaymentPlanSummary=async function(accountId){
+    let el=document.getElementById('paymentPlanPanel'); if(!el||!accountId)return;
+    renderPaymentPlanLoading();
+    let plan=await loadPaymentPlanForAccount(accountId,true);
+    if(!plan){renderPaymentPlanEmpty();return}
+    let payments=(plan.payments||[]).slice().sort((a,b)=>String(a.dueDate||a.due_date||'').localeCompare(String(b.dueDate||b.due_date||'')));
+    let total=ppMoneyNum(plan.totalAmount||plan.total_amount||plan.balance||0);
+    let paid=ppPlanPaid(plan);
+    let remaining=Math.max(0,ppMoneyNum(plan.remainingAmount||plan.remaining_amount||(total-paid)));
+    let next=ppNext(payments);
+    let each=ppRegular(payments);
+    let freq=plan.frequency||'Custom';
+    let scheduled=payments.filter(p=>!['Paid','Cancelled','Canceled'].includes(ppDisplayPayStatus(p))).length;
+    let paidCount=payments.filter(p=>ppDisplayPayStatus(p)==='Paid').length;
+    let missed=payments.filter(p=>['Missed','Broken'].includes(ppDisplayPayStatus(p))).length;
+    let accountBal=(typeof accountBalance==='function'?accountBalance(getCurrent()):remaining);
+    let pct=total>0?Math.min(100,Math.max(0,(paid/total)*100)):0;
+    let admin=ppIsAdmin();
+    let status=plan.status||'Active';
+    let statusClass=ppPlanStatusClass(status);
+    let startEnd=ppDateRange(payments);
+    let notes=String(plan.notes||'').trim();
+    el.innerHTML=`<div class="planProCard">
+      <div class="planProHeader">
+        <div>
+          <div class="planProEyebrow">Promise Arrangement</div>
+          <div class="planProTitleRow"><div class="planProTitle">Payment Plan</div><span class="planProStatus ${statusClass}">● ${ppEsc(status)}</span>${admin?'':'<span class="planProViewOnly">Employee View Only</span>'}</div>
+          <div class="planProSub">${ppEsc(freq)} plan • ${scheduled} scheduled • ${paidCount} paid • Next due: <b>${ppEsc(next?String(next.dueDate||next.due_date||'').slice(0,10):'—')}</b>${next?' for <b>'+ppMoney(next.amountDue||next.amount_due||0)+'</b>':''}</div>
+        </div>
+        <div class="planProActions">
+          ${admin?`<button class="outline" onclick="openPaymentPlan()">Edit Plan</button><button class="red" onclick="deletePaymentPlan('${ppEsc(String(plan.id)).replace(/'/g,'&#39;')}','${ppEsc(String(accountId)).replace(/'/g,'&#39;')}')">Delete Plan</button>`:'<span class="planProViewOnly">Admin controls edit/delete</span>'}
+        </div>
+      </div>
+      <div class="planProKpis">
+        <div class="planProKpi"><div class="planProKpiLabel">Plan Total</div><div class="planProKpiValue">${ppMoney(total)}</div></div>
+        <div class="planProKpi"><div class="planProKpiLabel">Paid</div><div class="planProKpiValue">${ppMoney(paid)}</div></div>
+        <div class="planProKpi"><div class="planProKpiLabel">Remaining</div><div class="planProKpiValue primary">${ppMoney(remaining)}</div></div>
+        <div class="planProKpi"><div class="planProKpiLabel">Installment</div><div class="planProKpiValue">${each?ppMoney(each):'Varies'}</div></div>
+        <div class="planProKpi"><div class="planProKpiLabel">Frequency</div><div class="planProKpiValue">${ppEsc(freq)}</div></div>
+        <div class="planProKpi"><div class="planProKpiLabel">Next Due</div><div class="planProKpiValue">${ppEsc(next?String(next.dueDate||next.due_date||'').slice(0,10):'—')}</div></div>
+        <div class="planProKpi"><div class="planProKpiLabel">Account Bal.</div><div class="planProKpiValue">${ppMoney(accountBal)}</div></div>
+      </div>
+      <div class="planProBody">
+        <div class="planProBox"><div class="planProBoxTitle">Plan Details</div><div class="planProTermsGrid">
+          <div class="planProTerm"><div class="planProTermLabel">Schedule Range</div><div class="planProTermValue">${ppEsc(startEnd)}</div></div>
+          <div class="planProTerm"><div class="planProTermLabel">Payment Count</div><div class="planProTermValue">${payments.length}</div></div>
+          <div class="planProTerm"><div class="planProTermLabel">Missed / Broken</div><div class="planProTermValue">${missed}</div></div>
+          <div class="planProTerm"><div class="planProTermLabel">Created By</div><div class="planProTermValue">${ppEsc(plan.createdByEmail||plan.created_by_email||currentUser?.email||'—')}</div></div>
+          ${notes?`<div class="planProTerm" style="grid-column:1/-1"><div class="planProTermLabel">Notes / Terms</div><div class="planProTermValue">${ppEsc(notes)}</div></div>`:''}
+        </div></div>
+        <div class="planProBox"><div class="planProProgressTop"><div><div class="planProBoxTitle">Collection Progress</div><div class="planProSub">Paid against plan total</div></div><div class="planProProgressPct">${pct.toFixed(0)}%</div></div><div class="planProProgressBar"><div class="planProProgressFill" style="width:${pct.toFixed(2)}%"></div></div><div class="planProProgressMeta"><div class="planProMetaPill"><b>${ppMoney(total)}</b><span>Total</span></div><div class="planProMetaPill"><b>${ppMoney(paid)}</b><span>Paid</span></div><div class="planProMetaPill"><b>${ppMoney(remaining)}</b><span>Left</span></div></div></div>
+      </div>
+      ${ppPlanTable(payments)}
+      <div class="planProFooterNote">Payment plan terms are locked for employees. Only Admin can create, edit, or delete the plan. Employees can view the schedule and continue working the account.</div>
+    </div>`;
+  };
+
+  const oldOpenPaymentPlan = window.openPaymentPlan;
+  window.openPaymentPlan=async function(){
+    if(!ppIsAdmin())return alert('Admin only: employees can view payment plans, but cannot create, modify, or delete them.');
+    let modal=document.getElementById('paymentPlanModal');
+    if(modal && !modal.querySelector('.planProAdminLock')){
+      let body=modal.querySelector('.modalbody');
+      if(body)body.insertAdjacentHTML('afterbegin','<div class="planProAdminLock">Admin only: payment plan terms, schedule changes, and deletion are restricted to admin users.</div>');
+    }
+    if(typeof oldOpenPaymentPlan==='function')return oldOpenPaymentPlan.apply(this,arguments);
+  };
+
+  const oldSavePaymentPlan = window.savePaymentPlan;
+  window.savePaymentPlan=async function(){
+    if(!ppIsAdmin())return alert('Admin only: employees cannot save or modify payment plans.');
+    if(typeof oldSavePaymentPlan==='function')return oldSavePaymentPlan.apply(this,arguments);
+  };
+
+  window.deletePaymentPlan=async function(planId,accountId){
+    if(!ppIsAdmin())return alert('Admin only: employees cannot delete payment plans.');
+    if(!planId)return alert('No payment plan selected.');
+    let ok=confirm('Delete this payment plan and its schedule from this account? This cannot be undone.');
+    if(!ok)return;
+    try{
+      await dbFetch('/payment_plan_payments?plan_id=eq.'+encodeURIComponent(planId),{method:'DELETE',headers:{Prefer:'return=minimal'}}).catch(()=>{});
+      await dbFetch('/payment_plan_payments?payment_plan_id=eq.'+encodeURIComponent(planId),{method:'DELETE',headers:{Prefer:'return=minimal'}}).catch(()=>{});
+      await dbFetch('/payment_plans?id=eq.'+encodeURIComponent(planId),{method:'DELETE',headers:{Prefer:'return=minimal'}});
+      try{delete paymentPlanCache[accountId]}catch(e){}
+      if(typeof insertActivity==='function')await insertActivity(accountId,'Payment Plan Deleted','Admin deleted the payment plan and schedule.').catch(()=>{});
+      if(typeof insertAudit==='function')await insertAudit('Payment Plan Deleted','Deleted payment plan '+planId,'account',accountId).catch(()=>{});
+      await renderPaymentPlanSummary(accountId).catch(()=>renderPaymentPlanEmpty());
+      await loadHistory(accountId).catch(()=>{});
+      alert('Payment plan deleted.');
+    }catch(e){
+      alert('Could not delete payment plan: '+(e.message||e));
+    }
+  };
+
+  document.addEventListener('DOMContentLoaded',()=>{
+    setTimeout(()=>{try{if(currentAccountId)renderPaymentPlanSummary(currentAccountId)}catch(e){}},800);
+  });
+})();
+</script>
+
+</body></html>`;
   let w=window.open('','_blank');
   if(!w){download('co-pilot-admin-reports.html',html,'text/html');return alert('Popup blocked. Downloaded an HTML report you can print to PDF.')}
   w.document.write(html);w.document.close();setTimeout(()=>w.print(),500);
