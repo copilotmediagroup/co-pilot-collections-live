@@ -75,7 +75,7 @@ drop policy if exists payment_promises_update on public.payment_promises;
 drop policy if exists payment_promises_delete on public.payment_promises;
 
 create policy payment_promises_select on public.payment_promises for select to authenticated using (
-  lower(coalesce(auth.jwt() ->> 'email','')) in ('afinch2678@gmail.com','demo-admin@copilotdemo.com')
+  lower(coalesce(auth.jwt() ->> 'email','')) in ('afinch2678@gmail.com')
   or lower(coalesce(employee_email,'')) = lower(coalesce(auth.jwt() ->> 'email',''))
   or lower(coalesce(created_by_email,'')) = lower(coalesce(auth.jwt() ->> 'email',''))
   or lower(coalesce(assigned_to_email,'')) = lower(coalesce(auth.jwt() ->> 'email',''))
@@ -85,17 +85,17 @@ create policy payment_promises_select on public.payment_promises for select to a
 create policy payment_promises_insert on public.payment_promises for insert to authenticated with check (auth.role() = 'authenticated');
 
 create policy payment_promises_update on public.payment_promises for update to authenticated using (
-  lower(coalesce(auth.jwt() ->> 'email','')) in ('afinch2678@gmail.com','demo-admin@copilotdemo.com')
+  lower(coalesce(auth.jwt() ->> 'email','')) in ('afinch2678@gmail.com')
   or lower(coalesce(employee_email,'')) = lower(coalesce(auth.jwt() ->> 'email',''))
   or lower(coalesce(created_by_email,'')) = lower(coalesce(auth.jwt() ->> 'email',''))
 ) with check (
-  lower(coalesce(auth.jwt() ->> 'email','')) in ('afinch2678@gmail.com','demo-admin@copilotdemo.com')
+  lower(coalesce(auth.jwt() ->> 'email','')) in ('afinch2678@gmail.com')
   or lower(coalesce(employee_email,'')) = lower(coalesce(auth.jwt() ->> 'email',''))
   or lower(coalesce(created_by_email,'')) = lower(coalesce(auth.jwt() ->> 'email',''))
 );
 
 create policy payment_promises_delete on public.payment_promises for delete to authenticated using (
-  lower(coalesce(auth.jwt() ->> 'email','')) in ('afinch2678@gmail.com','demo-admin@copilotdemo.com')
+  lower(coalesce(auth.jwt() ->> 'email','')) in ('afinch2678@gmail.com')
 );
 
 notify pgrst, 'reload schema';

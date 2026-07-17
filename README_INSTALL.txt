@@ -43,3 +43,8 @@ CALL LOGGING + CONTACT INTELLIGENCE
 - Phone clicks still use tel: links so RingCentral Chrome extension can detect/dial them.
 - After a phone click, the CRM auto-opens a call outcome popup so collectors can log No Answer, Voicemail, RPC, Promise, Refusal, Dispute, Callback, Wrong Number, DNC, etc.
 - The Calls / Contact Intelligence dashboard tracks contact rate, right-party-contact rate, collector call report, callback queue, bad-number review, recent calls, and CSV export.
+
+
+PAYMENT SAVE FIX INCLUDED:
+If notes, payment promises, or payment plans do not save, run this SQL in the matching Supabase project and refresh the app:
+SQL_TO_RUN_IN_SUPABASE/RUN_THIS_PROMISE_AUTOMATION_AND_CALL_INTELLIGENCE_SQL.sql

@@ -1,4 +1,5 @@
 <!doctype html>
+<!-- PAYMENT_PROMISE_PLAN_SAVE_FIX_MARKER: payment promise, payment plan, and notes save repair -->
 <!-- LIVE_CALL_INTELLIGENCE_MARKER: call logging + contact intelligence -->
 <!-- LIVE_PROMISE_AUTOMATION_ALERTS_MARKER: promise automation + collector alerts -->
 <html>
@@ -10362,6 +10363,233 @@ function filteredContactCalls(){let emp=String(document.getElementById('contactE
 function callAccount(c){return accountById(c.accountId||c.account_id)}
 function renderContactIntelligence(){let calls=filteredContactCalls();let contacts=calls.filter(c=>c.isContact===true||c.is_contact===true||isContactOutcome(c.callResult||c.call_result));let rpc=calls.filter(c=>c.isRpc===true||c.is_rpc===true||isRpcOutcome(c.callResult||c.call_result));let promises=calls.filter(c=>c.isPromise===true||c.is_promise===true||isPromiseOutcome(c.callResult||c.call_result));let bad=calls.filter(c=>c.isWrongNumber===true||c.is_wrong_number===true||isWrongNumberOutcome(c.callResult||c.call_result));let callbacks=(contactIntelData.callbacks||[]);contactSetText('ciCalls',calls.length);contactSetText('ciContacts',contacts.length);contactSetText('ciContactRate',calls.length?(contacts.length/calls.length*100).toFixed(1)+'%':'0%');contactSetText('ciRpc',rpc.length);contactSetText('ciRpcRate',calls.length?(rpc.length/calls.length*100).toFixed(1)+'%':'0%');contactSetText('ciPromises',promises.length);contactSetText('ciCallbacks',callbacks.length);contactSetText('ciBadNumbers',bad.length);let em={};calls.forEach(c=>{let e=String(c.createdByEmail||'Unassigned').toLowerCase();if(!em[e])em[e]={email:e,calls:0,contacts:0,rpc:0,promises:0,voicemail:0,bad:0};let r=c.callResult||c.call_result;em[e].calls++;if(isContactOutcome(r)||c.isContact||c.is_contact)em[e].contacts++;if(isRpcOutcome(r)||c.isRpc||c.is_rpc)em[e].rpc++;if(isPromiseOutcome(r)||c.isPromise||c.is_promise)em[e].promises++;if(r==='Left Voicemail')em[e].voicemail++;if(isWrongNumberOutcome(r)||c.isWrongNumber||c.is_wrong_number)em[e].bad++});let empRows=Object.values(em).sort((a,b)=>b.contacts-a.contacts||b.calls-a.calls);let eb=document.getElementById('ciEmployeeBody');if(eb)eb.innerHTML=empRows.map(e=>`<tr><td><b>${esc(e.email)}</b></td><td>${e.calls}</td><td>${e.contacts}</td><td>${e.rpc}</td><td>${e.calls?(e.contacts/e.calls*100).toFixed(1):'0'}%</td><td>${e.calls?(e.rpc/e.calls*100).toFixed(1):'0'}%</td><td>${e.promises}</td><td>${e.voicemail}</td><td>${e.bad}</td></tr>`).join('')||'<tr><td colspan="9"><div class="contactEmpty">No call results found.</div></td></tr>';let cb=document.getElementById('ciCallbackQueue');if(cb){let today=todayISO();cb.innerHTML=callbacks.slice(0,50).map(f=>{let a=accountById(f.accountId||f.account_id);let due=callDateOnly(f.dueDate||f.due_date);let cls=due<today?'overdue':due===today?'today':'';return `<div class="callbackCard ${cls}"><div class="callbackTitle">${esc(a?nameOf(a):'Unknown Account')} · ${esc(due||'No date')}</div><div class="callbackMeta">${esc(f.reason||'Callback')}<br>${esc(f.assignedToEmail||f.assigned_to_email||'Unassigned')} · ${esc(f.notes||'')}</div></div>`}).join('')||'<div class="contactEmpty">No open callbacks.</div>'}let rb=document.getElementById('ciRecentBody');if(rb)rb.innerHTML=calls.slice(0,100).map(c=>{let a=callAccount(c);let r=c.callResult||c.call_result||'—';return `<tr><td>${esc(new Date(c.createdAt||c.created_at||Date.now()).toLocaleString())}</td><td><b>${esc(a?nameOf(a):'Unknown')}</b><div class="callbackMeta">${esc(a?acctNo(a):'')}</div></td><td>${esc(fmtPhone(c.phoneNumber||c.phone_number||''))}</td><td><span class="callResultPill ${callPillClass(r)}">${esc(r)}</span></td><td>${esc(c.createdByEmail||c.created_by_email||'')}</td><td>${esc(c.notes||'')}</td></tr>`}).join('')||'<tr><td colspan="6"><div class="contactEmpty">No recent calls.</div></td></tr>';let bb=document.getElementById('ciBadNumberBody');if(bb)bb.innerHTML=bad.slice(0,100).map(c=>{let a=callAccount(c);let r=c.callResult||c.call_result||'Wrong Number';return `<tr><td><b>${esc(a?nameOf(a):'Unknown')}</b><div class="callbackMeta">${esc(a?acctNo(a):'')}</div></td><td>${esc(fmtPhone(c.phoneNumber||c.phone_number||''))}</td><td><span class="callResultPill bad">${esc(r)}</span></td><td>${esc(c.createdByEmail||c.created_by_email||'')}</td><td>${esc(callDateOnly(c.createdAt||c.created_at)||'')}</td></tr>`}).join('')||'<tr><td colspan="5"><div class="contactEmpty">No bad number results in this range.</div></td></tr>'}
 function exportContactIntelligenceCSV(){let calls=filteredContactCalls();let rows=[['created_at','account_name','account_number','phone','result','category','direction','duration_seconds','is_contact','is_rpc','is_promise','next_call_at','employee','notes']];calls.forEach(c=>{let a=callAccount(c);rows.push([c.createdAt||c.created_at||'',a?nameOf(a):'',a?acctNo(a):'',c.phoneNumber||c.phone_number||'',c.callResult||c.call_result||'',c.outcomeCategory||c.outcome_category||callOutcomeCategory(c.callResult||c.call_result),c.direction||'',c.durationSeconds||c.duration_seconds||0,!!(c.isContact||c.is_contact),!!(c.isRpc||c.is_rpc),!!(c.isPromise||c.is_promise),c.nextCallAt||c.next_call_at||'',c.createdByEmail||c.created_by_email||'',c.notes||''])});download('co-pilot-call-intelligence.csv',rows.map(r=>r.map(csvEscape).join(',')).join('\n'),'text/csv')}
+
+
+
+/* PAYMENT PROMISE / PAYMENT PLAN / NOTES SAVE FIX MARKER
+   Fixes saves after the call-intelligence build by writing old + new payment columns,
+   showing visible errors, refreshing history immediately, and keeping Pay Desk hooks alive. */
+(function(){
+  if(window.__cpcmPaymentPromisePlanNotesSaveFix)return;
+  window.__cpcmPaymentPromisePlanNotesSaveFix=true;
+
+  function sfEl(id){return document.getElementById(id)}
+  function sfVal(id){let e=sfEl(id);return e?String(e.value||'').trim():''}
+  function sfMoneyNum(v){try{return moneyNum(v)}catch(e){let n=parseFloat(String(v||'').replace(/[^0-9.-]/g,''));return Number.isFinite(n)?n:0}}
+  function sfMoney(v){try{return money(v)}catch(e){return '$'+sfMoneyNum(v).toFixed(2)}}
+  function sfToday(){try{return todayISO()}catch(e){return new Date().toISOString().slice(0,10)}}
+  function sfAcctBal(a){try{return accountBalance(a)}catch(e){return sfMoneyNum(a?.currentBalance||a?.current_balance||a?.balance||0)}}
+  function sfName(a){try{return nameOf(a)}catch(e){return a?.fullName||a?.full_name||'Account'}}
+  function sfAcctNo(a){try{return acctNo(a)}catch(e){return a?.accountNumber||a?.account_number||''}}
+  function sfAssignee(a){try{return currentAssignee(a)}catch(e){return a?.assignedToEmail||a?.assigned_to_email||currentUser?.email||''}}
+  function sfInsertActivity(accountId,type,text,phone='',oldStatus='',newStatus=''){
+    if(typeof insertActivity==='function')return insertActivity(accountId,type,text,phone,oldStatus,newStatus).catch(()=>{});
+    return Promise.resolve();
+  }
+  function sfInsertAudit(action,details,targetType,targetId){
+    if(typeof insertAudit==='function')return insertAudit(action,details,targetType,targetId).catch(()=>{});
+    return Promise.resolve();
+  }
+  function sfShowSaveError(area,e){
+    console.error(area+' save failed:',e);
+    let msg=(e&&e.message)?e.message:String(e||'Unknown error');
+    alert(area+' did not save. Run SQL_TO_RUN_IN_SUPABASE/RUN_THIS_PROMISE_AUTOMATION_AND_CALL_INTELLIGENCE_SQL.sql in the matching Supabase project, then refresh. Supabase said: '+msg);
+  }
+
+  saveCurrent = async function(){
+    let a=getCurrent();
+    if(!a)return alert('No account selected.');
+    let note=(sfEl('agentNote')?.value||'').trim();
+    if(!note)return;
+    try{
+      await dbFetch('/account_notes',{method:'POST',body:JSON.stringify([{account_id:a.id,note,created_by_email:currentUser.email}])});
+      await sfInsertActivity(a.id,'Note',note);
+      if(sfEl('agentNote'))sfEl('agentNote').value='';
+      if(sfEl('noteCounter'))sfEl('noteCounter').textContent='0 / 2000';
+      await loadHistory(a.id).catch(()=>{});
+      await loadAccounts().catch(()=>{});
+      currentAccountId=a.id;
+      render();
+    }catch(e){
+      sfShowSaveError('Agent note',e);
+    }
+  };
+
+  saveAndNext = async function(){await saveCurrent(); nextAccount();};
+
+  savePaymentPlan = async function(){
+    let a=getCurrent();
+    if(!a)return alert('No account selected.');
+    try{
+      if(!Array.isArray(paymentScheduleDraft) || !paymentScheduleDraft.length)return alert('Generate or add at least one payment date.');
+      if(typeof sanitizeDraftAmounts==='function')sanitizeDraftAmounts();
+      let acctBal=sfAcctBal(a);
+      let total=sfMoneyNum(sfVal('planTotal'));
+      if(total<=0)return alert('Plan total must be greater than zero.');
+      if(total>acctBal+0.01)return alert('Not allowed: plan total cannot exceed the current account balance of '+sfMoney(acctBal)+'.');
+      let paidToday=sfMoneyNum(sfVal('planToday'));
+      if(paidToday>total+0.01)return alert('Payment today cannot be greater than the plan total.');
+      let remainingAfterToday=Number(Math.max(0,total-paidToday).toFixed(2));
+      let scheduledDue=paymentScheduleDraft.reduce((s,p)=>s+sfMoneyNum(p.amountDue ?? p.amount_due ?? p.amount ?? p.paymentAmount),0);
+      if(scheduledDue>remainingAfterToday+0.01)return alert('Not allowed: scheduled future payments '+sfMoney(scheduledDue)+' exceed remaining balance after today '+sfMoney(remainingAfterToday)+'.');
+
+      let status=sfVal('planStatus')||'Active';
+      let frequency=sfVal('planFrequency')||'Custom';
+      let notes=sfVal('planNotes');
+      let existing=null;
+      try{existing=await loadPaymentPlanForAccount(a.id,true)}catch(e){existing=null}
+      if(existing&&existing.id){
+        await dbFetch(`/payment_plans?id=eq.${existing.id}`,{method:'PATCH',body:JSON.stringify({status:'Replaced',updated_at:new Date().toISOString()})}).catch(()=>{});
+      }
+      let paidFromSchedule=paymentScheduleDraft.reduce((s,p)=>s+sfMoneyNum(p.amountPaid ?? p.amount_paid ?? 0),0);
+      let paidTotal=Number((paidToday+paidFromSchedule).toFixed(2));
+      let remaining=Number(Math.max(0,total-paidTotal).toFixed(2));
+      let nextDue=(paymentScheduleDraft.find(p=>String(p.status||'Scheduled')!=='Paid')||paymentScheduleDraft[0]||{}).dueDate || sfToday();
+      let each=0;
+      try{each=regularPaymentAmount({payments:paymentScheduleDraft})}catch(e){each=paymentScheduleDraft.length?Number((scheduledDue/paymentScheduleDraft.length).toFixed(2)):0}
+      let planPayload={
+        account_id:a.id,
+        total_amount:total,
+        starting_balance:acctBal,
+        remaining_amount:remaining,
+        balance:remaining,
+        payment_amount:each,
+        frequency,
+        start_date:(paymentScheduleDraft[0]?.dueDate||sfToday()),
+        next_due_date:nextDue,
+        status,
+        notes,
+        created_by_email:currentUser.email,
+        updated_at:new Date().toISOString()
+      };
+      let planRows=await dbFetch('/payment_plans',{method:'POST',body:JSON.stringify([planPayload])});
+      let plan=Array.isArray(planRows)?planRows[0]:planRows;
+      if(!plan || !plan.id)throw new Error('Supabase did not return the saved payment plan id.');
+      let pid=plan.id;
+      let rows=paymentScheduleDraft.map(p=>{
+        let due=sfMoneyNum(p.amountDue ?? p.amount_due ?? p.amount ?? p.paymentAmount);
+        let paid=sfMoneyNum(p.amountPaid ?? p.amount_paid ?? 0);
+        let paidDate=p.paidDate||p.paid_date||p.paymentDate||'';
+        return {
+          plan_id:pid,
+          payment_plan_id:pid,
+          account_id:a.id,
+          due_date:p.dueDate||p.due_date||sfToday(),
+          scheduled_date:p.dueDate||p.due_date||sfToday(),
+          amount_due:due,
+          amount:due,
+          payment_amount:paid||due,
+          amount_paid:paid,
+          paid_date:paidDate||null,
+          payment_date:paidDate||null,
+          paid_at:paidDate?new Date(paidDate+'T12:00:00').toISOString():null,
+          status:p.status||'Scheduled',
+          notes,
+          created_by_email:currentUser.email,
+          updated_at:new Date().toISOString()
+        };
+      });
+      if(rows.length)await dbFetch('/payment_plan_payments',{method:'POST',body:JSON.stringify(rows)});
+      if(paidToday>0){
+        await dbFetch('/payment_plan_payments',{method:'POST',body:JSON.stringify([{
+          plan_id:pid,
+          payment_plan_id:pid,
+          account_id:a.id,
+          due_date:sfToday(),
+          scheduled_date:sfToday(),
+          amount_due:paidToday,
+          amount:paidToday,
+          payment_amount:paidToday,
+          amount_paid:paidToday,
+          paid_date:sfToday(),
+          payment_date:sfToday(),
+          paid_at:new Date().toISOString(),
+          status:'Paid',
+          notes:'Payment made today when payment plan was created. '+notes,
+          created_by_email:currentUser.email,
+          updated_at:new Date().toISOString()
+        }])});
+      }
+      await dbFetch(`/accounts?id=eq.${a.id}`,{method:'PATCH',body:JSON.stringify({current_balance:remaining,status:status==='Active'?'Promise to Pay':(a.status||'Promise to Pay'),disposition:'Promise to Pay',updated_at:new Date().toISOString()})});
+      await sfInsertActivity(a.id,'Payment Plan','Payment plan saved: total '+sfMoney(total)+', payment today '+sfMoney(paidToday)+', paid total '+sfMoney(paidTotal)+', remaining '+sfMoney(remaining)+', frequency '+frequency);
+      await sfInsertAudit('Payment Plan Saved','Payment plan saved for '+sfName(a)+' totaling '+sfMoney(total),'account',a.id);
+      try{delete paymentPlanCache[a.id]}catch(e){}
+      closeModal('paymentPlanModal');
+      await loadAccounts().catch(()=>{});
+      currentAccountId=a.id;
+      await renderPaymentPlanSummary(a.id).catch(()=>{});
+      await loadHistory(a.id).catch(()=>{});
+      render();
+      alert('Payment plan saved. Account balance updated to '+sfMoney(remaining)+'.');
+    }catch(e){
+      sfShowSaveError('Payment plan',e);
+    }
+  };
+
+  const __savePaymentPromiseCore = async function(){
+    let a=getCurrent();
+    let id=sfVal('ptAccountId');
+    if(id&&(!a||String(a.id)!==String(id)))a=accountById(id)||a;
+    if(!a)return alert('Open an account first.');
+    let amount=sfMoneyNum(sfVal('ptAmount')),
+        due=sfVal('ptDueDate')||sfToday(),
+        count=Math.max(1,Math.min(60,parseInt(sfVal('ptCount')||'1',10)||1)),
+        frequency=sfVal('ptFrequency')||'One-Time',
+        kind=count>1?'Payment Plan':(sfVal('ptPaymentKind')||'One-Time Payment'),
+        method=sfVal('ptMethod')||'Card',
+        last4=(typeof ptSafeLast4==='function'?ptSafeLast4(sfVal('ptLast4')):sfVal('ptLast4').replace(/\D/g,'').slice(-4)),
+        auth=sfVal('ptAuthMethod')||'Phone Authorization',
+        notes=sfVal('ptNotes');
+    if(amount<=0)return alert('Enter a payment amount.');
+    let gid=(typeof promiseGroupId==='function'?promiseGroupId():('promise-'+Date.now()+'-'+Math.random().toString(36).slice(2)));
+    let rows=[];
+    for(let i=0;i<count;i++){
+      let dueDate=(typeof ptIsoAdd==='function'?ptIsoAdd(due,frequency,i):due);
+      rows.push({
+        account_id:a.id,
+        promise_group_id:gid,
+        schedule_index:i+1,
+        schedule_total:count,
+        debtor_name:sfName(a),
+        account_number:sfAcctNo(a),
+        payment_kind:kind,
+        payment_amount:amount,
+        total_amount:Number((amount*count).toFixed(2)),
+        due_date:dueDate,
+        payment_method:method,
+        method_last4:last4,
+        authorization_method:auth,
+        status:'Pending Processing',
+        employee_email:currentUser.email,
+        assigned_to_email:sfAssignee(a),
+        notes,
+        created_by_email:currentUser.email,
+        updated_at:new Date().toISOString()
+      });
+    }
+    await dbFetch('/payment_promises',{method:'POST',body:JSON.stringify(rows)});
+    await dbFetch(`/accounts?id=eq.${a.id}`,{method:'PATCH',body:JSON.stringify({status:'Promise to Pay',disposition:'Promise to Pay',updated_at:new Date().toISOString()})}).catch(()=>{});
+    await sfInsertActivity(a.id,'Payment Promise Recorded',`${count} payment promise(s) recorded for ${sfMoney(amount)} each. First due ${due}. Method: ${method}${last4?' ending '+last4:''}. ${notes}`.trim());
+    await sfInsertAudit('Payment Promise Recorded',`${count} payment promise(s) for ${sfName(a)} totaling ${sfMoney(amount*count)}`,'account',a.id);
+    if(typeof fillPaymentPromiseForm==='function')fillPaymentPromiseForm(a);
+    if(typeof loadPaymentTracker==='function')await loadPaymentTracker();
+    await loadAccounts().catch(()=>{});
+    currentAccountId=a.id;
+    await loadHistory(a.id).catch(()=>{});
+    render();
+    alert('Payment promise saved.');
+  };
+
+  savePaymentPromise = async function(){
+    try{
+      await __savePaymentPromiseCore();
+      if(typeof runPromiseAutomation==='function')await runPromiseAutomation(false,false).catch(()=>{});
+      if(typeof refreshCollectorAlertBadge==='function')await refreshCollectorAlertBadge().catch(()=>{});
+    }catch(e){
+      sfShowSaveError('Payment promise',e);
+    }
+  };
+})();
 
 </script>
 </body>
