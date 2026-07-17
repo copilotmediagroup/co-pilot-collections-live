@@ -11040,7 +11040,7 @@ function exportContactIntelligenceCSV(){let calls=filteredContactCalls();let row
 
 
 
-/* REPORTS_CLEAN_DIRECT_BOOTSTRAP: force both Reports buttons to use the direct open function */
+/* REPORTS_NO_FREEZE_FIX: direct Reports buttons without MutationObserver loop */
 (function(){
   function isReportsButton(b){
     if(!b)return false;
@@ -11064,8 +11064,9 @@ function exportContactIntelligenceCSV(){let calls=filteredContactCalls();let row
     if(isReportsButton(b))return openAdminReports(e);
   },true);
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',wireReports);else wireReports();
-  try{new MutationObserver(wireReports).observe(document.documentElement,{childList:true,subtree:true,attributes:true,attributeFilter:['class','onclick','title']});}catch(e){}
-  [250,750,1500,3000,6000,10000].forEach(function(ms){setTimeout(wireReports,ms)});
+  // Do not use a MutationObserver here. Rewriting button onclick attributes while
+  // observing onclick/class changes can create an endless mutation loop in Bolt preview.
+  [250,750,1500,3000].forEach(function(ms){setTimeout(wireReports,ms)});
 })();
 
 </script>
