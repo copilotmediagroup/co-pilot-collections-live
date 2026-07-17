@@ -1,6 +1,7 @@
 <!doctype html>
 <html>
 <head>
+<!-- LIVE_COMPLIANCE_GUARD_MARKER: compliance guard + call rules -->
 <!-- LIVE_REPORTING_CLEAN_PACKAGE_MARKER: clean live package + admin reports -->
 <!-- LIVE_REPORTING_CLEAN_PACKAGE_MARKER: clean live package + admin reports -->
 <!-- LIVE_REPORTING_CLEAN_PACKAGE_MARKER: clean live package + admin reports -->
@@ -3319,6 +3320,39 @@ button {
 @media(max-width:1450px){.reportFilters{grid-template-columns:repeat(3,1fr)}.reportStats{grid-template-columns:repeat(3,1fr)}}
 @media(max-width:1000px){.reportGrid{grid-template-columns:1fr}.reportFilters,.reportStats{grid-template-columns:1fr}}
 
+
+
+/* COMPLIANCE GUARD + CALL RULES */
+.complianceBanner{grid-column:1/-1;padding:13px 15px;border-radius:16px;background:#fff;border:1px solid #dbe3ef;box-shadow:0 2px 10px rgba(15,23,42,.035)}
+.complianceTop{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap}
+.complianceTitle{font-size:15px;font-weight:1000;color:#0f172a;display:flex;align-items:center;gap:8px}
+.complianceState{border-radius:999px;padding:5px 10px;font-size:11px;font-weight:1000;background:#dcfce7;color:#166534;display:inline-flex;align-items:center;gap:6px}
+.complianceState.warn{background:#fff7ed;color:#9a3412;border:1px solid #fed7aa}
+.complianceState.block{background:#fee2e2;color:#991b1b;border:1px solid #fecaca}
+.complianceBadges{display:flex;gap:7px;flex-wrap:wrap;margin-top:10px}
+.complianceBadge{border-radius:999px;padding:5px 9px;font-size:11px;font-weight:900;background:#eef2ff;color:#1d4ed8;border:1px solid #c7d2fe}
+.complianceBadge.block{background:#fee2e2;color:#991b1b;border-color:#fecaca}
+.complianceBadge.warn{background:#fff7ed;color:#9a3412;border-color:#fed7aa}
+.complianceBadge.good{background:#dcfce7;color:#166534;border-color:#bbf7d0}
+.complianceSummary{font-size:12px;color:#475569;line-height:1.45;margin-top:8px}
+.complianceActions{display:flex;gap:8px;flex-wrap:wrap}
+.complianceGrid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.complianceGrid label{font-size:12px;font-weight:900;color:#334155;display:block;margin-bottom:5px}
+.complianceGrid input,.complianceGrid select,.complianceGrid textarea{width:100%;border:1px solid #cbd5e1;border-radius:10px;padding:10px;font:inherit;background:#fff}
+.complianceGrid textarea{min-height:86px;resize:vertical}
+.complianceWide{grid-column:1/-1}.complianceHalf{grid-column:span 2}
+.complianceChecklist{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:12px 0}
+.complianceCheck{border:1px solid #e2e8f0;border-radius:13px;background:#f8fbff;padding:10px;font-size:12px;font-weight:850;color:#334155;display:flex;gap:8px;align-items:flex-start}
+.complianceCheck input{width:auto;margin-top:2px}
+.complianceRuleBox{border:1px solid #e2e8f0;border-radius:14px;background:#f8fafc;padding:12px;margin:12px 0}
+.complianceRuleTitle{font-weight:1000;color:#0f172a;margin-bottom:8px}
+.complianceRuleList{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;font-size:12px;color:#334155}
+.complianceModalBox{max-width:1120px}
+.phoneChip.blocked{opacity:.62;background:#f8fafc;border-color:#fecaca;color:#991b1b;cursor:not-allowed}
+.callBlockedNote{font-size:10px;color:#991b1b;font-weight:900;margin-top:3px}
+@media(max-width:1450px){.complianceGrid{grid-template-columns:repeat(2,1fr)}.complianceChecklist,.complianceRuleList{grid-template-columns:repeat(2,1fr)}.complianceHalf{grid-column:span 1}}
+@media(max-width:850px){.complianceGrid,.complianceChecklist,.complianceRuleList{grid-template-columns:1fr}.complianceHalf{grid-column:1/-1}}
+
 </style>
 </head>
 <body>
@@ -3395,6 +3429,7 @@ button {
       <button class="gray adminOnly hidden" onclick="openPermissionsModal()">Perms</button>
       <button class="gray adminOnly hidden" onclick="openEmployeeMonitorModal()">Monitor</button>
       <button class="gray adminOnly hidden" onclick="openAdminReports()">Reports</button>
+      <button class="gray" onclick="openComplianceGuard()">Guard</button>
       <button class="gray adminOnly hidden" onclick="openEmployeeAdminModal()">Staff</button>
       <button class="gray adminOnly hidden" onclick="openBrandingSettingsModal()">Brand</button>
       <button class="gray adminOnly hidden" onclick="openAssignModal()">Assign</button>
@@ -3414,6 +3449,7 @@ button {
       <button class="navIcon purple" data-nav="messages" title="Team Chat / Messenger" onclick="toggleChatDock()"><span class="navEmoji">💬</span><span class="msgUnreadBadge">0</span></button>
       <button class="navIcon gold" title="Collector Leaderboard" onclick="openLeaderboard()"><span class="navEmoji">🏆</span></button>
       <button class="navIcon purple adminOnly hidden" title="Admin Reports" onclick="openAdminReports()"><span class="navEmoji">📊</span></button>
+      <button class="navIcon red" title="Compliance Guard" onclick="openComplianceGuard()"><span class="navEmoji">🛡️</span></button>
       <button class="navIcon money" title="Pay Desk" onclick="openPaymentTracker()"><span class="navEmoji">💵</span></button>
       <button class="navIcon green" title="Daily Work Queue" onclick="openDailyWorkQueue()"><span class="navEmoji">✅</span></button>
       <button class="navIcon sky" title="Letters / Documents" onclick="openDocumentGenerator()"><span class="navEmoji">📄</span></button>
@@ -3454,6 +3490,8 @@ button {
           <div><div class="fieldLabel">Email</div><div class="fieldVal" id="email">—</div></div>
         </div>
       </section>
+
+      <section class="panel complianceBanner" id="complianceBanner"></section>
 
       <section class="panel allFieldsTopPanel">
         <div class="allFieldsTopHeader">
@@ -4470,6 +4508,49 @@ button {
   </div>
 </div></div>
 
+
+
+<div id="complianceGuardModal" class="modal"><div class="modalbox complianceModalBox">
+  <div class="modalhead"><h2>Compliance Guard / Call Rules</h2><button class="gray" onclick="closeModal('complianceGuardModal')">Close</button></div>
+  <div class="modalbody">
+    <div id="complianceAccountTitle" class="powerWarning">Open an account to review compliance rules.</div>
+    <div class="complianceRuleBox">
+      <div class="complianceRuleTitle">Call protection rules</div>
+      <div class="complianceRuleList">
+        <div>• Blocks DNC, cease & desist, bankruptcy, deceased, attorney represented, disputed/frozen, and wrong-number accounts.</div>
+        <div>• Warns or blocks outside the account state/time-zone call window.</div>
+        <div>• Warns or blocks after the daily call limit is reached.</div>
+        <div>• Admin can override a block with a saved compliance override note.</div>
+      </div>
+    </div>
+    <div id="complianceCurrentWarnings" class="complianceBadges"></div>
+    <div class="complianceChecklist">
+      <label class="complianceCheck"><input id="cgDoNotCall" type="checkbox"> <span><b>Do Not Call</b><br>Block outbound phone attempts.</span></label>
+      <label class="complianceCheck"><input id="cgCease" type="checkbox"> <span><b>Cease & Desist</b><br>Hard block unless admin override.</span></label>
+      <label class="complianceCheck"><input id="cgDisputed" type="checkbox"> <span><b>Disputed / Frozen</b><br>Requires verification before collection.</span></label>
+      <label class="complianceCheck"><input id="cgBankruptcy" type="checkbox"> <span><b>Bankruptcy</b><br>Hard block collection contact.</span></label>
+      <label class="complianceCheck"><input id="cgDeceased" type="checkbox"> <span><b>Deceased</b><br>Hard block normal collection contact.</span></label>
+      <label class="complianceCheck"><input id="cgAttorney" type="checkbox"> <span><b>Attorney Represented</b><br>Collector should not call consumer directly.</span></label>
+      <label class="complianceCheck"><input id="cgWrongNumber" type="checkbox"> <span><b>Wrong Number</b><br>Block calling this account's numbers.</span></label>
+      <label class="complianceCheck"><input id="cgNeedsReview" type="checkbox"> <span><b>Needs Manager Review</b><br>Warning before action.</span></label>
+      <label class="complianceCheck"><input id="cgConsent" type="checkbox"> <span><b>Consent Confirmed</b><br>Mark phone/contact consent on file.</span></label>
+    </div>
+    <div class="complianceGrid">
+      <div><label>Call Window Start</label><input id="cgCallStart" type="time" value="08:00"></div>
+      <div><label>Call Window End</label><input id="cgCallEnd" type="time" value="21:00"></div>
+      <div><label>Max Calls Per Day</label><input id="cgMaxCalls" type="number" min="1" max="20" value="2"></div>
+      <div><label>Time Zone Override</label><select id="cgTimeZone"><option value="">Auto by State</option><option>America/New_York</option><option>America/Chicago</option><option>America/Denver</option><option>America/Phoenix</option><option>America/Los_Angeles</option><option>America/Anchorage</option><option>Pacific/Honolulu</option></select></div>
+      <div><label>Consent Date</label><input id="cgConsentDate" type="date"></div>
+      <div><label>Attorney Name</label><input id="cgAttorneyName" placeholder="Attorney / firm"></div>
+      <div class="complianceHalf"><label>Restriction Source</label><input id="cgRestrictionSource" placeholder="Consumer request, skip trace, court notice, dispute letter..."></div>
+      <div class="complianceWide"><label>Compliance Notes</label><textarea id="cgNotes" placeholder="Document why this account is restricted, who approved contact, and any safe contact instructions."></textarea></div>
+    </div>
+    <div style="display:flex;justify-content:flex-end;gap:10px;flex-wrap:wrap;margin-top:14px">
+      <button class="outline" onclick="resetComplianceForm()">Reset Form</button>
+      <button class="green adminOnly hidden" onclick="saveComplianceGuard()">Save Compliance Rules</button>
+    </div>
+  </div>
+</div>
 
 <div id="adminReportsModal" class="modal"><div class="modalbox powerBox adminReportsBox">
   <div class="modalhead"><h2>Admin Reports</h2><button class="gray" onclick="closeModal('adminReportsModal')">Close</button></div>
@@ -5504,7 +5585,7 @@ function fieldCard(label,k,v,a){
  let phones=[];
  try{phones=extractPhones(val)}catch(e){}
  if(phones.length && /phone|tel|mobile|cell/i.test(String(label)+' '+String(k))){
-   shown=phones.map(p=>`<a href="tel:${normPhone(p)}" onclick="recordDial('${a.id}','${normPhone(p)}')">${fmtPhone(p)}</a>`).join(', ');
+   shown=phones.map(p=>`<a href="#" onclick="event.preventDefault(); return dialPhone('${a.id}','${normPhone(p)}')">${fmtPhone(p)}</a>`).join(', ');
  }else{
    shown=displayVal(k,v,a);
  }
@@ -5582,6 +5663,7 @@ function renderCurrent(a,q){
    document.getElementById('statusDisplay').innerHTML='<span class="badge">—</span>';
    document.getElementById('email').textContent='—';
    renderAllImportedFields(null);
+   renderComplianceBanner(null);
    let pp=document.getElementById('paymentPlanSummary'); if(pp)pp.innerHTML='<div class="emptyMain"><b>No accounts yet</b><span>Import a CSV portfolio to start the workflow.</span></div>';
    let pg=document.getElementById('phoneGrid'); if(pg)pg.innerHTML='<div class="muted">No phone numbers until an account is selected.</div>';
    let dg=document.getElementById('dispoGrid'); if(dg)dg.innerHTML='';
@@ -5608,6 +5690,7 @@ function renderCurrent(a,q){
  document.getElementById('email').textContent=a.email||'—';
 
  renderAllImportedFields(a);
+ renderComplianceBanner(a);
  renderPaymentPlanSummary(a.id);
  renderPhones(a);
  renderDispos(a);
@@ -5616,12 +5699,191 @@ function renderPhones(a){
  let ps=phones(a).map(p=>normPhone(p)).filter(p=>p.length>=10);
  let seen=new Set();
  ps=ps.filter(p=>{let key=p.slice(-10); if(seen.has(key))return false; seen.add(key); return true;}).slice(0,6);
- document.getElementById('phoneGrid').innerHTML=ps.map((p,i)=>`<a class="phoneChip" href="tel:${normPhone(p)}" onclick="recordDial('${a.id}','${normPhone(p)}')"><div class="phoneIcon">☎</div><div><div class="phoneNum">${fmtPhone(p)}</div><div class="phoneType">${i===0?'Primary':i===1?'Mobile':'Alternate'}</div></div></a>`).join('')||'<div class="muted">No phone numbers on this account.</div>'
+ let blocked=phoneIsBlocked(a);
+ document.getElementById('phoneGrid').innerHTML=ps.map((p,i)=>`<a class="phoneChip ${blocked?'blocked':''}" href="#" onclick="event.preventDefault(); return dialPhone('${a.id}','${normPhone(p)}')"><div class="phoneIcon">☎</div><div><div class="phoneNum">${fmtPhone(p)}</div><div class="phoneType">${i===0?'Primary':i===1?'Mobile':'Alternate'}</div>${blocked?'<div class="callBlockedNote">Compliance review required</div>':''}</div></a>`).join('')||'<div class="muted">No phone numbers on this account.</div>'
 }
 function renderDispos(a){document.getElementById('selectedDisposition').textContent=currentDisposition||a?.disposition||'Select one';document.getElementById('dispoGrid').innerHTML=DISPOS.map(d=>`<button class="dispo ${d==='Disputed'?'orangeText':['Promise to Pay','Settled'].includes(d)?'greenText':['Bad Number','DNC'].includes(d)?'redText':d==='Callback'?'purpleText':''} ${(currentDisposition||a?.disposition)===d?'selected':''}" onclick="selectDisposition('${d}')">${d}</button>`).join('')}
-async function selectDisposition(d){let cur=getCurrent();if(!cur)return;currentDisposition=d;let old=cur.status,newStatus=d==='Disputed'?'Disputed':d;let updated=(await dbFetch(`/accounts?id=eq.${cur.id}`,{method:'PATCH',body:JSON.stringify({status:newStatus,disposition:d,updated_at:new Date().toISOString()})}))[0];await insertActivity(cur.id,'Status Updated','Disposition set to '+d,'',old,newStatus);await insertAudit('Status Updated','Disposition set to '+d,'account',cur.id);let i=accounts.findIndex(a=>a.id===cur.id);if(i>=0)accounts[i]=toCamel(updated);render();if(d==='Callback')openFollowUpModal('Callback');if(d==='Disputed')openDisputeModal();if(d==='Promise to Pay')openPaymentPlan();}
+async function selectDisposition(d){let cur=getCurrent();if(!cur)return;currentDisposition=d;let old=cur.status,newStatus=d==='Disputed'?'Disputed':d;let body={status:newStatus,disposition:d,updated_at:new Date().toISOString()};if(d==='DNC')body.do_not_call=true;if(d==='Disputed')body.disputed_flag=true;if(d==='Bad Number')body.wrong_number_flag=true;let updated;try{updated=(await dbFetch(`/accounts?id=eq.${cur.id}`,{method:'PATCH',body:JSON.stringify(body)}))[0]}catch(e){delete body.do_not_call;delete body.disputed_flag;delete body.wrong_number_flag;updated=(await dbFetch(`/accounts?id=eq.${cur.id}`,{method:'PATCH',body:JSON.stringify(body)}))[0]}await insertActivity(cur.id,'Status Updated','Disposition set to '+d,'',old,newStatus);await insertAudit('Status Updated','Disposition set to '+d,'account',cur.id);let i=accounts.findIndex(a=>a.id===cur.id);if(i>=0)accounts[i]=toCamel(updated);render();if(d==='Callback')openFollowUpModal('Callback');if(d==='Disputed')openDisputeModal();if(d==='Promise to Pay')openPaymentPlan();}
 async function insertActivity(accountId,type,text,phone='',oldStatus='',newStatus=''){await dbFetch('/activity_logs',{method:'POST',body:JSON.stringify([{account_id:accountId,action_type:type,action_text:text,phone_number:phone,old_status:oldStatus,new_status:newStatus,created_by_email:currentUser.email}])}).catch(()=>{})}
 async function recordDial(id,phone){document.getElementById('callNumber').textContent=fmtPhone(phone);document.getElementById('lastDialed').textContent='Dialing '+fmtPhone(phone);await dbFetch(`/accounts?id=eq.${id}`,{method:'PATCH',body:JSON.stringify({last_contact_number:phone,updated_at:new Date().toISOString()})}).catch(()=>{});await insertActivity(id,'Outbound Call','Clicked phone number '+fmtPhone(phone),phone);await insertAudit('Outbound Call','Clicked phone '+fmtPhone(phone),'account',id)}
+
+/* COMPLIANCE GUARD + CALL RULES */
+function boolish(v){return v===true||v==='true'||v==='Yes'||v==='yes'||v===1||v==='1'}
+function cgVal(a,keys,def=''){
+  for(let k of keys){if(a&&a[k]!==undefined&&a[k]!==null&&String(a[k]).trim()!=='')return a[k]}
+  return def;
+}
+function cgStateTZ(st){
+  st=String(st||'').trim().toUpperCase();
+  const eastern=['CT','DC','DE','FL','GA','IN','KY','MA','MD','ME','MI','NC','NH','NJ','NY','OH','PA','RI','SC','TN','VA','VT','WV'];
+  const central=['AL','AR','IA','IL','KS','LA','MN','MO','MS','ND','NE','OK','SD','TX','WI'];
+  const mountain=['AZ','CO','ID','MT','NM','UT','WY'];
+  const pacific=['CA','NV','OR','WA'];
+  if(st==='AK')return 'America/Anchorage';
+  if(st==='HI')return 'Pacific/Honolulu';
+  if(pacific.includes(st))return 'America/Los_Angeles';
+  if(mountain.includes(st))return st==='AZ'?'America/Phoenix':'America/Denver';
+  if(central.includes(st))return 'America/Chicago';
+  return 'America/New_York';
+}
+function cgNowMinutes(tz){
+  try{
+    let parts=new Intl.DateTimeFormat('en-US',{timeZone:tz,hour:'2-digit',minute:'2-digit',hour12:false}).formatToParts(new Date());
+    let h=Number(parts.find(p=>p.type==='hour')?.value||0),m=Number(parts.find(p=>p.type==='minute')?.value||0);
+    if(h===24)h=0;return h*60+m;
+  }catch(e){let d=new Date();return d.getHours()*60+d.getMinutes()}
+}
+function cgTimeMinutes(v){let m=String(v||'').match(/^(\d{1,2}):(\d{2})/);return m?Number(m[1])*60+Number(m[2]):null}
+function cgTimeWindow(a){
+  let start=String(cgVal(a,['complianceCallStart','preferredCallStart','callWindowStart'],'08:00')).slice(0,5)||'08:00';
+  let end=String(cgVal(a,['complianceCallEnd','preferredCallEnd','callWindowEnd'],'21:00')).slice(0,5)||'21:00';
+  let tz=String(cgVal(a,['complianceTimeZone','timeZoneOverride','timezoneOverride'],''))||cgStateTZ(a?.state);
+  let now=cgNowMinutes(tz),s=cgTimeMinutes(start),e=cgTimeMinutes(end);
+  let inside=s===null||e===null?true:(s<=e?(now>=s&&now<=e):(now>=s||now<=e));
+  return {start,end,tz,now,inside};
+}
+function complianceRules(a){
+  let status=String(a?.disposition||a?.status||'').toLowerCase();
+  let flags=[];
+  function add(cond,label,type='block'){if(cond)flags.push({label,type})}
+  add(boolish(cgVal(a,['doNotCall','do_not_call','dncFlag'],false))||status==='dnc','Do Not Call','block');
+  add(boolish(cgVal(a,['ceaseAndDesist','cease_and_desist'],false)),'Cease & Desist','block');
+  add(boolish(cgVal(a,['bankruptcyFlag','bankruptcy_flag','bankruptcy'],false)),'Bankruptcy','block');
+  add(boolish(cgVal(a,['deceasedFlag','deceased_flag','deceased'],false)),'Deceased','block');
+  add(boolish(cgVal(a,['attorneyRepresented','attorney_represented'],false)),'Attorney Represented','block');
+  add(boolish(cgVal(a,['wrongNumberFlag','wrong_number_flag'],false))||status==='bad number','Wrong Number','block');
+  add(boolish(cgVal(a,['disputedFlag','disputed_flag'],false))||status==='disputed','Disputed / Frozen','block');
+  add(boolish(cgVal(a,['needsManagerReview','needs_manager_review'],false)),'Manager Review Needed','warn');
+  let win=cgTimeWindow(a);
+  if(!win.inside)flags.push({label:`Outside call window ${win.start}-${win.end} (${win.tz.replace('America/','')})`,type:'warn'});
+  if(boolish(cgVal(a,['consentConfirmed','consent_confirmed'],false)))flags.push({label:'Consent on File',type:'good'});
+  return {flags,hard:flags.filter(f=>f.type==='block'),warn:flags.filter(f=>f.type==='warn'),good:flags.filter(f=>f.type==='good'),window:win,maxCalls:Number(cgVal(a,['maxCallsPerDay','max_calls_per_day'],2)||2)};
+}
+function renderComplianceBanner(a){
+  let box=document.getElementById('complianceBanner'); if(!box)return;
+  if(!a){box.innerHTML='<div class="complianceTop"><div><div class="complianceTitle">🛡️ Compliance Guard</div><div class="complianceSummary">No account selected.</div></div></div>';return}
+  let r=complianceRules(a),state=r.hard.length?'block':r.warn.length?'warn':'good';
+  let label=r.hard.length?'CALL BLOCKED':r.warn.length?'REVIEW BEFORE CALL':'CLEAR TO CALL';
+  let badges=r.flags.length?r.flags.map(f=>`<span class="complianceBadge ${f.type}">${esc(f.label)}</span>`).join(''):'<span class="complianceBadge good">No restrictions saved</span>';
+  box.innerHTML=`<div class="complianceTop"><div><div class="complianceTitle">🛡️ Compliance Guard <span class="complianceState ${state}">${label}</span></div><div class="complianceSummary">Call window: ${esc(r.window.start)}-${esc(r.window.end)} ${esc(r.window.tz)} · Daily call limit: ${esc(r.maxCalls)} · State: ${esc(a.state||'Unknown')}</div></div><div class="complianceActions"><button class="outline" onclick="openComplianceGuard()">Review Rules</button></div></div><div class="complianceBadges">${badges}</div>`;
+}
+function phoneIsBlocked(a){return complianceRules(a).hard.length>0}
+async function todayCallCountForAccount(id){
+  try{
+    let start=todayISO()+'T00:00:00';
+    let rows=await dbFetch(`/activity_logs?account_id=eq.${id}&action_type=eq.Outbound%20Call&created_at=gte.${encodeURIComponent(start)}&select=id&limit=1000`);
+    return Array.isArray(rows)?rows.length:0;
+  }catch(e){return 0}
+}
+async function complianceCheckBeforeCall(a,phone){
+  if(!a)return false;
+  let r=complianceRules(a),issues=[...r.hard,...r.warn];
+  let calls=await todayCallCountForAccount(a.id);
+  if(calls>=r.maxCalls)issues.push({label:`Daily call limit reached (${calls}/${r.maxCalls})`,type:'warn'});
+  if(!issues.length)return true;
+  let msg='Compliance Guard warning for '+nameOf(a)+'\n\n'+issues.map(x=>'• '+x.label).join('\n')+'\n\nPhone: '+fmtPhone(phone);
+  let hard=issues.some(x=>x.type==='block');
+  if(hard&&!currentUser.isAdmin){
+    alert(msg+'\n\nThis call is blocked. Ask an admin to review or override.');
+    await insertActivity(a.id,'Compliance Block','Blocked outbound call to '+fmtPhone(phone)+': '+issues.map(x=>x.label).join(', '),phone).catch(()=>{});
+    return false;
+  }
+  if(hard&&currentUser.isAdmin){
+    let ok=confirm(msg+'\n\nADMIN OVERRIDE: Continue and log the override?');
+    if(!ok)return false;
+    let reason=prompt('Admin override reason:','Reviewed and approved one-time contact attempt.')||'Admin override';
+    await insertComplianceEvent(a.id,'Admin Override',reason,phone).catch(()=>{});
+    await insertActivity(a.id,'Compliance Override','Admin override for '+fmtPhone(phone)+': '+reason,phone).catch(()=>{});
+    return true;
+  }
+  let ok=confirm(msg+'\n\nContinue with this call attempt?');
+  if(!ok)return false;
+  await insertComplianceEvent(a.id,'Warning Acknowledged',issues.map(x=>x.label).join(', '),phone).catch(()=>{});
+  return true;
+}
+async function insertComplianceEvent(accountId,eventType,notes,phone=''){
+  await dbFetch('/compliance_events',{method:'POST',body:JSON.stringify([{account_id:accountId,event_type:eventType,phone_number:phone,notes,created_by_email:currentUser.email}])});
+}
+async function dialPhone(id,phone){
+  let a=accountById(id)||getCurrent();
+  if(!a)return false;
+  phone=normPhone(phone);
+  let ok=await complianceCheckBeforeCall(a,phone);
+  if(!ok)return false;
+  window.location.href='tel:'+phone;
+  await recordDial(id,phone);
+  return false;
+}
+function openComplianceGuard(){
+  let a=getCurrent();
+  if(!a)return alert('Open an account first.');
+  document.getElementById('complianceGuardModal').classList.add('open');
+  fillComplianceForm(a);
+}
+function fillComplianceForm(a){
+  document.getElementById('complianceAccountTitle').textContent=`${nameOf(a)} · Acct ${acctNo(a)||'—'} · ${money(accountBalance(a))}`;
+  let r=complianceRules(a);
+  let warn=document.getElementById('complianceCurrentWarnings');
+  warn.innerHTML=(r.flags.length?r.flags:[{label:'No restrictions saved',type:'good'}]).map(f=>`<span class="complianceBadge ${f.type}">${esc(f.label)}</span>`).join('');
+  let set=(id,val)=>{let el=document.getElementById(id);if(el)el.type==='checkbox'?el.checked=boolish(val):el.value=val||''};
+  set('cgDoNotCall',cgVal(a,['doNotCall','do_not_call'],false));
+  set('cgCease',cgVal(a,['ceaseAndDesist','cease_and_desist'],false));
+  set('cgDisputed',cgVal(a,['disputedFlag','disputed_flag'],String(a.status||a.disposition).toLowerCase()==='disputed'));
+  set('cgBankruptcy',cgVal(a,['bankruptcyFlag','bankruptcy_flag'],false));
+  set('cgDeceased',cgVal(a,['deceasedFlag','deceased_flag'],false));
+  set('cgAttorney',cgVal(a,['attorneyRepresented','attorney_represented'],false));
+  set('cgWrongNumber',cgVal(a,['wrongNumberFlag','wrong_number_flag'],String(a.status||a.disposition).toLowerCase()==='bad number'));
+  set('cgNeedsReview',cgVal(a,['needsManagerReview','needs_manager_review'],false));
+  set('cgConsent',cgVal(a,['consentConfirmed','consent_confirmed'],false));
+  set('cgCallStart',String(cgVal(a,['complianceCallStart','preferredCallStart'],'08:00')).slice(0,5)||'08:00');
+  set('cgCallEnd',String(cgVal(a,['complianceCallEnd','preferredCallEnd'],'21:00')).slice(0,5)||'21:00');
+  set('cgMaxCalls',cgVal(a,['maxCallsPerDay','max_calls_per_day'],2));
+  set('cgTimeZone',cgVal(a,['complianceTimeZone','timeZoneOverride'],''));
+  set('cgConsentDate',String(cgVal(a,['consentDate','consent_date'],'')).slice(0,10));
+  set('cgAttorneyName',cgVal(a,['attorneyName','attorney_name'],''));
+  set('cgRestrictionSource',cgVal(a,['restrictionSource','restriction_source'],''));
+  set('cgNotes',cgVal(a,['complianceNotes','compliance_notes'],''));
+}
+function resetComplianceForm(){let a=getCurrent();if(a)fillComplianceForm(a)}
+async function saveComplianceGuard(){
+  if(!currentUser.isAdmin)return alert('Admin only');
+  let a=getCurrent(); if(!a)return;
+  let body={
+    do_not_call:document.getElementById('cgDoNotCall').checked,
+    cease_and_desist:document.getElementById('cgCease').checked,
+    disputed_flag:document.getElementById('cgDisputed').checked,
+    bankruptcy_flag:document.getElementById('cgBankruptcy').checked,
+    deceased_flag:document.getElementById('cgDeceased').checked,
+    attorney_represented:document.getElementById('cgAttorney').checked,
+    wrong_number_flag:document.getElementById('cgWrongNumber').checked,
+    needs_manager_review:document.getElementById('cgNeedsReview').checked,
+    consent_confirmed:document.getElementById('cgConsent').checked,
+    compliance_call_start:val('cgCallStart')||'08:00',
+    compliance_call_end:val('cgCallEnd')||'21:00',
+    max_calls_per_day:Number(val('cgMaxCalls')||2),
+    compliance_time_zone:val('cgTimeZone')||null,
+    consent_date:val('cgConsentDate')||null,
+    attorney_name:val('cgAttorneyName'),
+    restriction_source:val('cgRestrictionSource'),
+    compliance_notes:val('cgNotes'),
+    compliance_updated_by_email:currentUser.email,
+    compliance_updated_at:new Date().toISOString(),
+    updated_at:new Date().toISOString()
+  };
+  if(body.do_not_call){body.status='DNC';body.disposition='DNC'}
+  else if(body.disputed_flag){body.status='Disputed';body.disposition='Disputed'}
+  else if(body.wrong_number_flag){body.status='Bad Number';body.disposition='Bad Number'}
+  try{
+    let updated=(await dbFetch(`/accounts?id=eq.${a.id}`,{method:'PATCH',body:JSON.stringify(body)}))[0];
+    let i=accounts.findIndex(x=>String(x.id)===String(a.id)); if(i>=0)accounts[i]=toCamel(updated);
+    await insertComplianceEvent(a.id,'Rules Updated','Compliance flags updated in Compliance Guard.');
+    await insertActivity(a.id,'Compliance Updated','Compliance Guard rules updated.');
+    await insertAudit('Compliance Updated','Updated compliance rules for '+nameOf(a),'account',a.id);
+    closeModal('complianceGuardModal');
+    render();
+  }catch(e){alert('Compliance columns are not ready yet. Run RUN_THIS_COMPLIANCE_GUARD_SQL.sql in Supabase, then reload.\n\n'+e.message)}
+}
+
 async function loadHistory(id){if(!id)return;try{let notes=await dbFetch(`/account_notes?account_id=eq.${id}&select=*&order=created_at.desc&limit=20`),acts=await dbFetch(`/activity_logs?account_id=eq.${id}&select=*&order=created_at.desc&limit=20`);let events=[...acts.map(x=>({date:x.created_at,type:x.action_type,text:x.action_text})),...notes.map(x=>({date:x.created_at,type:'Note',text:x.note}))].sort((a,b)=>new Date(b.date)-new Date(a.date)).slice(0,8);document.getElementById('activityList').innerHTML=events.map(e=>`<div class="event"><div class="eventTitle">${esc(e.type)}</div><div>${esc(e.text)}</div><div class="eventMeta">${new Date(e.date).toLocaleString()}</div></div>`).join('')||'<div class="muted">No activity yet.</div>'}catch{}}
 document.getElementById('agentNote').addEventListener('input',()=>{let v=document.getElementById('agentNote').value;document.getElementById('noteCounter').textContent=v.length+' / 2000'})
 
@@ -8193,7 +8455,7 @@ function openPayoffQuote(){
 /* removed old openAccountDocs; enhanced version is inserted later */
 
 
-async function saveCurrent(){let a=getCurrent();if(!a)return;let note=document.getElementById('agentNote').value.trim();if(note){await dbFetch('/account_notes',{method:'POST',body:JSON.stringify([{account_id:a.id,note,created_by_email:currentUser.email}])});await insertActivity(a.id,'Note',note)}document.getElementById('agentNote').value='';await loadAccounts()}async function saveAndNext(){await saveCurrent();nextAccount()}function nextAccount(){let q=queue(),cur=getCurrent(),idx=q.findIndex(a=>a.id===cur?.id);if(q[idx+1])setCurrent(q[idx+1].id)}function skipAccount(){nextAccount()}function callPrimary(){let p=phones(getCurrent())[0];if(p)window.location.href='tel:'+normPhone(p)}function endCall(){document.getElementById('lastDialed').textContent='Call ended';document.getElementById('callNumber').textContent='—'}
+async function saveCurrent(){let a=getCurrent();if(!a)return;let note=document.getElementById('agentNote').value.trim();if(note){await dbFetch('/account_notes',{method:'POST',body:JSON.stringify([{account_id:a.id,note,created_by_email:currentUser.email}])});await insertActivity(a.id,'Note',note)}document.getElementById('agentNote').value='';await loadAccounts()}async function saveAndNext(){await saveCurrent();nextAccount()}function nextAccount(){let q=queue(),cur=getCurrent(),idx=q.findIndex(a=>a.id===cur?.id);if(q[idx+1])setCurrent(q[idx+1].id)}function skipAccount(){nextAccount()}async function callPrimary(){let a=getCurrent();let p=phones(a)[0];if(p)await dialPhone(a.id,normPhone(p))}function endCall(){document.getElementById('lastDialed').textContent='Call ended';document.getElementById('callNumber').textContent='—'}
 function val(id){return document.getElementById(id).value.trim()}function setVal(id,v){document.getElementById(id).value=v??''}function inputId(k){return{accountNumber:'accountNumberInput',status:'statusInput',ssn:'ssnInput',state:'stateInput',email:'emailInput'}[k]||k}function openModal(){document.querySelector('#modal form').reset();document.getElementById('id').value='';document.getElementById('modalTitle').textContent='Add Account';document.getElementById('modal').classList.add('open')}function closeModal(id){document.getElementById(id).classList.remove('open')}
 async function saveAccount(e){e.preventDefault();if(!currentUser.isAdmin)return alert('Admin only');let id=val('id'),acct={};FIELDS.forEach(k=>acct[k]=val(inputId(k)));acct.fullName=acct.fullName||[acct.firstName,acct.middleName,acct.lastName].filter(Boolean).join(' ');if(id)await dbFetch(`/accounts?id=eq.${id}`,{method:'PATCH',body:JSON.stringify(toRow(acct))});else await dbFetch('/accounts',{method:'POST',body:JSON.stringify([toRow(acct)])});closeModal('modal');await loadAccounts()}
 
@@ -8781,7 +9043,7 @@ function focusQueue(){
   document.querySelector('.sidebar')?.scrollIntoView({behavior:'smooth',block:'start'});
 }
 function closeAllLargeModalsForNav(){
-  ['adminReportsModal','leaderboardModal','paymentTrackerModal','paymentsDashboardModal','todayDashboardModal','dailyWorkQueueModal','promiseDashboardModal','employeeMonitorModal','employeeAdminModal','brandingSettingsModal','auditModal','permissionsModal','documentGeneratorModal'].forEach(id=>{
+  ['complianceGuardModal','adminReportsModal','leaderboardModal','paymentTrackerModal','paymentsDashboardModal','todayDashboardModal','dailyWorkQueueModal','promiseDashboardModal','employeeMonitorModal','employeeAdminModal','brandingSettingsModal','auditModal','permissionsModal','documentGeneratorModal'].forEach(id=>{
     let el=document.getElementById(id);
     if(el)el.classList.remove('open');
   });
