@@ -10975,6 +10975,102 @@ function exportContactIntelligenceCSV(){let calls=filteredContactCalls();let row
   }, 800);
 })();
 
+
+
+/* REPORTS MODAL INSTANT OPEN + STACKING FIX */
+(function(){
+  var modalIds = ['complianceGuardModal','adminReportsModal','leaderboardModal','paymentTrackerModal','paymentsDashboardModal','todayDashboardModal','dailyWorkQueueModal','promiseDashboardModal','employeeMonitorModal','employeeAdminModal','brandingSettingsModal','auditModal','permissionsModal','documentGeneratorModal','paymentPlanModal','callOutcomeModal'];
+  var reportToken = 0;
+  function reportModal(){ return document.getElementById('adminReportsModal'); }
+  function hideBusy(){ try{ var b=document.getElementById('globalBusy'); if(b)b.classList.add('hidden'); }catch(e){} }
+  function closeModalsExcept(exceptId){
+    modalIds.forEach(function(id){
+      if(id===exceptId) return;
+      var el=document.getElementById(id);
+      if(el) el.classList.remove('open');
+    });
+    if(exceptId!=='adminReportsModal') reportToken++;
+    hideBusy();
+  }
+  function setReportNotice(msg){
+    try{ var n=document.getElementById('reportNotice'); if(n)n.textContent=msg; }catch(e){}
+  }
+  function installReportStyles(){
+    if(document.getElementById('reportsInstantOpenFixStyle')) return;
+    var style=document.createElement('style');
+    style.id='reportsInstantOpenFixStyle';
+    style.textContent='body.reportsOpenFix #adminReportsModal{z-index:90!important;} body.reportsOpenFix #globalBusy{z-index:50!important;} #adminReportsModal .modalbox{position:relative;}';
+    document.head.appendChild(style);
+  }
+  installReportStyles();
+
+  var oldBusy = window.setGlobalBusy;
+  window.setGlobalBusy = function(show,title,text){
+    var titleText=String(title||'').toLowerCase();
+    if(titleText.indexOf('report')!==-1 && reportModal() && reportModal().classList.contains('open')){
+      hideBusy();
+      if(show) setReportNotice(text || 'Loading reports. The report window will stay open while data loads.');
+      return;
+    }
+    if(typeof oldBusy==='function') return oldBusy.apply(this,arguments);
+  };
+
+  var oldCloseModal = window.closeModal;
+  window.closeModal = function(id){
+    if(id==='adminReportsModal'){
+      reportToken++;
+      document.body.classList.remove('reportsOpenFix');
+      hideBusy();
+    }
+    if(typeof oldCloseModal==='function') return oldCloseModal.apply(this,arguments);
+    var el=document.getElementById(id); if(el)el.classList.remove('open');
+  };
+
+  window.openAdminReports = function(){
+    try{
+      if(!window.currentUser || !currentUser.isAdmin) return alert('Admin only.');
+      closeModalsExcept('adminReportsModal');
+      var modal=reportModal();
+      if(!modal) return alert('Reports panel was not found. Reload the app and try again.');
+      document.body.classList.add('reportsOpenFix');
+      modal.classList.add('open');
+      modal.style.zIndex='90';
+      if(typeof buildAdminReportFilters==='function') buildAdminReportFilters();
+      var rs=document.getElementById('reportStart'), re=document.getElementById('reportEnd');
+      if((!rs || !rs.value) || (!re || !re.value)){
+        if(typeof setAdminReportRange==='function') setAdminReportRange('today');
+      }
+      setReportNotice('Loading reports now. This panel will stay open; other panels will not stack behind it.');
+      var myToken=++reportToken;
+      setTimeout(function(){
+        if(myToken!==reportToken) return;
+        var m=reportModal();
+        if(!m || !m.classList.contains('open')) return;
+        try{
+          var p = (typeof window.loadAdminReports==='function') ? window.loadAdminReports() : (typeof loadAdminReports==='function' ? loadAdminReports() : null);
+          if(p && typeof p.catch==='function') p.catch(function(e){ console.warn('Reports load failed',e); setReportNotice('Reports could not load one or more sections. Try Refresh, and confirm the latest SQL tables exist.'); hideBusy(); });
+        }catch(e){ console.warn('Reports open failed',e); setReportNotice('Reports could not load. Try Refresh, and confirm the latest SQL tables exist.'); hideBusy(); }
+      },80);
+    }catch(e){ console.warn('Open reports failed',e); alert('Could not open Reports: '+(e.message||e)); hideBusy(); }
+  };
+
+  var oldCompliance = window.openComplianceGuard;
+  window.openComplianceGuard = function(){
+    closeModalsExcept('complianceGuardModal');
+    if(typeof oldCompliance==='function') return oldCompliance.apply(this,arguments);
+    var a=(typeof getCurrent==='function')?getCurrent():null;
+    if(!a)return alert('Open an account first.');
+    document.getElementById('complianceGuardModal')?.classList.add('open');
+    if(typeof fillComplianceForm==='function') fillComplianceForm(a);
+  };
+
+  var oldCloseAll = window.closeAllLargeModalsForNav;
+  window.closeAllLargeModalsForNav = function(){
+    closeModalsExcept('');
+    if(typeof oldCloseAll==='function') return oldCloseAll.apply(this,arguments);
+  };
+})();
+
 </script>
 </body>
 </html>
