@@ -7,6 +7,7 @@
 <!-- LIVE_PROMISE_AUTOMATION_ALERTS_MARKER: promise automation + collector alerts -->
 <html>
 <head>
+<!-- STABLE_SINGLE_FILE_QA_LOCK_2026_07_18: System Check + Version Lock build -->
 <!-- LIVE_COMPLIANCE_GUARD_MARKER: compliance guard + call rules -->
 <!-- LIVE_REPORTING_CLEAN_PACKAGE_MARKER: clean live package + admin reports -->
 <!-- LIVE_REPORTING_CLEAN_PACKAGE_MARKER: clean live package + admin reports -->
@@ -12060,5 +12061,115 @@ function exportContactIntelligenceCSV(){let calls=filteredContactCalls();let row
 })();
 </script>
 
+
+
+<!-- SYSTEM_QA_VERSION_LOCK_MARKER: admin QA system check + build label, stable single-file app -->
+<script id="cpcmSystemQaVersionLockScript">
+(function(){
+  if(window.__cpcmSystemQaVersionLockLoaded) return;
+  window.__cpcmSystemQaVersionLockLoaded = true;
+  var BUILD_NAME = "Co Pilot Collections Manager — Stability QA / Version Lock";
+  var BUILD_VERSION = "STABLE_SINGLE_FILE_QA_LOCK_2026_07_18";
+  var EXPECTED_ENV = "LIVE";
+  var EXPECTED_URL = "https://bwvufgzbkaymffwxuuzr.supabase.co";
+  var EXPECTED_KEY_PREFIX = "sb_publishable_cvwkN3fOovsYvAvzXvrmRA";
+  function esc(v){return String(v==null?'':v).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+  function lower(v){return String(v==null?'':v).toLowerCase().trim();}
+  function cfg(){try{return window.CO_PILOT_SUPABASE_CONFIG||{}}catch(e){return {}}}
+  function curUser(){try{return window.currentUser||window.authUser||window.loggedInUser||null}catch(e){return null}}
+  function curEmail(){var u=curUser();return lower((u&&(u.email||u.user_email||u.email_address))||'')}
+  function roleText(){try{return lower((document.getElementById('roleBadge')&&document.getElementById('roleBadge').textContent)||document.body.textContent.match(/\bAdmin\b|\bEmployee\b|\bNot logged in\b/)||'')}catch(e){return ''}}
+  function isAdmin(){var u=curUser(), e=curEmail(), r=lower((u&&(u.role||u.user_role||u.account_role))||'');var badge=roleText();return e==='afinch2678@gmail.com'||r==='admin'||(u&&u.isAdmin===true)||badge.indexOf('admin')>=0;}
+  function qs(sel){try{return document.querySelector(sel)}catch(e){return null}}
+  function qsa(sel){try{return Array.prototype.slice.call(document.querySelectorAll(sel))}catch(e){return []}}
+  function visibleTextIncludes(txt){return lower(document.body.innerText||document.body.textContent||'').indexOf(lower(txt))>=0}
+  function btnByText(txt){txt=lower(txt);return qsa('button,a,.navIcon,.qaItem').some(function(el){return lower(el.textContent||el.title||el.getAttribute('aria-label')||'').indexOf(txt)>=0});}
+  function maybeTopbar(){return qs('.topbar')||qs('header')||qs('.topActions')||qs('.app header')}
+  function injectCss(){
+    if(document.getElementById('cpcmSystemQaStyle')) return;
+    var st=document.createElement('style'); st.id='cpcmSystemQaStyle';
+    st.textContent = ''+
+      '#cpcmQaFab{position:fixed;right:14px;bottom:86px;z-index:75000;background:#0b45c6;color:#fff;border:1px solid rgba(255,255,255,.28);box-shadow:0 10px 30px rgba(15,23,42,.25);border-radius:999px;height:38px;padding:0 13px;font:900 12px Arial,Helvetica,sans-serif;cursor:pointer;display:flex;gap:7px;align-items:center}'+
+      '#cpcmQaVersionBadge{position:fixed;right:14px;bottom:42px;z-index:70000;background:#0f172a;color:#dbeafe;border:1px solid rgba(255,255,255,.22);border-radius:999px;padding:6px 10px;font:800 10px Arial,Helvetica,sans-serif;box-shadow:0 8px 18px rgba(15,23,42,.22)}'+
+      '#cpcmSystemQaPage{position:fixed;inset:0;z-index:80000;background:#eef3f9;color:#0f172a;font-family:Arial,Helvetica,sans-serif;display:none;overflow:auto}#cpcmSystemQaPage.open{display:block}'+
+      '.cpcmQaTop{background:linear-gradient(90deg,#05225f,#0b45c6);color:#fff;padding:16px 20px;display:flex;justify-content:space-between;align-items:center;gap:12px;position:sticky;top:0;z-index:2}.cpcmQaTitle{font-size:22px;font-weight:1000}.cpcmQaSub{font-size:12px;color:#dbeafe;margin-top:3px}.cpcmQaActions{display:flex;gap:8px;flex-wrap:wrap}.cpcmQaBtn{border:0;border-radius:10px;padding:10px 13px;font-weight:900;cursor:pointer;background:#2563eb;color:white}.cpcmQaBtn.gray{background:#334155}.cpcmQaBtn.green{background:#16a34a}.cpcmQaBtn.red{background:#dc2626}.cpcmQaBtn.white{background:#fff;color:#1d4ed8}'+
+      '.cpcmQaWrap{padding:16px;max-width:1320px;margin:0 auto}.cpcmQaGrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:12px}.cpcmQaMetric{background:#fff;border:1px solid #dbe3ef;border-radius:14px;padding:13px;box-shadow:0 3px 12px rgba(15,23,42,.05)}.cpcmQaMetricLabel{font-size:10px;font-weight:900;color:#64748b;text-transform:uppercase;letter-spacing:.04em}.cpcmQaMetricVal{font-size:20px;font-weight:1000;margin-top:6px;color:#0f172a}.cpcmQaCard{background:#fff;border:1px solid #dbe3ef;border-radius:16px;box-shadow:0 4px 18px rgba(15,23,42,.06);margin-bottom:12px}.cpcmQaCardHead{padding:13px 15px;border-bottom:1px solid #e5edf7;display:flex;justify-content:space-between;align-items:center}.cpcmQaCardTitle{font-weight:1000}.cpcmQaCardBody{padding:14px}.cpcmQaTable{width:100%;border-collapse:collapse;font-size:12px}.cpcmQaTable th{text-align:left;background:#f8fafc;color:#334155;font-size:10px;text-transform:uppercase;letter-spacing:.04em;padding:9px;border-bottom:1px solid #e2e8f0}.cpcmQaTable td{padding:9px;border-bottom:1px solid #edf2f8;vertical-align:top}.cpcmQaPill{display:inline-flex;border-radius:999px;padding:4px 8px;font-size:11px;font-weight:900;align-items:center;gap:4px}.cpcmQaPill.pass{background:#dcfce7;color:#166534}.cpcmQaPill.warn{background:#fff7ed;color:#9a3412}.cpcmQaPill.fail{background:#fee2e2;color:#991b1b}.cpcmQaPill.info{background:#dbeafe;color:#1d4ed8}.cpcmQaCode{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:10px;white-space:pre-wrap;word-break:break-word;max-height:260px;overflow:auto}.cpcmQaNote{background:#eff6ff;border:1px solid #bfdbfe;color:#1e3a8a;border-radius:12px;padding:10px;font-size:12px;font-weight:800;margin-bottom:10px}.cpcmQaManual{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.cpcmQaManual div{border:1px solid #e2e8f0;border-radius:12px;background:#f8fbff;padding:10px;font-size:12px;font-weight:850}'+
+      '@media(max-width:1100px){.cpcmQaGrid{grid-template-columns:repeat(2,1fr)}.cpcmQaManual{grid-template-columns:1fr}}@media(max-width:700px){.cpcmQaGrid{grid-template-columns:1fr}.cpcmQaTop{display:block}.cpcmQaActions{margin-top:10px}}';
+    document.head.appendChild(st);
+  }
+  function status(ok,warn){return ok?'pass':warn?'warn':'fail'}
+  function line(name, ok, detail, warn){return {name:name, ok:!!ok, warn:!!warn, detail:detail||''}}
+  function runChecks(){
+    var c=cfg(), url=String(c.url||''), key=String(c.publishableKey||'');
+    var topbar=maybeTopbar(); var bodyFont=''; try{bodyFont=getComputedStyle(document.body).fontFamily||''}catch(e){}
+    var checks=[];
+    checks.push(line('Supabase config object exists', !!(c&&c.url&&c.publishableKey), url||'Missing config'));
+    checks.push(line('Correct '+EXPECTED_ENV+' Supabase URL', url===EXPECTED_URL, url||'Missing URL'));
+    checks.push(line('Base Supabase URL only, no /rest/v1', url && url.indexOf('/rest/v1')<0, url||'Missing URL'));
+    checks.push(line('Publishable key present', key.indexOf('sb_publishable_')===0, key?key.slice(0,28)+'…':'Missing key'));
+    checks.push(line('Key matches expected project prefix', key.indexOf(EXPECTED_KEY_PREFIX)===0, key?key.slice(0,34)+'…':'Missing key', key && key.indexOf(EXPECTED_KEY_PREFIX)!==0));
+    checks.push(line('Main app container found', !!qs('.app'), qs('.app')?'Found .app':'Missing .app'));
+    checks.push(line('Top navigation/header found', !!topbar, topbar?(topbar.className||topbar.tagName):'Missing topbar/header'));
+    checks.push(line('Queue panel found', !!(qs('.queueList')||visibleTextIncludes('Queue')), 'Queue text/list check'));
+    checks.push(line('Account details area found', !!(qs('.accountCard')||visibleTextIncludes('Account Details')), 'Account card/details check'));
+    checks.push(line('Payment Plan area found', visibleTextIncludes('Payment Plan')||!!qs('.paymentPlanPanel'), 'Payment Plan card check'));
+    checks.push(line('Compliance Guard found', visibleTextIncludes('Compliance Guard'), 'Compliance card/check'));
+    checks.push(line('Softphone found', visibleTextIncludes('Softphone')||!!qs('.softphone'), 'Softphone/right panel check'));
+    checks.push(line('Team Messenger available', visibleTextIncludes('Team Messenger')||visibleTextIncludes('Messenger'), 'Chat/messenger check'));
+    checks.push(line('Reports button/page present', btnByText('reports')||visibleTextIncludes('Reports'), 'Reports nav/text check'));
+    checks.push(line('Cleanup button/page present', btnByText('cleanup')||visibleTextIncludes('Cleanup'), 'Cleanup nav/text check'));
+    checks.push(line('Tickler/Scorecards present', visibleTextIncludes('Tickler')&&visibleTextIncludes('Scorecards'), 'Tickler + Scorecards check'));
+    checks.push(line('Admin role detected when logged in as admin', isAdmin() || !curEmail(), curEmail()?('email='+curEmail()+' roleText='+roleText()):'Not logged in yet', !!curEmail()&&!isAdmin()));
+    checks.push(line('Professional CSS appears active', bodyFont.indexOf('Arial')>=0 || !!qs('style'), bodyFont||'No computed font', bodyFont && /Times/i.test(bodyFont)));
+    checks.push(line('Build marker installed', !!window.__cpcmSystemQaVersionLockLoaded, BUILD_VERSION));
+    return checks;
+  }
+  function metric(label,val,sub){return '<div class="cpcmQaMetric"><div class="cpcmQaMetricLabel">'+esc(label)+'</div><div class="cpcmQaMetricVal">'+esc(val)+'</div>'+(sub?'<div style="font-size:11px;color:#64748b;margin-top:4px">'+esc(sub)+'</div>':'')+'</div>'}
+  function renderQa(){
+    injectCss(); var p=ensurePage(); var checks=runChecks();
+    var pass=checks.filter(function(x){return x.ok&&!x.warn}).length, warn=checks.filter(function(x){return x.warn}).length, fail=checks.filter(function(x){return !x.ok&&!x.warn}).length;
+    var c=cfg(); var role=isAdmin()?'Admin detected':(curEmail()?'Logged in, not admin':'Not logged in');
+    document.getElementById('cpcmQaMetrics').innerHTML=[metric('Build',BUILD_VERSION,EXPECTED_ENV),metric('Checks Passed',pass+'/'+checks.length,warn+' warnings, '+fail+' failed'),metric('Environment',EXPECTED_ENV,c.url||'Missing URL'),metric('Current Role',role,curEmail()||roleText()||'No session yet')].join('');
+    document.getElementById('cpcmQaChecks').innerHTML='<table class="cpcmQaTable"><thead><tr><th>Status</th><th>Check</th><th>Details</th></tr></thead><tbody>'+checks.map(function(x){var cls=x.ok&&!x.warn?'pass':x.warn?'warn':'fail';var label=x.ok&&!x.warn?'Pass':x.warn?'Warning':'Fail';return '<tr><td><span class="cpcmQaPill '+cls+'">'+label+'</span></td><td><b>'+esc(x.name)+'</b></td><td>'+esc(x.detail)+'</td></tr>'}).join('')+'</tbody></table>';
+    document.getElementById('cpcmQaDiag').textContent=diagnostics();
+  }
+  function diagnostics(){
+    var c=cfg(); var buttons=qsa('button').map(function(b){return lower(b.textContent).replace(/\s+/g,' ').trim()}).filter(Boolean).slice(0,80);
+    return [
+      'Build: '+BUILD_NAME,
+      'Version: '+BUILD_VERSION,
+      'Expected Env: '+EXPECTED_ENV,
+      'Config URL: '+(c.url||'missing'),
+      'Key Prefix: '+String(c.publishableKey||'missing').slice(0,32)+'…',
+      'Current Email: '+(curEmail()||'not logged in'),
+      'Role Text: '+(roleText()||'unknown'),
+      'Admin Detected: '+(isAdmin()?'yes':'no'),
+      'App Container: '+(!!qs('.app')),
+      'Topbar/Header: '+(!!maybeTopbar()),
+      'Buttons Found: '+buttons.join(' | ')
+    ].join('\n');
+  }
+  function copyDiag(){var txt=diagnostics(); if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(txt).then(function(){alert('System diagnostics copied.')}).catch(function(){prompt('Copy diagnostics:',txt)})}else{prompt('Copy diagnostics:',txt)}}
+  function ensurePage(){
+    var p=document.getElementById('cpcmSystemQaPage'); if(p) return p;
+    p=document.createElement('div'); p.id='cpcmSystemQaPage';
+    p.innerHTML='<div class="cpcmQaTop"><div><div class="cpcmQaTitle">System Check + Version Lock</div><div class="cpcmQaSub">'+esc(BUILD_NAME)+' • '+esc(BUILD_VERSION)+' • '+esc(EXPECTED_ENV)+'</div></div><div class="cpcmQaActions"><button class="cpcmQaBtn green" onclick="window.cpcmRunSystemCheck()">Run Check</button><button class="cpcmQaBtn white" onclick="window.cpcmCopySystemDiagnostics()">Copy Diagnostics</button><button class="cpcmQaBtn gray" onclick="window.cpcmCloseSystemCheck()">Back to App</button></div></div><div class="cpcmQaWrap"><div class="cpcmQaNote">This screen is a safe admin QA checklist. It does not change account data. Use it after every ZIP upload to verify environment, layout, admin detection, and core app sections before adding new features.</div><div id="cpcmQaMetrics" class="cpcmQaGrid"></div><div class="cpcmQaCard"><div class="cpcmQaCardHead"><div class="cpcmQaCardTitle">Automatic Checks</div><span class="cpcmQaPill info">Safe read-only</span></div><div class="cpcmQaCardBody" id="cpcmQaChecks"></div></div><div class="cpcmQaCard"><div class="cpcmQaCardHead"><div class="cpcmQaCardTitle">Manual Smoke Test Checklist</div><span class="cpcmQaPill warn">Click through after upload</span></div><div class="cpcmQaCardBody"><div class="cpcmQaManual"><div>1. Login works</div><div>2. Queue opens first 5 accounts</div><div>3. Notes save and stay after refresh</div><div>4. Employee can create payment plan</div><div>5. Admin can edit/delete payment plan</div><div>6. Compliance Guard opens</div><div>7. Reports full page opens and Back works</div><div>8. Chat opens without blocking screen</div><div>9. Pay Desk / Ledger open</div><div>10. Tickler opens</div><div>11. Scorecards opens</div><div>12. No plain raw HTML layout</div></div></div></div><div class="cpcmQaCard"><div class="cpcmQaCardHead"><div class="cpcmQaCardTitle">Diagnostics</div><button class="cpcmQaBtn" onclick="window.cpcmCopySystemDiagnostics()">Copy</button></div><div class="cpcmQaCardBody"><pre id="cpcmQaDiag" class="cpcmQaCode"></pre></div></div></div>';
+    document.body.appendChild(p); return p;
+  }
+  function addButton(){
+    injectCss();
+    if(!document.getElementById('cpcmQaFab')){var b=document.createElement('button');b.id='cpcmQaFab';b.type='button';b.innerHTML='🧪 System Check';b.onclick=window.cpcmOpenSystemCheck;document.body.appendChild(b)}
+    if(!document.getElementById('cpcmQaVersionBadge')){var v=document.createElement('div');v.id='cpcmQaVersionBadge';v.textContent=BUILD_VERSION+' • '+EXPECTED_ENV;document.body.appendChild(v)}
+    var top=maybeTopbar();
+    if(top && !document.getElementById('cpcmQaTopButton')){var nb=document.createElement('button');nb.id='cpcmQaTopButton';nb.type='button';nb.textContent='System Check';nb.title='Run system QA checks';nb.style.background='#0f766e';nb.style.color='#fff';nb.style.border='0';nb.style.borderRadius='8px';nb.style.padding='8px 10px';nb.style.fontWeight='900';nb.style.cursor='pointer';nb.onclick=window.cpcmOpenSystemCheck;top.appendChild(nb)}
+  }
+  window.cpcmOpenSystemCheck=function(){renderQa();ensurePage().classList.add('open')};
+  window.cpcmCloseSystemCheck=function(){var p=document.getElementById('cpcmSystemQaPage'); if(p)p.classList.remove('open')};
+  window.cpcmRunSystemCheck=function(){renderQa()};
+  window.cpcmCopySystemDiagnostics=copyDiag;
+  function boot(){addButton(); setTimeout(addButton,800); setTimeout(addButton,2200)}
+  if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',boot)}else{boot()}
+})();
+</script>
 </body>
 </html>

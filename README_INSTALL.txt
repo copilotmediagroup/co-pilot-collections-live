@@ -69,3 +69,8 @@ MANAGER QA + COLLECTOR SCORECARDS UPDATE
 - Exports scorecards to CSV.
 - No new SQL required; uses existing CRM tables and local QA-note fallback.
 
+SYSTEM CHECK / VERSION LOCK BUILD
+- Upload this ZIP only to the LIVE repo.
+- Run: npm install && npm run dev
+- Use the floating 'System Check' button after login to verify the build.
+- No SQL changes are required for this QA build.

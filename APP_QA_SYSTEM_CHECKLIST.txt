@@ -1,0 +1,16 @@
+Co Pilot Collections Manager — QA Smoke Checklist
+
+After uploading this ZIP:
+1. Run npm install && npm run dev.
+2. Confirm the polished layout loads, not raw plain HTML.
+3. Login as admin.
+4. Click System Check and confirm Supabase environment is correct.
+5. Confirm account queue opens.
+6. Save an agent note.
+7. Create a payment plan as employee test user if needed.
+8. Confirm admin can edit/delete payment plans.
+9. Open Compliance Guard.
+10. Open Reports full page and Back to Queue.
+11. Open Chat / Team Messenger.
+12. Open Pay Desk, Ledger, Tickler, Scorecards.
+13. Confirm no stuck loading or page unresponsive warning.
