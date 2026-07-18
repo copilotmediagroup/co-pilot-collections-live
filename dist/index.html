@@ -1,4 +1,5 @@
 <!doctype html>
+<!-- PRODUCTION_STABILITY_REFACTOR_PHASE_1_MARKER: legacy reports modal removed, no watcher loops, stable full-page navigation -->
 <!-- LIVE_DATA_CLEANUP_DUPLICATE_FINDER_MARKER: admin cleanup dashboard + duplicate scan -->
 
 <!-- PAYMENT_PROMISE_PLAN_SAVE_FIX_MARKER: payment promise, payment plan, and notes save repair -->
@@ -6,6 +7,7 @@
 <!-- LIVE_PROMISE_AUTOMATION_ALERTS_MARKER: promise automation + collector alerts -->
 <html>
 <head>
+<!-- STABLE_SINGLE_FILE_QA_LOCK_2026_07_18: System Check + Version Lock build -->
 <!-- LIVE_COMPLIANCE_GUARD_MARKER: compliance guard + call rules -->
 <!-- LIVE_REPORTING_CLEAN_PACKAGE_MARKER: clean live package + admin reports -->
 <!-- LIVE_REPORTING_CLEAN_PACKAGE_MARKER: clean live package + admin reports -->
@@ -4758,54 +4760,9 @@ button {
   </div>
 </div>
 
-<div id="adminReportsModal" class="modal"><div class="modalbox powerBox adminReportsBox">
-  <div class="modalhead"><h2>Admin Reports</h2><button class="gray" onclick="closeModal('adminReportsModal')">Close</button></div>
-  <div class="modalbody">
-    <div class="reportHero">
-      <div>
-        <div class="reportTitle">Production, payments, collector activity, and portfolio performance</div>
-        <div class="reportSub">Tracks collected dollars, promises created, promises kept, broken promises, liquidation rate, contact rate, right-party-contact rate, collector rankings, portfolio results, and employee activity.</div>
-      </div>
-      <div style="display:flex;gap:8px;flex-wrap:wrap">
-        <button class="outline" onclick="loadAdminReports()">Refresh</button>
-        <button class="green" onclick="exportAdminReportsCSV()">Export CSV</button>
-        <button class="purple" onclick="exportAdminReportsPDF()">Print / Save PDF</button>
-      </div>
-    </div>
-    <div class="reportFilters">
-      <div><label>Range</label><select id="reportRange" onchange="adminReportRangeChanged()"><option value="today">Today</option><option value="yesterday">Yesterday</option><option value="week">This Week</option><option value="lastWeek">Last Week</option><option value="month">This Month</option><option value="lastMonth">Last Month</option><option value="year">This Year</option><option value="custom">Custom</option></select></div>
-      <div><label>Start Date</label><input id="reportStart" type="date" onchange="loadAdminReports()"></div>
-      <div><label>End Date</label><input id="reportEnd" type="date" onchange="loadAdminReports()"></div>
-      <div><label>Employee</label><select id="reportEmployee" onchange="loadAdminReports()"><option value="">All Employees</option></select></div>
-      <div><label>Portfolio</label><select id="reportPortfolio" onchange="loadAdminReports()"><option value="">All Portfolios</option></select></div>
-      <div><button class="green" onclick="loadAdminReports()">Apply</button></div>
-    </div>
-    <div id="reportNotice" class="reportNotice">Reports use the records already in the CRM: payment promises, payment ledger, call results, activity logs, notes, and accounts.</div>
-    <div class="reportStats">
-      <div class="reportStat green"><div class="reportLabel">Collected Today</div><div class="reportValue" id="rCollectedToday">$0.00</div><div class="reportHint">Confirmed paid dollars today</div></div>
-      <div class="reportStat green"><div class="reportLabel">Collected This Week</div><div class="reportValue" id="rCollectedWeek">$0.00</div><div class="reportHint">Confirmed paid dollars this week</div></div>
-      <div class="reportStat green"><div class="reportLabel">Collected This Month</div><div class="reportValue" id="rCollectedMonth">$0.00</div><div class="reportHint">Confirmed paid dollars this month</div></div>
-      <div class="reportStat blue"><div class="reportLabel">Promises Created</div><div class="reportValue" id="rPromisesCreated">$0.00</div><div class="reportHint" id="rPromisesCreatedCount">0 promises</div></div>
-      <div class="reportStat purple"><div class="reportLabel">Promises Kept</div><div class="reportValue" id="rPromisesKept">$0.00</div><div class="reportHint" id="rPromisesKeptCount">0 kept</div></div>
-      <div class="reportStat red"><div class="reportLabel">Broken Promises</div><div class="reportValue" id="rBrokenPromises">$0.00</div><div class="reportHint" id="rBrokenPromisesCount">0 broken/failed</div></div>
-      <div class="reportStat orange"><div class="reportLabel">Liquidation Rate</div><div class="reportValue" id="rLiquidationRate">0%</div><div class="reportHint">Collected ÷ placed balance</div></div>
-      <div class="reportStat blue"><div class="reportLabel">Contact Rate</div><div class="reportValue" id="rContactRate">0%</div><div class="reportHint" id="rContactCount">0 contacts / 0 calls</div></div>
-      <div class="reportStat purple"><div class="reportLabel">Right Party Contact</div><div class="reportValue" id="rRpcRate">0%</div><div class="reportHint" id="rRpcCount">0 RPC / 0 calls</div></div>
-      <div class="reportStat"><div class="reportLabel">Accounts Worked</div><div class="reportValue" id="rAccountsWorked">0</div><div class="reportHint">Unique accounts touched</div></div>
-      <div class="reportStat"><div class="reportLabel">Employee Activity</div><div class="reportValue" id="rEmployeeActivity">0</div><div class="reportHint">Calls, notes, statuses, promises</div></div>
-      <div class="reportStat"><div class="reportLabel">Top Collector</div><div class="reportValue" id="rTopCollector">—</div><div class="reportHint">By collected dollars</div></div>
-    </div>
-    <div class="reportGrid">
-      <section class="reportSection full"><div class="reportSectionHead"><h3>Collector Ranking</h3><span>Dollars collected, promises, contacts, RPC, broken promises</span></div><div class="reportTableWrap"><table class="reportTable"><thead><tr><th>Rank</th><th>Collector</th><th>Collected</th><th>Promises Created</th><th>Promises Kept</th><th>Broken</th><th>Calls</th><th>Contact Rate</th><th>RPC Rate</th><th>Accounts Worked</th></tr></thead><tbody id="reportCollectorBody"></tbody></table></div></section>
-      <section class="reportSection full"><div class="reportSectionHead"><h3>Portfolio Performance</h3><span>Placed balance, current balance, collected, promises, liquidation</span></div><div class="reportTableWrap"><table class="reportTable"><thead><tr><th>Portfolio</th><th>Accounts</th><th>Placed Balance</th><th>Current Balance</th><th>Collected</th><th>Promises</th><th>Broken</th><th>Liquidation</th></tr></thead><tbody id="reportPortfolioBody"></tbody></table></div></section>
-      <section class="reportSection"><div class="reportSectionHead"><h3>Employee Activity</h3><span>Calls, notes, dispositions, promises</span></div><div class="reportTableWrap"><table class="reportTable"><thead><tr><th>Employee</th><th>Calls</th><th>Notes</th><th>Status Updates</th><th>Promises</th><th>Accounts Worked</th></tr></thead><tbody id="reportEmployeeBody"></tbody></table></div></section>
-      <section class="reportSection"><div class="reportSectionHead"><h3>Recent Confirmed Payments</h3><span>Latest payments in selected range</span></div><div class="reportTableWrap"><table class="reportTable"><thead><tr><th>Date</th><th>Debtor</th><th>Amount</th><th>Method</th><th>Collector</th></tr></thead><tbody id="reportPaymentsBody"></tbody></table></div></section>
-    </div>
-  </div>
-</div></div>
+<!-- Legacy Admin Reports modal removed in Production Stability Refactor Phase 1. Reports now uses the full-page reportsPageStable screen only. -->
 
-
-<div id="contactIntelligenceModal" class="modal"><div class="modalbox contactIntelBox">
+<div id="contactIntelligenceModal" class="modal"><div class="modalbox contactIntelBox"><div id="contactIntelligenceModal" class="modal"><div class="modalbox contactIntelBox">
   <div class="modalhead"><h2>Call Logging + Contact Intelligence</h2><button class="gray" onclick="closeModal('contactIntelligenceModal')">Close</button></div>
   <div class="modalbody">
     <div class="contactIntelHero">
@@ -9387,7 +9344,7 @@ function focusQueue(){
   document.querySelector('.sidebar')?.scrollIntoView({behavior:'smooth',block:'start'});
 }
 function closeAllLargeModalsForNav(){
-  ['complianceGuardModal','adminReportsModal','leaderboardModal','paymentTrackerModal','paymentsDashboardModal','todayDashboardModal','dailyWorkQueueModal','promiseDashboardModal','employeeMonitorModal','employeeAdminModal','brandingSettingsModal','auditModal','permissionsModal','documentGeneratorModal'].forEach(id=>{
+  ['complianceGuardModal','leaderboardModal','paymentTrackerModal','paymentsDashboardModal','todayDashboardModal','dailyWorkQueueModal','promiseDashboardModal','employeeMonitorModal','employeeAdminModal','brandingSettingsModal','auditModal','permissionsModal','documentGeneratorModal'].forEach(id=>{
     let el=document.getElementById(id);
     if(el)el.classList.remove('open');
   });
@@ -9528,187 +9485,9 @@ function renderLeaderboard(start,end){
 
 
 /* ADMIN REPORTING DASHBOARD */
-let adminReportData={loaded:false,summary:{},collectors:[],portfolios:[],employees:[],payments:[],rangeText:''};
-function openAdminReports(){
-  if(!currentUser.isAdmin)return alert('Admin only.');
-  document.getElementById('adminReportsModal').classList.add('open');
-  buildAdminReportFilters();
-  if(!document.getElementById('reportStart').value || !document.getElementById('reportEnd').value){
-    setAdminReportRange('today');
-  }
-  loadAdminReports();
-}
-function setAdminReportRange(range){
-  let now=new Date(todayISO()+'T00:00:00');
-  let start=new Date(now), end=new Date(now);
-  if(range==='yesterday'){start.setDate(start.getDate()-1);end=new Date(start)}
-  else if(range==='week'){start=leaderboardMonday(now);end=new Date(now)}
-  else if(range==='lastWeek'){end=leaderboardMonday(now);end.setDate(end.getDate()-1);start=leaderboardMonday(end)}
-  else if(range==='month'){start=new Date(now.getFullYear(),now.getMonth(),1);end=new Date(now)}
-  else if(range==='lastMonth'){start=new Date(now.getFullYear(),now.getMonth()-1,1);end=new Date(now.getFullYear(),now.getMonth(),0)}
-  else if(range==='year'){start=new Date(now.getFullYear(),0,1);end=new Date(now)}
-  let s=document.getElementById('reportStart'),e=document.getElementById('reportEnd');
-  if(s)s.value=isoDate(start); if(e)e.value=isoDate(end);
-}
-function adminReportRangeChanged(){let r=document.getElementById('reportRange')?.value||'today';if(r!=='custom')setAdminReportRange(r);loadAdminReports()}
-function buildAdminReportFilters(){
-  let emp=document.getElementById('reportEmployee'),pf=document.getElementById('reportPortfolio');
-  if(emp){
-    let cur=emp.value;
-    let set=new Set(['']);
-    (appUsers||[]).forEach(u=>{let e=String(u.email||'').toLowerCase().trim();if(e)set.add(e)});
-    (accounts||[]).forEach(a=>{let e=String(a.assignedToEmail||'').toLowerCase().trim();if(e)set.add(e)});
-    emp.innerHTML='<option value="">All Employees</option>'+[...set].filter(Boolean).sort().map(e=>`<option value="${esc(e)}">${esc(e)}</option>`).join('');
-    if([...set].includes(cur))emp.value=cur;
-  }
-  if(pf){
-    let cur=pf.value;
-    let names=[...new Set((accounts||[]).map(a=>a.portfolio||a.accountDescription||'Unassigned Portfolio').filter(Boolean))].sort();
-    pf.innerHTML='<option value="">All Portfolios</option>'+names.map(n=>`<option value="${esc(n)}">${esc(n)}</option>`).join('');
-    if(names.includes(cur))pf.value=cur;
-  }
-}
-function reportDate(v){let d=String(v||'').slice(0,10);return /^\d{4}-\d{2}-\d{2}$/.test(d)?d:''}
-function reportInRange(v,start,end){let d=reportDate(v);return Boolean(d&&d>=start&&d<=end)}
-function reportMoneyValue(r){return moneyNum(r.amount||r.paymentAmount||r.payment_amount||r.amountDue||r.amount_due||r.paidAmount||r.paid_amount||0)}
-function reportPaidValue(r){return moneyNum(r.paidAmount||r.paid_amount)||reportMoneyValue(r)}
-function reportStatus(r){return String(r.status||'').toLowerCase()}
-function reportEmployee(r){return String(r.employeeEmail||r.employee_email||r.processedByEmail||r.processed_by_email||r.createdByEmail||r.created_by_email||r.assignedToEmail||r.assigned_to_email||'Unassigned').toLowerCase()}
-function reportAccountId(r){return String(r.accountId||r.account_id||'')}
-function reportAccount(r){return accountById(reportAccountId(r))||null}
-function reportPortfolioForRow(r){let a=reportAccount(r);return a?(a.portfolio||a.accountDescription||'Unassigned Portfolio'):'Unassigned Portfolio'}
-function reportIsPaidPromise(r){return reportStatus(r)==='paid'}
-function reportIsBrokenPromise(r){let st=reportStatus(r),due=reportDate(r.dueDate||r.due_date);return ['failed','nsf','broken promise'].includes(st)||(due&&due<todayISO()&&!['paid','canceled'].includes(st))}
-function reportCallResult(r){return String(r.callResult||r.call_result||r.actionText||r.action_text||'').toLowerCase()}
-function reportIsContact(r){let x=reportCallResult(r);return Boolean(x&&!/no answer|voicemail|left message|bad number|wrong number|busy|dialed|clicked phone/.test(x))}
-function reportIsRpc(r){let x=reportCallResult(r);return /right party|rpc|spoke|promise|settled|payment|callback|disputed|connected/.test(x)}
-async function reportFetch(path){
-  try{
-    path=String(path||'').replace(/limit=50000/g,'limit=3000');
-    let timeout=new Promise((_,reject)=>setTimeout(()=>reject(new Error('Report query timed out')),9000));
-    let rows=await Promise.race([dbFetch(path),timeout]);
-    return (rows||[]).map(toCamel);
-  }catch(e){
-    console.warn('Report source skipped:',path,e?.message||e);
-    return [];
-  }
-}
-function reportSetText(id,v){let el=document.getElementById(id);if(el)el.textContent=v}
-function reportAddEmp(map,email){email=String(email||'Unassigned').toLowerCase();if(!map[email])map[email]={email,collected:0,promised:0,promiseCount:0,kept:0,keptCount:0,broken:0,brokenCount:0,calls:0,contacts:0,rpc:0,notes:0,statusUpdates:0,accounts:new Set(),activity:0};return map[email]}
-function reportAddPortfolio(map,name){name=name||'Unassigned Portfolio';if(!map[name])map[name]={portfolio:name,accounts:0,placed:0,current:0,collected:0,promised:0,broken:0};return map[name]}
-function filterReportRowsByAccount(rows,portfolio){if(!portfolio)return rows;return rows.filter(r=>reportPortfolioForRow(r)===portfolio)}
-async function loadAdminReports(){
-  if(!currentUser.isAdmin)return;
-  let start=document.getElementById('reportStart')?.value||todayISO();
-  let end=document.getElementById('reportEnd')?.value||todayISO();
-  if(start>end){let t=start;start=end;end=t;document.getElementById('reportStart').value=start;document.getElementById('reportEnd').value=end}
-  let empFilter=String(document.getElementById('reportEmployee')?.value||'').toLowerCase();
-  let portfolioFilter=document.getElementById('reportPortfolio')?.value||'';
-  setGlobalBusy(true,'Loading reports','Reading payments, promises, calls, activity, and portfolio data...');
-  try{
-    let [promises,ledger,calls,acts,notes]=await Promise.all([
-      reportFetch('/payment_promises?select=*&order=created_at.desc&limit=50000'),
-      reportFetch('/payments_ledger?select=*&order=payment_date.desc&limit=50000'),
-      reportFetch('/call_results?select=*&order=created_at.desc&limit=50000'),
-      reportFetch('/activity_logs?select=*&order=created_at.desc&limit=50000'),
-      reportFetch('/account_notes?select=*&order=created_at.desc&limit=50000')
-    ]);
-    if(portfolioFilter){promises=filterReportRowsByAccount(promises,portfolioFilter);ledger=filterReportRowsByAccount(ledger,portfolioFilter);calls=filterReportRowsByAccount(calls,portfolioFilter);acts=filterReportRowsByAccount(acts,portfolioFilter);notes=filterReportRowsByAccount(notes,portfolioFilter)}
-    if(empFilter){
-      promises=promises.filter(r=>reportEmployee(r)===empFilter);
-      ledger=ledger.filter(r=>reportEmployee(r)===empFilter);
-      calls=calls.filter(r=>reportEmployee(r)===empFilter);
-      acts=acts.filter(r=>reportEmployee(r)===empFilter);
-      notes=notes.filter(r=>reportEmployee(r)===empFilter);
-    }
-    let promiseCreated=promises.filter(r=>reportInRange(r.createdAt||r.created_at,start,end));
-    let promisePaid=promises.filter(r=>reportIsPaidPromise(r)&&reportInRange(r.paidDate||r.paid_date||r.processedAt||r.processed_at,start,end));
-    let promiseBroken=promises.filter(r=>reportIsBrokenPromise(r)&&(reportInRange(r.processedAt||r.processed_at,start,end)||reportInRange(r.dueDate||r.due_date,start,end)));
-    let ledgerPaid=ledger.filter(r=>reportInRange(r.paymentDate||r.payment_date||r.createdAt||r.created_at,start,end) && /completed|paid|collected|posted/.test(reportStatus(r)||'completed'));
-    let collectedRows=ledgerPaid.length?ledgerPaid:promisePaid;
-    let collected=collectedRows.reduce((s,r)=>s+(ledgerPaid.length?moneyNum(r.amount):reportPaidValue(r)),0);
-    let today=todayISO(),weekStart=isoDate(leaderboardMonday(new Date(today+'T00:00:00'))),monthStart=today.slice(0,7)+'-01';
-    let allLedgerPaid=ledger.filter(r=>/completed|paid|collected|posted/.test(reportStatus(r)||'completed'));
-    let allPaidPromises=promises.filter(reportIsPaidPromise);
-    let allPaidSource=allLedgerPaid.length?allLedgerPaid:allPaidPromises;
-    let allPaidAmt=(r)=>allLedgerPaid.length?moneyNum(r.amount):reportPaidValue(r);
-    let allPaidDate=(r)=>allLedgerPaid.length?(r.paymentDate||r.payment_date||r.createdAt||r.created_at):(r.paidDate||r.paid_date||r.processedAt||r.processed_at);
-    let collectedToday=allPaidSource.filter(r=>reportInRange(allPaidDate(r),today,today)).reduce((s,r)=>s+allPaidAmt(r),0);
-    let collectedWeek=allPaidSource.filter(r=>reportInRange(allPaidDate(r),weekStart,today)).reduce((s,r)=>s+allPaidAmt(r),0);
-    let collectedMonth=allPaidSource.filter(r=>reportInRange(allPaidDate(r),monthStart,today)).reduce((s,r)=>s+allPaidAmt(r),0);
-    let rangeCalls=calls.filter(r=>reportInRange(r.createdAt||r.created_at,start,end));
-    let callFallback=rangeCalls.length?rangeCalls:acts.filter(r=>reportInRange(r.createdAt||r.created_at,start,end)&&/outbound call|call result|clicked phone/i.test(String(r.actionType||r.action_type||r.actionText||r.action_text||'')));
-    let contacts=rangeCalls.filter(reportIsContact).length;
-    let rpc=rangeCalls.filter(reportIsRpc).length;
-    let callCount=callFallback.length;
-    let notesRange=notes.filter(r=>reportInRange(r.createdAt||r.created_at,start,end));
-    let actsRange=acts.filter(r=>reportInRange(r.createdAt||r.created_at,start,end));
-    let uniqueAccounts=new Set([...promiseCreated,...promisePaid,...promiseBroken,...rangeCalls,...notesRange,...actsRange].map(reportAccountId).filter(Boolean));
-    let employeeMap={};
-    promiseCreated.forEach(r=>{let e=reportAddEmp(employeeMap,reportEmployee(r));e.promised+=reportMoneyValue(r);e.promiseCount++;e.activity++;if(reportAccountId(r))e.accounts.add(reportAccountId(r))});
-    promisePaid.forEach(r=>{let e=reportAddEmp(employeeMap,reportEmployee(r));e.collected+=reportPaidValue(r);e.kept+=reportPaidValue(r);e.keptCount++;e.activity++;if(reportAccountId(r))e.accounts.add(reportAccountId(r))});
-    promiseBroken.forEach(r=>{let e=reportAddEmp(employeeMap,reportEmployee(r));e.broken+=reportMoneyValue(r);e.brokenCount++;e.activity++;if(reportAccountId(r))e.accounts.add(reportAccountId(r))});
-    callFallback.forEach(r=>{let e=reportAddEmp(employeeMap,reportEmployee(r));e.calls++;if(reportIsContact(r))e.contacts++;if(reportIsRpc(r))e.rpc++;e.activity++;if(reportAccountId(r))e.accounts.add(reportAccountId(r))});
-    notesRange.forEach(r=>{let e=reportAddEmp(employeeMap,reportEmployee(r));e.notes++;e.activity++;if(reportAccountId(r))e.accounts.add(reportAccountId(r))});
-    actsRange.filter(r=>/status|disposition/i.test(String(r.actionType||r.action_type||''))).forEach(r=>{let e=reportAddEmp(employeeMap,reportEmployee(r));e.statusUpdates++;e.activity++;if(reportAccountId(r))e.accounts.add(reportAccountId(r))});
-    let portfolioMap={};
-    (accounts||[]).filter(a=>!portfolioFilter||(a.portfolio||a.accountDescription||'Unassigned Portfolio')===portfolioFilter).forEach(a=>{let p=reportAddPortfolio(portfolioMap,a.portfolio||a.accountDescription||'Unassigned Portfolio');p.accounts++;p.placed+=moneyNum(a.originalBalance||a.principal||a.currentBalance);p.current+=accountBalance(a)});
-    promiseCreated.forEach(r=>{let p=reportAddPortfolio(portfolioMap,reportPortfolioForRow(r));p.promised+=reportMoneyValue(r)});
-    promiseBroken.forEach(r=>{let p=reportAddPortfolio(portfolioMap,reportPortfolioForRow(r));p.broken+=reportMoneyValue(r)});
-    collectedRows.forEach(r=>{let p=reportAddPortfolio(portfolioMap,reportPortfolioForRow(r));p.collected+=ledgerPaid.length?moneyNum(r.amount):reportPaidValue(r)});
-    let placed=Object.values(portfolioMap).reduce((s,p)=>s+p.placed,0);
-    let collectors=Object.values(employeeMap).sort((a,b)=>b.collected-a.collected||b.promised-a.promised||a.email.localeCompare(b.email));
-    let portfolios=Object.values(portfolioMap).sort((a,b)=>b.collected-a.collected||b.placed-a.placed);
-    let employees=Object.values(employeeMap).sort((a,b)=>b.activity-a.activity||a.email.localeCompare(b.email));
-    let payments=collectedRows.slice().sort((a,b)=>String((b.paymentDate||b.payment_date||b.paidDate||b.paid_date||b.processedAt||b.processed_at||'')).localeCompare(String(a.paymentDate||a.payment_date||a.paidDate||a.paid_date||a.processedAt||a.processed_at||''))).slice(0,50);
-    adminReportData={loaded:true,rangeText:start===end?start:`${start} to ${end}`,summary:{collected,collectedToday,collectedWeek,collectedMonth,promised:promiseCreated.reduce((s,r)=>s+reportMoneyValue(r),0),promiseCount:promiseCreated.length,kept:promisePaid.reduce((s,r)=>s+reportPaidValue(r),0),keptCount:promisePaid.length,broken:promiseBroken.reduce((s,r)=>s+reportMoneyValue(r),0),brokenCount:promiseBroken.length,placed,liquidation:placed?collected/placed*100:0,callCount,contacts,rpc,contactRate:callCount?contacts/callCount*100:0,rpcRate:callCount?rpc/callCount*100:0,accountsWorked:uniqueAccounts.size,employeeActivity:employees.reduce((s,e)=>s+e.activity,0),topCollector:collectors[0]?.email||'—'},collectors,portfolios,employees,payments};
-    renderAdminReports();
-  }finally{setGlobalBusy(false)}
-}
-function renderAdminReports(){
-  let s=adminReportData.summary||{};
-  reportSetText('rCollectedToday',money(s.collectedToday));reportSetText('rCollectedWeek',money(s.collectedWeek));reportSetText('rCollectedMonth',money(s.collectedMonth));
-  reportSetText('rPromisesCreated',money(s.promised));reportSetText('rPromisesCreatedCount',`${s.promiseCount||0} promises created`);
-  reportSetText('rPromisesKept',money(s.kept));reportSetText('rPromisesKeptCount',`${s.keptCount||0} kept promises`);
-  reportSetText('rBrokenPromises',money(s.broken));reportSetText('rBrokenPromisesCount',`${s.brokenCount||0} broken/failed`);
-  reportSetText('rLiquidationRate',(s.liquidation||0).toFixed(2)+'%');
-  reportSetText('rContactRate',(s.contactRate||0).toFixed(1)+'%');reportSetText('rContactCount',`${s.contacts||0} contacts / ${s.callCount||0} calls`);
-  reportSetText('rRpcRate',(s.rpcRate||0).toFixed(1)+'%');reportSetText('rRpcCount',`${s.rpc||0} RPC / ${s.callCount||0} calls`);
-  reportSetText('rAccountsWorked',String(s.accountsWorked||0));reportSetText('rEmployeeActivity',String(s.employeeActivity||0));reportSetText('rTopCollector',s.topCollector&&s.topCollector!=='—'?s.topCollector.split('@')[0]:'—');
-  let cb=document.getElementById('reportCollectorBody');
-  if(cb)cb.innerHTML=(adminReportData.collectors||[]).map((r,i)=>{let cr=r.calls?r.contacts/r.calls*100:0,rr=r.calls?r.rpc/r.calls*100:0;return `<tr><td><span class="reportRank ${i===0?'top':''}">${i+1}</span></td><td><b>${esc(r.email)}</b></td><td class="reportMoney reportGood">${money(r.collected)}</td><td>${money(r.promised)}<div class="reportHint">${r.promiseCount} created</div></td><td>${money(r.kept)}<div class="reportHint">${r.keptCount} kept</div></td><td class="reportBad">${money(r.broken)}<div class="reportHint">${r.brokenCount} broken</div></td><td>${r.calls}</td><td>${cr.toFixed(1)}%</td><td>${rr.toFixed(1)}%</td><td>${r.accounts.size}</td></tr>`}).join('')||'<tr><td colspan="10"><div class="reportEmpty">No collector activity in this range.</div></td></tr>';
-  let pb=document.getElementById('reportPortfolioBody');
-  if(pb)pb.innerHTML=(adminReportData.portfolios||[]).map(p=>{let liq=p.placed?p.collected/p.placed*100:0;return `<tr><td><b>${esc(p.portfolio)}</b></td><td>${p.accounts}</td><td>${money(p.placed)}</td><td>${money(p.current)}</td><td class="reportMoney reportGood">${money(p.collected)}</td><td>${money(p.promised)}</td><td class="reportBad">${money(p.broken)}</td><td><b>${liq.toFixed(2)}%</b></td></tr>`}).join('')||'<tr><td colspan="8"><div class="reportEmpty">No portfolio data found.</div></td></tr>';
-  let eb=document.getElementById('reportEmployeeBody');
-  if(eb)eb.innerHTML=(adminReportData.employees||[]).map(e=>`<tr><td><b>${esc(e.email)}</b></td><td>${e.calls}</td><td>${e.notes}</td><td>${e.statusUpdates}</td><td>${e.promiseCount}</td><td>${e.accounts.size}</td></tr>`).join('')||'<tr><td colspan="6"><div class="reportEmpty">No employee activity in this range.</div></td></tr>';
-  let payb=document.getElementById('reportPaymentsBody');
-  if(payb)payb.innerHTML=(adminReportData.payments||[]).map(r=>{let a=reportAccount(r);let dt=reportDate(r.paymentDate||r.payment_date||r.paidDate||r.paid_date||r.processedAt||r.processed_at);let amt=moneyNum(r.amount)||reportPaidValue(r);return `<tr><td>${esc(dt||'—')}</td><td><b>${esc(a?nameOf(a):(r.debtorName||r.debtor_name||'Unknown'))}</b><div class="reportHint">${esc(a?acctNo(a):(r.accountNumber||r.account_number||''))}</div></td><td class="reportMoney reportGood">${money(amt)}</td><td>${esc(r.paymentMethod||r.payment_method||r.paymentType||r.payment_type||'—')}</td><td>${esc(reportEmployee(r))}</td></tr>`}).join('')||'<tr><td colspan="5"><div class="reportEmpty">No confirmed payments in this range.</div></td></tr>';
-}
-function adminReportCsvRows(){
-  let d=adminReportData, out=[];
-  out.push(['Co Pilot Admin Reports',d.rangeText]);out.push([]);
-  out.push(['Summary','Value']);Object.entries(d.summary||{}).forEach(([k,v])=>{if(k!=='topCollector')out.push([k,v])});out.push(['topCollector',d.summary?.topCollector||'—']);out.push([]);
-  out.push(['Collector Ranking']);out.push(['collector','collected','promises_created_amount','promise_count','promises_kept_amount','kept_count','broken_amount','broken_count','calls','contacts','rpc','accounts_worked']);(d.collectors||[]).forEach(r=>out.push([r.email,r.collected,r.promised,r.promiseCount,r.kept,r.keptCount,r.broken,r.brokenCount,r.calls,r.contacts,r.rpc,r.accounts.size]));out.push([]);
-  out.push(['Portfolio Performance']);out.push(['portfolio','accounts','placed_balance','current_balance','collected','promises','broken','liquidation_rate']);(d.portfolios||[]).forEach(p=>out.push([p.portfolio,p.accounts,p.placed,p.current,p.collected,p.promised,p.broken,p.placed?(p.collected/p.placed*100).toFixed(2)+'%':'0%']));out.push([]);
-  out.push(['Employee Activity']);out.push(['employee','calls','notes','status_updates','promises','accounts_worked']);(d.employees||[]).forEach(e=>out.push([e.email,e.calls,e.notes,e.statusUpdates,e.promiseCount,e.accounts.size]));
-  return out;
-}
-function csvEscape(v){return `"${String(v??'').replace(/"/g,'""')}"`}
-function exportAdminReportsCSV(){if(!adminReportData.loaded)return alert('Load reports first.');let csv=adminReportCsvRows().map(r=>r.map(csvEscape).join(',')).join('\\n');download('co-pilot-admin-reports.csv',csv,'text/csv')}
-function exportAdminReportsPDF(){
-  if(!adminReportData.loaded)return alert('Load reports first.');
-  let html=`<!doctype html><html><head><title>Co Pilot Admin Reports</title><style>body{font-family:Arial,sans-serif;color:#0f172a;padding:24px}h1{margin:0 0 4px}h2{margin-top:22px;border-bottom:1px solid #ddd;padding-bottom:6px}table{width:100%;border-collapse:collapse;font-size:12px;margin-top:8px}th,td{border:1px solid #ddd;padding:6px;text-align:left}th{background:#f1f5f9}.money{font-weight:bold;color:#166534}.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.card{border:1px solid #ddd;border-radius:10px;padding:10px}.label{font-size:10px;color:#64748b;text-transform:uppercase}.value{font-size:18px;font-weight:bold}</style></head><body><h1>Co Pilot Admin Reports</h1><div>${esc(adminReportData.rangeText)}</div><div class="grid"><div class="card"><div class="label">Collected</div><div class="value">${money(adminReportData.summary.collected)}</div></div><div class="card"><div class="label">Promises Created</div><div class="value">${money(adminReportData.summary.promised)}</div></div><div class="card"><div class="label">Liquidation</div><div class="value">${(adminReportData.summary.liquidation||0).toFixed(2)}%</div></div></div>${reportTableHtmlForPrint('Collector Ranking',['Collector','Collected','Promises','Kept','Broken','Calls','Contact %','RPC %'],(adminReportData.collectors||[]).map(r=>[r.email,money(r.collected),money(r.promised),money(r.kept),money(r.broken),r.calls,(r.calls?r.contacts/r.calls*100:0).toFixed(1)+'%',(r.calls?r.rpc/r.calls*100:0).toFixed(1)+'%']))}${reportTableHtmlForPrint('Portfolio Performance',['Portfolio','Accounts','Placed','Current','Collected','Promises','Liquidation'],(adminReportData.portfolios||[]).map(p=>[p.portfolio,p.accounts,money(p.placed),money(p.current),money(p.collected),money(p.promised),p.placed?(p.collected/p.placed*100).toFixed(2)+'%':'0%']))}
+/* Legacy modal Admin Reports functions removed in Production Stability Refactor Phase 1. */
 
-
-</body></html>`;
-  let w=window.open('','_blank');
-  if(!w){download('co-pilot-admin-reports.html',html,'text/html');return alert('Popup blocked. Downloaded an HTML report you can print to PDF.')}
-  w.document.write(html);w.document.close();setTimeout(()=>w.print(),500);
-}
-function reportTableHtmlForPrint(title,heads,rows){return `<h2>${esc(title)}</h2><table><thead><tr>${heads.map(h=>`<th>${esc(h)}</th>`).join('')}</tr></thead><tbody>${rows.map(r=>`<tr>${r.map(v=>`<td>${esc(v)}</td>`).join('')}</tr>`).join('')||`<tr><td colspan="${heads.length}">No data</td></tr>`}</tbody></table>`}
-
-
-/* PAYMENT PLAN UI REDESIGN + ADMIN-ONLY EDIT/DELETE LOCK */
+/* PAYMENT PLAN UI REDESIGN + ADMIN-ONLY EDIT/DELETE LOCK *//* PAYMENT PLAN UI REDESIGN + ADMIN-ONLY EDIT/DELETE LOCK */
 (function(){
   const ppEsc = (v)=> (typeof esc==='function'?esc(v):String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])));
   const ppMoney = (v)=> (typeof money==='function'?money(v):('$'+(Number(v||0).toFixed(2))));
@@ -9883,28 +9662,9 @@ function reportTableHtmlForPrint(title,heads,rows){return `<h2>${esc(title)}</h2
 
 
 
-/* REPORTS LOADING SAFETY PATCH */
-(function(){
-  const oldLoadReports = window.loadAdminReports;
-  window.loadAdminReports = async function(){
-    let safety=setTimeout(()=>{try{setGlobalBusy(false)}catch(e){};let n=document.getElementById('reportNotice');if(n)n.textContent='Reports are taking longer than expected. Showing any data that could be loaded; try Refresh again if needed.';},12000);
-    try{
-      if(typeof oldLoadReports==='function'){
-        await oldLoadReports.apply(this,arguments);
-      }
-      let n=document.getElementById('reportNotice');
-      if(n && adminReportData && adminReportData.loaded)n.textContent='Reports loaded. Some sections may be blank if the matching tables do not have records yet.';
-    }catch(e){
-      console.warn('Admin reports failed',e);
-      try{adminReportData={loaded:true,rangeText:'—',summary:{collected:0,collectedToday:0,collectedWeek:0,collectedMonth:0,promised:0,promiseCount:0,kept:0,keptCount:0,broken:0,brokenCount:0,placed:0,liquidation:0,callCount:0,contacts:0,rpc:0,contactRate:0,rpcRate:0,accountsWorked:0,employeeActivity:0,topCollector:'—'},collectors:[],portfolios:[],employees:[],payments:[]}; renderAdminReports();}catch(x){}
-      let n=document.getElementById('reportNotice');
-      if(n)n.textContent='Reports could not read one or more data tables yet. The dashboard is still open; run the latest SQL if sections stay blank.';
-    }finally{
-      clearTimeout(safety);
-      try{setGlobalBusy(false)}catch(e){}
-    }
-  };
-})();
+/* Legacy Reports modal loading patch removed in Production Stability Refactor Phase 1. */
+
+/* FACEBOOK STYLE DIRECT CHAT */
 
 /* FACEBOOK STYLE DIRECT CHAT */
 let chatContactsData=[];
@@ -11272,20 +11032,39 @@ function exportContactIntelligenceCSV(){let calls=filteredContactCalls();let row
 
   async function refreshReportsPageStable(){
     ensureReportsPage();
-    setReportsDefaultDates();
-    var n = document.getElementById('reportsPageStableNotice');
-    if(n) n.textContent = 'Loading reports safely... If one table is empty or slow, the page will still load.';
-    ['reportsStableKpis','reportsStableCollectors','reportsStablePortfolios','reportsStableCalls','reportsStableRecent'].forEach(function(id){var el=document.getElementById(id); if(el)el.innerHTML='<div class="reportsEmpty">Loading...</div>';});
-    var data = await loadReportsData();
-    buildReportFilters(data);
-    renderReports(data);
+    if(window.__reportsPageStableLoading){
+      var already = document.getElementById('reportsPageStableNotice');
+      if(already) already.textContent = 'Reports are already loading. Please wait a moment.';
+      return;
+    }
+    window.__reportsPageStableLoading = true;
+    try{
+      setReportsDefaultDates();
+      var n = document.getElementById('reportsPageStableNotice');
+      if(n) n.textContent = 'Loading reports safely... If one table is empty or slow, the page will still load.';
+      ['reportsStableKpis','reportsStableCollectors','reportsStablePortfolios','reportsStableCalls','reportsStableRecent'].forEach(function(id){var el=document.getElementById(id); if(el)el.innerHTML='<div class="reportsEmpty">Loading...</div>';});
+      var data = await loadReportsData();
+      buildReportFilters(data);
+      renderReports(data);
+    }catch(e){
+      console.warn('Reports page failed safely', e);
+      var fail = document.getElementById('reportsPageStableNotice');
+      if(fail) fail.textContent = 'Reports could not load one or more sections. The app is still stable; try Refresh or check table access.';
+    }finally{
+      window.__reportsPageStableLoading = false;
+    }
   }
 
   function openReportsPageStable(){
     if(!reportsIsAdmin()) return alert('Admin only.');
     ensureReportsPage();
     try{ if(typeof window.closeAllLargeModalsForNav === 'function') window.closeAllLargeModalsForNav(); }catch(e){}
-    try{ var old = document.getElementById('adminReportsModal'); if(old) old.classList.remove('open'); }catch(e){}
+    try{
+      document.querySelectorAll('.modal.open').forEach(function(m){m.classList.remove('open');});
+      document.querySelectorAll('[id$="PageStable"].open,.cleanupPage.open,.importPage.open,.settlementPage.open,.docsPage.open,.ticklerPage.open,.scorecardsPage.open').forEach(function(p){
+        if(p.id !== 'reportsPageStable') p.classList.remove('open');
+      });
+    }catch(e){}
     document.getElementById('reportsPageStable').classList.add('open');
     setReportsDefaultDates();
     setTimeout(function(){ refreshReportsPageStable(); },0);
@@ -12100,7 +11879,254 @@ function exportContactIntelligenceCSV(){let calls=filteredContactCalls();let row
   }
   function renderDocMetrics(rows){let box=dEl('docMetrics'); if(!box)return; let receipts=rows.filter(r=>/receipt/i.test(r.actionType||r.actionText||'')).length, letters=rows.filter(r=>/letter|settlement/i.test(r.actionType||r.actionText||'')).length, plans=rows.filter(r=>/agreement|plan/i.test(r.actionType||r.actionText||'')).length, comms=rows.filter(r=>/mail|printed|certified|communication/i.test(r.actionType||r.actionText||'')).length; box.innerHTML=[['Receipts',receipts],['Letters',letters],['Plan Agreements',plans],['Comms Docs',comms]].map(x=>'<div class="docMetric"><div class="docMetricLabel">'+dEsc(x[0])+'</div><div class="docMetricValue">'+dEsc(x[1])+'</div></div>').join('')}
   window.exportDocumentHistoryCSV=function(){let rows=window.__docHistoryRows||[]; let csv=[['Date','Type','Summary','Created By'].map(dCsvCell).join(',')].concat(rows.map(r=>[r.createdAt,r.actionType,r.actionText,r.createdByEmail].map(dCsvCell).join(','))).join('\n'); dDownload('co-pilot-document-history.csv',csv)};
-  window.printCurrentDocument=function(){let p=dEl('docPreview'); if(!p)return; let w=window.open('','_blank','width=900,height=1100'); let html='<!doctype html><html><head><title>Co Pilot Document</title><style>body{font-family:Arial,Helvetica,sans-serif;color:#0f172a;padding:30px;line-height:1.45}h1{font-size:24px}h2{font-size:18px;margin-top:20px}table{width:100%;border-collapse:collapse;margin:12px 0;font-size:13px}th,td{border:1px solid #dbe3ef;padding:8px;text-align:left}th{background:#f8fafc}.muted{color:#64748b}.docSignLine{margin-top:36px;border-top:1px solid #0f172a;width:260px;padding-top:6px;font-size:12px}.docWatermark{font-size:11px;color:#94a3b8;text-align:right;margin-top:18px}</style></head><body>'+p.innerHTML+'</body></html>'; if(w){w.document.write(html);w.document.close();setTimeout(()=>{w.focus();w.print()},250)}else{window.print()}};
+  window.printCurrentDocument=function(){let p=dEl('docPreview'); if(!p)return; let w=window.open('','_blank','width=900,height=1100'); let html='<!doctype html><html><head><title>Co Pilot Document</title><style>body{font-family:Arial,Helvetica,sans-serif;color:#0f172a;padding:30px;line-height:1.45}h1{font-size:24px}h2{font-size:18px;margin-top:20px}table{width:100%;border-collapse:collapse;margin:12px 0;font-size:13px}th,td{border:1px solid #dbe3ef;padding:8px;text-align:left}th{background:#f8fafc}.muted{color:#64748b}.docSignLine{margin-top:36px;border-top:1px solid #0f172a;width:260px;padding-top:6px;font-size:12px}.docWatermark{font-size:11px;color:#94a3b8;text-align:right;margin-top:18px}</style></head><body>'+p.innerHTML+'
+
+<script id="productionStabilityPhase1Script">
+(function(){
+  if(window.__cpcmProductionStabilityPhase1Loaded) return;
+  window.__cpcmProductionStabilityPhase1Loaded = true;
+  window.CPCM_ADMIN_EMAIL = 'afinch2678@gmail.com';
+  window.cpcmCurrentEmail = function(){
+    try{return String((window.currentUser && window.currentUser.email) || '').toLowerCase().trim();}catch(e){return '';}
+  };
+  window.cpcmIsAdmin = function(){
+    try{
+      var email = window.cpcmCurrentEmail();
+      var role = String((window.currentUser && (window.currentUser.role || window.currentUser.userRole)) || '').toLowerCase();
+      var badge = String((document.getElementById('roleBadge') || {}).textContent || '').toLowerCase();
+      return email === window.CPCM_ADMIN_EMAIL || !!(window.currentUser && window.currentUser.isAdmin) || role === 'admin' || badge.indexOf('admin') >= 0;
+    }catch(e){return false;}
+  };
+  window.cpcmCloseAllOverlays = function(exceptId){
+    try{
+      document.querySelectorAll('.modal.open').forEach(function(el){if(el.id !== exceptId) el.classList.remove('open');});
+      ['reportsPageStable','cleanupPage','importHistoryPage','settlementDashboardPage','documentCenterPage','ticklerCommandCenterPage','managerQaScorecardsPage'].forEach(function(id){
+        var el=document.getElementById(id);
+        if(el && id !== exceptId) el.classList.remove('open');
+      });
+    }catch(e){}
+  };
+})();
+</script>
+
+
+<script>
+/* MESSENGER_NAMES_NO_ATTACHED_ACCOUNTS_FIX — staff display names + no debtor/account attachment in messenger */
+(function(){
+  const BUILD='MESSENGER_NAMES_NO_ATTACHED_ACCOUNTS_2026_07_18';
+  function lower(v){return String(v||'').trim().toLowerCase()}
+  function safe(v){try{return (typeof esc==='function'?esc(String(v||'')):String(v||'').replace(/[&<>"']/g,function(m){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]}))}catch(e){return String(v||'')}}
+  function cleanName(v){return String(v||'').replace(/\s+/g,' ').trim()}
+  function emailPrefix(email){
+    email=lower(email);
+    if(email==='afinch2678@gmail.com')return 'Antonio Finch';
+    let p=(email.split('@')[0]||'Team Member').replace(/[._-]+/g,' ').replace(/\d+/g,' ').replace(/\s+/g,' ').trim();
+    return p?p.replace(/\b\w/g,function(c){return c.toUpperCase()}):email;
+  }
+  function userEmail(u){return lower(u&&((u.email)||(u.userEmail)||(u.user_email))) }
+  function userNameValue(u){
+    if(!u)return '';
+    return cleanName(u.fullName||u.full_name||u.displayName||u.display_name||u.employeeName||u.employee_name||u.name||u.userName||u.username||'');
+  }
+  function findUser(email){email=lower(email);try{return (window.appUsers||appUsers||[]).find(function(u){return userEmail(u)===email})||null}catch(e){return null}}
+  function storedName(email){try{return cleanName(localStorage.getItem('cpcmStaffName:'+lower(email))||'')}catch(e){return ''}}
+  window.cpcmStaffDisplayName=function(email){
+    email=lower(email);
+    if(!email)return 'Team Member';
+    let u=findUser(email);
+    let n=userNameValue(u) || storedName(email);
+    try{if(!n && currentUser && lower(currentUser.email)===email)n=userNameValue(currentUser)}catch(e){}
+    return n || emailPrefix(email);
+  };
+  window.cpcmStaffInitials=function(email){
+    let n=window.cpcmStaffDisplayName(email);
+    let parts=n.split(/\s+/).filter(Boolean);
+    return (parts.length>1?(parts[0][0]+parts[parts.length-1][0]):n.slice(0,2)).toUpperCase();
+  };
+
+  // Replace messenger naming so it never uses debtor/account names as the sender.
+  window.chatName=function(email){return window.cpcmStaffDisplayName(email)};
+  window.chatInitials=function(email){return window.cpcmStaffInitials(email)};
+
+  function meEmail(){try{return lower((typeof chatMe==='function'?chatMe():currentUser&&currentUser.email)||'')}catch(e){return lower(currentUser&&currentUser.email)}}
+  function onlineEmail(email){try{return typeof presenceIsOnlineEmail==='function'?presenceIsOnlineEmail(email):false}catch(e){return false}}
+  function staffRole(email){try{return typeof staffRoleForEmail==='function'?staffRoleForEmail(email):(findUser(email)?.role||'employee')}catch(e){return 'employee'}}
+  function isAllowedUser(u){
+    let email=userEmail(u); if(!email)return false;
+    let role=lower(u.role||'employee');
+    let approved=(u.isApproved===true||u.is_approved===true||lower(u.approvalStatus||u.approval_status)==='approved'||role==='admin'||email==='afinch2678@gmail.com');
+    let active=!(u.isActive===false||u.is_active===false||lower(u.approvalStatus||u.approval_status)==='removed');
+    return approved && active;
+  }
+  window.buildChatContacts=function(){
+    let me=meEmail(), map={};
+    function add(email,u){email=lower(email); if(!email)return; if(!map[email])map[email]={email:email,user:u||findUser(email)||{email:email},unread:0,lastMessageAt:'',lastPreview:''};}
+    add(me, findUser(me)||{email:me,role:(currentUser&&currentUser.isAdmin)?'admin':'employee',fullName:window.cpcmStaffDisplayName(me)});
+    try{(appUsers||[]).forEach(function(u){if(isAllowedUser(u))add(userEmail(u),u)})}catch(e){}
+    try{(chatPresenceData||[]).forEach(function(p){add(p.userEmail||p.user_email,{email:p.userEmail||p.user_email})})}catch(e){}
+    try{(chatAllMessages||[]).forEach(function(m){add(m.fromEmail||m.from_email);add(m.toEmail||m.to_email)})}catch(e){}
+    Object.values(map).forEach(function(c){
+      c.self=(c.email===me);
+      c.online=c.self?true:onlineEmail(c.email);
+      let msgs=(chatAllMessages||[]).filter(function(m){let f=lower(m.fromEmail||m.from_email),t=lower(m.toEmail||m.to_email);return (f===me&&t===c.email)||(f===c.email&&t===me)});
+      c.unread=msgs.filter(function(m){let f=lower(m.fromEmail||m.from_email),t=lower(m.toEmail||m.to_email);return t===me && f!==me && !m.readAt && !m.read_at && String(m.status||'Open')!=='Closed'}).length;
+      let last=msgs[msgs.length-1]; if(last){c.lastMessageAt=last.createdAt||last.created_at||'';c.lastPreview=String(last.body||'').slice(0,70)}
+    });
+    window.chatContactsData=chatContactsData=Object.values(map).sort(function(a,b){
+      if(a.self!==b.self)return a.self?-1:1;
+      if(a.unread!==b.unread)return b.unread-a.unread;
+      if(a.online!==b.online)return a.online?-1:1;
+      return window.cpcmStaffDisplayName(a.email).localeCompare(window.cpcmStaffDisplayName(b.email));
+    });
+  };
+
+  window.renderPresenceBanner=function(){
+    let head=document.querySelector('.chatContactsHead'); if(!head)return;
+    let existing=document.getElementById('chatPresenceBanner');
+    if(!existing){existing=document.createElement('div');existing.id='chatPresenceBanner';existing.className='chatPresenceBanner';head.insertAdjacentElement('afterend',existing)}
+    let seen={};
+    let n=(chatContactsData||[]).filter(function(c){let e=lower(c.email); if(!e||seen[e])return false; seen[e]=true; return c.self||onlineEmail(e)}).length;
+    existing.innerHTML='<span><b>'+n+'</b> online</span><span>You are online 🟢</span>';
+  };
+
+  window.renderChatContacts=function(){
+    let list=document.getElementById('chatContactList'); if(!list)return;
+    let q=lower(document.getElementById('chatSearch')&&document.getElementById('chatSearch').value||'');
+    let rows=(chatContactsData||[]).filter(function(c){return !q || lower(c.email).includes(q) || lower(window.cpcmStaffDisplayName(c.email)).includes(q) || lower(staffRole(c.email)).includes(q)});
+    list.innerHTML=rows.map(function(c){
+      let online=c.self?true:onlineEmail(c.email);
+      let meta=(c.self?'You • ':'')+safe(staffRole(c.email))+' • <span class="'+(online?'onlineText':'offlineText')+'">'+(online?'Online':'Offline')+'</span>'+(c.lastPreview&&!c.self?' • '+safe(c.lastPreview):'');
+      let click=c.self?'onclick="window.cpcmOpenStaffNameModal(\''+safe(c.email)+'\')"':'onclick="selectChatContact(\''+safe(c.email)+'\')"';
+      return '<div class="chatContact '+(c.self?'self':'')+' '+(c.email===chatActiveEmail?'active':'')+' '+(c.unread?'hasUnread':'')+'" '+click+'>'+ 
+        '<div class="chatAvatar">'+safe(window.cpcmStaffInitials(c.email))+'<span class="chatOnlineDot '+(online?'live':'off')+'"></span></div>'+ 
+        '<div class="chatContactMain"><div class="chatContactName">'+safe(window.cpcmStaffDisplayName(c.email))+(c.self?' <span class="chatSelfBadge">You</span>':'')+'</div><div class="chatContactMeta">'+meta+'</div></div>'+ 
+        '<div class="chatContactUnread '+(c.unread?'':'zero')+'">'+(c.unread?(c.unread>99?'99+':c.unread):'')+'</div>'+ 
+      '</div>';
+    }).join('') || '<div class="tmEmpty">No employees/admin are available yet.</div>';
+    renderPresenceBanner();
+  };
+
+  function formatChatDate(v){let d=new Date(v||Date.now()); if(isNaN(d.getTime()))d=new Date(); return d.toLocaleDateString([], {month:'short',day:'numeric',year:'numeric'})+' '+d.toLocaleTimeString([], {hour:'numeric',minute:'2-digit'});}
+  window.chatMessageBubble=function(m){
+    let from=lower(m.fromEmail||m.from_email), mine=from===meEmail();
+    let seen=mine&&(m.readAt||m.read_at);
+    return '<div class="chatBubbleWrap '+(mine?'mine':'theirs')+'">'+
+      '<div class="chatSenderName '+(mine?'mine':'theirs')+'">'+safe(window.cpcmStaffDisplayName(from))+'</div>'+
+      '<div class="chatBubble">'+safe(m.body||'')+'</div>'+ 
+      '<div class="chatMetaLine">'+safe(formatChatDate(m.createdAt||m.created_at||Date.now()))+(seen?' • Seen':'')+'</div>'+ 
+    '</div>';
+  };
+
+  window.renderChatConversation=function(){
+    let msgs=typeof activeChatMessages==='function'?activeChatMessages():[];
+    let box=document.getElementById('chatMessages'), nameEl=document.getElementById('chatActiveName'), statusEl=document.getElementById('chatActiveStatus'), av=document.getElementById('chatActiveAvatar'), btn=document.getElementById('chatSendBtn');
+    if(!box)return;
+    if(!chatActiveEmail || lower(chatActiveEmail)===meEmail()){
+      box.innerHTML='<div class="chatEmpty">Pick an employee or admin to start a direct chat.</div>'; if(btn)btn.disabled=true; chatActiveEmail=''; return;
+    }
+    if(btn)btn.disabled=false;
+    if(nameEl)nameEl.textContent=window.cpcmStaffDisplayName(chatActiveEmail);
+    let online=onlineEmail(chatActiveEmail);
+    if(statusEl)statusEl.innerHTML=safe(staffRole(chatActiveEmail))+' • <span class="'+(online?'onlineText':'offlineText')+'">'+(online?'Online':'Offline')+'</span>';
+    if(av)av.innerHTML=safe(window.cpcmStaffInitials(chatActiveEmail))+'<span class="chatOnlineDot '+(online?'live':'off')+'"></span>';
+    box.innerHTML=msgs.map(function(m){return chatMessageBubble(m)}).join('')||'<div class="chatEmpty">No messages yet. Type below to start the conversation.</div>';
+    box.scrollTop=box.scrollHeight;
+    try{loadTypingStatus()}catch(e){}
+  };
+
+  window.attachCurrentAccountToChat=function(){ alert('Attached accounts were removed from Messenger. Send only staff/admin messages here.'); };
+  window.sendChatMessage=async function(){
+    let input=document.getElementById('chatInput');
+    let body=String(input&&input.value||'').trim();
+    if(!chatActiveEmail)return alert('Select an employee/admin first.');
+    if(lower(chatActiveEmail)===meEmail())return alert('You cannot send a message to yourself.');
+    if(!body)return;
+    let row={account_id:null,account_name:'',account_number:'',from_email:currentUser.email,to_email:chatActiveEmail,message_type:'Direct Message',priority:'Normal',subject:'Direct Message',body:body,phone_number:'',status:'Open',created_by_email:currentUser.email,updated_at:new Date().toISOString()};
+    await dbFetch('/team_messages',{method:'POST',body:JSON.stringify([row])});
+    if(input)input.value='';
+    try{await setTyping(false)}catch(e){}
+    await chatRefreshAll(false);
+  };
+  window.openChatDock=async function(){
+    let dock=document.getElementById('chatDock'); if(!dock)return alert('Chat dock not found.');
+    chatAttachedAccountId='';
+    ensureMessengerNameUi();
+    dock.classList.add('open');
+    await chatRefreshAll(false);
+    if(lower(chatActiveEmail)===meEmail())chatActiveEmail='';
+    if(!chatActiveEmail){let first=(chatContactsData||[]).find(function(c){return !c.self&&c.email!==meEmail()}); if(first)await selectChatContact(first.email)}
+    try{startChatPolling()}catch(e){}
+  };
+
+  async function saveName(targetEmail,newName){
+    targetEmail=lower(targetEmail); newName=cleanName(newName);
+    if(!targetEmail)return alert('No user selected.');
+    if(!newName)return alert('Enter a display name.');
+    try{localStorage.setItem('cpcmStaffName:'+targetEmail,newName)}catch(e){}
+    let ok=false;
+    try{await dbFetch('/rpc/cpcm_update_staff_display_name',{method:'POST',body:JSON.stringify({target_email:targetEmail,new_full_name:newName})}); ok=true;}catch(e){}
+    if(!ok){
+      try{await dbFetch('/app_users?email=eq.'+encodeURIComponent(targetEmail),{method:'PATCH',body:JSON.stringify({full_name:newName,updated_at:new Date().toISOString()})}); ok=true;}catch(e){}
+    }
+    try{
+      let u=findUser(targetEmail); if(u){u.fullName=newName;u.full_name=newName;u.displayName=newName;u.display_name=newName}
+      if(currentUser&&lower(currentUser.email)===targetEmail){currentUser.fullName=newName;currentUser.full_name=newName;currentUser.displayName=newName;currentUser.display_name=newName}
+    }catch(e){}
+    await loadAppUsers().catch(function(){});
+    buildChatContacts(); renderChatContacts(); if(chatActiveEmail)renderChatConversation();
+    alert(ok?'Name saved.':'Name saved in this browser. Run the Messenger Names SQL so names save globally.');
+  }
+  window.cpcmSaveStaffDisplayName=async function(){
+    let target=(document.getElementById('cpcmNameTarget')&&document.getElementById('cpcmNameTarget').value)||meEmail();
+    let name=(document.getElementById('cpcmNameValue')&&document.getElementById('cpcmNameValue').value)||'';
+    await saveName(target,name);
+  };
+  window.cpcmOpenStaffNameModal=function(targetEmail){
+    ensureNameModal();
+    let sel=document.getElementById('cpcmNameTarget'), inp=document.getElementById('cpcmNameValue');
+    let isAdm=false; try{isAdm=currentUser&&currentUser.isAdmin===true}catch(e){}
+    let rows=[]; try{rows=(appUsers||[]).filter(isAllowedUser)}catch(e){}
+    if(!rows.some(function(u){return userEmail(u)===meEmail()}))rows.unshift({email:meEmail(),role:(currentUser&&currentUser.isAdmin)?'admin':'employee',fullName:window.cpcmStaffDisplayName(meEmail())});
+    if(sel){
+      sel.disabled=!isAdm;
+      sel.innerHTML=rows.sort(function(a,b){return window.cpcmStaffDisplayName(userEmail(a)).localeCompare(window.cpcmStaffDisplayName(userEmail(b)))}).map(function(u){let e=userEmail(u);return '<option value="'+safe(e)+'">'+safe(window.cpcmStaffDisplayName(e))+' — '+safe(e)+'</option>'}).join('');
+      sel.value=lower(targetEmail)||meEmail();
+      if(!isAdm)sel.value=meEmail();
+    }
+    if(inp)inp.value=window.cpcmStaffDisplayName(sel&&sel.value||meEmail());
+    document.getElementById('cpcmNameModal').classList.add('open');
+  };
+  window.cpcmNameTargetChanged=function(){let sel=document.getElementById('cpcmNameTarget'), inp=document.getElementById('cpcmNameValue'); if(inp&&sel)inp.value=window.cpcmStaffDisplayName(sel.value)};
+  window.cpcmCloseNameModal=function(){let m=document.getElementById('cpcmNameModal'); if(m)m.classList.remove('open')};
+  function ensureNameModal(){
+    if(document.getElementById('cpcmNameModal'))return;
+    let div=document.createElement('div'); div.id='cpcmNameModal'; div.className='modal';
+    div.innerHTML='<div class="modalbox" style="max-width:620px"><div class="modalhead"><h2>Staff Display Name</h2><button class="gray" onclick="cpcmCloseNameModal()">Close</button></div><div class="modalbody"><div class="notice">Names saved here are used by Team Messenger, Scorecards, Staff, and internal activity screens. Admin can rename any employee. Employees can rename themselves.</div><div class="grid"><div class="full"><label>Staff User</label><select id="cpcmNameTarget" onchange="cpcmNameTargetChanged()"></select></div><div class="full"><label>Display Name</label><input id="cpcmNameValue" placeholder="Example: Antonio Finch"></div><div class="full" style="display:flex;gap:10px;justify-content:flex-end"><button class="gray" onclick="cpcmCloseNameModal()">Cancel</button><button class="green" onclick="cpcmSaveStaffDisplayName()">Save Name</button></div></div></div></div>';
+    document.body.appendChild(div);
+  }
+  function ensureMessengerNameUi(){
+    let attach=document.querySelector('.chatAttachAccount'); if(attach){attach.style.display='none'; attach.textContent='Account Attach Removed'}
+    let actions=document.querySelector('.chatTopActions');
+    if(actions && !document.getElementById('cpcmNameBtn')){let b=document.createElement('button');b.id='cpcmNameBtn';b.title='Edit staff display name';b.textContent='Name';b.onclick=function(){cpcmOpenStaffNameModal(meEmail())};actions.insertBefore(b,actions.firstChild)}
+    let empTop=document.querySelector('#employeeAdminModal .employeeAdminTop');
+    if(empTop && !document.getElementById('cpcmStaffNamesBtn')){let b=document.createElement('button');b.id='cpcmStaffNamesBtn';b.className='outline';b.textContent='Edit Staff Names';b.onclick=function(){cpcmOpenStaffNameModal(meEmail())};empTop.appendChild(b)}
+  }
+  const _oldOpenEmp=window.openEmployeeAdminModal;
+  window.openEmployeeAdminModal=async function(){ if(_oldOpenEmp)await _oldOpenEmp.apply(this,arguments); ensureMessengerNameUi(); };
+
+  function injectCss(){
+    if(document.getElementById('cpcmMessengerNamesCss'))return;
+    let st=document.createElement('style'); st.id='cpcmMessengerNamesCss';
+    st.textContent='.chatAttachAccount,.chatAttachedLine{display:none!important}.chatSenderName{font-size:10.5px;font-weight:1000;color:#334155;margin:0 6px 3px}.chatSenderName.mine{text-align:right;color:#1d4ed8}.chatSenderName.theirs{text-align:left}.chatMetaLine{font-size:10px!important;color:#64748b!important;font-weight:800!important;margin-top:4px!important}.chatContact.self{background:#f8fafc;border-style:dashed}.chatSelfBadge{margin-left:6px;background:#dbeafe;color:#1d4ed8;border-radius:999px;padding:2px 6px;font-size:9px;font-weight:1000}.chatOnlineDot.live{background:#22c55e!important;box-shadow:0 0 0 2px #dcfce7}.chatOnlineDot.off{background:#94a3b8!important}#cpcmNameBtn{background:#0f766e!important;color:white!important}';
+    document.head.appendChild(st);
+  }
+  injectCss();
+  setTimeout(function(){try{ensureMessengerNameUi(); if(typeof buildChatContacts==='function'){buildChatContacts();renderChatContacts();if(chatActiveEmail)renderChatConversation();}}catch(e){}},1000);
+  window.CPCM_MESSENGER_NAMES_FIX_BUILD=BUILD;
+})();
+</script>
+
+</body></html>'; if(w){w.document.write(html);w.document.close();setTimeout(()=>{w.focus();w.print()},250)}else{window.print()}};
   window.refreshReceiptsLettersPage=async function(){let a=dCurrent(); if(!a)return; await hydrateDocInputs(window.__docTemplateKind||'receipt'); await loadDocumentHistory(a.id);};
   window.openReceiptsLettersPage=async function(kind){ensureDocNav(); ensureDocAccountPanel(); let page=ensureDocPage(); let a=dCurrent(); if(!a)return alert('No account selected.'); page.classList.add('open'); let ba=dEl('docBuilderAccount'); if(ba)ba.textContent=dName(a)+' • '+(dAcct(a)||'No account #'); renderTemplates(); await hydrateDocInputs(kind||'receipt'); await loadDocumentHistory(a.id);};
   window.closeReceiptsLettersPage=function(){let p=dEl('receiptsLettersPage'); if(p)p.classList.remove('open')};
@@ -12249,6 +12275,600 @@ function exportContactIntelligenceCSV(){let calls=filteredContactCalls();let row
   window.saveManagerQaReview=async function(){if(!isAdmin())return alert('Admin only.');var emp=lower(document.getElementById('qaReviewEmployee')&&document.getElementById('qaReviewEmployee').value), rating=document.getElementById('qaReviewRating')&&document.getElementById('qaReviewRating').value, note=document.getElementById('qaReviewNote')&&document.getElementById('qaReviewNote').value.trim();if(!emp)return alert('Select an employee.');if(!note)return alert('Enter a QA note.');var r={id:'qa_'+Date.now(),employee:emp,rating:rating,note:note,createdBy:email(),createdAt:nowIso()};var rows=loadReviews();rows.push(r);saveReviews(rows);qaState.reviews=rows;document.getElementById('qaReviewNote').value='';try{if(typeof insertAudit==='function')await insertAudit('Manager QA Review',rating+' for '+emp+': '+note,'employee',emp)}catch(e){}renderManagerQaScorecards();alert('QA note saved.')};
   window.exportManagerQaCSV=function(){var rows=filteredRows();var csv=[['Employee','Score','Calls','Contacts','RPC','Contact Rate','RPC Rate','Promises','Kept','Broken','Collected','Payments','Settlements','Settlements Approved','Notes','Follow Ups Done','Accounts Worked','Compliance Flags','Average Hours Between Touches'].join(',')].concat(rows.map(function(r){return [r.email,r.score,r.calls,r.contacts,r.rpc,pct(r.contactRate),pct(r.rpcRate),r.promises,r.kept,r.broken,r.paidDollars,r.payments,r.settlements,r.settlementsApproved,r.notes,r.followupsDone,r.accountsWorkedCount,r.compliance,r.avgHours].map(function(x){return '"'+String(x==null?'':x).replace(/"/g,'""')+'"'}).join(',')})).join('\n');var a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a.download='co-pilot-manager-qa-scorecards.csv';document.body.appendChild(a);a.click();setTimeout(function(){URL.revokeObjectURL(a.href);a.remove()},500)};
   document.addEventListener('DOMContentLoaded',function(){ensureNav()}); setTimeout(ensureNav,600);
+})();
+</script>
+
+
+
+<!-- SYSTEM_QA_VERSION_LOCK_MARKER: admin QA system check + build label, stable single-file app -->
+<script id="cpcmSystemQaVersionLockScript">
+(function(){
+  if(window.__cpcmSystemQaVersionLockLoaded) return;
+  window.__cpcmSystemQaVersionLockLoaded = true;
+  var BUILD_NAME = "Co Pilot Collections Manager — Stability QA / Version Lock";
+  var BUILD_VERSION = "STABLE_SINGLE_FILE_QA_LOCK_2026_07_18";
+  var EXPECTED_ENV = "LIVE";
+  var EXPECTED_URL = "https://bwvufgzbkaymffwxuuzr.supabase.co";
+  var EXPECTED_KEY_PREFIX = "sb_publishable_cvwkN3fOovsYvAvzXvrmRA";
+  function esc(v){return String(v==null?'':v).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+  function lower(v){return String(v==null?'':v).toLowerCase().trim();}
+  function cfg(){try{return window.CO_PILOT_SUPABASE_CONFIG||{}}catch(e){return {}}}
+  function curUser(){try{return window.currentUser||window.authUser||window.loggedInUser||null}catch(e){return null}}
+  function curEmail(){var u=curUser();return lower((u&&(u.email||u.user_email||u.email_address))||'')}
+  function roleText(){try{return lower((document.getElementById('roleBadge')&&document.getElementById('roleBadge').textContent)||document.body.textContent.match(/\bAdmin\b|\bEmployee\b|\bNot logged in\b/)||'')}catch(e){return ''}}
+  function isAdmin(){var u=curUser(), e=curEmail(), r=lower((u&&(u.role||u.user_role||u.account_role))||'');var badge=roleText();return e==='afinch2678@gmail.com'||r==='admin'||(u&&u.isAdmin===true)||badge.indexOf('admin')>=0;}
+  function qs(sel){try{return document.querySelector(sel)}catch(e){return null}}
+  function qsa(sel){try{return Array.prototype.slice.call(document.querySelectorAll(sel))}catch(e){return []}}
+  function visibleTextIncludes(txt){return lower(document.body.innerText||document.body.textContent||'').indexOf(lower(txt))>=0}
+  function btnByText(txt){txt=lower(txt);return qsa('button,a,.navIcon,.qaItem').some(function(el){return lower(el.textContent||el.title||el.getAttribute('aria-label')||'').indexOf(txt)>=0});}
+  function maybeTopbar(){return qs('.topbar')||qs('header')||qs('.topActions')||qs('.app header')}
+  function injectCss(){
+    if(document.getElementById('cpcmSystemQaStyle')) return;
+    var st=document.createElement('style'); st.id='cpcmSystemQaStyle';
+    st.textContent = ''+
+      '#cpcmQaFab{position:fixed;right:14px;bottom:86px;z-index:75000;background:#0b45c6;color:#fff;border:1px solid rgba(255,255,255,.28);box-shadow:0 10px 30px rgba(15,23,42,.25);border-radius:999px;height:38px;padding:0 13px;font:900 12px Arial,Helvetica,sans-serif;cursor:pointer;display:flex;gap:7px;align-items:center}'+
+      '#cpcmQaVersionBadge{position:fixed;right:14px;bottom:42px;z-index:70000;background:#0f172a;color:#dbeafe;border:1px solid rgba(255,255,255,.22);border-radius:999px;padding:6px 10px;font:800 10px Arial,Helvetica,sans-serif;box-shadow:0 8px 18px rgba(15,23,42,.22)}'+
+      '#cpcmSystemQaPage{position:fixed;inset:0;z-index:80000;background:#eef3f9;color:#0f172a;font-family:Arial,Helvetica,sans-serif;display:none;overflow:auto}#cpcmSystemQaPage.open{display:block}'+
+      '.cpcmQaTop{background:linear-gradient(90deg,#05225f,#0b45c6);color:#fff;padding:16px 20px;display:flex;justify-content:space-between;align-items:center;gap:12px;position:sticky;top:0;z-index:2}.cpcmQaTitle{font-size:22px;font-weight:1000}.cpcmQaSub{font-size:12px;color:#dbeafe;margin-top:3px}.cpcmQaActions{display:flex;gap:8px;flex-wrap:wrap}.cpcmQaBtn{border:0;border-radius:10px;padding:10px 13px;font-weight:900;cursor:pointer;background:#2563eb;color:white}.cpcmQaBtn.gray{background:#334155}.cpcmQaBtn.green{background:#16a34a}.cpcmQaBtn.red{background:#dc2626}.cpcmQaBtn.white{background:#fff;color:#1d4ed8}'+
+      '.cpcmQaWrap{padding:16px;max-width:1320px;margin:0 auto}.cpcmQaGrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:12px}.cpcmQaMetric{background:#fff;border:1px solid #dbe3ef;border-radius:14px;padding:13px;box-shadow:0 3px 12px rgba(15,23,42,.05)}.cpcmQaMetricLabel{font-size:10px;font-weight:900;color:#64748b;text-transform:uppercase;letter-spacing:.04em}.cpcmQaMetricVal{font-size:20px;font-weight:1000;margin-top:6px;color:#0f172a}.cpcmQaCard{background:#fff;border:1px solid #dbe3ef;border-radius:16px;box-shadow:0 4px 18px rgba(15,23,42,.06);margin-bottom:12px}.cpcmQaCardHead{padding:13px 15px;border-bottom:1px solid #e5edf7;display:flex;justify-content:space-between;align-items:center}.cpcmQaCardTitle{font-weight:1000}.cpcmQaCardBody{padding:14px}.cpcmQaTable{width:100%;border-collapse:collapse;font-size:12px}.cpcmQaTable th{text-align:left;background:#f8fafc;color:#334155;font-size:10px;text-transform:uppercase;letter-spacing:.04em;padding:9px;border-bottom:1px solid #e2e8f0}.cpcmQaTable td{padding:9px;border-bottom:1px solid #edf2f8;vertical-align:top}.cpcmQaPill{display:inline-flex;border-radius:999px;padding:4px 8px;font-size:11px;font-weight:900;align-items:center;gap:4px}.cpcmQaPill.pass{background:#dcfce7;color:#166534}.cpcmQaPill.warn{background:#fff7ed;color:#9a3412}.cpcmQaPill.fail{background:#fee2e2;color:#991b1b}.cpcmQaPill.info{background:#dbeafe;color:#1d4ed8}.cpcmQaCode{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:10px;white-space:pre-wrap;word-break:break-word;max-height:260px;overflow:auto}.cpcmQaNote{background:#eff6ff;border:1px solid #bfdbfe;color:#1e3a8a;border-radius:12px;padding:10px;font-size:12px;font-weight:800;margin-bottom:10px}.cpcmQaManual{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.cpcmQaManual div{border:1px solid #e2e8f0;border-radius:12px;background:#f8fbff;padding:10px;font-size:12px;font-weight:850}'+
+      '@media(max-width:1100px){.cpcmQaGrid{grid-template-columns:repeat(2,1fr)}.cpcmQaManual{grid-template-columns:1fr}}@media(max-width:700px){.cpcmQaGrid{grid-template-columns:1fr}.cpcmQaTop{display:block}.cpcmQaActions{margin-top:10px}}';
+    document.head.appendChild(st);
+  }
+  function status(ok,warn){return ok?'pass':warn?'warn':'fail'}
+  function line(name, ok, detail, warn){return {name:name, ok:!!ok, warn:!!warn, detail:detail||''}}
+  function runChecks(){
+    var c=cfg(), url=String(c.url||''), key=String(c.publishableKey||'');
+    var topbar=maybeTopbar(); var bodyFont=''; try{bodyFont=getComputedStyle(document.body).fontFamily||''}catch(e){}
+    var checks=[];
+    checks.push(line('Supabase config object exists', !!(c&&c.url&&c.publishableKey), url||'Missing config'));
+    checks.push(line('Correct '+EXPECTED_ENV+' Supabase URL', url===EXPECTED_URL, url||'Missing URL'));
+    checks.push(line('Base Supabase URL only, no /rest/v1', url && url.indexOf('/rest/v1')<0, url||'Missing URL'));
+    checks.push(line('Publishable key present', key.indexOf('sb_publishable_')===0, key?key.slice(0,28)+'…':'Missing key'));
+    checks.push(line('Key matches expected project prefix', key.indexOf(EXPECTED_KEY_PREFIX)===0, key?key.slice(0,34)+'…':'Missing key', key && key.indexOf(EXPECTED_KEY_PREFIX)!==0));
+    checks.push(line('Main app container found', !!qs('.app'), qs('.app')?'Found .app':'Missing .app'));
+    checks.push(line('Top navigation/header found', !!topbar, topbar?(topbar.className||topbar.tagName):'Missing topbar/header'));
+    checks.push(line('Queue panel found', !!(qs('.queueList')||visibleTextIncludes('Queue')), 'Queue text/list check'));
+    checks.push(line('Account details area found', !!(qs('.accountCard')||visibleTextIncludes('Account Details')), 'Account card/details check'));
+    checks.push(line('Payment Plan area found', visibleTextIncludes('Payment Plan')||!!qs('.paymentPlanPanel'), 'Payment Plan card check'));
+    checks.push(line('Compliance Guard found', visibleTextIncludes('Compliance Guard'), 'Compliance card/check'));
+    checks.push(line('Softphone found', visibleTextIncludes('Softphone')||!!qs('.softphone'), 'Softphone/right panel check'));
+    checks.push(line('Team Messenger available', visibleTextIncludes('Team Messenger')||visibleTextIncludes('Messenger'), 'Chat/messenger check'));
+    checks.push(line('Reports button/page present', btnByText('reports')||visibleTextIncludes('Reports'), 'Reports nav/text check'));
+    checks.push(line('Cleanup button/page present', btnByText('cleanup')||visibleTextIncludes('Cleanup'), 'Cleanup nav/text check'));
+    checks.push(line('Tickler/Scorecards present', visibleTextIncludes('Tickler')&&visibleTextIncludes('Scorecards'), 'Tickler + Scorecards check'));
+    checks.push(line('Admin role detected when logged in as admin', isAdmin() || !curEmail(), curEmail()?('email='+curEmail()+' roleText='+roleText()):'Not logged in yet', !!curEmail()&&!isAdmin()));
+    checks.push(line('Professional CSS appears active', bodyFont.indexOf('Arial')>=0 || !!qs('style'), bodyFont||'No computed font', bodyFont && /Times/i.test(bodyFont)));
+    checks.push(line('Build marker installed', !!window.__cpcmSystemQaVersionLockLoaded, BUILD_VERSION));
+    return checks;
+  }
+  function metric(label,val,sub){return '<div class="cpcmQaMetric"><div class="cpcmQaMetricLabel">'+esc(label)+'</div><div class="cpcmQaMetricVal">'+esc(val)+'</div>'+(sub?'<div style="font-size:11px;color:#64748b;margin-top:4px">'+esc(sub)+'</div>':'')+'</div>'}
+  function renderQa(){
+    injectCss(); var p=ensurePage(); var checks=runChecks();
+    var pass=checks.filter(function(x){return x.ok&&!x.warn}).length, warn=checks.filter(function(x){return x.warn}).length, fail=checks.filter(function(x){return !x.ok&&!x.warn}).length;
+    var c=cfg(); var role=isAdmin()?'Admin detected':(curEmail()?'Logged in, not admin':'Not logged in');
+    document.getElementById('cpcmQaMetrics').innerHTML=[metric('Build',BUILD_VERSION,EXPECTED_ENV),metric('Checks Passed',pass+'/'+checks.length,warn+' warnings, '+fail+' failed'),metric('Environment',EXPECTED_ENV,c.url||'Missing URL'),metric('Current Role',role,curEmail()||roleText()||'No session yet')].join('');
+    document.getElementById('cpcmQaChecks').innerHTML='<table class="cpcmQaTable"><thead><tr><th>Status</th><th>Check</th><th>Details</th></tr></thead><tbody>'+checks.map(function(x){var cls=x.ok&&!x.warn?'pass':x.warn?'warn':'fail';var label=x.ok&&!x.warn?'Pass':x.warn?'Warning':'Fail';return '<tr><td><span class="cpcmQaPill '+cls+'">'+label+'</span></td><td><b>'+esc(x.name)+'</b></td><td>'+esc(x.detail)+'</td></tr>'}).join('')+'</tbody></table>';
+    document.getElementById('cpcmQaDiag').textContent=diagnostics();
+  }
+  function diagnostics(){
+    var c=cfg(); var buttons=qsa('button').map(function(b){return lower(b.textContent).replace(/\s+/g,' ').trim()}).filter(Boolean).slice(0,80);
+    return [
+      'Build: '+BUILD_NAME,
+      'Version: '+BUILD_VERSION,
+      'Expected Env: '+EXPECTED_ENV,
+      'Config URL: '+(c.url||'missing'),
+      'Key Prefix: '+String(c.publishableKey||'missing').slice(0,32)+'…',
+      'Current Email: '+(curEmail()||'not logged in'),
+      'Role Text: '+(roleText()||'unknown'),
+      'Admin Detected: '+(isAdmin()?'yes':'no'),
+      'App Container: '+(!!qs('.app')),
+      'Topbar/Header: '+(!!maybeTopbar()),
+      'Buttons Found: '+buttons.join(' | ')
+    ].join('\n');
+  }
+  function copyDiag(){var txt=diagnostics(); if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(txt).then(function(){alert('System diagnostics copied.')}).catch(function(){prompt('Copy diagnostics:',txt)})}else{prompt('Copy diagnostics:',txt)}}
+  function ensurePage(){
+    var p=document.getElementById('cpcmSystemQaPage'); if(p) return p;
+    p=document.createElement('div'); p.id='cpcmSystemQaPage';
+    p.innerHTML='<div class="cpcmQaTop"><div><div class="cpcmQaTitle">System Check + Version Lock</div><div class="cpcmQaSub">'+esc(BUILD_NAME)+' • '+esc(BUILD_VERSION)+' • '+esc(EXPECTED_ENV)+'</div></div><div class="cpcmQaActions"><button class="cpcmQaBtn green" onclick="window.cpcmRunSystemCheck()">Run Check</button><button class="cpcmQaBtn white" onclick="window.cpcmCopySystemDiagnostics()">Copy Diagnostics</button><button class="cpcmQaBtn gray" onclick="window.cpcmCloseSystemCheck()">Back to App</button></div></div><div class="cpcmQaWrap"><div class="cpcmQaNote">This screen is a safe admin QA checklist. It does not change account data. Use it after every ZIP upload to verify environment, layout, admin detection, and core app sections before adding new features.</div><div id="cpcmQaMetrics" class="cpcmQaGrid"></div><div class="cpcmQaCard"><div class="cpcmQaCardHead"><div class="cpcmQaCardTitle">Automatic Checks</div><span class="cpcmQaPill info">Safe read-only</span></div><div class="cpcmQaCardBody" id="cpcmQaChecks"></div></div><div class="cpcmQaCard"><div class="cpcmQaCardHead"><div class="cpcmQaCardTitle">Manual Smoke Test Checklist</div><span class="cpcmQaPill warn">Click through after upload</span></div><div class="cpcmQaCardBody"><div class="cpcmQaManual"><div>1. Login works</div><div>2. Queue opens first 5 accounts</div><div>3. Notes save and stay after refresh</div><div>4. Employee can create payment plan</div><div>5. Admin can edit/delete payment plan</div><div>6. Compliance Guard opens</div><div>7. Reports full page opens and Back works</div><div>8. Chat opens without blocking screen</div><div>9. Pay Desk / Ledger open</div><div>10. Tickler opens</div><div>11. Scorecards opens</div><div>12. No plain raw HTML layout</div></div></div></div><div class="cpcmQaCard"><div class="cpcmQaCardHead"><div class="cpcmQaCardTitle">Diagnostics</div><button class="cpcmQaBtn" onclick="window.cpcmCopySystemDiagnostics()">Copy</button></div><div class="cpcmQaCardBody"><pre id="cpcmQaDiag" class="cpcmQaCode"></pre></div></div></div>';
+    document.body.appendChild(p); return p;
+  }
+  function addButton(){
+    injectCss();
+    if(!document.getElementById('cpcmQaFab')){var b=document.createElement('button');b.id='cpcmQaFab';b.type='button';b.innerHTML='🧪 System Check';b.onclick=window.cpcmOpenSystemCheck;document.body.appendChild(b)}
+    if(!document.getElementById('cpcmQaVersionBadge')){var v=document.createElement('div');v.id='cpcmQaVersionBadge';v.textContent=BUILD_VERSION+' • '+EXPECTED_ENV;document.body.appendChild(v)}
+    var top=maybeTopbar();
+    if(top && !document.getElementById('cpcmQaTopButton')){var nb=document.createElement('button');nb.id='cpcmQaTopButton';nb.type='button';nb.textContent='System Check';nb.title='Run system QA checks';nb.style.background='#0f766e';nb.style.color='#fff';nb.style.border='0';nb.style.borderRadius='8px';nb.style.padding='8px 10px';nb.style.fontWeight='900';nb.style.cursor='pointer';nb.onclick=window.cpcmOpenSystemCheck;top.appendChild(nb)}
+  }
+  window.cpcmOpenSystemCheck=function(){renderQa();ensurePage().classList.add('open')};
+  window.cpcmCloseSystemCheck=function(){var p=document.getElementById('cpcmSystemQaPage'); if(p)p.classList.remove('open')};
+  window.cpcmRunSystemCheck=function(){renderQa()};
+  window.cpcmCopySystemDiagnostics=copyDiag;
+  function boot(){addButton(); setTimeout(addButton,800); setTimeout(addButton,2200)}
+  if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',boot)}else{boot()}
+})();
+
+
+
+/* MESSENGER PRESENCE + CONTACTS + FACEBOOK-LIKE MESSAGE LAYOUT FIX
+   - Online count now includes the current logged-in user and all signed-up staff.
+   - Messenger left panel shows all staff/admin accounts, including the current user as "You".
+   - Current user is shown online but cannot be selected for self-chat.
+   - Message bubbles show sender name, clean timestamp/date, seen status, and attached account separately. */
+(function(){
+  if(window.__cpcmMessengerPresenceContactsFbLayoutFix)return;
+  window.__cpcmMessengerPresenceContactsFbLayoutFix=true;
+
+  function normEmail(v){return String(v||'').toLowerCase().trim()}
+  function safeEsc(v){try{return esc(v)}catch(e){return String(v??'').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;')}}
+  function meEmail(){try{return normEmail(chatMe())}catch(e){return normEmail(currentUser&&currentUser.email)}}
+  function getUserEmail(u){return normEmail(u && (u.email||u.userEmail||u.user_email))}
+  function findStaffUser(email){email=normEmail(email);return (appUsers||[]).find(function(u){return getUserEmail(u)===email})||null}
+  function valueOf(u,keys){for(var i=0;i<keys.length;i++){var v=u&&u[keys[i]];if(v!==undefined&&v!==null&&String(v).trim())return String(v).trim()}return ''}
+  function humanizeEmail(email){
+    var left=String(email||'').split('@')[0]||'User';
+    left=left.replace(/[._-]+/g,' ').replace(/\d+/g,' ').replace(/\s+/g,' ').trim();
+    if(!left)return String(email||'User');
+    return left.split(' ').map(function(w){return w?w.charAt(0).toUpperCase()+w.slice(1).toLowerCase():''}).join(' ');
+  }
+  function displayNameForEmail(email){
+    email=normEmail(email);
+    var u=findStaffUser(email);
+    var n=valueOf(u,['displayName','display_name','fullName','full_name','employeeName','employee_name','name','userName','username']);
+    if(!n){
+      var first=valueOf(u,['firstName','first_name']);
+      var last=valueOf(u,['lastName','last_name']);
+      n=[first,last].filter(Boolean).join(' ').trim();
+    }
+    if(!n && email==='afinch2678@gmail.com')n='Antonio Finch';
+    if(!n && email===meEmail() && currentUser){
+      n=valueOf(currentUser,['displayName','display_name','fullName','full_name','employeeName','employee_name','name']);
+    }
+    return n || humanizeEmail(email) || email || 'User';
+  }
+
+  chatName = function(email){return displayNameForEmail(email)};
+  chatInitials = function(email){
+    var n=displayNameForEmail(email);
+    return n.split(/\s+/).filter(Boolean).slice(0,2).map(function(x){return x[0]}).join('').toUpperCase() || '?';
+  };
+
+  function staffRoleForEmail(email){
+    email=normEmail(email);
+    var u=findStaffUser(email);
+    if((typeof isAdminEmail==='function' && isAdminEmail(email)) || String(u&&u.role||'').toLowerCase()==='admin')return 'Admin';
+    return 'Employee';
+  }
+  chatContactRole = function(email){return staffRoleForEmail(email)};
+
+  function userAllowedInMessenger(u){
+    var email=getUserEmail(u);
+    if(!email)return false;
+    var status=String(u.approvalStatus||u.approval_status||'').toLowerCase();
+    var role=String(u.role||'employee').toLowerCase();
+    if(status==='removed'||status==='rejected'||status==='fired')return false;
+    if(u.isActive===false || u.is_active===false)return false;
+    return role==='admin'||role==='employee'||!!email;
+  }
+  function ensureSelfUser(map){
+    var me=meEmail();
+    if(!me)return;
+    var u=findStaffUser(me)||{email:me,role:(currentUser&&currentUser.isAdmin)?'admin':'employee',approvalStatus:'approved',isApproved:true,isActive:true};
+    map[me]={email:me,user:u,self:true,online:true,unread:0,lastMessageAt:'',lastPreview:''};
+  }
+  function addChatUser(map,email,u){
+    email=normEmail(email);
+    if(!email)return;
+    var me=meEmail();
+    if(!u)u=findStaffUser(email)||{email:email,role:(typeof isAdminEmail==='function'&&isAdminEmail(email))?'admin':'employee'};
+    if(!map[email])map[email]={email:email,user:u,self:email===me,online:false,unread:0,lastMessageAt:'',lastPreview:''};
+    if(email===me)map[email].self=true;
+    map[email].user=map[email].user||u;
+  }
+  function allMessengerUsers(){
+    var map={};
+    ensureSelfUser(map);
+    (appUsers||[]).forEach(function(u){if(userAllowedInMessenger(u))addChatUser(map,getUserEmail(u),u)});
+    (chatPresenceData||[]).forEach(function(p){addChatUser(map,p.userEmail||p.user_email,{email:p.userEmail||p.user_email})});
+    (chatAllMessages||[]).forEach(function(m){
+      addChatUser(map,m.fromEmail||m.from_email);
+      addChatUser(map,m.toEmail||m.to_email);
+    });
+    return Object.values(map).map(function(c){c.self=normEmail(c.email)===meEmail();c.online=c.self?true:presenceIsOnlineEmail(c.email);return c});
+  }
+  function onlineMessengerCount(){
+    var seen={};
+    return allMessengerUsers().filter(function(c){
+      var e=normEmail(c.email); if(!e||seen[e])return false; seen[e]=true;
+      return c.self || presenceIsOnlineEmail(e);
+    }).length;
+  }
+
+  buildChatContacts = function(){
+    var me=meEmail();
+    var rows=allMessengerUsers();
+    rows.forEach(function(c){
+      c.unread=0; c.lastMessageAt=''; c.lastPreview='';
+      if(c.self)return;
+      var msgs=(chatAllMessages||[]).filter(function(m){
+        var from=normEmail(m.fromEmail||m.from_email), to=normEmail(m.toEmail||m.to_email);
+        return (from===me&&to===c.email)||(from===c.email&&to===me);
+      });
+      c.unread=msgs.filter(function(m){
+        var from=normEmail(m.fromEmail||m.from_email), to=normEmail(m.toEmail||m.to_email);
+        return to===me && from!==me && !m.readAt && !m.read_at && String(m.status||'Open')!=='Closed';
+      }).length;
+      var last=msgs[msgs.length-1];
+      if(last){c.lastMessageAt=last.createdAt||last.created_at||'';c.lastPreview=String(last.body||'').slice(0,70)}
+    });
+    chatContactsData=rows.sort(function(a,b){
+      if(a.self!==b.self)return a.self?-1:1;
+      if(a.unread!==b.unread)return b.unread-a.unread;
+      if(a.online!==b.online)return a.online?-1:1;
+      return String(chatName(a.email)).localeCompare(String(chatName(b.email)));
+    });
+  };
+
+  window.cpcmChatSelfNotice=function(){alert('This is you. Your online status is shown here, but you cannot message yourself. Choose another employee or admin.')} ;
+
+  renderPresenceBanner = function(){
+    var head=document.querySelector('.chatContactsHead');
+    if(!head)return;
+    var existing=document.getElementById('chatPresenceBanner');
+    if(!existing){existing=document.createElement('div');existing.id='chatPresenceBanner';existing.className='chatPresenceBanner';head.insertAdjacentElement('afterend',existing)}
+    var n=onlineMessengerCount();
+    var you=presenceIsOnlineEmail(meEmail());
+    existing.innerHTML='<span><b>'+n+'</b> online</span><span>'+(you?'You are online 🟢':'You appear offline ⚪')+'</span>';
+  };
+
+  renderChatContacts = function(){
+    var list=document.getElementById('chatContactList');
+    if(!list)return;
+    var q=String(document.getElementById('chatSearch')&&document.getElementById('chatSearch').value||'').toLowerCase();
+    var rows=(chatContactsData||[]).filter(function(c){return !q || c.email.includes(q) || chatName(c.email).toLowerCase().includes(q) || staffRoleForEmail(c.email).toLowerCase().includes(q)});
+    list.innerHTML=rows.map(function(c){
+      var online=c.self?true:presenceIsOnlineEmail(c.email);
+      var selfLabel=c.self?' <span class="chatSelfBadge">You</span>':'';
+      var meta=(c.self?'You • ':'')+staffRoleForEmail(c.email)+' • <span class="'+(online?'onlineText':'offlineText')+'">'+(online?'Online':'Offline')+'</span>'+(c.lastPreview&&!c.self?' • '+safeEsc(c.lastPreview):'');
+      var click=c.self?'onclick="window.cpcmChatSelfNotice()"':'onclick="selectChatContact(\''+safeEsc(c.email)+'\')"';
+      return '<div class="chatContact '+(c.self?'self':'')+' '+(c.email===chatActiveEmail?'active':'')+' '+(c.unread?'hasUnread':'')+'" '+click+'>'+ 
+        '<div class="chatAvatar">'+safeEsc(chatInitials(c.email))+'<span class="chatOnlineDot '+(online?'live':'off')+'"></span></div>'+ 
+        '<div class="chatContactMain"><div class="chatContactName">'+safeEsc(chatName(c.email))+selfLabel+'</div><div class="chatContactMeta">'+meta+'</div></div>'+ 
+        '<div class="chatContactUnread '+(c.unread?'':'zero')+'">'+(c.unread?(c.unread>99?'99+':c.unread):'')+'</div>'+ 
+      '</div>';
+    }).join('') || '<div class="tmEmpty">No employees/admin are available yet.</div>';
+    renderPresenceBanner();
+  };
+
+  function formatChatDate(v){
+    var d=new Date(v||Date.now()); if(isNaN(d.getTime()))d=new Date();
+    var now=new Date();
+    var ds=d.toDateString(), ns=now.toDateString();
+    var y=new Date(now); y.setDate(now.getDate()-1);
+    var time=d.toLocaleTimeString([], {hour:'numeric',minute:'2-digit'});
+    if(ds===ns)return 'Today '+time;
+    if(ds===y.toDateString())return 'Yesterday '+time;
+    return d.toLocaleDateString([], {month:'short',day:'numeric',year:'numeric'})+' '+time;
+  }
+  function messageAccountLabel(m){
+    var a=null; try{a=m.accountId?accountById(m.accountId):null}catch(e){}
+    var name=a?(typeof nameOf==='function'?nameOf(a):''):(m.accountName||m.account_name||'');
+    var num=a?(typeof acctNo==='function'?acctNo(a):''):(m.accountNumber||m.account_number||'');
+    return {name:name||'', num:num||''};
+  }
+
+  chatMessageBubble = function(m){
+    var from=normEmail(m.fromEmail||m.from_email);
+    var mine=from===meEmail();
+    var seen=mine && (m.readAt||m.read_at);
+    var acct=messageAccountLabel(m);
+    var attached=acct.name?'<div class="chatAttachedLine">Attached Account: '+safeEsc(acct.name)+(acct.num?' · '+safeEsc(acct.num):'')+'</div>':'';
+    return '<div class="chatBubbleWrap '+(mine?'mine':'theirs')+'">'+
+      '<div class="chatSenderName '+(mine?'mine':'theirs')+'">'+safeEsc(chatName(from))+'</div>'+
+      '<div class="chatBubble">'+safeEsc(m.body||'')+'</div>'+
+      attached+
+      '<div class="chatMetaLine">'+safeEsc(formatChatDate(m.createdAt||m.created_at||Date.now()))+(seen?' • Seen':'')+'</div>'+ 
+    '</div>';
+  };
+
+  var _oldSelectChatContact=selectChatContact;
+  selectChatContact = async function(email){
+    email=normEmail(email);
+    if(!email || email===meEmail()){window.cpcmChatSelfNotice();return;}
+    return _oldSelectChatContact(email);
+  };
+
+  renderChatConversation = function(){
+    var msgs=activeChatMessages();
+    var box=document.getElementById('chatMessages');
+    var nameEl=document.getElementById('chatActiveName');
+    var statusEl=document.getElementById('chatActiveStatus');
+    var av=document.getElementById('chatActiveAvatar');
+    var btn=document.getElementById('chatSendBtn');
+    if(!box)return;
+    if(!chatActiveEmail || chatActiveEmail===meEmail()){
+      box.innerHTML='<div class="chatEmpty">Pick an employee or admin to start a direct chat.</div>';
+      if(btn)btn.disabled=true;
+      chatActiveEmail='';
+      return;
+    }
+    if(btn)btn.disabled=false;
+    if(nameEl)nameEl.textContent=chatName(chatActiveEmail);
+    var online=presenceIsOnlineEmail(chatActiveEmail);
+    var attached=chatAttachedAccountId?accountById(chatAttachedAccountId):null;
+    if(statusEl)statusEl.innerHTML=staffRoleForEmail(chatActiveEmail)+' • <span class="'+(online?'onlineText':'offlineText')+'">'+(online?'Online':'Offline')+'</span>'+(attached?' • Attached Account: '+safeEsc(nameOf(attached)):'');
+    if(av)av.innerHTML=safeEsc(chatInitials(chatActiveEmail))+'<span class="chatOnlineDot '+(online?'live':'off')+'"></span>';
+    box.innerHTML=msgs.map(function(m){return chatMessageBubble(m)}).join('')||'<div class="chatEmpty">No messages yet. Type below to start the conversation.</div>';
+    box.scrollTop=box.scrollHeight;
+    try{loadTypingStatus()}catch(e){}
+  };
+
+  var _oldOpenChatDock=openChatDock;
+  openChatDock = async function(){
+    var dock=document.getElementById('chatDock');
+    if(!dock)return alert('Chat dock not found. Republish the latest package.');
+    dock.classList.add('open');
+    if(!chatAttachedAccountId && getCurrent&&getCurrent()&&getCurrent().id)chatAttachedAccountId=getCurrent().id;
+    await chatRefreshAll(false);
+    if(chatActiveEmail===meEmail())chatActiveEmail='';
+    if(!chatActiveEmail){
+      var first=(chatContactsData||[]).find(function(c){return !c.self && c.email!==meEmail()});
+      if(first)await selectChatContact(first.email);
+    }
+    startChatPolling();
+  };
+
+  var _oldSendChatMessage=sendChatMessage;
+  sendChatMessage = async function(){
+    if(chatActiveEmail===meEmail()){window.cpcmChatSelfNotice();return;}
+    return _oldSendChatMessage();
+  };
+
+  function injectMessengerFixCss(){
+    if(document.getElementById('cpcmMessengerFbLayoutCss'))return;
+    var st=document.createElement('style'); st.id='cpcmMessengerFbLayoutCss';
+    st.textContent='\n.chatContact.self{background:#f8fafc;border-style:dashed;cursor:default}.chatSelfBadge{margin-left:6px;background:#dbeafe;color:#1d4ed8;border-radius:999px;padding:2px 6px;font-size:9px;font-weight:1000}.chatSenderName{font-size:10.5px;font-weight:1000;color:#334155;margin:0 6px 3px}.chatSenderName.mine{text-align:right;color:#1d4ed8}.chatSenderName.theirs{text-align:left}.chatAttachedLine{font-size:10px;font-weight:900;color:#1d4ed8;background:#eff6ff;border:1px solid #bfdbfe;border-radius:999px;padding:4px 8px;margin-top:4px;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.chatBubbleWrap.mine .chatAttachedLine{align-self:flex-end}.chatBubbleWrap.theirs .chatAttachedLine{align-self:flex-start}.chatMetaLine{font-size:10px!important;color:#64748b!important;font-weight:800!important;margin-top:4px!important}.chatContactName{display:flex;align-items:center;gap:4px}.chatContact.self .chatContactName{color:#0f172a}.chatPresenceBanner b{font-weight:1000}.chatOnlineDot.live{background:#22c55e!important;box-shadow:0 0 0 2px #dcfce7}.chatOnlineDot.off{background:#94a3b8!important}\n';
+    document.head.appendChild(st);
+  }
+  injectMessengerFixCss();
+
+  var _oldChatRefreshAll=chatRefreshAll;
+  chatRefreshAll = async function(manual){
+    if(!token()||!currentUser.email)return;
+    try{startPresenceHeartbeat()}catch(e){}
+    try{await upsertPresence()}catch(e){}
+    try{await loadPresence()}catch(e){}
+    try{await chatHeartbeat()}catch(e){}
+    try{await loadAppUsers()}catch(e){}
+    try{await loadChatMessages()}catch(e){}
+    buildChatContacts();
+    if(chatActiveEmail===meEmail())chatActiveEmail='';
+    if(document.getElementById('chatDock')&&document.getElementById('chatDock').classList.contains('open') && chatActiveEmail){try{await markActiveChatRead()}catch(e){}}
+    buildChatContacts();
+    renderChatContacts();
+    if(chatActiveEmail)renderChatConversation();
+    updateChatUnreadBadge();
+    renderPresenceBanner();
+  };
+
+  setTimeout(function(){try{if(token()&&currentUser.email){upsertPresence();loadPresence().then(function(){buildChatContacts();renderChatContacts();renderPresenceBanner()}).catch(function(){})}}catch(e){}},1200);
+})();
+
+</script>
+
+<script>
+/* MESSENGER_NAMES_NO_ATTACHED_ACCOUNTS_FIX — staff display names + no debtor/account attachment in messenger */
+(function(){
+  const BUILD='MESSENGER_NAMES_NO_ATTACHED_ACCOUNTS_2026_07_18';
+  function lower(v){return String(v||'').trim().toLowerCase()}
+  function safe(v){try{return (typeof esc==='function'?esc(String(v||'')):String(v||'').replace(/[&<>"']/g,function(m){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]}))}catch(e){return String(v||'')}}
+  function cleanName(v){return String(v||'').replace(/\s+/g,' ').trim()}
+  function emailPrefix(email){
+    email=lower(email);
+    if(email==='afinch2678@gmail.com')return 'Antonio Finch';
+    let p=(email.split('@')[0]||'Team Member').replace(/[._-]+/g,' ').replace(/\d+/g,' ').replace(/\s+/g,' ').trim();
+    return p?p.replace(/\b\w/g,function(c){return c.toUpperCase()}):email;
+  }
+  function userEmail(u){return lower(u&&((u.email)||(u.userEmail)||(u.user_email))) }
+  function userNameValue(u){
+    if(!u)return '';
+    return cleanName(u.fullName||u.full_name||u.displayName||u.display_name||u.employeeName||u.employee_name||u.name||u.userName||u.username||'');
+  }
+  function findUser(email){email=lower(email);try{return (window.appUsers||appUsers||[]).find(function(u){return userEmail(u)===email})||null}catch(e){return null}}
+  function storedName(email){try{return cleanName(localStorage.getItem('cpcmStaffName:'+lower(email))||'')}catch(e){return ''}}
+  window.cpcmStaffDisplayName=function(email){
+    email=lower(email);
+    if(!email)return 'Team Member';
+    let u=findUser(email);
+    let n=userNameValue(u) || storedName(email);
+    try{if(!n && currentUser && lower(currentUser.email)===email)n=userNameValue(currentUser)}catch(e){}
+    return n || emailPrefix(email);
+  };
+  window.cpcmStaffInitials=function(email){
+    let n=window.cpcmStaffDisplayName(email);
+    let parts=n.split(/\s+/).filter(Boolean);
+    return (parts.length>1?(parts[0][0]+parts[parts.length-1][0]):n.slice(0,2)).toUpperCase();
+  };
+
+  // Replace messenger naming so it never uses debtor/account names as the sender.
+  window.chatName=function(email){return window.cpcmStaffDisplayName(email)};
+  window.chatInitials=function(email){return window.cpcmStaffInitials(email)};
+
+  function meEmail(){try{return lower((typeof chatMe==='function'?chatMe():currentUser&&currentUser.email)||'')}catch(e){return lower(currentUser&&currentUser.email)}}
+  function onlineEmail(email){try{return typeof presenceIsOnlineEmail==='function'?presenceIsOnlineEmail(email):false}catch(e){return false}}
+  function staffRole(email){try{return typeof staffRoleForEmail==='function'?staffRoleForEmail(email):(findUser(email)?.role||'employee')}catch(e){return 'employee'}}
+  function isAllowedUser(u){
+    let email=userEmail(u); if(!email)return false;
+    let role=lower(u.role||'employee');
+    let approved=(u.isApproved===true||u.is_approved===true||lower(u.approvalStatus||u.approval_status)==='approved'||role==='admin'||email==='afinch2678@gmail.com');
+    let active=!(u.isActive===false||u.is_active===false||lower(u.approvalStatus||u.approval_status)==='removed');
+    return approved && active;
+  }
+  window.buildChatContacts=function(){
+    let me=meEmail(), map={};
+    function add(email,u){email=lower(email); if(!email)return; if(!map[email])map[email]={email:email,user:u||findUser(email)||{email:email},unread:0,lastMessageAt:'',lastPreview:''};}
+    add(me, findUser(me)||{email:me,role:(currentUser&&currentUser.isAdmin)?'admin':'employee',fullName:window.cpcmStaffDisplayName(me)});
+    try{(appUsers||[]).forEach(function(u){if(isAllowedUser(u))add(userEmail(u),u)})}catch(e){}
+    try{(chatPresenceData||[]).forEach(function(p){add(p.userEmail||p.user_email,{email:p.userEmail||p.user_email})})}catch(e){}
+    try{(chatAllMessages||[]).forEach(function(m){add(m.fromEmail||m.from_email);add(m.toEmail||m.to_email)})}catch(e){}
+    Object.values(map).forEach(function(c){
+      c.self=(c.email===me);
+      c.online=c.self?true:onlineEmail(c.email);
+      let msgs=(chatAllMessages||[]).filter(function(m){let f=lower(m.fromEmail||m.from_email),t=lower(m.toEmail||m.to_email);return (f===me&&t===c.email)||(f===c.email&&t===me)});
+      c.unread=msgs.filter(function(m){let f=lower(m.fromEmail||m.from_email),t=lower(m.toEmail||m.to_email);return t===me && f!==me && !m.readAt && !m.read_at && String(m.status||'Open')!=='Closed'}).length;
+      let last=msgs[msgs.length-1]; if(last){c.lastMessageAt=last.createdAt||last.created_at||'';c.lastPreview=String(last.body||'').slice(0,70)}
+    });
+    window.chatContactsData=chatContactsData=Object.values(map).sort(function(a,b){
+      if(a.self!==b.self)return a.self?-1:1;
+      if(a.unread!==b.unread)return b.unread-a.unread;
+      if(a.online!==b.online)return a.online?-1:1;
+      return window.cpcmStaffDisplayName(a.email).localeCompare(window.cpcmStaffDisplayName(b.email));
+    });
+  };
+
+  window.renderPresenceBanner=function(){
+    let head=document.querySelector('.chatContactsHead'); if(!head)return;
+    let existing=document.getElementById('chatPresenceBanner');
+    if(!existing){existing=document.createElement('div');existing.id='chatPresenceBanner';existing.className='chatPresenceBanner';head.insertAdjacentElement('afterend',existing)}
+    let seen={};
+    let n=(chatContactsData||[]).filter(function(c){let e=lower(c.email); if(!e||seen[e])return false; seen[e]=true; return c.self||onlineEmail(e)}).length;
+    existing.innerHTML='<span><b>'+n+'</b> online</span><span>You are online 🟢</span>';
+  };
+
+  window.renderChatContacts=function(){
+    let list=document.getElementById('chatContactList'); if(!list)return;
+    let q=lower(document.getElementById('chatSearch')&&document.getElementById('chatSearch').value||'');
+    let rows=(chatContactsData||[]).filter(function(c){return !q || lower(c.email).includes(q) || lower(window.cpcmStaffDisplayName(c.email)).includes(q) || lower(staffRole(c.email)).includes(q)});
+    list.innerHTML=rows.map(function(c){
+      let online=c.self?true:onlineEmail(c.email);
+      let meta=(c.self?'You • ':'')+safe(staffRole(c.email))+' • <span class="'+(online?'onlineText':'offlineText')+'">'+(online?'Online':'Offline')+'</span>'+(c.lastPreview&&!c.self?' • '+safe(c.lastPreview):'');
+      let click=c.self?'onclick="window.cpcmOpenStaffNameModal(\''+safe(c.email)+'\')"':'onclick="selectChatContact(\''+safe(c.email)+'\')"';
+      return '<div class="chatContact '+(c.self?'self':'')+' '+(c.email===chatActiveEmail?'active':'')+' '+(c.unread?'hasUnread':'')+'" '+click+'>'+ 
+        '<div class="chatAvatar">'+safe(window.cpcmStaffInitials(c.email))+'<span class="chatOnlineDot '+(online?'live':'off')+'"></span></div>'+ 
+        '<div class="chatContactMain"><div class="chatContactName">'+safe(window.cpcmStaffDisplayName(c.email))+(c.self?' <span class="chatSelfBadge">You</span>':'')+'</div><div class="chatContactMeta">'+meta+'</div></div>'+ 
+        '<div class="chatContactUnread '+(c.unread?'':'zero')+'">'+(c.unread?(c.unread>99?'99+':c.unread):'')+'</div>'+ 
+      '</div>';
+    }).join('') || '<div class="tmEmpty">No employees/admin are available yet.</div>';
+    renderPresenceBanner();
+  };
+
+  function formatChatDate(v){let d=new Date(v||Date.now()); if(isNaN(d.getTime()))d=new Date(); return d.toLocaleDateString([], {month:'short',day:'numeric',year:'numeric'})+' '+d.toLocaleTimeString([], {hour:'numeric',minute:'2-digit'});}
+  window.chatMessageBubble=function(m){
+    let from=lower(m.fromEmail||m.from_email), mine=from===meEmail();
+    let seen=mine&&(m.readAt||m.read_at);
+    return '<div class="chatBubbleWrap '+(mine?'mine':'theirs')+'">'+
+      '<div class="chatSenderName '+(mine?'mine':'theirs')+'">'+safe(window.cpcmStaffDisplayName(from))+'</div>'+
+      '<div class="chatBubble">'+safe(m.body||'')+'</div>'+ 
+      '<div class="chatMetaLine">'+safe(formatChatDate(m.createdAt||m.created_at||Date.now()))+(seen?' • Seen':'')+'</div>'+ 
+    '</div>';
+  };
+
+  window.renderChatConversation=function(){
+    let msgs=typeof activeChatMessages==='function'?activeChatMessages():[];
+    let box=document.getElementById('chatMessages'), nameEl=document.getElementById('chatActiveName'), statusEl=document.getElementById('chatActiveStatus'), av=document.getElementById('chatActiveAvatar'), btn=document.getElementById('chatSendBtn');
+    if(!box)return;
+    if(!chatActiveEmail || lower(chatActiveEmail)===meEmail()){
+      box.innerHTML='<div class="chatEmpty">Pick an employee or admin to start a direct chat.</div>'; if(btn)btn.disabled=true; chatActiveEmail=''; return;
+    }
+    if(btn)btn.disabled=false;
+    if(nameEl)nameEl.textContent=window.cpcmStaffDisplayName(chatActiveEmail);
+    let online=onlineEmail(chatActiveEmail);
+    if(statusEl)statusEl.innerHTML=safe(staffRole(chatActiveEmail))+' • <span class="'+(online?'onlineText':'offlineText')+'">'+(online?'Online':'Offline')+'</span>';
+    if(av)av.innerHTML=safe(window.cpcmStaffInitials(chatActiveEmail))+'<span class="chatOnlineDot '+(online?'live':'off')+'"></span>';
+    box.innerHTML=msgs.map(function(m){return chatMessageBubble(m)}).join('')||'<div class="chatEmpty">No messages yet. Type below to start the conversation.</div>';
+    box.scrollTop=box.scrollHeight;
+    try{loadTypingStatus()}catch(e){}
+  };
+
+  window.attachCurrentAccountToChat=function(){ alert('Attached accounts were removed from Messenger. Send only staff/admin messages here.'); };
+  window.sendChatMessage=async function(){
+    let input=document.getElementById('chatInput');
+    let body=String(input&&input.value||'').trim();
+    if(!chatActiveEmail)return alert('Select an employee/admin first.');
+    if(lower(chatActiveEmail)===meEmail())return alert('You cannot send a message to yourself.');
+    if(!body)return;
+    let row={account_id:null,account_name:'',account_number:'',from_email:currentUser.email,to_email:chatActiveEmail,message_type:'Direct Message',priority:'Normal',subject:'Direct Message',body:body,phone_number:'',status:'Open',created_by_email:currentUser.email,updated_at:new Date().toISOString()};
+    await dbFetch('/team_messages',{method:'POST',body:JSON.stringify([row])});
+    if(input)input.value='';
+    try{await setTyping(false)}catch(e){}
+    await chatRefreshAll(false);
+  };
+  window.openChatDock=async function(){
+    let dock=document.getElementById('chatDock'); if(!dock)return alert('Chat dock not found.');
+    chatAttachedAccountId='';
+    ensureMessengerNameUi();
+    dock.classList.add('open');
+    await chatRefreshAll(false);
+    if(lower(chatActiveEmail)===meEmail())chatActiveEmail='';
+    if(!chatActiveEmail){let first=(chatContactsData||[]).find(function(c){return !c.self&&c.email!==meEmail()}); if(first)await selectChatContact(first.email)}
+    try{startChatPolling()}catch(e){}
+  };
+
+  async function saveName(targetEmail,newName){
+    targetEmail=lower(targetEmail); newName=cleanName(newName);
+    if(!targetEmail)return alert('No user selected.');
+    if(!newName)return alert('Enter a display name.');
+    try{localStorage.setItem('cpcmStaffName:'+targetEmail,newName)}catch(e){}
+    let ok=false;
+    try{await dbFetch('/rpc/cpcm_update_staff_display_name',{method:'POST',body:JSON.stringify({target_email:targetEmail,new_full_name:newName})}); ok=true;}catch(e){}
+    if(!ok){
+      try{await dbFetch('/app_users?email=eq.'+encodeURIComponent(targetEmail),{method:'PATCH',body:JSON.stringify({full_name:newName,updated_at:new Date().toISOString()})}); ok=true;}catch(e){}
+    }
+    try{
+      let u=findUser(targetEmail); if(u){u.fullName=newName;u.full_name=newName;u.displayName=newName;u.display_name=newName}
+      if(currentUser&&lower(currentUser.email)===targetEmail){currentUser.fullName=newName;currentUser.full_name=newName;currentUser.displayName=newName;currentUser.display_name=newName}
+    }catch(e){}
+    await loadAppUsers().catch(function(){});
+    buildChatContacts(); renderChatContacts(); if(chatActiveEmail)renderChatConversation();
+    alert(ok?'Name saved.':'Name saved in this browser. Run the Messenger Names SQL so names save globally.');
+  }
+  window.cpcmSaveStaffDisplayName=async function(){
+    let target=(document.getElementById('cpcmNameTarget')&&document.getElementById('cpcmNameTarget').value)||meEmail();
+    let name=(document.getElementById('cpcmNameValue')&&document.getElementById('cpcmNameValue').value)||'';
+    await saveName(target,name);
+  };
+  window.cpcmOpenStaffNameModal=function(targetEmail){
+    ensureNameModal();
+    let sel=document.getElementById('cpcmNameTarget'), inp=document.getElementById('cpcmNameValue');
+    let isAdm=false; try{isAdm=currentUser&&currentUser.isAdmin===true}catch(e){}
+    let rows=[]; try{rows=(appUsers||[]).filter(isAllowedUser)}catch(e){}
+    if(!rows.some(function(u){return userEmail(u)===meEmail()}))rows.unshift({email:meEmail(),role:(currentUser&&currentUser.isAdmin)?'admin':'employee',fullName:window.cpcmStaffDisplayName(meEmail())});
+    if(sel){
+      sel.disabled=!isAdm;
+      sel.innerHTML=rows.sort(function(a,b){return window.cpcmStaffDisplayName(userEmail(a)).localeCompare(window.cpcmStaffDisplayName(userEmail(b)))}).map(function(u){let e=userEmail(u);return '<option value="'+safe(e)+'">'+safe(window.cpcmStaffDisplayName(e))+' — '+safe(e)+'</option>'}).join('');
+      sel.value=lower(targetEmail)||meEmail();
+      if(!isAdm)sel.value=meEmail();
+    }
+    if(inp)inp.value=window.cpcmStaffDisplayName(sel&&sel.value||meEmail());
+    document.getElementById('cpcmNameModal').classList.add('open');
+  };
+  window.cpcmNameTargetChanged=function(){let sel=document.getElementById('cpcmNameTarget'), inp=document.getElementById('cpcmNameValue'); if(inp&&sel)inp.value=window.cpcmStaffDisplayName(sel.value)};
+  window.cpcmCloseNameModal=function(){let m=document.getElementById('cpcmNameModal'); if(m)m.classList.remove('open')};
+  function ensureNameModal(){
+    if(document.getElementById('cpcmNameModal'))return;
+    let div=document.createElement('div'); div.id='cpcmNameModal'; div.className='modal';
+    div.innerHTML='<div class="modalbox" style="max-width:620px"><div class="modalhead"><h2>Staff Display Name</h2><button class="gray" onclick="cpcmCloseNameModal()">Close</button></div><div class="modalbody"><div class="notice">Names saved here are used by Team Messenger, Scorecards, Staff, and internal activity screens. Admin can rename any employee. Employees can rename themselves.</div><div class="grid"><div class="full"><label>Staff User</label><select id="cpcmNameTarget" onchange="cpcmNameTargetChanged()"></select></div><div class="full"><label>Display Name</label><input id="cpcmNameValue" placeholder="Example: Antonio Finch"></div><div class="full" style="display:flex;gap:10px;justify-content:flex-end"><button class="gray" onclick="cpcmCloseNameModal()">Cancel</button><button class="green" onclick="cpcmSaveStaffDisplayName()">Save Name</button></div></div></div></div>';
+    document.body.appendChild(div);
+  }
+  function ensureMessengerNameUi(){
+    let attach=document.querySelector('.chatAttachAccount'); if(attach){attach.style.display='none'; attach.textContent='Account Attach Removed'}
+    let actions=document.querySelector('.chatTopActions');
+    if(actions && !document.getElementById('cpcmNameBtn')){let b=document.createElement('button');b.id='cpcmNameBtn';b.title='Edit staff display name';b.textContent='Name';b.onclick=function(){cpcmOpenStaffNameModal(meEmail())};actions.insertBefore(b,actions.firstChild)}
+    let empTop=document.querySelector('#employeeAdminModal .employeeAdminTop');
+    if(empTop && !document.getElementById('cpcmStaffNamesBtn')){let b=document.createElement('button');b.id='cpcmStaffNamesBtn';b.className='outline';b.textContent='Edit Staff Names';b.onclick=function(){cpcmOpenStaffNameModal(meEmail())};empTop.appendChild(b)}
+  }
+  const _oldOpenEmp=window.openEmployeeAdminModal;
+  window.openEmployeeAdminModal=async function(){ if(_oldOpenEmp)await _oldOpenEmp.apply(this,arguments); ensureMessengerNameUi(); };
+
+  function injectCss(){
+    if(document.getElementById('cpcmMessengerNamesCss'))return;
+    let st=document.createElement('style'); st.id='cpcmMessengerNamesCss';
+    st.textContent='.chatAttachAccount,.chatAttachedLine{display:none!important}.chatSenderName{font-size:10.5px;font-weight:1000;color:#334155;margin:0 6px 3px}.chatSenderName.mine{text-align:right;color:#1d4ed8}.chatSenderName.theirs{text-align:left}.chatMetaLine{font-size:10px!important;color:#64748b!important;font-weight:800!important;margin-top:4px!important}.chatContact.self{background:#f8fafc;border-style:dashed}.chatSelfBadge{margin-left:6px;background:#dbeafe;color:#1d4ed8;border-radius:999px;padding:2px 6px;font-size:9px;font-weight:1000}.chatOnlineDot.live{background:#22c55e!important;box-shadow:0 0 0 2px #dcfce7}.chatOnlineDot.off{background:#94a3b8!important}#cpcmNameBtn{background:#0f766e!important;color:white!important}';
+    document.head.appendChild(st);
+  }
+  injectCss();
+  setTimeout(function(){try{ensureMessengerNameUi(); if(typeof buildChatContacts==='function'){buildChatContacts();renderChatContacts();if(chatActiveEmail)renderChatConversation();}}catch(e){}},1000);
+  window.CPCM_MESSENGER_NAMES_FIX_BUILD=BUILD;
 })();
 </script>
 
