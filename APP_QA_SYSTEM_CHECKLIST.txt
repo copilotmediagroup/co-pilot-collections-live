@@ -19,4 +19,10 @@ After uploading this ZIP:
 MESSENGER_PRESENCE_CONTACTS_FB_LAYOUT_FIX:
 - Online count includes current logged-in user.
 - Contact list shows all signed-up staff/admin users, including current user as You.
-- Message bubbles show sender name, timestamp/date, seen status, and attached account separately.
+- Message bubbles show sender name, timestamp/date, and seen status. Debtor/account attachments must not appear in Messenger.
+
+
+LIVE_STABLE_BOUNDARY_REPAIR_2026_07_18_R1:
+- Receipts/Letters print script boundary repaired.
+- Exact duplicate Messenger Names patch removed; one final override remains after presence layout logic.
+- LIVE environment lock preserved.
