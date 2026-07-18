@@ -13,7 +13,11 @@ After uploading this ZIP:
 10. Open Reports full page and Back to Queue.
 11. Open Chat / Team Messenger.
 12. Open Pay Desk, Ledger, Tickler, Scorecards.
-13. Confirm no stuck loading or page unresponsive warning.
+13. Open Receipts & Letters and generate a receipt.
+14. Draw or type an electronic signature and confirm it appears above Authorized Representative.
+15. Click Download PDF and confirm the PDF matches the right-side Preview.
+16. Confirm the PDF filename includes the document type, consumer, and document number.
+17. Confirm no stuck loading or page unresponsive warning.
 
 
 MESSENGER_PRESENCE_CONTACTS_FB_LAYOUT_FIX:
@@ -22,7 +26,10 @@ MESSENGER_PRESENCE_CONTACTS_FB_LAYOUT_FIX:
 - Message bubbles show sender name, timestamp/date, and seen status. Debtor/account attachments must not appear in Messenger.
 
 
-LIVE_STABLE_BOUNDARY_REPAIR_2026_07_18_R1:
-- Receipts/Letters print script boundary repaired.
-- Exact duplicate Messenger Names patch removed; one final override remains after presence layout logic.
-- LIVE environment lock preserved.
+DOCUMENT_PDF_SIGNATURE_2026_07_18_R2:
+- Direct Download PDF added using local bundled PDF libraries.
+- Downloaded PDF is rendered from the right-side document Preview.
+- Mouse/touch electronic signature pad added above Authorized Representative.
+- Typed authorized-name signature option and Clear Signature added.
+- Existing Print / Save PDF fallback remains available.
+- Environment lock preserved.
