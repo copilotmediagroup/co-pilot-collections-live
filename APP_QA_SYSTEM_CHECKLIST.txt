@@ -14,3 +14,9 @@ After uploading this ZIP:
 11. Open Chat / Team Messenger.
 12. Open Pay Desk, Ledger, Tickler, Scorecards.
 13. Confirm no stuck loading or page unresponsive warning.
+
+
+MESSENGER_PRESENCE_CONTACTS_FB_LAYOUT_FIX:
+- Online count includes current logged-in user.
+- Contact list shows all signed-up staff/admin users, including current user as You.
+- Message bubbles show sender name, timestamp/date, seen status, and attached account separately.

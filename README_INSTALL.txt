@@ -74,3 +74,9 @@ SYSTEM CHECK / VERSION LOCK BUILD
 - Run: npm install && npm run dev
 - Use the floating 'System Check' button after login to verify the build.
 - No SQL changes are required for this QA build.
+
+
+MESSENGER_PRESENCE_CONTACTS_FB_LAYOUT_FIX:
+- Online count includes current logged-in user.
+- Contact list shows all signed-up staff/admin users, including current user as You.
+- Message bubbles show sender name, timestamp/date, seen status, and attached account separately.

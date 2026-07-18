@@ -12170,6 +12170,273 @@ function exportContactIntelligenceCSV(){let calls=filteredContactCalls();let row
   function boot(){addButton(); setTimeout(addButton,800); setTimeout(addButton,2200)}
   if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',boot)}else{boot()}
 })();
+
+
+
+/* MESSENGER PRESENCE + CONTACTS + FACEBOOK-LIKE MESSAGE LAYOUT FIX
+   - Online count now includes the current logged-in user and all signed-up staff.
+   - Messenger left panel shows all staff/admin accounts, including the current user as "You".
+   - Current user is shown online but cannot be selected for self-chat.
+   - Message bubbles show sender name, clean timestamp/date, seen status, and attached account separately. */
+(function(){
+  if(window.__cpcmMessengerPresenceContactsFbLayoutFix)return;
+  window.__cpcmMessengerPresenceContactsFbLayoutFix=true;
+
+  function normEmail(v){return String(v||'').toLowerCase().trim()}
+  function safeEsc(v){try{return esc(v)}catch(e){return String(v??'').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;')}}
+  function meEmail(){try{return normEmail(chatMe())}catch(e){return normEmail(currentUser&&currentUser.email)}}
+  function getUserEmail(u){return normEmail(u && (u.email||u.userEmail||u.user_email))}
+  function findStaffUser(email){email=normEmail(email);return (appUsers||[]).find(function(u){return getUserEmail(u)===email})||null}
+  function valueOf(u,keys){for(var i=0;i<keys.length;i++){var v=u&&u[keys[i]];if(v!==undefined&&v!==null&&String(v).trim())return String(v).trim()}return ''}
+  function humanizeEmail(email){
+    var left=String(email||'').split('@')[0]||'User';
+    left=left.replace(/[._-]+/g,' ').replace(/\d+/g,' ').replace(/\s+/g,' ').trim();
+    if(!left)return String(email||'User');
+    return left.split(' ').map(function(w){return w?w.charAt(0).toUpperCase()+w.slice(1).toLowerCase():''}).join(' ');
+  }
+  function displayNameForEmail(email){
+    email=normEmail(email);
+    var u=findStaffUser(email);
+    var n=valueOf(u,['displayName','display_name','fullName','full_name','employeeName','employee_name','name','userName','username']);
+    if(!n){
+      var first=valueOf(u,['firstName','first_name']);
+      var last=valueOf(u,['lastName','last_name']);
+      n=[first,last].filter(Boolean).join(' ').trim();
+    }
+    if(!n && email==='afinch2678@gmail.com')n='Antonio Finch';
+    if(!n && email===meEmail() && currentUser){
+      n=valueOf(currentUser,['displayName','display_name','fullName','full_name','employeeName','employee_name','name']);
+    }
+    return n || humanizeEmail(email) || email || 'User';
+  }
+
+  chatName = function(email){return displayNameForEmail(email)};
+  chatInitials = function(email){
+    var n=displayNameForEmail(email);
+    return n.split(/\s+/).filter(Boolean).slice(0,2).map(function(x){return x[0]}).join('').toUpperCase() || '?';
+  };
+
+  function staffRoleForEmail(email){
+    email=normEmail(email);
+    var u=findStaffUser(email);
+    if((typeof isAdminEmail==='function' && isAdminEmail(email)) || String(u&&u.role||'').toLowerCase()==='admin')return 'Admin';
+    return 'Employee';
+  }
+  chatContactRole = function(email){return staffRoleForEmail(email)};
+
+  function userAllowedInMessenger(u){
+    var email=getUserEmail(u);
+    if(!email)return false;
+    var status=String(u.approvalStatus||u.approval_status||'').toLowerCase();
+    var role=String(u.role||'employee').toLowerCase();
+    if(status==='removed'||status==='rejected'||status==='fired')return false;
+    if(u.isActive===false || u.is_active===false)return false;
+    return role==='admin'||role==='employee'||!!email;
+  }
+  function ensureSelfUser(map){
+    var me=meEmail();
+    if(!me)return;
+    var u=findStaffUser(me)||{email:me,role:(currentUser&&currentUser.isAdmin)?'admin':'employee',approvalStatus:'approved',isApproved:true,isActive:true};
+    map[me]={email:me,user:u,self:true,online:true,unread:0,lastMessageAt:'',lastPreview:''};
+  }
+  function addChatUser(map,email,u){
+    email=normEmail(email);
+    if(!email)return;
+    var me=meEmail();
+    if(!u)u=findStaffUser(email)||{email:email,role:(typeof isAdminEmail==='function'&&isAdminEmail(email))?'admin':'employee'};
+    if(!map[email])map[email]={email:email,user:u,self:email===me,online:false,unread:0,lastMessageAt:'',lastPreview:''};
+    if(email===me)map[email].self=true;
+    map[email].user=map[email].user||u;
+  }
+  function allMessengerUsers(){
+    var map={};
+    ensureSelfUser(map);
+    (appUsers||[]).forEach(function(u){if(userAllowedInMessenger(u))addChatUser(map,getUserEmail(u),u)});
+    (chatPresenceData||[]).forEach(function(p){addChatUser(map,p.userEmail||p.user_email,{email:p.userEmail||p.user_email})});
+    (chatAllMessages||[]).forEach(function(m){
+      addChatUser(map,m.fromEmail||m.from_email);
+      addChatUser(map,m.toEmail||m.to_email);
+    });
+    return Object.values(map).map(function(c){c.self=normEmail(c.email)===meEmail();c.online=c.self?true:presenceIsOnlineEmail(c.email);return c});
+  }
+  function onlineMessengerCount(){
+    var seen={};
+    return allMessengerUsers().filter(function(c){
+      var e=normEmail(c.email); if(!e||seen[e])return false; seen[e]=true;
+      return c.self || presenceIsOnlineEmail(e);
+    }).length;
+  }
+
+  buildChatContacts = function(){
+    var me=meEmail();
+    var rows=allMessengerUsers();
+    rows.forEach(function(c){
+      c.unread=0; c.lastMessageAt=''; c.lastPreview='';
+      if(c.self)return;
+      var msgs=(chatAllMessages||[]).filter(function(m){
+        var from=normEmail(m.fromEmail||m.from_email), to=normEmail(m.toEmail||m.to_email);
+        return (from===me&&to===c.email)||(from===c.email&&to===me);
+      });
+      c.unread=msgs.filter(function(m){
+        var from=normEmail(m.fromEmail||m.from_email), to=normEmail(m.toEmail||m.to_email);
+        return to===me && from!==me && !m.readAt && !m.read_at && String(m.status||'Open')!=='Closed';
+      }).length;
+      var last=msgs[msgs.length-1];
+      if(last){c.lastMessageAt=last.createdAt||last.created_at||'';c.lastPreview=String(last.body||'').slice(0,70)}
+    });
+    chatContactsData=rows.sort(function(a,b){
+      if(a.self!==b.self)return a.self?-1:1;
+      if(a.unread!==b.unread)return b.unread-a.unread;
+      if(a.online!==b.online)return a.online?-1:1;
+      return String(chatName(a.email)).localeCompare(String(chatName(b.email)));
+    });
+  };
+
+  window.cpcmChatSelfNotice=function(){alert('This is you. Your online status is shown here, but you cannot message yourself. Choose another employee or admin.')} ;
+
+  renderPresenceBanner = function(){
+    var head=document.querySelector('.chatContactsHead');
+    if(!head)return;
+    var existing=document.getElementById('chatPresenceBanner');
+    if(!existing){existing=document.createElement('div');existing.id='chatPresenceBanner';existing.className='chatPresenceBanner';head.insertAdjacentElement('afterend',existing)}
+    var n=onlineMessengerCount();
+    var you=presenceIsOnlineEmail(meEmail());
+    existing.innerHTML='<span><b>'+n+'</b> online</span><span>'+(you?'You are online 🟢':'You appear offline ⚪')+'</span>';
+  };
+
+  renderChatContacts = function(){
+    var list=document.getElementById('chatContactList');
+    if(!list)return;
+    var q=String(document.getElementById('chatSearch')&&document.getElementById('chatSearch').value||'').toLowerCase();
+    var rows=(chatContactsData||[]).filter(function(c){return !q || c.email.includes(q) || chatName(c.email).toLowerCase().includes(q) || staffRoleForEmail(c.email).toLowerCase().includes(q)});
+    list.innerHTML=rows.map(function(c){
+      var online=c.self?true:presenceIsOnlineEmail(c.email);
+      var selfLabel=c.self?' <span class="chatSelfBadge">You</span>':'';
+      var meta=(c.self?'You • ':'')+staffRoleForEmail(c.email)+' • <span class="'+(online?'onlineText':'offlineText')+'">'+(online?'Online':'Offline')+'</span>'+(c.lastPreview&&!c.self?' • '+safeEsc(c.lastPreview):'');
+      var click=c.self?'onclick="window.cpcmChatSelfNotice()"':'onclick="selectChatContact(\''+safeEsc(c.email)+'\')"';
+      return '<div class="chatContact '+(c.self?'self':'')+' '+(c.email===chatActiveEmail?'active':'')+' '+(c.unread?'hasUnread':'')+'" '+click+'>'+ 
+        '<div class="chatAvatar">'+safeEsc(chatInitials(c.email))+'<span class="chatOnlineDot '+(online?'live':'off')+'"></span></div>'+ 
+        '<div class="chatContactMain"><div class="chatContactName">'+safeEsc(chatName(c.email))+selfLabel+'</div><div class="chatContactMeta">'+meta+'</div></div>'+ 
+        '<div class="chatContactUnread '+(c.unread?'':'zero')+'">'+(c.unread?(c.unread>99?'99+':c.unread):'')+'</div>'+ 
+      '</div>';
+    }).join('') || '<div class="tmEmpty">No employees/admin are available yet.</div>';
+    renderPresenceBanner();
+  };
+
+  function formatChatDate(v){
+    var d=new Date(v||Date.now()); if(isNaN(d.getTime()))d=new Date();
+    var now=new Date();
+    var ds=d.toDateString(), ns=now.toDateString();
+    var y=new Date(now); y.setDate(now.getDate()-1);
+    var time=d.toLocaleTimeString([], {hour:'numeric',minute:'2-digit'});
+    if(ds===ns)return 'Today '+time;
+    if(ds===y.toDateString())return 'Yesterday '+time;
+    return d.toLocaleDateString([], {month:'short',day:'numeric',year:'numeric'})+' '+time;
+  }
+  function messageAccountLabel(m){
+    var a=null; try{a=m.accountId?accountById(m.accountId):null}catch(e){}
+    var name=a?(typeof nameOf==='function'?nameOf(a):''):(m.accountName||m.account_name||'');
+    var num=a?(typeof acctNo==='function'?acctNo(a):''):(m.accountNumber||m.account_number||'');
+    return {name:name||'', num:num||''};
+  }
+
+  chatMessageBubble = function(m){
+    var from=normEmail(m.fromEmail||m.from_email);
+    var mine=from===meEmail();
+    var seen=mine && (m.readAt||m.read_at);
+    var acct=messageAccountLabel(m);
+    var attached=acct.name?'<div class="chatAttachedLine">Attached Account: '+safeEsc(acct.name)+(acct.num?' · '+safeEsc(acct.num):'')+'</div>':'';
+    return '<div class="chatBubbleWrap '+(mine?'mine':'theirs')+'">'+
+      '<div class="chatSenderName '+(mine?'mine':'theirs')+'">'+safeEsc(chatName(from))+'</div>'+
+      '<div class="chatBubble">'+safeEsc(m.body||'')+'</div>'+
+      attached+
+      '<div class="chatMetaLine">'+safeEsc(formatChatDate(m.createdAt||m.created_at||Date.now()))+(seen?' • Seen':'')+'</div>'+ 
+    '</div>';
+  };
+
+  var _oldSelectChatContact=selectChatContact;
+  selectChatContact = async function(email){
+    email=normEmail(email);
+    if(!email || email===meEmail()){window.cpcmChatSelfNotice();return;}
+    return _oldSelectChatContact(email);
+  };
+
+  renderChatConversation = function(){
+    var msgs=activeChatMessages();
+    var box=document.getElementById('chatMessages');
+    var nameEl=document.getElementById('chatActiveName');
+    var statusEl=document.getElementById('chatActiveStatus');
+    var av=document.getElementById('chatActiveAvatar');
+    var btn=document.getElementById('chatSendBtn');
+    if(!box)return;
+    if(!chatActiveEmail || chatActiveEmail===meEmail()){
+      box.innerHTML='<div class="chatEmpty">Pick an employee or admin to start a direct chat.</div>';
+      if(btn)btn.disabled=true;
+      chatActiveEmail='';
+      return;
+    }
+    if(btn)btn.disabled=false;
+    if(nameEl)nameEl.textContent=chatName(chatActiveEmail);
+    var online=presenceIsOnlineEmail(chatActiveEmail);
+    var attached=chatAttachedAccountId?accountById(chatAttachedAccountId):null;
+    if(statusEl)statusEl.innerHTML=staffRoleForEmail(chatActiveEmail)+' • <span class="'+(online?'onlineText':'offlineText')+'">'+(online?'Online':'Offline')+'</span>'+(attached?' • Attached Account: '+safeEsc(nameOf(attached)):'');
+    if(av)av.innerHTML=safeEsc(chatInitials(chatActiveEmail))+'<span class="chatOnlineDot '+(online?'live':'off')+'"></span>';
+    box.innerHTML=msgs.map(function(m){return chatMessageBubble(m)}).join('')||'<div class="chatEmpty">No messages yet. Type below to start the conversation.</div>';
+    box.scrollTop=box.scrollHeight;
+    try{loadTypingStatus()}catch(e){}
+  };
+
+  var _oldOpenChatDock=openChatDock;
+  openChatDock = async function(){
+    var dock=document.getElementById('chatDock');
+    if(!dock)return alert('Chat dock not found. Republish the latest package.');
+    dock.classList.add('open');
+    if(!chatAttachedAccountId && getCurrent&&getCurrent()&&getCurrent().id)chatAttachedAccountId=getCurrent().id;
+    await chatRefreshAll(false);
+    if(chatActiveEmail===meEmail())chatActiveEmail='';
+    if(!chatActiveEmail){
+      var first=(chatContactsData||[]).find(function(c){return !c.self && c.email!==meEmail()});
+      if(first)await selectChatContact(first.email);
+    }
+    startChatPolling();
+  };
+
+  var _oldSendChatMessage=sendChatMessage;
+  sendChatMessage = async function(){
+    if(chatActiveEmail===meEmail()){window.cpcmChatSelfNotice();return;}
+    return _oldSendChatMessage();
+  };
+
+  function injectMessengerFixCss(){
+    if(document.getElementById('cpcmMessengerFbLayoutCss'))return;
+    var st=document.createElement('style'); st.id='cpcmMessengerFbLayoutCss';
+    st.textContent='\n.chatContact.self{background:#f8fafc;border-style:dashed;cursor:default}.chatSelfBadge{margin-left:6px;background:#dbeafe;color:#1d4ed8;border-radius:999px;padding:2px 6px;font-size:9px;font-weight:1000}.chatSenderName{font-size:10.5px;font-weight:1000;color:#334155;margin:0 6px 3px}.chatSenderName.mine{text-align:right;color:#1d4ed8}.chatSenderName.theirs{text-align:left}.chatAttachedLine{font-size:10px;font-weight:900;color:#1d4ed8;background:#eff6ff;border:1px solid #bfdbfe;border-radius:999px;padding:4px 8px;margin-top:4px;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.chatBubbleWrap.mine .chatAttachedLine{align-self:flex-end}.chatBubbleWrap.theirs .chatAttachedLine{align-self:flex-start}.chatMetaLine{font-size:10px!important;color:#64748b!important;font-weight:800!important;margin-top:4px!important}.chatContactName{display:flex;align-items:center;gap:4px}.chatContact.self .chatContactName{color:#0f172a}.chatPresenceBanner b{font-weight:1000}.chatOnlineDot.live{background:#22c55e!important;box-shadow:0 0 0 2px #dcfce7}.chatOnlineDot.off{background:#94a3b8!important}\n';
+    document.head.appendChild(st);
+  }
+  injectMessengerFixCss();
+
+  var _oldChatRefreshAll=chatRefreshAll;
+  chatRefreshAll = async function(manual){
+    if(!token()||!currentUser.email)return;
+    try{startPresenceHeartbeat()}catch(e){}
+    try{await upsertPresence()}catch(e){}
+    try{await loadPresence()}catch(e){}
+    try{await chatHeartbeat()}catch(e){}
+    try{await loadAppUsers()}catch(e){}
+    try{await loadChatMessages()}catch(e){}
+    buildChatContacts();
+    if(chatActiveEmail===meEmail())chatActiveEmail='';
+    if(document.getElementById('chatDock')&&document.getElementById('chatDock').classList.contains('open') && chatActiveEmail){try{await markActiveChatRead()}catch(e){}}
+    buildChatContacts();
+    renderChatContacts();
+    if(chatActiveEmail)renderChatConversation();
+    updateChatUnreadBadge();
+    renderPresenceBanner();
+  };
+
+  setTimeout(function(){try{if(token()&&currentUser.email){upsertPresence();loadPresence().then(function(){buildChatContacts();renderChatContacts();renderPresenceBanner()}).catch(function(){})}}catch(e){}},1200);
+})();
+
 </script>
 </body>
 </html>
