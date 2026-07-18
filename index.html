@@ -3564,7 +3564,7 @@ button {
 
 <div class="app">
   <header class="topbar">
-    <div class="brand"><div class="logo appBrandLogo" id="appBrandLogo">b</div><div><h1 id="appBrandName">Co Pilot Collections Manager</h1><p class="sub" id="appBrandSub">Import history, cleanup, communications, reports, compliance, promises, and team chat.</p></div></div>
+    <div class="brand"><div class="logo appBrandLogo" id="appBrandLogo">b</div><div><h1 id="appBrandName">Co Pilot Collections Manager</h1><p class="sub" id="appBrandSub">Receipts, settlements, import history, cleanup, communications, reports, compliance, promises, and team chat.</p></div></div>
     <div class="headerSearch"><span class="mag">⌕</span><input id="globalSearch" placeholder="Search phone, name, SSN, address..." oninput="handleSearchInput('global')"><span class="hotkey">⌘ K</span></div>
     <div class="topActions">
       <button class="gray helpBtn" onclick="openHelpModal()">Help</button>
@@ -11947,6 +11947,168 @@ function exportContactIntelligenceCSV(){let calls=filteredContactCalls();let row
   window.markSettlementStatus=markSettlementStatus;
   window.deleteSettlementOffer=deleteSettlementOffer;
   window.convertApprovedSettlementToPlan=convertApprovedSettlementToPlan;
+})();
+</script>
+
+
+<script>
+/* RECEIPTS + SETTLEMENT/PAYMENT LETTERS — stable full-page document center */
+(function(){
+  if(window.__coPilotReceiptsLettersPatch)return;
+  window.__coPilotReceiptsLettersPatch=true;
+  const DOC_ADMIN_EMAIL='afinch2678@gmail.com';
+  function dEl(id){return document.getElementById(id)}
+  function dEsc(v){return String(v==null?'':v).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;')}
+  function dVal(id){let el=dEl(id);return el?String(el.value||'').trim():''}
+  function dEmail(){try{return String((window.currentUser&&currentUser.email)||localStorage.getItem('coPilotUserEmail')||'').toLowerCase().trim()}catch(e){return ''}}
+  function dIsAdmin(){try{return !!(window.currentUser&&(currentUser.isAdmin||currentUser.role==='admin'||String(currentUser.email||'').toLowerCase()===DOC_ADMIN_EMAIL))||dEmail()===DOC_ADMIN_EMAIL}catch(e){return false}}
+  function dCurrent(){try{return (typeof getCurrent==='function'&&getCurrent()) || (window.accounts||[]).find(a=>String(a.id)===String(window.currentAccountId)) || (window.accounts||[])[0] || null}catch(e){return null}}
+  function dName(a){try{return typeof nameOf==='function'?nameOf(a):(a?.fullName||[a?.firstName,a?.middleName,a?.lastName].filter(Boolean).join(' ')||'Unknown Account')}catch(e){return 'Unknown Account'}}
+  function dAcct(a){try{return typeof acctNo==='function'?acctNo(a):(a?.accountNumber||a?.clientAccountNumber||a?.accountId||'')}catch(e){return ''}}
+  function dMoneyNum(v){try{return typeof moneyNum==='function'?moneyNum(v):(Number(String(v??'').replace(/[^0-9.-]/g,''))||0)}catch(e){return 0}}
+  function dMoney(v){try{return typeof money==='function'?money(v):Number(v||0).toLocaleString('en-US',{style:'currency',currency:'USD'})}catch(e){return '$0.00'}}
+  function dBalance(a){try{return typeof accountBalance==='function'?accountBalance(a):dMoneyNum(a?.currentBalance||a?.principal||a?.originalBalance)}catch(e){return 0}}
+  function dToday(){let x=new Date();return x.toISOString().slice(0,10)}
+  function dDate(v){if(!v)return '—'; let d=new Date(v); return isNaN(d)?String(v):d.toLocaleDateString()}
+  function dDateTime(v){if(!v)return '—'; let d=new Date(v); return isNaN(d)?String(v):d.toLocaleString()}
+  function dId(prefix){return prefix+'-'+Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,7).toUpperCase()}
+  function dDownload(name,text,type='text/csv'){let blob=new Blob([text],{type});let a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)}
+  function dCsvCell(v){return '"'+String(v==null?'':v).replace(/"/g,'""')+'"'}
+  async function dFetch(path){try{if(typeof dbFetch!=='function')return [];let r=await dbFetch(path);return Array.isArray(r)?r:[]}catch(e){console.warn('document center fetch failed',path,e);return []}}
+  function dCamel(row){let o={};Object.keys(row||{}).forEach(k=>{let ck=k.replace(/_([a-z])/g,(_,c)=>c.toUpperCase());o[ck]=row[k]});return o}
+  async function dActivity(accountId,type,text){try{if(typeof insertActivity==='function')await insertActivity(accountId,type,text)}catch(e){}try{if(typeof insertAudit==='function')await insertAudit(type,text,'documents',String(accountId||''))}catch(e){}}
+
+  function ensureDocStyles(){
+    if(dEl('receiptsLettersStyles'))return;
+    let style=document.createElement('style');
+    style.id='receiptsLettersStyles';
+    style.textContent=`
+      .docAccountPanel{grid-column:1/-1;background:#fff;border:1px solid #dbe3ef;border-radius:16px;box-shadow:0 2px 10px rgba(15,23,42,.035);padding:14px 16px;min-width:0}
+      .docTop{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;flex-wrap:wrap}.docTitle{font-size:16px;font-weight:1000;color:#0f172a}.docSub{font-size:12px;color:#64748b;margin-top:4px}.docActions{display:flex;gap:8px;flex-wrap:wrap}.docPill{display:inline-block;border-radius:999px;padding:4px 8px;font-size:11px;font-weight:900;background:#eef2ff;color:#1d4ed8}.docMiniGrid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:12px}.docMini{border:1px solid #e2e8f0;border-radius:13px;background:#f8fbff;padding:10px}.docMiniLabel{font-size:10px;font-weight:900;text-transform:uppercase;color:#64748b;margin-bottom:5px}.docMiniValue{font-size:13px;font-weight:1000;color:#0f172a}
+      #receiptsLettersPage{display:none;position:fixed;inset:0;z-index:9300;background:#eef3f9;color:#0f172a;overflow:auto}#receiptsLettersPage.open{display:block}.docPageTop{min-height:76px;background:linear-gradient(90deg,#05225f,#07379a,#0b45c6);color:#fff;display:flex;justify-content:space-between;gap:14px;align-items:center;padding:14px 18px;box-shadow:0 4px 18px rgba(15,23,42,.2)}.docPageTitle{font-size:23px;font-weight:1000;letter-spacing:-.4px}.docPageSub{font-size:12px;color:#dbeafe;margin-top:3px}.docPageActions{display:flex;gap:9px;flex-wrap:wrap}.docPageBody{padding:16px;display:grid;grid-template-columns:1.05fr .95fr;gap:14px}.docCard{background:#fff;border:1px solid #dbe3ef;border-radius:16px;box-shadow:0 3px 14px rgba(15,23,42,.055);overflow:hidden}.docCardHead{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;padding:14px 16px;border-bottom:1px solid #edf2f8;background:#f8fbff}.docCardHead h3{margin:0;font-size:16px}.docCardBody{padding:14px 16px}.docNotice{background:#eff6ff;border:1px solid #bfdbfe;color:#1e3a8a;border-radius:12px;padding:10px;font-size:12px;font-weight:850}.docGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.docGrid label{display:block;font-size:11px;font-weight:900;color:#334155;margin-bottom:5px}.docGrid input,.docGrid select,.docGrid textarea{width:100%;border:1px solid #cbd5e1;border-radius:10px;padding:10px;background:#fff;font:inherit;font-size:13px}.docGrid textarea{min-height:78px;resize:vertical}.docWide{grid-column:1/-1}.docHalf{grid-column:span 2}.docTemplateGrid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}.docTemplate{border:1px solid #dbe3ef;background:#fff;border-radius:14px;padding:12px;cursor:pointer;transition:.12s ease}.docTemplate:hover{border-color:#2563eb;box-shadow:0 0 0 3px rgba(37,99,235,.10)}.docTemplate.active{border:2px solid #2563eb;background:#eff6ff}.docTemplateTitle{font-weight:1000;color:#0f172a}.docTemplateText{font-size:12px;color:#64748b;margin-top:4px;line-height:1.35}.docMetrics{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:12px}.docMetric{border:1px solid #e2e8f0;border-radius:13px;background:#f8fbff;padding:10px}.docMetricLabel{font-size:10px;font-weight:900;text-transform:uppercase;color:#64748b;margin-bottom:5px}.docMetricValue{font-size:15px;font-weight:1000;color:#0f172a}.docHistoryTable{width:100%;border-collapse:collapse;font-size:12px}.docHistoryTable th{position:sticky;top:0;background:#f8fafc;text-align:left;padding:9px;border-bottom:1px solid #e2e8f0;color:#334155;font-size:10px;text-transform:uppercase;z-index:1}.docHistoryTable td{padding:8px 9px;border-bottom:1px solid #edf2f8;vertical-align:top}.docTableWrap{border:1px solid #e2e8f0;border-radius:13px;overflow:auto;max-height:360px}.docPreview{font-family:Arial,Helvetica,sans-serif;background:white;border:1px solid #dbe3ef;border-radius:14px;padding:18px;min-height:420px;line-height:1.45}.docPreview h1{font-size:22px;margin:0;color:#0f172a}.docPreview h2{font-size:18px;margin:18px 0 8px;color:#0f172a}.docPreview .muted{color:#64748b}.docPreview table{width:100%;border-collapse:collapse;margin:12px 0;font-size:13px}.docPreview th,.docPreview td{border:1px solid #e2e8f0;padding:8px;text-align:left}.docPreview th{background:#f8fafc}.docSignLine{margin-top:36px;border-top:1px solid #0f172a;width:260px;padding-top:6px;font-size:12px}.docWatermark{font-size:11px;color:#94a3b8;text-align:right;margin-top:18px}.docButtonRow{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.navIcon.documentIcon{background:#0ea5e9;color:#fff}.topActions .documentCenterBtn{background:#0ea5e9!important;color:white!important;font-weight:1000!important}
+      @media(max-width:1300px){.docPageBody{grid-template-columns:1fr}.docMiniGrid,.docMetrics{grid-template-columns:repeat(2,1fr)}.docGrid,.docTemplateGrid{grid-template-columns:repeat(2,1fr)}.docHalf{grid-column:span 1}}@media(max-width:760px){.docPageTop{height:auto;align-items:flex-start;flex-direction:column}.docMiniGrid,.docMetrics,.docGrid,.docTemplateGrid{grid-template-columns:1fr}.docPageActions{width:100%}}
+      @media print{#receiptsLettersPage{position:static!important;display:block!important;background:white!important}.docPageTop,.docCard:not(.printableDocCard),.docActions,.docPageActions,.navRail,.topbar,.bottom{display:none!important}.docPageBody{display:block!important;padding:0!important}.printableDocCard{border:0!important;box-shadow:none!important}.printableDocCard .docCardHead{display:none!important}.docPreview{border:0!important;border-radius:0!important}}
+    `;
+    document.head.appendChild(style);
+  }
+
+  function ensureDocAccountPanel(){
+    ensureDocStyles();
+    if(dEl('docAccountPanel'))return dEl('docAccountPanel');
+    let panel=document.createElement('section');
+    panel.id='docAccountPanel'; panel.className='docAccountPanel';
+    let anchor=dEl('settlementAccountPanel')||dEl('paymentPlanPanel')||document.querySelector('.notePanel');
+    if(anchor&&anchor.parentNode)anchor.parentNode.insertBefore(panel,anchor.nextSibling);
+    return panel;
+  }
+  function renderDocAccountPanel(){
+    let a=dCurrent(), p=ensureDocAccountPanel(); if(!p)return;
+    if(!a){p.innerHTML='<div class="docTop"><div><div class="docTitle">Receipts & Letters</div><div class="docSub">No account selected.</div></div></div>';return;}
+    p.innerHTML='<div class="docTop"><div><div class="docTitle">Receipts & Letters <span class="docPill">Document Center</span></div><div class="docSub">Generate receipts, settlement letters, payment-plan agreements, and keep document history for '+dEsc(dName(a))+'.</div></div><div class="docActions"><button class="green" onclick="openReceiptsLettersPage(\'receipt\')">Payment Receipt</button><button class="outline" onclick="openReceiptsLettersPage(\'settlement\')">Settlement Letter</button><button class="outline" onclick="openReceiptsLettersPage(\'plan\')">Plan Agreement</button><button class="gray" onclick="openReceiptsLettersPage()">Documents</button></div></div><div class="docMiniGrid"><div class="docMini"><div class="docMiniLabel">Account</div><div class="docMiniValue">'+dEsc(dAcct(a)||'—')+'</div></div><div class="docMini"><div class="docMiniLabel">Current Balance</div><div class="docMiniValue">'+dMoney(dBalance(a))+'</div></div><div class="docMini"><div class="docMiniLabel">Company Docs</div><div class="docMiniValue">Receipts / Letters</div></div><div class="docMini"><div class="docMiniLabel">Access</div><div class="docMiniValue">'+(dIsAdmin()?'Admin + Employees':'Employee')+'</div></div></div>';
+  }
+  function ensureDocNav(){
+    ensureDocStyles();
+    let top=document.querySelector('.topActions');
+    if(top&&!dEl('documentCenterTopBtn')){
+      let b=document.createElement('button'); b.id='documentCenterTopBtn'; b.type='button'; b.className='gray documentCenterBtn'; b.textContent='Docs'; b.onclick=function(){openReceiptsLettersPage()};
+      let ref=top.querySelector('button[onclick*="openDocumentGenerator"]'); top.insertBefore(b, ref?ref.nextSibling:top.firstChild);
+    }
+    let rail=document.querySelector('.navRail');
+    if(rail&&!dEl('documentCenterSideBtn')){
+      let n=document.createElement('button'); n.id='documentCenterSideBtn'; n.className='navIcon documentIcon'; n.type='button'; n.title='Receipts & Letters'; n.innerHTML='<span class="navEmoji">📄</span>'; n.onclick=function(){openReceiptsLettersPage()};
+      let spacer=rail.querySelector('.navSpacer'); rail.insertBefore(n, spacer||rail.lastChild);
+    }
+    let q=document.querySelector('.quickActions');
+    if(q&&!dEl('docQuickAction')){
+      let div=document.createElement('div'); div.id='docQuickAction'; div.className='qaItem'; div.onclick=function(){openReceiptsLettersPage()}; div.innerHTML='<span class="qaLeft"><span class="qaIcon">📄</span>Receipts & Letters</span><span>›</span>';
+      q.appendChild(div);
+    }
+  }
+
+  function ensureDocPage(){
+    ensureDocStyles();
+    if(dEl('receiptsLettersPage'))return dEl('receiptsLettersPage');
+    let page=document.createElement('div'); page.id='receiptsLettersPage';
+    page.innerHTML=`
+      <div class="docPageTop">
+        <div><div class="docPageTitle">Receipts & Settlement Letters</div><div class="docPageSub">Generate receipts, settlement approvals, payment-plan agreements, and document account history.</div></div>
+        <div class="docPageActions"><button class="outline" onclick="refreshReceiptsLettersPage()">Refresh</button><button class="green" onclick="exportDocumentHistoryCSV()">Export History CSV</button><button class="gray" onclick="printCurrentDocument()">Print / Save PDF</button><button class="red" onclick="closeReceiptsLettersPage()">Back to Queue</button></div>
+      </div>
+      <div class="docPageBody">
+        <div class="docCard"><div class="docCardHead"><h3>Document Builder</h3><span class="docPill" id="docBuilderAccount">No account</span></div><div class="docCardBody">
+          <div class="docNotice">Choose a document type, verify the amounts, then generate/print. Every generated document is logged to the account activity.</div>
+          <div class="docTemplateGrid" id="docTemplateGrid" style="margin-top:12px"></div>
+          <div class="docGrid" style="margin-top:12px">
+            <div><label>Document Date</label><input id="docDate" type="date"></div>
+            <div><label>Due / Valid Until</label><input id="docDueDate" type="date"></div>
+            <div><label>Receipt / Document #</label><input id="docNumber"></div>
+            <div><label>Payment Amount</label><input id="docPaymentAmount" type="number" step="0.01"></div>
+            <div><label>Settlement Amount</label><input id="docSettlementAmount" type="number" step="0.01"></div>
+            <div><label>Remaining Balance</label><input id="docRemainingBalance" type="number" step="0.01"></div>
+            <div><label>Installment Amount</label><input id="docInstallmentAmount" type="number" step="0.01"></div>
+            <div><label>Frequency</label><select id="docFrequency"><option>One-Time</option><option>Weekly</option><option>Bi-Weekly</option><option>Monthly</option></select></div>
+            <div><label>Authorized By</label><input id="docAuthorizedBy" placeholder="Antonio Finch / Data Market House"></div>
+            <div class="docWide"><label>Notes / Terms</label><textarea id="docNotes" placeholder="Document-specific terms, authorization language, or payment instructions."></textarea></div>
+          </div>
+          <div class="docButtonRow"><button class="green" onclick="generateReceiptDocument()">Generate Receipt</button><button class="purple" onclick="generateSettlementLetter()">Generate Settlement Letter</button><button class="gray" onclick="generatePaymentPlanAgreement()">Generate Plan Agreement</button><button class="outline" onclick="openDocumentGenerator()">Open Letter Builder</button></div>
+        </div></div>
+        <div class="docCard printableDocCard"><div class="docCardHead"><h3>Preview</h3><span class="docPill" id="docPreviewType">Ready</span></div><div class="docCardBody"><div class="docPreview" id="docPreview"><h1>Document Preview</h1><p class="muted">Select a document type or generate a receipt/letter for the active account.</p></div></div></div>
+        <div class="docCard"><div class="docCardHead"><h3>Account Document Metrics</h3><span class="docPill" id="docMetricsCount">0 docs</span></div><div class="docCardBody"><div class="docMetrics" id="docMetrics"></div></div></div>
+        <div class="docCard"><div class="docCardHead"><h3>Document History</h3><span class="docPill" id="docHistoryCount">0 rows</span></div><div class="docCardBody"><div class="docTableWrap" id="docHistoryWrap"><div class="docNotice">Loading document history...</div></div></div></div>
+      </div>`;
+    document.body.appendChild(page); return page;
+  }
+
+  function addDays(days){let d=new Date();d.setDate(d.getDate()+days);return d.toISOString().slice(0,10)}
+  function currentDocAccount(){let a=dCurrent(); if(!a)alert('No account selected.'); return a;}
+  function setTemplateActive(kind){document.querySelectorAll('.docTemplate').forEach(x=>x.classList.toggle('active',x.dataset.kind===kind)); window.__docTemplateKind=kind; let t=dEl('docPreviewType'); if(t)t.textContent=kind==='receipt'?'Payment Receipt':kind==='settlement'?'Settlement Letter':kind==='plan'?'Payment Plan Agreement':'Document';}
+  function renderTemplates(){let box=dEl('docTemplateGrid'); if(!box)return; let templates=[['receipt','Payment Receipt','Receipt number, payment amount, date, remaining balance, and company authorization.'],['settlement','Settlement Approval Letter','Approved settlement amount, discount, deadline, and terms.'],['plan','Payment Plan Agreement','Balance, down payment, installment schedule, frequency, and missed-payment terms.'],['letter','Open Letter Builder','Use the existing letter builder for custom collection letters.']]; box.innerHTML=templates.map(t=>'<div class="docTemplate" data-kind="'+t[0]+'" onclick="selectDocTemplate(\''+t[0]+'\')"><div class="docTemplateTitle">'+dEsc(t[1])+'</div><div class="docTemplateText">'+dEsc(t[2])+'</div></div>').join('');}
+  async function hydrateDocInputs(kind){
+    let a=dCurrent(); if(!a)return;
+    if(!dEl('docDate'))return;
+    dEl('docDate').value=dToday(); dEl('docDueDate').value=addDays(10); dEl('docNumber').value=dId(kind==='receipt'?'RCPT':kind==='settlement'?'SETTLE':'PLAN'); dEl('docAuthorizedBy').value=(window.currentUser&&currentUser.email)||'Authorized Representative';
+    dEl('docRemainingBalance').value=dBalance(a).toFixed(2); dEl('docPaymentAmount').value='0.00'; dEl('docSettlementAmount').value='0.00'; dEl('docInstallmentAmount').value='0.00'; dEl('docFrequency').value='Monthly'; dEl('docNotes').value='';
+    let rows=await dFetch('/payment_ledger?account_id=eq.'+encodeURIComponent(a.id)+'&select=*&order=created_at.desc&limit=1'); let pay=dCamel(rows[0]||{});
+    if(pay.amount)dEl('docPaymentAmount').value=dMoneyNum(pay.amount).toFixed(2); if(pay.balanceAfter!=null)dEl('docRemainingBalance').value=dMoneyNum(pay.balanceAfter).toFixed(2);
+    let settlements=await dFetch('/settlements?account_id=eq.'+encodeURIComponent(a.id)+'&select=*&order=created_at.desc&limit=1'); let set=dCamel(settlements[0]||{});
+    if(set.settlementAmount)dEl('docSettlementAmount').value=dMoneyNum(set.settlementAmount).toFixed(2); if(set.dueDate)dEl('docDueDate').value=String(set.dueDate).slice(0,10); if(set.notes)dEl('docNotes').value=String(set.notes).slice(0,600);
+    let plans=await dFetch('/payment_plans?account_id=eq.'+encodeURIComponent(a.id)+'&select=*&order=created_at.desc&limit=1'); let plan=dCamel(plans[0]||{});
+    if(plan.paymentAmount||plan.installmentAmount||plan.amount)dEl('docInstallmentAmount').value=dMoneyNum(plan.paymentAmount||plan.installmentAmount||plan.amount).toFixed(2); if(plan.frequency)dEl('docFrequency').value=String(plan.frequency); if(plan.remainingAmount!=null)dEl('docRemainingBalance').value=dMoneyNum(plan.remainingAmount).toFixed(2);
+    if(kind==='receipt')generateReceiptDocument(false); else if(kind==='settlement')generateSettlementLetter(false); else if(kind==='plan')generatePaymentPlanAgreement(false); else renderDefaultPreview();
+  }
+  window.selectDocTemplate=async function(kind){if(kind==='letter'){if(typeof openDocumentGenerator==='function')return openDocumentGenerator();} setTemplateActive(kind); await hydrateDocInputs(kind);};
+
+  function companyHeader(title,docNo){let brand=(dEl('appBrandName')?.textContent||'Co Pilot Collections Manager'); return '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:18px"><div><h1>'+dEsc(title)+'</h1><div class="muted">'+dEsc(brand)+'</div></div><div style="text-align:right"><b>Document #</b><br>'+dEsc(docNo||'—')+'<br><span class="muted">'+dEsc(dDate(dVal('docDate')||dToday()))+'</span></div></div><hr style="border:0;border-top:1px solid #e2e8f0;margin:16px 0">'}
+  function accountBlock(a){return '<table><tr><th>Consumer</th><td>'+dEsc(dName(a))+'</td><th>Account #</th><td>'+dEsc(dAcct(a)||'—')+'</td></tr><tr><th>Original Creditor</th><td>'+dEsc(a?.originalCreditor||a?.issuerName||a?.portfolio||'—')+'</td><th>Current Balance</th><td>'+dMoney(dBalance(a))+'</td></tr><tr><th>Address</th><td colspan="3">'+dEsc([a?.address,a?.address2,a?.city,a?.state,a?.zip].filter(Boolean).join(', ')||'—')+'</td></tr></table>'}
+  function scheduleTable(rows){if(!rows||!rows.length)return '<p class="muted">No saved schedule rows found. Use the payment-plan section to create the schedule.</p>'; return '<table><thead><tr><th>Due Date</th><th>Amount Due</th><th>Amount Paid</th><th>Status</th><th>Paid Date</th></tr></thead><tbody>'+rows.slice(0,24).map(r=>{let x=dCamel(r);return '<tr><td>'+dEsc(dDate(x.dueDate))+'</td><td>'+dMoney(dMoneyNum(x.amountDue||x.amount||x.paymentAmount))+'</td><td>'+dMoney(dMoneyNum(x.amountPaid||0))+'</td><td>'+dEsc(x.status||'Scheduled')+'</td><td>'+dEsc(dDate(x.paidDate||x.paymentDate))+'</td></tr>'}).join('')+'</tbody></table>'}
+  function renderDefaultPreview(){let a=dCurrent(); let el=dEl('docPreview'); if(!el)return; el.innerHTML=companyHeader('Document Preview',dVal('docNumber'))+(a?accountBlock(a):'<p>No account selected.</p>')+'<p class="muted">Choose a document type to generate a receipt, settlement approval letter, or payment plan agreement.</p>';}
+  function setPreview(html,type){let p=dEl('docPreview'); if(p)p.innerHTML=html; let t=dEl('docPreviewType'); if(t)t.textContent=type||'Preview';}
+  async function logGenerated(type,summary){let a=dCurrent(); if(!a)return; await dActivity(a.id,type,summary+' • Document # '+(dVal('docNumber')||'—')); await loadDocumentHistory(a.id);}
+  window.generateReceiptDocument=async function(shouldLog=true){let a=currentDocAccount(); if(!a)return; setTemplateActive('receipt'); let amt=dMoneyNum(dVal('docPaymentAmount')), rem=dMoneyNum(dVal('docRemainingBalance')); let html=companyHeader('Payment Receipt',dVal('docNumber'))+accountBlock(a)+'<h2>Receipt Details</h2><table><tr><th>Payment Amount</th><td>'+dMoney(amt)+'</td><th>Payment Date</th><td>'+dEsc(dDate(dVal('docDate')))+' </td></tr><tr><th>Remaining Balance</th><td>'+dMoney(rem)+'</td><th>Created By</th><td>'+dEsc((currentUser&&currentUser.email)||'—')+'</td></tr></table><p>This receipt confirms that the payment listed above was recorded on the account shown. This receipt does not modify any agreement unless separately authorized in writing.</p><div class="docSignLine">'+dEsc(dVal('docAuthorizedBy')||'Authorized Representative')+'</div><div class="docWatermark">Generated by Co Pilot Collections Manager</div>'; setPreview(html,'Payment Receipt'); if(shouldLog)await logGenerated('Payment Receipt Generated','Generated payment receipt for '+dMoney(amt));};
+  window.generateSettlementLetter=async function(shouldLog=true){let a=currentDocAccount(); if(!a)return; setTemplateActive('settlement'); let bal=dBalance(a), amt=dMoneyNum(dVal('docSettlementAmount')), discount=Math.max(0,bal-amt), pct=bal?amt/bal*100:0; let html=companyHeader('Settlement Approval Letter',dVal('docNumber'))+accountBlock(a)+'<h2>Approved Settlement Terms</h2><table><tr><th>Original / Current Balance</th><td>'+dMoney(bal)+'</td><th>Approved Settlement</th><td>'+dMoney(amt)+'</td></tr><tr><th>Settlement Percentage</th><td>'+pct.toFixed(2)+'%</td><th>Discount</th><td>'+dMoney(discount)+'</td></tr><tr><th>Valid Until</th><td>'+dEsc(dDate(dVal('docDueDate')))+'</td><th>Payment Frequency</th><td>'+dEsc(dVal('docFrequency'))+'</td></tr></table><p>This settlement is valid only if payment is made according to the terms above and by the valid-until date. If payment is not received by the deadline, the settlement may be void and the account may return to the prior balance, less any payments actually received, subject to applicable law and account terms.</p><h2>Notes / Terms</h2><p>'+dEsc(dVal('docNotes')||'No additional terms entered.').replace(/\n/g,'<br>')+'</p><div class="docSignLine">'+dEsc(dVal('docAuthorizedBy')||'Authorized Representative')+'</div><div class="docWatermark">Generated by Co Pilot Collections Manager</div>'; setPreview(html,'Settlement Letter'); if(shouldLog)await logGenerated('Settlement Letter Generated','Generated settlement letter for '+dMoney(amt));};
+  window.generatePaymentPlanAgreement=async function(shouldLog=true){let a=currentDocAccount(); if(!a)return; setTemplateActive('plan'); let rows=await dFetch('/payment_plan_payments?account_id=eq.'+encodeURIComponent(a.id)+'&select=*&order=due_date.asc&limit=100'); let total=dMoneyNum(dVal('docRemainingBalance')||dBalance(a)), each=dMoneyNum(dVal('docInstallmentAmount')), freq=dVal('docFrequency'); let html=companyHeader('Payment Plan Agreement',dVal('docNumber'))+accountBlock(a)+'<h2>Payment Plan Terms</h2><table><tr><th>Plan Balance</th><td>'+dMoney(total)+'</td><th>Installment Amount</th><td>'+dMoney(each)+'</td></tr><tr><th>Frequency</th><td>'+dEsc(freq||'Monthly')+'</td><th>First / Next Due</th><td>'+dEsc(dDate(dVal('docDueDate')))+'</td></tr></table><h2>Schedule</h2>'+scheduleTable(rows)+'<p>If a payment is missed, returned, or paid late, the plan may be marked broken and the account may require admin review. Payment-plan terms remain subject to the account notes and applicable law.</p><h2>Notes / Terms</h2><p>'+dEsc(dVal('docNotes')||'No additional terms entered.').replace(/\n/g,'<br>')+'</p><div class="docSignLine">'+dEsc(dVal('docAuthorizedBy')||'Authorized Representative')+'</div><div class="docWatermark">Generated by Co Pilot Collections Manager</div>'; setPreview(html,'Plan Agreement'); if(shouldLog)await logGenerated('Payment Plan Agreement Generated','Generated payment plan agreement for '+dMoney(total));};
+
+  async function loadDocumentHistory(accountId){
+    let wrap=dEl('docHistoryWrap'); if(!wrap)return;
+    let rows=await dFetch('/activity_logs?account_id=eq.'+encodeURIComponent(accountId)+'&select=*&order=created_at.desc&limit=200');
+    rows=rows.map(dCamel).filter(r=>/Receipt|Letter|Agreement|Document|Communication|Certified|Mailed|Printed/i.test(String(r.actionType||''))+(/Receipt|Letter|Agreement|Document|Certified|Mailed|Printed/i.test(String(r.actionText||''))?1:0));
+    window.__docHistoryRows=rows;
+    let count=dEl('docHistoryCount'); if(count)count.textContent=rows.length+' rows'; let m=dEl('docMetricsCount'); if(m)m.textContent=rows.length+' docs';
+    renderDocMetrics(rows);
+    if(!rows.length){wrap.innerHTML='<div class="docNotice">No receipt or letter history has been logged for this account yet.</div>';return;}
+    wrap.innerHTML='<table class="docHistoryTable"><thead><tr><th>Date</th><th>Type</th><th>Summary</th><th>Created By</th></tr></thead><tbody>'+rows.map(r=>'<tr><td>'+dEsc(dDateTime(r.createdAt))+'</td><td>'+dEsc(r.actionType||'Document')+'</td><td>'+dEsc(r.actionText||'')+'</td><td>'+dEsc(r.createdByEmail||'—')+'</td></tr>').join('')+'</tbody></table>';
+  }
+  function renderDocMetrics(rows){let box=dEl('docMetrics'); if(!box)return; let receipts=rows.filter(r=>/receipt/i.test(r.actionType||r.actionText||'')).length, letters=rows.filter(r=>/letter|settlement/i.test(r.actionType||r.actionText||'')).length, plans=rows.filter(r=>/agreement|plan/i.test(r.actionType||r.actionText||'')).length, comms=rows.filter(r=>/mail|printed|certified|communication/i.test(r.actionType||r.actionText||'')).length; box.innerHTML=[['Receipts',receipts],['Letters',letters],['Plan Agreements',plans],['Comms Docs',comms]].map(x=>'<div class="docMetric"><div class="docMetricLabel">'+dEsc(x[0])+'</div><div class="docMetricValue">'+dEsc(x[1])+'</div></div>').join('')}
+  window.exportDocumentHistoryCSV=function(){let rows=window.__docHistoryRows||[]; let csv=[['Date','Type','Summary','Created By'].map(dCsvCell).join(',')].concat(rows.map(r=>[r.createdAt,r.actionType,r.actionText,r.createdByEmail].map(dCsvCell).join(','))).join('\n'); dDownload('co-pilot-document-history.csv',csv)};
+  window.printCurrentDocument=function(){let p=dEl('docPreview'); if(!p)return; let w=window.open('','_blank','width=900,height=1100'); let html='<!doctype html><html><head><title>Co Pilot Document</title><style>body{font-family:Arial,Helvetica,sans-serif;color:#0f172a;padding:30px;line-height:1.45}h1{font-size:24px}h2{font-size:18px;margin-top:20px}table{width:100%;border-collapse:collapse;margin:12px 0;font-size:13px}th,td{border:1px solid #dbe3ef;padding:8px;text-align:left}th{background:#f8fafc}.muted{color:#64748b}.docSignLine{margin-top:36px;border-top:1px solid #0f172a;width:260px;padding-top:6px;font-size:12px}.docWatermark{font-size:11px;color:#94a3b8;text-align:right;margin-top:18px}</style></head><body>'+p.innerHTML+'</body></html>'; if(w){w.document.write(html);w.document.close();setTimeout(()=>{w.focus();w.print()},250)}else{window.print()}};
+  window.refreshReceiptsLettersPage=async function(){let a=dCurrent(); if(!a)return; await hydrateDocInputs(window.__docTemplateKind||'receipt'); await loadDocumentHistory(a.id);};
+  window.openReceiptsLettersPage=async function(kind){ensureDocNav(); ensureDocAccountPanel(); let page=ensureDocPage(); let a=dCurrent(); if(!a)return alert('No account selected.'); page.classList.add('open'); let ba=dEl('docBuilderAccount'); if(ba)ba.textContent=dName(a)+' • '+(dAcct(a)||'No account #'); renderTemplates(); await hydrateDocInputs(kind||'receipt'); await loadDocumentHistory(a.id);};
+  window.closeReceiptsLettersPage=function(){let p=dEl('receiptsLettersPage'); if(p)p.classList.remove('open')};
+
+  var oldRender=window.render;
+  if(typeof oldRender==='function' && !window.__docRenderWrapped){window.__docRenderWrapped=true;window.render=function(){let r=oldRender.apply(this,arguments);setTimeout(function(){try{renderDocAccountPanel()}catch(e){}},0);return r;};}
+  document.addEventListener('DOMContentLoaded',function(){ensureDocNav();ensureDocAccountPanel();setTimeout(function(){try{renderDocAccountPanel()}catch(e){}},700)});
+  setTimeout(function(){ensureDocNav();ensureDocAccountPanel();try{renderDocAccountPanel()}catch(e){}},900);
 })();
 </script>
 
