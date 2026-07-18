@@ -11575,5 +11575,380 @@ function exportContactIntelligenceCSV(){let calls=filteredContactCalls();let row
 })();
 </script>
 
+
+
+<!-- SETTLEMENT_WORKFLOW_APPROVAL_COMPLETE_MARKER: full-page settlement approval workflow + account status card -->
+<script id="settlementWorkflowApprovalScript">
+(function(){
+  if(window.__coPilotSettlementWorkflowApproval) return;
+  window.__coPilotSettlementWorkflowApproval = true;
+
+  function sEl(id){return document.getElementById(id)}
+  function sVal(id){var e=sEl(id);return e?String(e.value||'').trim():''}
+  function sEsc(v){try{return esc(v)}catch(e){return String(v==null?'':v).replace(/[&<>\"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}}
+  function sNum(v){try{return moneyNum(v)}catch(e){var n=parseFloat(String(v||'').replace(/[^0-9.-]/g,''));return Number.isFinite(n)?n:0}}
+  function sMoney(v){try{return money(v)}catch(e){return '$'+sNum(v).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2})}}
+  function sToday(){try{return todayISO()}catch(e){return new Date().toISOString().slice(0,10)}}
+  function sAddDays(days){try{return addDaysISO(sToday(),days)}catch(e){var d=new Date();d.setDate(d.getDate()+days);return d.toISOString().slice(0,10)}}
+  function sName(a){try{return nameOf(a)}catch(e){return a?.fullName||a?.full_name||a?.debtor_name||'Account'}}
+  function sAcct(a){try{return acctNo(a)}catch(e){return a?.accountNumber||a?.account_number||''}}
+  function sBalance(a){try{return accountBalance(a)}catch(e){return sNum(a?.currentBalance||a?.current_balance||a?.balance||a?.originalBalance||a?.original_balance)}}
+  function sCurrent(){try{return getCurrent()}catch(e){return null}}
+  function sAccountById(id){try{return accountById(id)}catch(e){return (window.accounts||[]).find(function(a){return String(a.id)===String(id)})}}
+  function sEmail(){try{return String(currentUser?.email||'').toLowerCase().trim()}catch(e){return ''}}
+  function isSettlementAdmin(){
+    try{
+      var email=sEmail();
+      var role=String(currentUser?.role||'').toLowerCase();
+      var badge=String(sEl('roleBadge')?.textContent||'').toLowerCase();
+      return email==='afinch2678@gmail.com' || currentUser?.isAdmin===true || role==='admin' || badge.includes('admin');
+    }catch(e){return false;}
+  }
+  function sStatusClass(status){
+    var s=String(status||'Pending Approval').toLowerCase();
+    if(s.includes('approved')||s.includes('paid')) return 'settleGreen';
+    if(s.includes('reject')||s.includes('broken')) return 'settleRed';
+    if(s.includes('pending')) return 'settleOrange';
+    return 'settleBlue';
+  }
+  function normalizeSettlement(r){
+    if(!r) return null;
+    var o = (typeof toCamel==='function') ? toCamel(r) : r;
+    o.id = o.id || r.id;
+    o.accountId = o.accountId || o.account_id;
+    o.settlementAmount = sNum(o.settlementAmount ?? o.settlement_amount);
+    o.settlementPercent = sNum(o.settlementPercent ?? o.settlement_percent);
+    o.balance = sNum(o.balance);
+    o.dueDate = o.dueDate || o.due_date || '';
+    o.paymentType = o.paymentType || o.payment_type || 'Lump Sum';
+    o.status = o.status || 'Pending Approval';
+    o.notes = o.notes || '';
+    o.createdByEmail = o.createdByEmail || o.created_by_email || '';
+    o.createdAt = o.createdAt || o.created_at || '';
+    o.updatedAt = o.updatedAt || o.updated_at || '';
+    return o;
+  }
+  function settlementAccountMap(){var m={};(window.accounts||[]).forEach(function(a){m[String(a.id)]=a});return m;}
+  async function settlementFetchAll(){
+    if(typeof dbFetch!=='function') return [];
+    try{return (await dbFetch('/settlements?select=*&order=created_at.desc&limit=2000')).map(normalizeSettlement)}catch(e){console.warn('settlements load failed',e);return []}
+  }
+  async function settlementFetchForAccount(accountId){
+    if(!accountId || typeof dbFetch!=='function') return [];
+    try{return (await dbFetch('/settlements?account_id=eq.'+encodeURIComponent(accountId)+'&select=*&order=created_at.desc&limit=20')).map(normalizeSettlement)}catch(e){return []}
+  }
+  async function settlementActivity(accountId,type,text){try{if(typeof insertActivity==='function')await insertActivity(accountId,type,text)}catch(e){} try{if(typeof insertAudit==='function')await insertAudit(type,text,'settlement',String(accountId||''))}catch(e){}}
+
+  function ensureSettlementStyles(){
+    if(sEl('settlementWorkflowStyles')) return;
+    var style=document.createElement('style');
+    style.id='settlementWorkflowStyles';
+    style.textContent = `
+      .settlementAccountPanel{grid-column:1/-1;background:#fff;border:1px solid #dbe3ef;border-radius:16px;box-shadow:0 2px 10px rgba(15,23,42,.035);padding:14px 16px;min-width:0}
+      .settleTop{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;flex-wrap:wrap}.settleTitle{font-size:16px;font-weight:1000;color:#0f172a}.settleSub{font-size:12px;color:#64748b;margin-top:4px}.settleActions{display:flex;gap:8px;flex-wrap:wrap}.settleActions button{height:34px;border-radius:9px;padding:0 10px;font-size:12px}
+      .settleMetrics{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:9px;margin-top:12px}.settleMetric{border:1px solid #e2e8f0;background:#f8fbff;border-radius:12px;padding:9px}.settleLabel{font-size:10px;text-transform:uppercase;font-weight:1000;color:#64748b;letter-spacing:.03em}.settleValue{font-size:14px;font-weight:1000;color:#0f172a;margin-top:4px;overflow-wrap:anywhere}.settlePill{display:inline-block;border-radius:999px;padding:4px 8px;font-size:11px;font-weight:1000}.settleGreen{background:#dcfce7;color:#166534}.settleRed{background:#fee2e2;color:#991b1b}.settleOrange{background:#fff7ed;color:#9a3412}.settleBlue{background:#eef2ff;color:#1d4ed8}.settleNote{margin-top:10px;border:1px solid #edf2f8;background:#f8fafc;border-radius:12px;padding:9px;font-size:12px;color:#475569;line-height:1.35}
+      #settlementApprovalPage{position:fixed;inset:0;background:#eef3f9;z-index:61000;display:none;color:#0f172a;font-family:Arial,Helvetica,sans-serif;overflow:hidden}#settlementApprovalPage.open{display:flex;flex-direction:column}
+      .settlePageTop{height:68px;background:linear-gradient(90deg,#05225f,#0b45c6);color:#fff;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:0 18px;box-shadow:0 6px 20px rgba(15,23,42,.2)}.settlePageTitle{font-size:20px;font-weight:1000}.settlePageSub{font-size:12px;color:#dbeafe;margin-top:3px}.settlePageActions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.settlePageActions button{height:38px;border:0;border-radius:10px;padding:0 12px;font-weight:900;cursor:pointer;background:#2563eb;color:white}.settlePageActions .outline{background:white;color:#1d4ed8}.settlePageActions .green{background:#16a34a}.settlePageActions .red{background:#dc2626}.settlePageActions .gray{background:#334155}
+      .settlePageBody{padding:16px;overflow:auto}.settleNotice{border:1px solid #bfdbfe;background:#eff6ff;color:#1e3a8a;border-radius:14px;padding:10px 12px;font-size:13px;font-weight:850;margin-bottom:12px}.settleFilters{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;margin-bottom:12px}.settleFilters label{font-size:11px;font-weight:900;color:#334155;margin-bottom:4px;display:block}.settleFilters input,.settleFilters select{height:38px;border:1px solid #cbd5e1;border-radius:10px;padding:8px;background:white;width:100%}
+      .settleKpis{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:10px;margin-bottom:12px}.settleKpi{background:#fff;border:1px solid #dbe3ef;border-radius:14px;padding:12px;box-shadow:0 2px 10px rgba(15,23,42,.04)}.settleKpiLabel{font-size:10px;color:#64748b;font-weight:1000;text-transform:uppercase;letter-spacing:.04em}.settleKpiValue{font-size:20px;font-weight:1000;margin-top:5px;color:#0f172a}.settleKpiSub{font-size:11px;color:#64748b;margin-top:4px;line-height:1.3}
+      .settleCard{background:#fff;border:1px solid #dbe3ef;border-radius:16px;box-shadow:0 2px 12px rgba(15,23,42,.04);overflow:hidden}.settleCardHead{padding:12px 14px;border-bottom:1px solid #e5edf7;display:flex;align-items:center;justify-content:space-between;background:#f8fbff}.settleCardHead h3{margin:0;font-size:15px}.settleCardBody{padding:12px;max-height:550px;overflow:auto}.settleTable{width:100%;border-collapse:collapse;font-size:12px}.settleTable th{text-align:left;background:#f8fafc;color:#334155;font-size:10px;text-transform:uppercase;letter-spacing:.03em;padding:8px;border-bottom:1px solid #e2e8f0;position:sticky;top:0;z-index:1}.settleTable td{padding:8px;border-bottom:1px solid #edf2f8;vertical-align:top}.settleTable input,.settleTable textarea,.settleTable select{width:100%;border:1px solid #cbd5e1;border-radius:8px;padding:7px;font-size:12px}.settleTinyBtns{display:flex;gap:6px;flex-wrap:wrap}.settleTinyBtns button{height:30px;border-radius:8px;padding:0 8px;font-size:11px}.settleEmpty{border:1px dashed #cbd5e1;border-radius:14px;background:#f8fafc;padding:18px;text-align:center;color:#64748b;font-weight:850}
+      .settleModalNotice{background:#fff7ed;border:1px solid #fed7aa;color:#9a3412;border-radius:12px;padding:10px;font-size:12px;font-weight:850;margin:0 0 12px}.settleApprovalLine{background:#eff6ff;border:1px solid #bfdbfe;color:#1e3a8a;border-radius:12px;padding:10px;font-size:12px;font-weight:850;margin-top:10px}
+      @media(max-width:1250px){.settleMetrics,.settleKpis{grid-template-columns:repeat(3,1fr)}.settleFilters{grid-template-columns:repeat(2,1fr)}}@media(max-width:750px){.settlePageTop{height:auto;align-items:flex-start;flex-direction:column;padding:12px}.settleMetrics,.settleKpis,.settleFilters{grid-template-columns:1fr}.settlePageActions{width:100%}}
+    `;
+    document.head.appendChild(style);
+  }
+
+  function ensureSettlementCard(){
+    ensureSettlementStyles();
+    if(sEl('settlementAccountPanel')) return sEl('settlementAccountPanel');
+    var panel=document.createElement('section');
+    panel.id='settlementAccountPanel';
+    panel.className='settlementAccountPanel';
+    var anchor=sEl('paymentPlanPanel');
+    if(anchor && anchor.parentNode) anchor.parentNode.insertBefore(panel, anchor.nextSibling);
+    return panel;
+  }
+
+  async function renderSettlementAccountCard(){
+    var a=sCurrent();
+    var panel=ensureSettlementCard();
+    if(!panel) return;
+    if(!a){panel.innerHTML='<div class="settleTop"><div><div class="settleTitle">Settlement Workflow</div><div class="settleSub">No account selected.</div></div></div>';return;}
+    var rows=await settlementFetchForAccount(a.id);
+    var latest=rows[0];
+    if(!latest){
+      panel.innerHTML='<div class="settleTop"><div><div class="settleTitle">Settlement Workflow</div><div class="settleSub">No settlement offer on this account yet.</div></div><div class="settleActions"><button class="green" onclick="openSettlementModal()">Propose Settlement</button><button class="outline" onclick="openSettlementApprovalPage()">Settlement Dashboard</button></div></div>';
+      return;
+    }
+    var status=latest.status||'Pending Approval';
+    panel.innerHTML='<div class="settleTop"><div><div class="settleTitle">Settlement Workflow <span class="settlePill '+sStatusClass(status)+'">'+sEsc(status)+'</span></div><div class="settleSub">Latest offer for '+sEsc(sName(a))+' • Account '+sEsc(sAcct(a)||'—')+'</div></div><div class="settleActions"><button class="green" onclick="openSettlementModal()">New Offer</button><button class="outline" onclick="openSettlementApprovalPage()">Settlement Dashboard</button></div></div>'+ 
+      '<div class="settleMetrics"><div class="settleMetric"><div class="settleLabel">Current Balance</div><div class="settleValue">'+sMoney(sBalance(a))+'</div></div><div class="settleMetric"><div class="settleLabel">Settlement Amount</div><div class="settleValue">'+sMoney(latest.settlementAmount)+'</div></div><div class="settleMetric"><div class="settleLabel">Settlement %</div><div class="settleValue">'+(latest.settlementPercent||0).toFixed(2)+'%</div></div><div class="settleMetric"><div class="settleLabel">Due Date</div><div class="settleValue">'+sEsc(latest.dueDate||'—')+'</div></div><div class="settleMetric"><div class="settleLabel">Proposed By</div><div class="settleValue">'+sEsc(latest.createdByEmail||'—')+'</div></div></div>'+ 
+      '<div class="settleNote"><b>Notes:</b> '+sEsc(latest.notes||'No notes saved.')+'</div>';
+  }
+
+  function ensureSettlementNav(){
+    if(sEl('settlementTopNavBtn')) return;
+    var top=document.querySelector('.topActions');
+    if(top){
+      var b=document.createElement('button');
+      b.id='settlementTopNavBtn'; b.className='gray'; b.type='button'; b.textContent='Settlements'; b.onclick=function(){openSettlementApprovalPage()};
+      var ref=top.querySelector('button[onclick*="openImportHistoryPage"],button[onclick*="openDataCleanupDashboard"]');
+      top.insertBefore(b, ref||top.firstChild);
+    }
+    var rail=document.querySelector('.navRail');
+    if(rail && !sEl('settlementSideNavBtn')){
+      var n=document.createElement('button');
+      n.id='settlementSideNavBtn'; n.className='navIcon'; n.title='Settlement Workflow'; n.type='button'; n.innerHTML='<span class="navEmoji">%</span>'; n.onclick=function(){openSettlementApprovalPage()};
+      var spacer=rail.querySelector('.navSpacer'); rail.insertBefore(n, spacer||rail.lastChild);
+    }
+  }
+
+  function ensureSettlementPage(){
+    ensureSettlementStyles();
+    if(sEl('settlementApprovalPage')) return sEl('settlementApprovalPage');
+    var page=document.createElement('div');
+    page.id='settlementApprovalPage';
+    page.innerHTML=`
+      <div class="settlePageTop">
+        <div><div class="settlePageTitle">Settlement Workflow</div><div class="settlePageSub">Employees propose settlements. Admin approves, rejects, modifies, or converts to a plan.</div></div>
+        <div class="settlePageActions">
+          <button class="outline" onclick="refreshSettlementApprovalPage()">Refresh</button>
+          <button class="green" onclick="exportSettlementsCSV()">Export CSV</button>
+          <button class="gray" onclick="window.print()">Print / Save PDF</button>
+          <button class="red" onclick="closeSettlementApprovalPage()">Back to Queue</button>
+        </div>
+      </div>
+      <div class="settlePageBody">
+        <div class="settleNotice" id="settlementPageNotice">Pending settlements need admin approval before they become final.</div>
+        <div class="settleFilters">
+          <div><label>Status</label><select id="settleFilterStatus" onchange="renderSettlementApprovalPage()"><option value="">All</option><option>Pending Approval</option><option>Approved</option><option>Rejected</option><option>Paid</option><option>Broken</option></select></div>
+          <div><label>Employee</label><select id="settleFilterEmployee" onchange="renderSettlementApprovalPage()"><option value="">All Employees</option></select></div>
+          <div><label>Search</label><input id="settleFilterSearch" placeholder="Name, account, notes" oninput="renderSettlementApprovalPage()"></div>
+          <div><label>Start Date</label><input id="settleFilterStart" type="date" onchange="renderSettlementApprovalPage()"></div>
+          <div><label>End Date</label><input id="settleFilterEnd" type="date" onchange="renderSettlementApprovalPage()"></div>
+        </div>
+        <div class="settleKpis" id="settlementKpis"></div>
+        <div class="settleCard"><div class="settleCardHead"><h3>Settlement Offers</h3><span class="settlePill settleBlue" id="settleRowCount">0 rows</span></div><div class="settleCardBody" id="settlementRows"><div class="settleEmpty">Loading settlements...</div></div></div>
+      </div>`;
+    document.body.appendChild(page);
+    return page;
+  }
+
+  function settlementMatchesDate(row){
+    var st=sVal('settleFilterStart'), en=sVal('settleFilterEnd');
+    var d=String(row.createdAt||row.updatedAt||'').slice(0,10);
+    if(st && d < st) return false;
+    if(en && d > en) return false;
+    return true;
+  }
+  function fillSettlementEmployees(rows){
+    var sel=sEl('settleFilterEmployee'); if(!sel) return;
+    var cur=sel.value, seen={}; rows.forEach(function(r){var e=String(r.createdByEmail||'').toLowerCase().trim(); if(e)seen[e]=1;});
+    var opts='<option value="">All Employees</option>'+Object.keys(seen).sort().map(function(e){return '<option value="'+sEsc(e)+'">'+sEsc(e)+'</option>';}).join('');
+    if(sel.innerHTML!==opts) sel.innerHTML=opts;
+    sel.value=cur;
+  }
+  function filteredSettlements(rows){
+    var status=sVal('settleFilterStatus').toLowerCase(), emp=sVal('settleFilterEmployee').toLowerCase(), q=sVal('settleFilterSearch').toLowerCase();
+    var amap=settlementAccountMap();
+    return rows.filter(function(r){
+      var a=amap[String(r.accountId)]||{};
+      if(status && String(r.status||'').toLowerCase()!==status) return false;
+      if(emp && String(r.createdByEmail||'').toLowerCase()!==emp) return false;
+      if(!settlementMatchesDate(r)) return false;
+      if(q){
+        var hay=[sName(a),sAcct(a),r.notes,r.status,r.createdByEmail,r.settlementAmount].join(' ').toLowerCase();
+        if(!hay.includes(q)) return false;
+      }
+      if(!isSettlementAdmin() && String(r.createdByEmail||'').toLowerCase()!==sEmail()) return false;
+      return true;
+    });
+  }
+  function settlementKpis(rows){
+    var pending=rows.filter(function(r){return String(r.status).toLowerCase()==='pending approval'});
+    var approved=rows.filter(function(r){return String(r.status).toLowerCase()==='approved'});
+    var rejected=rows.filter(function(r){return String(r.status).toLowerCase()==='rejected'});
+    var paid=rows.filter(function(r){return String(r.status).toLowerCase()==='paid'});
+    var expected=approved.reduce(function(s,r){return s+sNum(r.settlementAmount)},0);
+    var pendingAmt=pending.reduce(function(s,r){return s+sNum(r.settlementAmount)},0);
+    var paidAmt=paid.reduce(function(s,r){return s+sNum(r.settlementAmount)},0);
+    return {pending:pending.length,approved:approved.length,rejected:rejected.length,paid:paid.length,expected:expected,pendingAmt:pendingAmt,paidAmt:paidAmt,total:rows.length};
+  }
+  function renderSettlementKpis(rows){
+    var k=settlementKpis(rows), el=sEl('settlementKpis'); if(!el) return;
+    el.innerHTML = [
+      ['Pending',k.pending,sMoney(k.pendingAmt)],['Approved',k.approved,sMoney(k.expected)],['Rejected',k.rejected,'Needs review'],['Paid',k.paid,sMoney(k.paidAmt)],['Total Offers',k.total,'All statuses'],['Expected Dollars',sMoney(k.expected),'Approved not paid']
+    ].map(function(x){return '<div class="settleKpi"><div class="settleKpiLabel">'+sEsc(x[0])+'</div><div class="settleKpiValue">'+sEsc(x[1])+'</div><div class="settleKpiSub">'+sEsc(x[2])+'</div></div>';}).join('');
+  }
+  function renderSettlementApprovalPage(){
+    var all=window.settlementWorkflowRows||[];
+    fillSettlementEmployees(all);
+    var rows=filteredSettlements(all);
+    renderSettlementKpis(rows);
+    var count=sEl('settleRowCount'); if(count) count.textContent=rows.length+' rows';
+    var body=sEl('settlementRows'); if(!body) return;
+    var amap=settlementAccountMap();
+    if(!rows.length){body.innerHTML='<div class="settleEmpty">No settlements found for this filter.</div>';return;}
+    body.innerHTML='<table class="settleTable"><thead><tr><th>Account</th><th>Status</th><th>Balance</th><th>Offer</th><th>Due</th><th>Proposed By</th><th>Admin Amount / Notes</th><th>Actions</th></tr></thead><tbody>'+rows.map(function(r){
+      var a=amap[String(r.accountId)]||{}; var status=r.status||'Pending Approval'; var admin=isSettlementAdmin();
+      var canAdmin=admin; var pending=String(status).toLowerCase()==='pending approval'; var approved=String(status).toLowerCase()==='approved';
+      var action='';
+      if(canAdmin && pending){
+        action='<div class="settleTinyBtns"><button class="green" onclick="approveSettlement(\''+sEsc(r.id)+'\')">Approve</button><button class="purple" onclick="approveSettlementAsPlan(\''+sEsc(r.id)+'\')">Approve + Plan</button><button class="red" onclick="rejectSettlement(\''+sEsc(r.id)+'\')">Reject</button><button class="gray" onclick="deleteSettlementOffer(\''+sEsc(r.id)+'\')">Delete</button></div>';
+      }else if(canAdmin && approved){
+        action='<div class="settleTinyBtns"><button class="purple" onclick="convertApprovedSettlementToPlan(\''+sEsc(r.id)+'\')">Create Plan</button><button class="green" onclick="markSettlementStatus(\''+sEsc(r.id)+'\',\'Paid\')">Mark Paid</button><button class="red" onclick="markSettlementStatus(\''+sEsc(r.id)+'\',\'Broken\')">Mark Broken</button><button class="gray" onclick="deleteSettlementOffer(\''+sEsc(r.id)+'\')">Delete</button></div>';
+      }else if(canAdmin){
+        action='<div class="settleTinyBtns"><button class="gray" onclick="deleteSettlementOffer(\''+sEsc(r.id)+'\')">Delete</button></div>';
+      }else{
+        action='<span class="settlePill settleBlue">View Only</span>';
+      }
+      return '<tr><td><b>'+sEsc(sName(a))+'</b><br><small>'+sEsc(sAcct(a)||r.accountId||'—')+'</small></td><td><span class="settlePill '+sStatusClass(status)+'">'+sEsc(status)+'</span></td><td>'+sMoney(r.balance||sBalance(a))+'</td><td><b>'+sMoney(r.settlementAmount)+'</b><br><small>'+(r.settlementPercent||0).toFixed(2)+'%</small></td><td>'+sEsc(r.dueDate||'—')+'</td><td>'+sEsc(r.createdByEmail||'—')+'<br><small>'+sEsc(String(r.createdAt||'').slice(0,16).replace('T',' '))+'</small></td><td><input id="settleAmount_'+sEsc(r.id)+'" type="number" step="0.01" value="'+sEsc(r.settlementAmount.toFixed(2))+'" '+(!pending||!admin?'disabled':'')+'><textarea id="settleAdminNotes_'+sEsc(r.id)+'" placeholder="Admin notes" '+(!pending||!admin?'disabled':'')+'></textarea><small>'+sEsc(r.notes||'')+'</small></td><td>'+action+'</td></tr>';
+    }).join('')+'</tbody></table>';
+  }
+  async function refreshSettlementApprovalPage(){
+    ensureSettlementPage();
+    var n=sEl('settlementPageNotice'); if(n)n.textContent='Loading settlements...';
+    window.settlementWorkflowRows=await settlementFetchAll();
+    renderSettlementApprovalPage();
+    if(n)n.textContent=(isSettlementAdmin()?'Admin view: approve, reject, modify, or convert settlements to a plan.':'Employee view: showing your settlement proposals only.');
+  }
+  function openSettlementApprovalPage(){
+    ensureSettlementNav(); ensureSettlementPage();
+    try{if(typeof closeAllLargeModalsForNav==='function')closeAllLargeModalsForNav()}catch(e){}
+    sEl('settlementApprovalPage').classList.add('open');
+    refreshSettlementApprovalPage();
+  }
+  function closeSettlementApprovalPage(){var p=sEl('settlementApprovalPage');if(p)p.classList.remove('open')}
+
+  async function patchSettlement(id, payload){
+    payload.updated_at=new Date().toISOString();
+    return await dbFetch('/settlements?id=eq.'+encodeURIComponent(id),{method:'PATCH',body:JSON.stringify(payload)});
+  }
+  async function approveSettlement(id){
+    var rows=window.settlementWorkflowRows||await settlementFetchAll(); var r=rows.find(function(x){return String(x.id)===String(id)}); if(!r)return alert('Settlement not found.');
+    if(!isSettlementAdmin())return alert('Admin approval required.');
+    if(String(r.createdByEmail||'').toLowerCase()===sEmail() && !confirm('You proposed this settlement. Admin approval is still required. Continue as admin?')) return;
+    var amt=sNum(sVal('settleAmount_'+id)||r.settlementAmount), a=sAccountById(r.accountId), bal=sNum(r.balance||sBalance(a));
+    if(amt<=0)return alert('Settlement amount must be greater than zero.');
+    if(bal && amt>bal+0.01)return alert('Settlement cannot exceed balance.');
+    var note=sVal('settleAdminNotes_'+id);
+    var pct=bal?amt/bal*100:r.settlementPercent;
+    var notes=(r.notes||'')+'\nAdmin Approved by '+(currentUser?.email||'Admin')+' on '+new Date().toLocaleString()+(note?': '+note:'');
+    await patchSettlement(id,{status:'Approved',settlement_amount:amt,settlement_percent:pct,notes:notes});
+    await dbFetch('/accounts?id=eq.'+encodeURIComponent(r.accountId),{method:'PATCH',body:JSON.stringify({status:'Settlement Approved',disposition:'Settlement Approved',updated_at:new Date().toISOString()})}).catch(function(){});
+    await settlementActivity(r.accountId,'Settlement Approved','Approved settlement '+sMoney(amt)+' for '+sName(a));
+    await refreshSettlementApprovalPage(); await renderSettlementAccountCard(); alert('Settlement approved.');
+  }
+  async function approveSettlementAsPlan(id){await approveSettlement(id); setTimeout(function(){convertApprovedSettlementToPlan(id)},300)}
+  async function rejectSettlement(id){
+    if(!isSettlementAdmin())return alert('Admin only.');
+    var rows=window.settlementWorkflowRows||await settlementFetchAll(); var r=rows.find(function(x){return String(x.id)===String(id)}); if(!r)return;
+    var note=sVal('settleAdminNotes_'+id)||prompt('Rejection reason / admin note:','');
+    var notes=(r.notes||'')+'\nAdmin Rejected by '+(currentUser?.email||'Admin')+' on '+new Date().toLocaleString()+(note?': '+note:'');
+    await patchSettlement(id,{status:'Rejected',notes:notes});
+    await settlementActivity(r.accountId,'Settlement Rejected','Rejected settlement '+sMoney(r.settlementAmount)+(note?' — '+note:''));
+    await refreshSettlementApprovalPage(); await renderSettlementAccountCard();
+  }
+  async function markSettlementStatus(id,status){
+    if(!isSettlementAdmin())return alert('Admin only.');
+    var rows=window.settlementWorkflowRows||await settlementFetchAll(); var r=rows.find(function(x){return String(x.id)===String(id)}); if(!r)return;
+    await patchSettlement(id,{status:status,notes:(r.notes||'')+'\nMarked '+status+' by '+(currentUser?.email||'Admin')+' on '+new Date().toLocaleString()});
+    await settlementActivity(r.accountId,'Settlement '+status,'Marked settlement '+status+': '+sMoney(r.settlementAmount));
+    await refreshSettlementApprovalPage(); await renderSettlementAccountCard();
+  }
+  async function deleteSettlementOffer(id){
+    if(!isSettlementAdmin())return alert('Admin only.');
+    if(!confirm('Delete this settlement offer? This cannot be undone.'))return;
+    await dbFetch('/settlements?id=eq.'+encodeURIComponent(id),{method:'DELETE'});
+    await refreshSettlementApprovalPage(); await renderSettlementAccountCard();
+  }
+  async function convertApprovedSettlementToPlan(id){
+    var rows=window.settlementWorkflowRows||await settlementFetchAll(); var r=rows.find(function(x){return String(x.id)===String(id)}); if(!r)return alert('Settlement not found.');
+    var a=sAccountById(r.accountId); if(!a)return alert('Account is not loaded. Refresh accounts then try again.');
+    currentAccountId=a.id; try{render()}catch(e){}
+    closeSettlementApprovalPage();
+    if(typeof openPaymentPlan==='function'){
+      await openPaymentPlan();
+      setTimeout(function(){
+        if(sEl('planTotal'))sEl('planTotal').value=sNum(r.settlementAmount).toFixed(2);
+        if(sEl('planEach'))sEl('planEach').value=sNum(r.settlementAmount).toFixed(2);
+        if(sEl('planCount'))sEl('planCount').value='1';
+        if(sEl('planStartDate'))sEl('planStartDate').value=r.dueDate||sToday();
+        if(sEl('planFrequency'))sEl('planFrequency').value='One-Time';
+        if(sEl('planNotes'))sEl('planNotes').value='Approved settlement converted to payment plan. Settlement ID: '+r.id+'\n'+(r.notes||'');
+        try{if(typeof recalcPlanFromInputs==='function')recalcPlanFromInputs('count'); if(typeof renderPlanSchedule==='function')renderPlanSchedule()}catch(e){}
+      },300);
+    }
+  }
+  function exportSettlementsCSV(){
+    var rows=filteredSettlements(window.settlementWorkflowRows||[]), amap=settlementAccountMap();
+    var out=[['Created','Status','Debtor','Account Number','Balance','Settlement Amount','Settlement Percent','Due Date','Payment Type','Proposed By','Notes']];
+    rows.forEach(function(r){var a=amap[String(r.accountId)]||{};out.push([r.createdAt||'',r.status||'',sName(a),sAcct(a),r.balance||sBalance(a),r.settlementAmount,(r.settlementPercent||0).toFixed(2),r.dueDate||'',r.paymentType||'',r.createdByEmail||'',r.notes||'']);});
+    var csv=out.map(function(row){return row.map(function(c){return '"'+String(c==null?'':c).replace(/"/g,'""')+'"';}).join(',')}).join('\n');
+    var blob=new Blob([csv],{type:'text/csv'});var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='co-pilot-settlement-report.csv';a.click();setTimeout(function(){URL.revokeObjectURL(a.href)},1000);
+  }
+
+  var oldOpenSettlementModal=window.openSettlementModal;
+  window.openSettlementModal=function(){
+    var a=sCurrent(); if(!a)return alert('No account selected.');
+    try{if(typeof oldOpenSettlementModal==='function')oldOpenSettlementModal()}catch(e){var m=sEl('settlementModal'); if(m)m.classList.add('open')}
+    setTimeout(function(){
+      var bal=sBalance(a); if(sEl('settleBalance'))sEl('settleBalance').value=bal.toFixed(2);
+      if(sEl('settlePercent'))sEl('settlePercent').value='50';
+      if(sEl('settleAmount'))sEl('settleAmount').value=(bal*0.50).toFixed(2);
+      if(sEl('settleDueDate'))sEl('settleDueDate').value=sAddDays(7);
+      if(sEl('settleApproval'))sEl('settleApproval').value='Yes';
+      var body=sEl('settlementModal')?.querySelector('.modalbody');
+      if(body && !sEl('settleWorkflowNotice')){
+        var notice=document.createElement('div'); notice.id='settleWorkflowNotice'; notice.className='settleModalNotice';
+        notice.textContent='Settlement offers save as Pending Admin Approval. Employees can propose settlements, but admin must approve, reject, modify, or convert the offer before it becomes final.';
+        body.insertBefore(notice, body.firstChild);
+      }
+      var btn=sEl('settlementModal')?.querySelector('button[onclick="saveSettlement()"]'); if(btn)btn.textContent=isSettlementAdmin()?'Save Settlement Proposal':'Submit for Admin Approval';
+      try{if(typeof recalcSettlement==='function')recalcSettlement('percent')}catch(e){}
+    },100);
+  };
+  window.saveSettlement=async function(){
+    var a=sCurrent(); if(!a)return alert('No account selected.');
+    var bal=sNum(sVal('settleBalance')||sBalance(a)), amt=sNum(sVal('settleAmount')), pct=sNum(sVal('settlePercent'));
+    if(amt<=0)return alert('Settlement amount must be greater than zero.');
+    if(amt>bal+0.01)return alert('Settlement cannot be higher than balance.');
+    if(!pct && bal)pct=amt/bal*100;
+    var row={account_id:a.id,balance:bal,settlement_percent:pct,settlement_amount:amt,due_date:sVal('settleDueDate')||sAddDays(7),payment_type:sVal('settlePaymentType')||'Lump Sum',manager_approval_required:true,status:'Pending Approval',notes:sVal('settleNotes'),created_by_email:currentUser?.email||'',updated_at:new Date().toISOString()};
+    try{
+      await dbFetch('/settlements',{method:'POST',body:JSON.stringify([row])});
+      await dbFetch('/accounts?id=eq.'+encodeURIComponent(a.id),{method:'PATCH',body:JSON.stringify({status:'Settlement Pending',disposition:'Settlement Pending',updated_at:new Date().toISOString()})}).catch(function(){});
+      await settlementActivity(a.id,'Settlement Proposed','Proposed settlement '+sMoney(amt)+' ('+pct.toFixed(2)+'%) due '+row.due_date+' — pending admin approval.');
+      try{closeModal('settlementModal')}catch(e){}
+      await renderSettlementAccountCard();
+      alert(isSettlementAdmin()?'Settlement proposal saved pending approval. Open Settlement Dashboard to approve it.':'Settlement submitted for admin approval.');
+    }catch(e){
+      console.error('settlement save failed',e);
+      alert('Settlement did not save. Make sure RUN_THIS_FINAL_SECURITY_CLEANUP_SQL.sql has been run in Supabase so the settlements table exists. Supabase said: '+(e.message||e));
+    }
+  };
+
+  var oldRender=window.render;
+  if(typeof oldRender==='function' && !window.__settlementRenderWrapped){
+    window.__settlementRenderWrapped=true;
+    window.render=function(){var r=oldRender.apply(this,arguments); setTimeout(function(){renderSettlementAccountCard().catch(function(){})},0); return r;};
+  }
+  document.addEventListener('DOMContentLoaded',function(){ensureSettlementNav(); ensureSettlementCard(); setTimeout(function(){renderSettlementAccountCard().catch(function(){})},600);});
+  setTimeout(function(){ensureSettlementNav(); ensureSettlementCard(); renderSettlementAccountCard().catch(function(){})},800);
+
+  window.openSettlementApprovalPage=openSettlementApprovalPage;
+  window.closeSettlementApprovalPage=closeSettlementApprovalPage;
+  window.refreshSettlementApprovalPage=refreshSettlementApprovalPage;
+  window.renderSettlementApprovalPage=renderSettlementApprovalPage;
+  window.exportSettlementsCSV=exportSettlementsCSV;
+  window.approveSettlement=approveSettlement;
+  window.approveSettlementAsPlan=approveSettlementAsPlan;
+  window.rejectSettlement=rejectSettlement;
+  window.markSettlementStatus=markSettlementStatus;
+  window.deleteSettlementOffer=deleteSettlementOffer;
+  window.convertApprovedSettlementToPlan=convertApprovedSettlementToPlan;
+})();
+</script>
+
 </body>
 </html>
