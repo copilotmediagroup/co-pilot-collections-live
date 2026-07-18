@@ -1,5 +1,3 @@
-REPORTS NAV GLITCH FIX PACKAGE
-
 Co Pilot Collections Manager - LIVE Package
 
 Repo target: co-pilot-collections-live
@@ -57,6 +55,3 @@ PAYMENT PLAN UI + ADMIN LOCK UPDATE
 - Employees can view payment plans only.
 - Only Admin can create, edit, save, or delete payment plans.
 - No new SQL is required for the UI/admin-lock update if the previous payment save SQL was already run.
-
-
-Added: Reports opens instantly, closes other panels first, does not hide behind the loading overlay, and Compliance/other panels no longer stack with Reports. No new SQL required.
