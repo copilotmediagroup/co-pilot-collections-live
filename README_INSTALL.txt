@@ -25,3 +25,11 @@ Settlement Workflow + Approval build: LIVE_SETTLEMENT_WORKFLOW_APPROVAL_TO_GITHU
 - Employees can submit settlement proposals.
 - Admin can approve, reject, modify amount, delete, mark paid/broken, or convert approved settlement to a payment plan.
 - No new SQL required if the existing security cleanup SQL with the settlements table has already been run.
+
+
+MANAGER QA + COLLECTOR SCORECARDS UPDATE
+- Adds full-page Manager QA / Collector Scorecards.
+- Employees can view their own scorecard.
+- Admin can review all collectors, save QA/coaching notes, mark Compliance Concern, Coaching Needed, Needs Review, or Good.
+- Exports scorecards to CSV.
+- No new SQL required; uses existing CRM tables and local QA-note fallback.
