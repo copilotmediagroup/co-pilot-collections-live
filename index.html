@@ -12,6 +12,7 @@
 <!-- LIVE_REPORTING_CLEAN_PACKAGE_MARKER: clean live package + admin reports -->
 <!-- LIVE_REPORTING_CLEAN_PACKAGE_MARKER: clean live package + admin reports -->
 <!-- LIVE_REPORTING_CLEAN_PACKAGE_MARKER: clean live package + admin reports -->
+  <!-- REPORTS_PAGE_REBUILD_STABLE_MARKER: reports rebuilt as full page, no modal stacking -->
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Co Pilot Collections Manager</title>
@@ -3558,7 +3559,7 @@ button {
       <button class="gray adminOnly hidden" onclick="openAuditLog()">Audit</button>
       <button class="gray adminOnly hidden" onclick="openPermissionsModal()">Perms</button>
       <button class="gray adminOnly hidden" onclick="openEmployeeMonitorModal()">Monitor</button>
-      <button class="gray adminOnly hidden" onclick="openAdminReports()">Reports</button>
+      <button class="gray adminOnly hidden" onclick="openReportsPageStable()">Reports</button>
       <button class="gray" onclick="openComplianceGuard()">Guard</button>
       <button class="gray adminOnly hidden" onclick="openEmployeeAdminModal()">Staff</button>
       <button class="gray adminOnly hidden" onclick="openBrandingSettingsModal()">Brand</button>
@@ -3578,7 +3579,7 @@ button {
       <button class="navIcon sky" title="Today Dashboard" onclick="openTodayDashboard()"><span class="navEmoji">🏠</span></button>
       <button class="navIcon purple" data-nav="messages" title="Team Chat / Messenger" onclick="toggleChatDock()"><span class="navEmoji">💬</span><span class="msgUnreadBadge">0</span></button>
       <button class="navIcon gold" title="Collector Leaderboard" onclick="openLeaderboard()"><span class="navEmoji">🏆</span></button>
-      <button class="navIcon purple adminOnly hidden" title="Admin Reports" onclick="openAdminReports()"><span class="navEmoji">📊</span></button>
+      <button class="navIcon purple adminOnly hidden" title="Admin Reports" onclick="openReportsPageStable()"><span class="navEmoji">📊</span></button>
       <button class="navIcon red" title="Compliance Guard" onclick="openComplianceGuard()"><span class="navEmoji">🛡️</span></button>
       <button class="navIcon sky" title="Call Intelligence" onclick="openContactIntelligence()"><span class="navEmoji">☎</span></button>
       <button class="navIcon money" title="Pay Desk" onclick="openPaymentTracker()"><span class="navEmoji">💵</span></button>
@@ -10975,6 +10976,296 @@ function exportContactIntelligenceCSV(){let calls=filteredContactCalls();let row
   }, 800);
 })();
 
+
+
+/* REPORTS PAGE REBUILD STABLE — full page, no modal stacking, no watcher loops */
+(function(){
+  var ADMIN_EMAIL = 'afinch2678@gmail.com';
+
+  function reportsIsAdmin(){
+    try{
+      var email = String((window.currentUser && window.currentUser.email) || '').toLowerCase().trim();
+      var badge = String((document.getElementById('roleBadge') || {}).textContent || '').toLowerCase();
+      return !!(window.currentUser && window.currentUser.isAdmin) || email === ADMIN_EMAIL || badge.indexOf('admin') >= 0;
+    }catch(e){ return false; }
+  }
+
+  function reportsEscape(v){
+    return String(v == null ? '' : v).replace(/[&<>"']/g, function(c){
+      return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
+    });
+  }
+  function reportsNum(v){
+    var n = Number(String(v == null ? '' : v).replace(/[^0-9.-]/g,''));
+    return isFinite(n) ? n : 0;
+  }
+  function reportsMoney(v){
+    try{return '$' + reportsNum(v).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});}
+    catch(e){return '$0.00';}
+  }
+  function reportsDate(v){ return String(v || '').slice(0,10); }
+  function reportsToday(){ return new Date().toISOString().slice(0,10); }
+  function reportsStartOfWeek(){
+    var d = new Date(reportsToday() + 'T00:00:00');
+    var day = d.getDay();
+    d.setDate(d.getDate() + (day === 0 ? -6 : 1 - day));
+    return d.toISOString().slice(0,10);
+  }
+  function reportsStartOfMonth(){
+    var d = new Date();
+    return new Date(d.getFullYear(), d.getMonth(), 1).toISOString().slice(0,10);
+  }
+  function reportsInRange(value, start, end){
+    var d = reportsDate(value);
+    return !!d && (!start || d >= start) && (!end || d <= end);
+  }
+  function reportsStatus(row){ return String(row.status || row.call_result || row.disposition || '').toLowerCase(); }
+  function reportsEmail(row){ return String(row.employee_email || row.assigned_to_email || row.created_by_email || row.createdByEmail || row.processed_by_email || 'Unassigned').toLowerCase().trim() || 'unassigned'; }
+  function reportsAccountMap(){
+    var map = {};
+    (window.accounts || []).forEach(function(a){ if(a && a.id) map[String(a.id)] = a; });
+    return map;
+  }
+  function reportsAccountName(a){
+    if(!a) return 'Unknown Account';
+    return a.name || a.fullName || a.debtorName || [a.firstName,a.lastName].filter(Boolean).join(' ') || a.accountNumber || 'Unknown Account';
+  }
+  function reportsPortfolio(a){
+    if(!a) return 'Unknown';
+    return a.portfolio || a.creditor || a.creditorName || a.sourceFile || a.accountDescription || 'Unknown';
+  }
+  function reportsAccountBalance(a){ return reportsNum(a && (a.balance || a.currentBalance || a.accountBalance || a.originalBalance || a.principal)); }
+
+  function ensureReportsPage(){
+    if(document.getElementById('reportsPageStable')) return;
+    var style = document.createElement('style');
+    style.id = 'reportsPageStableStyle';
+    style.textContent = `
+      #reportsPageStable{position:fixed;inset:0;background:#eef3f9;z-index:60000;display:none;color:#0f172a;font-family:Arial,Helvetica,sans-serif;overflow:hidden}
+      #reportsPageStable.open{display:flex;flex-direction:column}
+      .reportsPageTop{height:68px;background:linear-gradient(90deg,#05225f,#0b45c6);color:white;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:0 18px;box-shadow:0 6px 20px rgba(15,23,42,.2)}
+      .reportsPageTitle{font-size:20px;font-weight:1000}.reportsPageSub{font-size:12px;color:#dbeafe;margin-top:3px}.reportsPageActions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.reportsPageActions button{height:38px;border:0;border-radius:10px;padding:0 12px;font-weight:900;cursor:pointer;background:#2563eb;color:#fff}.reportsPageActions .outline{background:#fff;color:#1d4ed8}.reportsPageActions .green{background:#16a34a}.reportsPageActions .gray{background:#334155}.reportsPageActions .red{background:#dc2626}
+      .reportsPageBody{padding:16px;overflow:auto}.reportsPageNotice{border:1px solid #bfdbfe;background:#eff6ff;color:#1e3a8a;border-radius:14px;padding:10px 12px;font-size:13px;font-weight:850;margin-bottom:12px}.reportsFilters{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;margin-bottom:12px}.reportsFilters label{font-size:11px;font-weight:900;color:#334155;margin-bottom:4px;display:block}.reportsFilters input,.reportsFilters select{height:38px;border:1px solid #cbd5e1;border-radius:10px;padding:8px;background:#fff;width:100%}
+      .reportsKPIs{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:10px;margin-bottom:12px}.reportsKPI{background:#fff;border:1px solid #dbe3ef;border-radius:14px;padding:12px;box-shadow:0 2px 10px rgba(15,23,42,.04)}.reportsKPILabel{font-size:10px;color:#64748b;font-weight:1000;text-transform:uppercase;letter-spacing:.04em}.reportsKPIValue{font-size:20px;font-weight:1000;margin-top:5px;color:#0f172a}.reportsKPISub{font-size:11px;color:#64748b;margin-top:4px;line-height:1.3}
+      .reportsGrid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.reportsCard{background:#fff;border:1px solid #dbe3ef;border-radius:16px;box-shadow:0 2px 12px rgba(15,23,42,.04);overflow:hidden}.reportsCardHead{padding:12px 14px;border-bottom:1px solid #e5edf7;display:flex;align-items:center;justify-content:space-between;gap:8px;background:#f8fbff}.reportsCardHead h3{margin:0;font-size:15px}.reportsCardBody{padding:12px;max-height:360px;overflow:auto}.reportsTable{width:100%;border-collapse:collapse;font-size:12px}.reportsTable th{text-align:left;background:#f8fafc;color:#334155;font-size:10px;text-transform:uppercase;letter-spacing:.03em;padding:8px;border-bottom:1px solid #e2e8f0;position:sticky;top:0}.reportsTable td{padding:8px;border-bottom:1px solid #edf2f8;vertical-align:top}.reportsPill{display:inline-block;border-radius:999px;background:#eef2ff;color:#1d4ed8;font-size:10px;font-weight:900;padding:3px 7px}.reportsPill.green{background:#dcfce7;color:#166534}.reportsPill.red{background:#fee2e2;color:#991b1b}.reportsPill.orange{background:#fff7ed;color:#9a3412}.reportsEmpty{border:1px dashed #cbd5e1;border-radius:14px;background:#f8fafc;padding:18px;text-align:center;color:#64748b;font-weight:850}.reportsProgress{height:8px;background:#e2e8f0;border-radius:999px;overflow:hidden;margin-top:7px}.reportsProgress span{display:block;height:100%;background:#2563eb;border-radius:999px}
+      @media(max-width:1200px){.reportsKPIs{grid-template-columns:repeat(3,1fr)}.reportsGrid{grid-template-columns:1fr}.reportsFilters{grid-template-columns:repeat(2,1fr)}}@media(max-width:700px){.reportsPageTop{height:auto;align-items:flex-start;flex-direction:column;padding:12px}.reportsKPIs,.reportsFilters{grid-template-columns:1fr}.reportsPageActions{width:100%}}
+    `;
+    document.head.appendChild(style);
+    var page = document.createElement('div');
+    page.id = 'reportsPageStable';
+    page.innerHTML = `
+      <div class="reportsPageTop">
+        <div><div class="reportsPageTitle">Admin Reports</div><div class="reportsPageSub">Full page reports rebuilt outside the old modal system.</div></div>
+        <div class="reportsPageActions">
+          <button class="outline" onclick="refreshReportsPageStable()">Refresh</button>
+          <button class="green" onclick="exportReportsPageStableCSV()">Export CSV</button>
+          <button class="gray" onclick="window.print()">Print / Save PDF</button>
+          <button class="red" onclick="closeReportsPageStable()">Back to Queue</button>
+        </div>
+      </div>
+      <div class="reportsPageBody">
+        <div class="reportsPageNotice" id="reportsPageStableNotice">Reports open as a full page now. No modal stacking, no delayed handler, and no Compliance panel behind it.</div>
+        <div class="reportsFilters">
+          <div><label>Range</label><select id="reportsStableRange" onchange="reportsPageRangeChanged()"><option value="today">Today</option><option value="week">This Week</option><option value="month">This Month</option><option value="year">This Year</option><option value="custom">Custom</option></select></div>
+          <div><label>Start Date</label><input id="reportsStableStart" type="date" onchange="refreshReportsPageStable()"></div>
+          <div><label>End Date</label><input id="reportsStableEnd" type="date" onchange="refreshReportsPageStable()"></div>
+          <div><label>Employee</label><select id="reportsStableEmployee" onchange="refreshReportsPageStable()"><option value="">All Employees</option></select></div>
+          <div><label>Portfolio</label><select id="reportsStablePortfolio" onchange="refreshReportsPageStable()"><option value="">All Portfolios</option></select></div>
+        </div>
+        <div class="reportsKPIs" id="reportsStableKpis"></div>
+        <div class="reportsGrid">
+          <div class="reportsCard"><div class="reportsCardHead"><h3>Collector Ranking</h3><span class="reportsPill">Live</span></div><div class="reportsCardBody" id="reportsStableCollectors"></div></div>
+          <div class="reportsCard"><div class="reportsCardHead"><h3>Portfolio Performance</h3><span class="reportsPill">Balances</span></div><div class="reportsCardBody" id="reportsStablePortfolios"></div></div>
+          <div class="reportsCard"><div class="reportsCardHead"><h3>Call Performance</h3><span class="reportsPill">Contact Intel</span></div><div class="reportsCardBody" id="reportsStableCalls"></div></div>
+          <div class="reportsCard"><div class="reportsCardHead"><h3>Recent Payments / Promises</h3><span class="reportsPill">Pay Desk</span></div><div class="reportsCardBody" id="reportsStableRecent"></div></div>
+        </div>
+      </div>`;
+    document.body.appendChild(page);
+  }
+
+  function setReportsDefaultDates(){
+    var range = document.getElementById('reportsStableRange');
+    var start = document.getElementById('reportsStableStart');
+    var end = document.getElementById('reportsStableEnd');
+    if(!range || !start || !end) return;
+    var today = reportsToday();
+    var s = today;
+    if(range.value === 'week') s = reportsStartOfWeek();
+    else if(range.value === 'month') s = reportsStartOfMonth();
+    else if(range.value === 'year') s = new Date(new Date().getFullYear(),0,1).toISOString().slice(0,10);
+    if(!start.value || range.value !== 'custom') start.value = s;
+    if(!end.value || range.value !== 'custom') end.value = today;
+  }
+
+  function reportsPageRangeChanged(){ setReportsDefaultDates(); refreshReportsPageStable(); }
+
+  function safeTimeoutPromise(p, ms, fallback){
+    return new Promise(function(resolve){
+      var done = false;
+      var t = setTimeout(function(){ if(!done){ done=true; resolve(fallback); } }, ms || 3500);
+      Promise.resolve(p).then(function(v){ if(!done){ done=true; clearTimeout(t); resolve(v); } }).catch(function(){ if(!done){ done=true; clearTimeout(t); resolve(fallback); } });
+    });
+  }
+  async function safeTable(path){
+    if(typeof window.dbFetch !== 'function') return [];
+    return await safeTimeoutPromise(window.dbFetch(path), 3500, []);
+  }
+
+  async function loadReportsData(){
+    var accs = Array.isArray(window.accounts) ? window.accounts.slice() : [];
+    var results = await Promise.all([
+      safeTable('/payments_ledger?select=*&limit=2000&order=created_at.desc'),
+      safeTable('/payment_promises?select=*&limit=2000&order=created_at.desc'),
+      safeTable('/call_results?select=*&limit=2000&order=created_at.desc'),
+      safeTable('/payment_plans?select=*&limit=2000&order=created_at.desc'),
+      safeTable('/account_notes?select=*&limit=1000&order=created_at.desc')
+    ]);
+    return {accounts:accs, ledger:results[0]||[], promises:results[1]||[], calls:results[2]||[], plans:results[3]||[], notes:results[4]||[]};
+  }
+
+  function buildReportFilters(data){
+    var emp = document.getElementById('reportsStableEmployee');
+    var pf = document.getElementById('reportsStablePortfolio');
+    if(emp){
+      var cur = emp.value;
+      var set = {};
+      (data.accounts||[]).forEach(function(a){ var e = String(a.assignedToEmail || a.assigned_to_email || a.createdByEmail || a.created_by_email || '').toLowerCase().trim(); if(e)set[e]=1; });
+      (data.ledger||[]).concat(data.promises||[], data.calls||[]).forEach(function(r){ var e=reportsEmail(r); if(e && e !== 'unassigned')set[e]=1; });
+      emp.innerHTML = '<option value="">All Employees</option>' + Object.keys(set).sort().map(function(e){return '<option value="'+reportsEscape(e)+'">'+reportsEscape(e)+'</option>';}).join('');
+      emp.value = cur;
+    }
+    if(pf){
+      var curp = pf.value;
+      var pset = {};
+      (data.accounts||[]).forEach(function(a){ var p = reportsPortfolio(a); if(p)pset[p]=1; });
+      pf.innerHTML = '<option value="">All Portfolios</option>' + Object.keys(pset).sort().map(function(p){return '<option value="'+reportsEscape(p)+'">'+reportsEscape(p)+'</option>';}).join('');
+      pf.value = curp;
+    }
+  }
+
+  function filterReportData(data){
+    var start = (document.getElementById('reportsStableStart')||{}).value || '';
+    var end = (document.getElementById('reportsStableEnd')||{}).value || reportsToday();
+    var emp = String((document.getElementById('reportsStableEmployee')||{}).value || '').toLowerCase();
+    var port = String((document.getElementById('reportsStablePortfolio')||{}).value || '');
+    var amap = reportsAccountMap();
+    function byEmp(r){ return !emp || reportsEmail(r) === emp || String((amap[String(r.account_id)]||{}).assignedToEmail || (amap[String(r.account_id)]||{}).assigned_to_email || '').toLowerCase() === emp; }
+    function byPort(r){ return !port || reportsPortfolio(amap[String(r.account_id)]) === port; }
+    function byAcct(a){ return (!emp || String(a.assignedToEmail || a.assigned_to_email || '').toLowerCase() === emp) && (!port || reportsPortfolio(a) === port); }
+    return {
+      accounts:(data.accounts||[]).filter(byAcct),
+      ledger:(data.ledger||[]).filter(function(r){return reportsInRange(r.payment_date||r.paid_at||r.created_at,start,end)&&byEmp(r)&&byPort(r);}),
+      promises:(data.promises||[]).filter(function(r){return reportsInRange(r.created_at||r.due_date,start,end)&&byEmp(r)&&byPort(r);}),
+      calls:(data.calls||[]).filter(function(r){return reportsInRange(r.result_at||r.created_at,start,end)&&byEmp(r)&&byPort(r);}),
+      plans:(data.plans||[]).filter(function(r){return reportsInRange(r.created_at||r.start_date,start,end)&&byEmp(r)&&byPort(r);}),
+      notes:(data.notes||[]).filter(function(r){return reportsInRange(r.created_at,start,end)&&byEmp(r)&&byPort(r);})
+    };
+  }
+
+  function renderReports(dataRaw){
+    var data = filterReportData(dataRaw);
+    var totalBalance = data.accounts.reduce(function(sum,a){return sum+reportsAccountBalance(a);},0);
+    var collected = data.ledger.reduce(function(sum,r){return sum + reportsNum(r.amount || r.payment_amount || r.paid_amount);},0);
+    var today = reportsToday(), week = reportsStartOfWeek(), month = reportsStartOfMonth();
+    var collectedToday = (dataRaw.ledger||[]).filter(function(r){return reportsInRange(r.payment_date||r.paid_at||r.created_at,today,today);}).reduce(function(s,r){return s+reportsNum(r.amount||r.payment_amount||r.paid_amount);},0);
+    var collectedWeek = (dataRaw.ledger||[]).filter(function(r){return reportsInRange(r.payment_date||r.paid_at||r.created_at,week,today);}).reduce(function(s,r){return s+reportsNum(r.amount||r.payment_amount||r.paid_amount);},0);
+    var collectedMonth = (dataRaw.ledger||[]).filter(function(r){return reportsInRange(r.payment_date||r.paid_at||r.created_at,month,today);}).reduce(function(s,r){return s+reportsNum(r.amount||r.payment_amount||r.paid_amount);},0);
+    var promisesAmount = data.promises.reduce(function(sum,r){return sum+reportsNum(r.payment_amount||r.total_amount||r.amount);},0);
+    var kept = data.promises.filter(function(r){return /paid|kept|processed|complete|settled/.test(reportsStatus(r));});
+    var broken = data.promises.filter(function(r){return /broken|failed|missed|nsf|declined|default/.test(reportsStatus(r));});
+    var calls = data.calls.length;
+    var contacts = data.calls.filter(function(r){return r.is_contact === true || /contact|right party|rpc|promise|refused|dispute|settled/.test(reportsStatus(r));}).length;
+    var rpc = data.calls.filter(function(r){return r.is_rpc === true || /right party|rpc/.test(reportsStatus(r));}).length;
+    var liquidation = totalBalance ? (collected / totalBalance * 100) : 0;
+    var contactRate = calls ? contacts / calls * 100 : 0;
+    var rpcRate = calls ? rpc / calls * 100 : 0;
+    var kpiHtml = [
+      ['Collected Today',reportsMoney(collectedToday),'Week: '+reportsMoney(collectedWeek)],
+      ['Collected Month',reportsMoney(collectedMonth),'Selected range: '+reportsMoney(collected)],
+      ['Promises Created',data.promises.length,promisesAmount?reportsMoney(promisesAmount):'No promised dollars found'],
+      ['Promises Kept',kept.length,'Broken / missed: '+broken.length],
+      ['Contact Rate',contactRate.toFixed(1)+'%','RPC rate: '+rpcRate.toFixed(1)+'%'],
+      ['Liquidation Rate',liquidation.toFixed(2)+'%','Balance loaded: '+reportsMoney(totalBalance)]
+    ].map(function(k){return '<div class="reportsKPI"><div class="reportsKPILabel">'+reportsEscape(k[0])+'</div><div class="reportsKPIValue">'+reportsEscape(k[1])+'</div><div class="reportsKPISub">'+reportsEscape(k[2])+'</div></div>';}).join('');
+    document.getElementById('reportsStableKpis').innerHTML = kpiHtml;
+
+    var collectors = {};
+    data.accounts.forEach(function(a){ var e=String(a.assignedToEmail||a.assigned_to_email||'unassigned').toLowerCase(); if(!collectors[e])collectors[e]={email:e,calls:0,contacts:0,rpc:0,promises:0,promiseAmt:0,collected:0,balance:0,accounts:0}; collectors[e].accounts++; collectors[e].balance += reportsAccountBalance(a); });
+    data.calls.forEach(function(r){ var e=reportsEmail(r); if(!collectors[e])collectors[e]={email:e,calls:0,contacts:0,rpc:0,promises:0,promiseAmt:0,collected:0,balance:0,accounts:0}; collectors[e].calls++; if(r.is_contact===true || /contact|right party|rpc|promise|refused|dispute|settled/.test(reportsStatus(r))) collectors[e].contacts++; if(r.is_rpc===true || /right party|rpc/.test(reportsStatus(r))) collectors[e].rpc++; });
+    data.promises.forEach(function(r){ var e=reportsEmail(r); if(!collectors[e])collectors[e]={email:e,calls:0,contacts:0,rpc:0,promises:0,promiseAmt:0,collected:0,balance:0,accounts:0}; collectors[e].promises++; collectors[e].promiseAmt += reportsNum(r.payment_amount||r.total_amount||r.amount); });
+    data.ledger.forEach(function(r){ var e=reportsEmail(r); if(!collectors[e])collectors[e]={email:e,calls:0,contacts:0,rpc:0,promises:0,promiseAmt:0,collected:0,balance:0,accounts:0}; collectors[e].collected += reportsNum(r.amount||r.payment_amount||r.paid_amount); });
+    var collectorRows = Object.keys(collectors).map(function(k){return collectors[k];}).sort(function(a,b){return b.collected-a.collected || b.promiseAmt-a.promiseAmt || b.calls-a.calls;}).slice(0,25);
+    document.getElementById('reportsStableCollectors').innerHTML = collectorRows.length ? '<table class="reportsTable"><thead><tr><th>Collector</th><th>Accounts</th><th>Calls</th><th>Contact</th><th>RPC</th><th>Promises</th><th>Collected</th></tr></thead><tbody>'+collectorRows.map(function(r){return '<tr><td><b>'+reportsEscape(r.email)+'</b></td><td>'+r.accounts+'</td><td>'+r.calls+'</td><td>'+r.contacts+'</td><td>'+r.rpc+'</td><td>'+r.promises+'<br><small>'+reportsMoney(r.promiseAmt)+'</small></td><td><b>'+reportsMoney(r.collected)+'</b></td></tr>';}).join('')+'</tbody></table>' : '<div class="reportsEmpty">No collector activity found for this filter.</div>';
+
+    var ports = {};
+    data.accounts.forEach(function(a){ var p=reportsPortfolio(a); if(!ports[p])ports[p]={name:p,accounts:0,balance:0,collected:0,promises:0}; ports[p].accounts++; ports[p].balance += reportsAccountBalance(a); });
+    var amap = reportsAccountMap();
+    data.ledger.forEach(function(r){ var p=reportsPortfolio(amap[String(r.account_id)]); if(!ports[p])ports[p]={name:p,accounts:0,balance:0,collected:0,promises:0}; ports[p].collected += reportsNum(r.amount||r.payment_amount||r.paid_amount); });
+    data.promises.forEach(function(r){ var p=reportsPortfolio(amap[String(r.account_id)]); if(!ports[p])ports[p]={name:p,accounts:0,balance:0,collected:0,promises:0}; ports[p].promises += reportsNum(r.payment_amount||r.total_amount||r.amount); });
+    var portRows = Object.keys(ports).map(function(k){return ports[k];}).sort(function(a,b){return b.balance-a.balance;}).slice(0,25);
+    document.getElementById('reportsStablePortfolios').innerHTML = portRows.length ? '<table class="reportsTable"><thead><tr><th>Portfolio</th><th>Accounts</th><th>Balance</th><th>Collected</th><th>Liquidation</th></tr></thead><tbody>'+portRows.map(function(p){var pct=p.balance?(p.collected/p.balance*100):0;return '<tr><td><b>'+reportsEscape(p.name)+'</b></td><td>'+p.accounts+'</td><td>'+reportsMoney(p.balance)+'</td><td>'+reportsMoney(p.collected)+'</td><td>'+pct.toFixed(2)+'%<div class="reportsProgress"><span style="width:'+Math.min(100,pct).toFixed(1)+'%"></span></div></td></tr>';}).join('')+'</tbody></table>' : '<div class="reportsEmpty">No portfolio data loaded.</div>';
+
+    var outcome = {};
+    data.calls.forEach(function(r){ var k=String(r.call_result || r.disposition || r.outcome_category || 'Unknown'); outcome[k]=(outcome[k]||0)+1; });
+    var outcomeRows = Object.keys(outcome).sort(function(a,b){return outcome[b]-outcome[a];});
+    document.getElementById('reportsStableCalls').innerHTML = '<div class="reportsKPIs" style="grid-template-columns:repeat(3,1fr);margin-bottom:10px"><div class="reportsKPI"><div class="reportsKPILabel">Total Calls</div><div class="reportsKPIValue">'+calls+'</div></div><div class="reportsKPI"><div class="reportsKPILabel">Contacts</div><div class="reportsKPIValue">'+contacts+'</div></div><div class="reportsKPI"><div class="reportsKPILabel">Right Party</div><div class="reportsKPIValue">'+rpc+'</div></div></div>' + (outcomeRows.length ? '<table class="reportsTable"><thead><tr><th>Outcome</th><th>Count</th></tr></thead><tbody>'+outcomeRows.map(function(k){return '<tr><td>'+reportsEscape(k)+'</td><td><b>'+outcome[k]+'</b></td></tr>';}).join('')+'</tbody></table>' : '<div class="reportsEmpty">No call logs found for this filter.</div>');
+
+    var recent = [];
+    data.ledger.slice(0,8).forEach(function(r){ recent.push({type:'Payment',date:reportsDate(r.payment_date||r.paid_at||r.created_at),amount:reportsNum(r.amount||r.payment_amount||r.paid_amount),status:r.status||'Paid',email:reportsEmail(r)}); });
+    data.promises.slice(0,8).forEach(function(r){ recent.push({type:'Promise',date:reportsDate(r.due_date||r.created_at),amount:reportsNum(r.payment_amount||r.total_amount||r.amount),status:r.status||'Pending',email:reportsEmail(r)}); });
+    recent = recent.sort(function(a,b){return String(b.date).localeCompare(String(a.date));}).slice(0,12);
+    document.getElementById('reportsStableRecent').innerHTML = recent.length ? '<table class="reportsTable"><thead><tr><th>Type</th><th>Date</th><th>Amount</th><th>Status</th><th>Employee</th></tr></thead><tbody>'+recent.map(function(r){var cls=/paid|kept|complete/i.test(r.status)?'green':(/broken|failed|missed|nsf/i.test(r.status)?'red':'orange');return '<tr><td>'+reportsEscape(r.type)+'</td><td>'+reportsEscape(r.date)+'</td><td><b>'+reportsMoney(r.amount)+'</b></td><td><span class="reportsPill '+cls+'">'+reportsEscape(r.status)+'</span></td><td>'+reportsEscape(r.email)+'</td></tr>';}).join('')+'</tbody></table>' : '<div class="reportsEmpty">No recent payments or promises found.</div>';
+
+    var n = document.getElementById('reportsPageStableNotice');
+    if(n) n.textContent = 'Loaded '+data.accounts.length+' accounts, '+data.ledger.length+' payment rows, '+data.promises.length+' promises, and '+data.calls.length+' call logs for the selected filter.';
+    window.reportsPageStableLastData = {raw:dataRaw,filtered:data};
+  }
+
+  async function refreshReportsPageStable(){
+    ensureReportsPage();
+    setReportsDefaultDates();
+    var n = document.getElementById('reportsPageStableNotice');
+    if(n) n.textContent = 'Loading reports safely... If one table is empty or slow, the page will still load.';
+    ['reportsStableKpis','reportsStableCollectors','reportsStablePortfolios','reportsStableCalls','reportsStableRecent'].forEach(function(id){var el=document.getElementById(id); if(el)el.innerHTML='<div class="reportsEmpty">Loading...</div>';});
+    var data = await loadReportsData();
+    buildReportFilters(data);
+    renderReports(data);
+  }
+
+  function openReportsPageStable(){
+    if(!reportsIsAdmin()) return alert('Admin only.');
+    ensureReportsPage();
+    try{ if(typeof window.closeAllLargeModalsForNav === 'function') window.closeAllLargeModalsForNav(); }catch(e){}
+    try{ var old = document.getElementById('adminReportsModal'); if(old) old.classList.remove('open'); }catch(e){}
+    document.getElementById('reportsPageStable').classList.add('open');
+    setReportsDefaultDates();
+    setTimeout(function(){ refreshReportsPageStable(); },0);
+  }
+  function closeReportsPageStable(){
+    var el = document.getElementById('reportsPageStable');
+    if(el) el.classList.remove('open');
+  }
+  function exportReportsPageStableCSV(){
+    var data = (window.reportsPageStableLastData && window.reportsPageStableLastData.filtered) || {ledger:[],promises:[],calls:[],accounts:[]};
+    var rows = [['Section','Date','Name/Type','Amount/Count','Status','Employee']];
+    (data.ledger||[]).forEach(function(r){rows.push(['Payment',reportsDate(r.payment_date||r.paid_at||r.created_at),r.reference_number||r.payment_method||'Payment',reportsNum(r.amount||r.payment_amount||r.paid_amount),r.status||'Paid',reportsEmail(r)]);});
+    (data.promises||[]).forEach(function(r){rows.push(['Promise',reportsDate(r.due_date||r.created_at),r.debtor_name||r.account_number||'Promise',reportsNum(r.payment_amount||r.total_amount||r.amount),r.status||'',reportsEmail(r)]);});
+    (data.calls||[]).forEach(function(r){rows.push(['Call',reportsDate(r.result_at||r.created_at),r.call_result||r.disposition||'Call',1,r.outcome_category||'',reportsEmail(r)]);});
+    var csv = rows.map(function(r){return r.map(function(c){return '"'+String(c==null?'':c).replace(/"/g,'""')+'"';}).join(',');}).join('\n');
+    var blob = new Blob([csv],{type:'text/csv'});
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'co-pilot-admin-reports.csv';
+    a.click();
+    setTimeout(function(){ URL.revokeObjectURL(a.href); },1000);
+  }
+
+  window.openReportsPageStable = openReportsPageStable;
+  window.closeReportsPageStable = closeReportsPageStable;
+  window.refreshReportsPageStable = refreshReportsPageStable;
+  window.exportReportsPageStableCSV = exportReportsPageStableCSV;
+  window.reportsPageRangeChanged = reportsPageRangeChanged;
+})();
 </script>
 </body>
 </html>
