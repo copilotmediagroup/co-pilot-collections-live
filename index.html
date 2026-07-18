@@ -11909,6 +11909,223 @@ function exportContactIntelligenceCSV(){let calls=filteredContactCalls();let row
 })();
 </script>
 
+
+<script>
+/* MESSENGER_NAMES_NO_ATTACHED_ACCOUNTS_FIX — staff display names + no debtor/account attachment in messenger */
+(function(){
+  const BUILD='MESSENGER_NAMES_NO_ATTACHED_ACCOUNTS_2026_07_18';
+  function lower(v){return String(v||'').trim().toLowerCase()}
+  function safe(v){try{return (typeof esc==='function'?esc(String(v||'')):String(v||'').replace(/[&<>"']/g,function(m){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]}))}catch(e){return String(v||'')}}
+  function cleanName(v){return String(v||'').replace(/\s+/g,' ').trim()}
+  function emailPrefix(email){
+    email=lower(email);
+    if(email==='afinch2678@gmail.com')return 'Antonio Finch';
+    let p=(email.split('@')[0]||'Team Member').replace(/[._-]+/g,' ').replace(/\d+/g,' ').replace(/\s+/g,' ').trim();
+    return p?p.replace(/\b\w/g,function(c){return c.toUpperCase()}):email;
+  }
+  function userEmail(u){return lower(u&&((u.email)||(u.userEmail)||(u.user_email))) }
+  function userNameValue(u){
+    if(!u)return '';
+    return cleanName(u.fullName||u.full_name||u.displayName||u.display_name||u.employeeName||u.employee_name||u.name||u.userName||u.username||'');
+  }
+  function findUser(email){email=lower(email);try{return (window.appUsers||appUsers||[]).find(function(u){return userEmail(u)===email})||null}catch(e){return null}}
+  function storedName(email){try{return cleanName(localStorage.getItem('cpcmStaffName:'+lower(email))||'')}catch(e){return ''}}
+  window.cpcmStaffDisplayName=function(email){
+    email=lower(email);
+    if(!email)return 'Team Member';
+    let u=findUser(email);
+    let n=userNameValue(u) || storedName(email);
+    try{if(!n && currentUser && lower(currentUser.email)===email)n=userNameValue(currentUser)}catch(e){}
+    return n || emailPrefix(email);
+  };
+  window.cpcmStaffInitials=function(email){
+    let n=window.cpcmStaffDisplayName(email);
+    let parts=n.split(/\s+/).filter(Boolean);
+    return (parts.length>1?(parts[0][0]+parts[parts.length-1][0]):n.slice(0,2)).toUpperCase();
+  };
+
+  // Replace messenger naming so it never uses debtor/account names as the sender.
+  window.chatName=function(email){return window.cpcmStaffDisplayName(email)};
+  window.chatInitials=function(email){return window.cpcmStaffInitials(email)};
+
+  function meEmail(){try{return lower((typeof chatMe==='function'?chatMe():currentUser&&currentUser.email)||'')}catch(e){return lower(currentUser&&currentUser.email)}}
+  function onlineEmail(email){try{return typeof presenceIsOnlineEmail==='function'?presenceIsOnlineEmail(email):false}catch(e){return false}}
+  function staffRole(email){try{return typeof staffRoleForEmail==='function'?staffRoleForEmail(email):(findUser(email)?.role||'employee')}catch(e){return 'employee'}}
+  function isAllowedUser(u){
+    let email=userEmail(u); if(!email)return false;
+    let role=lower(u.role||'employee');
+    let approved=(u.isApproved===true||u.is_approved===true||lower(u.approvalStatus||u.approval_status)==='approved'||role==='admin'||email==='afinch2678@gmail.com');
+    let active=!(u.isActive===false||u.is_active===false||lower(u.approvalStatus||u.approval_status)==='removed');
+    return approved && active;
+  }
+  window.buildChatContacts=function(){
+    let me=meEmail(), map={};
+    function add(email,u){email=lower(email); if(!email)return; if(!map[email])map[email]={email:email,user:u||findUser(email)||{email:email},unread:0,lastMessageAt:'',lastPreview:''};}
+    add(me, findUser(me)||{email:me,role:(currentUser&&currentUser.isAdmin)?'admin':'employee',fullName:window.cpcmStaffDisplayName(me)});
+    try{(appUsers||[]).forEach(function(u){if(isAllowedUser(u))add(userEmail(u),u)})}catch(e){}
+    try{(chatPresenceData||[]).forEach(function(p){add(p.userEmail||p.user_email,{email:p.userEmail||p.user_email})})}catch(e){}
+    try{(chatAllMessages||[]).forEach(function(m){add(m.fromEmail||m.from_email);add(m.toEmail||m.to_email)})}catch(e){}
+    Object.values(map).forEach(function(c){
+      c.self=(c.email===me);
+      c.online=c.self?true:onlineEmail(c.email);
+      let msgs=(chatAllMessages||[]).filter(function(m){let f=lower(m.fromEmail||m.from_email),t=lower(m.toEmail||m.to_email);return (f===me&&t===c.email)||(f===c.email&&t===me)});
+      c.unread=msgs.filter(function(m){let f=lower(m.fromEmail||m.from_email),t=lower(m.toEmail||m.to_email);return t===me && f!==me && !m.readAt && !m.read_at && String(m.status||'Open')!=='Closed'}).length;
+      let last=msgs[msgs.length-1]; if(last){c.lastMessageAt=last.createdAt||last.created_at||'';c.lastPreview=String(last.body||'').slice(0,70)}
+    });
+    window.chatContactsData=chatContactsData=Object.values(map).sort(function(a,b){
+      if(a.self!==b.self)return a.self?-1:1;
+      if(a.unread!==b.unread)return b.unread-a.unread;
+      if(a.online!==b.online)return a.online?-1:1;
+      return window.cpcmStaffDisplayName(a.email).localeCompare(window.cpcmStaffDisplayName(b.email));
+    });
+  };
+
+  window.renderPresenceBanner=function(){
+    let head=document.querySelector('.chatContactsHead'); if(!head)return;
+    let existing=document.getElementById('chatPresenceBanner');
+    if(!existing){existing=document.createElement('div');existing.id='chatPresenceBanner';existing.className='chatPresenceBanner';head.insertAdjacentElement('afterend',existing)}
+    let seen={};
+    let n=(chatContactsData||[]).filter(function(c){let e=lower(c.email); if(!e||seen[e])return false; seen[e]=true; return c.self||onlineEmail(e)}).length;
+    existing.innerHTML='<span><b>'+n+'</b> online</span><span>You are online 🟢</span>';
+  };
+
+  window.renderChatContacts=function(){
+    let list=document.getElementById('chatContactList'); if(!list)return;
+    let q=lower(document.getElementById('chatSearch')&&document.getElementById('chatSearch').value||'');
+    let rows=(chatContactsData||[]).filter(function(c){return !q || lower(c.email).includes(q) || lower(window.cpcmStaffDisplayName(c.email)).includes(q) || lower(staffRole(c.email)).includes(q)});
+    list.innerHTML=rows.map(function(c){
+      let online=c.self?true:onlineEmail(c.email);
+      let meta=(c.self?'You • ':'')+safe(staffRole(c.email))+' • <span class="'+(online?'onlineText':'offlineText')+'">'+(online?'Online':'Offline')+'</span>'+(c.lastPreview&&!c.self?' • '+safe(c.lastPreview):'');
+      let click=c.self?'onclick="window.cpcmOpenStaffNameModal(\''+safe(c.email)+'\')"':'onclick="selectChatContact(\''+safe(c.email)+'\')"';
+      return '<div class="chatContact '+(c.self?'self':'')+' '+(c.email===chatActiveEmail?'active':'')+' '+(c.unread?'hasUnread':'')+'" '+click+'>'+ 
+        '<div class="chatAvatar">'+safe(window.cpcmStaffInitials(c.email))+'<span class="chatOnlineDot '+(online?'live':'off')+'"></span></div>'+ 
+        '<div class="chatContactMain"><div class="chatContactName">'+safe(window.cpcmStaffDisplayName(c.email))+(c.self?' <span class="chatSelfBadge">You</span>':'')+'</div><div class="chatContactMeta">'+meta+'</div></div>'+ 
+        '<div class="chatContactUnread '+(c.unread?'':'zero')+'">'+(c.unread?(c.unread>99?'99+':c.unread):'')+'</div>'+ 
+      '</div>';
+    }).join('') || '<div class="tmEmpty">No employees/admin are available yet.</div>';
+    renderPresenceBanner();
+  };
+
+  function formatChatDate(v){let d=new Date(v||Date.now()); if(isNaN(d.getTime()))d=new Date(); return d.toLocaleDateString([], {month:'short',day:'numeric',year:'numeric'})+' '+d.toLocaleTimeString([], {hour:'numeric',minute:'2-digit'});}
+  window.chatMessageBubble=function(m){
+    let from=lower(m.fromEmail||m.from_email), mine=from===meEmail();
+    let seen=mine&&(m.readAt||m.read_at);
+    return '<div class="chatBubbleWrap '+(mine?'mine':'theirs')+'">'+
+      '<div class="chatSenderName '+(mine?'mine':'theirs')+'">'+safe(window.cpcmStaffDisplayName(from))+'</div>'+
+      '<div class="chatBubble">'+safe(m.body||'')+'</div>'+ 
+      '<div class="chatMetaLine">'+safe(formatChatDate(m.createdAt||m.created_at||Date.now()))+(seen?' • Seen':'')+'</div>'+ 
+    '</div>';
+  };
+
+  window.renderChatConversation=function(){
+    let msgs=typeof activeChatMessages==='function'?activeChatMessages():[];
+    let box=document.getElementById('chatMessages'), nameEl=document.getElementById('chatActiveName'), statusEl=document.getElementById('chatActiveStatus'), av=document.getElementById('chatActiveAvatar'), btn=document.getElementById('chatSendBtn');
+    if(!box)return;
+    if(!chatActiveEmail || lower(chatActiveEmail)===meEmail()){
+      box.innerHTML='<div class="chatEmpty">Pick an employee or admin to start a direct chat.</div>'; if(btn)btn.disabled=true; chatActiveEmail=''; return;
+    }
+    if(btn)btn.disabled=false;
+    if(nameEl)nameEl.textContent=window.cpcmStaffDisplayName(chatActiveEmail);
+    let online=onlineEmail(chatActiveEmail);
+    if(statusEl)statusEl.innerHTML=safe(staffRole(chatActiveEmail))+' • <span class="'+(online?'onlineText':'offlineText')+'">'+(online?'Online':'Offline')+'</span>';
+    if(av)av.innerHTML=safe(window.cpcmStaffInitials(chatActiveEmail))+'<span class="chatOnlineDot '+(online?'live':'off')+'"></span>';
+    box.innerHTML=msgs.map(function(m){return chatMessageBubble(m)}).join('')||'<div class="chatEmpty">No messages yet. Type below to start the conversation.</div>';
+    box.scrollTop=box.scrollHeight;
+    try{loadTypingStatus()}catch(e){}
+  };
+
+  window.attachCurrentAccountToChat=function(){ alert('Attached accounts were removed from Messenger. Send only staff/admin messages here.'); };
+  window.sendChatMessage=async function(){
+    let input=document.getElementById('chatInput');
+    let body=String(input&&input.value||'').trim();
+    if(!chatActiveEmail)return alert('Select an employee/admin first.');
+    if(lower(chatActiveEmail)===meEmail())return alert('You cannot send a message to yourself.');
+    if(!body)return;
+    let row={account_id:null,account_name:'',account_number:'',from_email:currentUser.email,to_email:chatActiveEmail,message_type:'Direct Message',priority:'Normal',subject:'Direct Message',body:body,phone_number:'',status:'Open',created_by_email:currentUser.email,updated_at:new Date().toISOString()};
+    await dbFetch('/team_messages',{method:'POST',body:JSON.stringify([row])});
+    if(input)input.value='';
+    try{await setTyping(false)}catch(e){}
+    await chatRefreshAll(false);
+  };
+  window.openChatDock=async function(){
+    let dock=document.getElementById('chatDock'); if(!dock)return alert('Chat dock not found.');
+    chatAttachedAccountId='';
+    ensureMessengerNameUi();
+    dock.classList.add('open');
+    await chatRefreshAll(false);
+    if(lower(chatActiveEmail)===meEmail())chatActiveEmail='';
+    if(!chatActiveEmail){let first=(chatContactsData||[]).find(function(c){return !c.self&&c.email!==meEmail()}); if(first)await selectChatContact(first.email)}
+    try{startChatPolling()}catch(e){}
+  };
+
+  async function saveName(targetEmail,newName){
+    targetEmail=lower(targetEmail); newName=cleanName(newName);
+    if(!targetEmail)return alert('No user selected.');
+    if(!newName)return alert('Enter a display name.');
+    try{localStorage.setItem('cpcmStaffName:'+targetEmail,newName)}catch(e){}
+    let ok=false;
+    try{await dbFetch('/rpc/cpcm_update_staff_display_name',{method:'POST',body:JSON.stringify({target_email:targetEmail,new_full_name:newName})}); ok=true;}catch(e){}
+    if(!ok){
+      try{await dbFetch('/app_users?email=eq.'+encodeURIComponent(targetEmail),{method:'PATCH',body:JSON.stringify({full_name:newName,updated_at:new Date().toISOString()})}); ok=true;}catch(e){}
+    }
+    try{
+      let u=findUser(targetEmail); if(u){u.fullName=newName;u.full_name=newName;u.displayName=newName;u.display_name=newName}
+      if(currentUser&&lower(currentUser.email)===targetEmail){currentUser.fullName=newName;currentUser.full_name=newName;currentUser.displayName=newName;currentUser.display_name=newName}
+    }catch(e){}
+    await loadAppUsers().catch(function(){});
+    buildChatContacts(); renderChatContacts(); if(chatActiveEmail)renderChatConversation();
+    alert(ok?'Name saved.':'Name saved in this browser. Run the Messenger Names SQL so names save globally.');
+  }
+  window.cpcmSaveStaffDisplayName=async function(){
+    let target=(document.getElementById('cpcmNameTarget')&&document.getElementById('cpcmNameTarget').value)||meEmail();
+    let name=(document.getElementById('cpcmNameValue')&&document.getElementById('cpcmNameValue').value)||'';
+    await saveName(target,name);
+  };
+  window.cpcmOpenStaffNameModal=function(targetEmail){
+    ensureNameModal();
+    let sel=document.getElementById('cpcmNameTarget'), inp=document.getElementById('cpcmNameValue');
+    let isAdm=false; try{isAdm=currentUser&&currentUser.isAdmin===true}catch(e){}
+    let rows=[]; try{rows=(appUsers||[]).filter(isAllowedUser)}catch(e){}
+    if(!rows.some(function(u){return userEmail(u)===meEmail()}))rows.unshift({email:meEmail(),role:(currentUser&&currentUser.isAdmin)?'admin':'employee',fullName:window.cpcmStaffDisplayName(meEmail())});
+    if(sel){
+      sel.disabled=!isAdm;
+      sel.innerHTML=rows.sort(function(a,b){return window.cpcmStaffDisplayName(userEmail(a)).localeCompare(window.cpcmStaffDisplayName(userEmail(b)))}).map(function(u){let e=userEmail(u);return '<option value="'+safe(e)+'">'+safe(window.cpcmStaffDisplayName(e))+' — '+safe(e)+'</option>'}).join('');
+      sel.value=lower(targetEmail)||meEmail();
+      if(!isAdm)sel.value=meEmail();
+    }
+    if(inp)inp.value=window.cpcmStaffDisplayName(sel&&sel.value||meEmail());
+    document.getElementById('cpcmNameModal').classList.add('open');
+  };
+  window.cpcmNameTargetChanged=function(){let sel=document.getElementById('cpcmNameTarget'), inp=document.getElementById('cpcmNameValue'); if(inp&&sel)inp.value=window.cpcmStaffDisplayName(sel.value)};
+  window.cpcmCloseNameModal=function(){let m=document.getElementById('cpcmNameModal'); if(m)m.classList.remove('open')};
+  function ensureNameModal(){
+    if(document.getElementById('cpcmNameModal'))return;
+    let div=document.createElement('div'); div.id='cpcmNameModal'; div.className='modal';
+    div.innerHTML='<div class="modalbox" style="max-width:620px"><div class="modalhead"><h2>Staff Display Name</h2><button class="gray" onclick="cpcmCloseNameModal()">Close</button></div><div class="modalbody"><div class="notice">Names saved here are used by Team Messenger, Scorecards, Staff, and internal activity screens. Admin can rename any employee. Employees can rename themselves.</div><div class="grid"><div class="full"><label>Staff User</label><select id="cpcmNameTarget" onchange="cpcmNameTargetChanged()"></select></div><div class="full"><label>Display Name</label><input id="cpcmNameValue" placeholder="Example: Antonio Finch"></div><div class="full" style="display:flex;gap:10px;justify-content:flex-end"><button class="gray" onclick="cpcmCloseNameModal()">Cancel</button><button class="green" onclick="cpcmSaveStaffDisplayName()">Save Name</button></div></div></div></div>';
+    document.body.appendChild(div);
+  }
+  function ensureMessengerNameUi(){
+    let attach=document.querySelector('.chatAttachAccount'); if(attach){attach.style.display='none'; attach.textContent='Account Attach Removed'}
+    let actions=document.querySelector('.chatTopActions');
+    if(actions && !document.getElementById('cpcmNameBtn')){let b=document.createElement('button');b.id='cpcmNameBtn';b.title='Edit staff display name';b.textContent='Name';b.onclick=function(){cpcmOpenStaffNameModal(meEmail())};actions.insertBefore(b,actions.firstChild)}
+    let empTop=document.querySelector('#employeeAdminModal .employeeAdminTop');
+    if(empTop && !document.getElementById('cpcmStaffNamesBtn')){let b=document.createElement('button');b.id='cpcmStaffNamesBtn';b.className='outline';b.textContent='Edit Staff Names';b.onclick=function(){cpcmOpenStaffNameModal(meEmail())};empTop.appendChild(b)}
+  }
+  const _oldOpenEmp=window.openEmployeeAdminModal;
+  window.openEmployeeAdminModal=async function(){ if(_oldOpenEmp)await _oldOpenEmp.apply(this,arguments); ensureMessengerNameUi(); };
+
+  function injectCss(){
+    if(document.getElementById('cpcmMessengerNamesCss'))return;
+    let st=document.createElement('style'); st.id='cpcmMessengerNamesCss';
+    st.textContent='.chatAttachAccount,.chatAttachedLine{display:none!important}.chatSenderName{font-size:10.5px;font-weight:1000;color:#334155;margin:0 6px 3px}.chatSenderName.mine{text-align:right;color:#1d4ed8}.chatSenderName.theirs{text-align:left}.chatMetaLine{font-size:10px!important;color:#64748b!important;font-weight:800!important;margin-top:4px!important}.chatContact.self{background:#f8fafc;border-style:dashed}.chatSelfBadge{margin-left:6px;background:#dbeafe;color:#1d4ed8;border-radius:999px;padding:2px 6px;font-size:9px;font-weight:1000}.chatOnlineDot.live{background:#22c55e!important;box-shadow:0 0 0 2px #dcfce7}.chatOnlineDot.off{background:#94a3b8!important}#cpcmNameBtn{background:#0f766e!important;color:white!important}';
+    document.head.appendChild(st);
+  }
+  injectCss();
+  setTimeout(function(){try{ensureMessengerNameUi(); if(typeof buildChatContacts==='function'){buildChatContacts();renderChatContacts();if(chatActiveEmail)renderChatConversation();}}catch(e){}},1000);
+  window.CPCM_MESSENGER_NAMES_FIX_BUILD=BUILD;
+})();
+</script>
+
 </body></html>'; if(w){w.document.write(html);w.document.close();setTimeout(()=>{w.focus();w.print()},250)}else{window.print()}};
   window.refreshReceiptsLettersPage=async function(){let a=dCurrent(); if(!a)return; await hydrateDocInputs(window.__docTemplateKind||'receipt'); await loadDocumentHistory(a.id);};
   window.openReceiptsLettersPage=async function(kind){ensureDocNav(); ensureDocAccountPanel(); let page=ensureDocPage(); let a=dCurrent(); if(!a)return alert('No account selected.'); page.classList.add('open'); let ba=dEl('docBuilderAccount'); if(ba)ba.textContent=dName(a)+' • '+(dAcct(a)||'No account #'); renderTemplates(); await hydrateDocInputs(kind||'receipt'); await loadDocumentHistory(a.id);};
@@ -12438,5 +12655,222 @@ function exportContactIntelligenceCSV(){let calls=filteredContactCalls();let row
 })();
 
 </script>
+
+<script>
+/* MESSENGER_NAMES_NO_ATTACHED_ACCOUNTS_FIX — staff display names + no debtor/account attachment in messenger */
+(function(){
+  const BUILD='MESSENGER_NAMES_NO_ATTACHED_ACCOUNTS_2026_07_18';
+  function lower(v){return String(v||'').trim().toLowerCase()}
+  function safe(v){try{return (typeof esc==='function'?esc(String(v||'')):String(v||'').replace(/[&<>"']/g,function(m){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]}))}catch(e){return String(v||'')}}
+  function cleanName(v){return String(v||'').replace(/\s+/g,' ').trim()}
+  function emailPrefix(email){
+    email=lower(email);
+    if(email==='afinch2678@gmail.com')return 'Antonio Finch';
+    let p=(email.split('@')[0]||'Team Member').replace(/[._-]+/g,' ').replace(/\d+/g,' ').replace(/\s+/g,' ').trim();
+    return p?p.replace(/\b\w/g,function(c){return c.toUpperCase()}):email;
+  }
+  function userEmail(u){return lower(u&&((u.email)||(u.userEmail)||(u.user_email))) }
+  function userNameValue(u){
+    if(!u)return '';
+    return cleanName(u.fullName||u.full_name||u.displayName||u.display_name||u.employeeName||u.employee_name||u.name||u.userName||u.username||'');
+  }
+  function findUser(email){email=lower(email);try{return (window.appUsers||appUsers||[]).find(function(u){return userEmail(u)===email})||null}catch(e){return null}}
+  function storedName(email){try{return cleanName(localStorage.getItem('cpcmStaffName:'+lower(email))||'')}catch(e){return ''}}
+  window.cpcmStaffDisplayName=function(email){
+    email=lower(email);
+    if(!email)return 'Team Member';
+    let u=findUser(email);
+    let n=userNameValue(u) || storedName(email);
+    try{if(!n && currentUser && lower(currentUser.email)===email)n=userNameValue(currentUser)}catch(e){}
+    return n || emailPrefix(email);
+  };
+  window.cpcmStaffInitials=function(email){
+    let n=window.cpcmStaffDisplayName(email);
+    let parts=n.split(/\s+/).filter(Boolean);
+    return (parts.length>1?(parts[0][0]+parts[parts.length-1][0]):n.slice(0,2)).toUpperCase();
+  };
+
+  // Replace messenger naming so it never uses debtor/account names as the sender.
+  window.chatName=function(email){return window.cpcmStaffDisplayName(email)};
+  window.chatInitials=function(email){return window.cpcmStaffInitials(email)};
+
+  function meEmail(){try{return lower((typeof chatMe==='function'?chatMe():currentUser&&currentUser.email)||'')}catch(e){return lower(currentUser&&currentUser.email)}}
+  function onlineEmail(email){try{return typeof presenceIsOnlineEmail==='function'?presenceIsOnlineEmail(email):false}catch(e){return false}}
+  function staffRole(email){try{return typeof staffRoleForEmail==='function'?staffRoleForEmail(email):(findUser(email)?.role||'employee')}catch(e){return 'employee'}}
+  function isAllowedUser(u){
+    let email=userEmail(u); if(!email)return false;
+    let role=lower(u.role||'employee');
+    let approved=(u.isApproved===true||u.is_approved===true||lower(u.approvalStatus||u.approval_status)==='approved'||role==='admin'||email==='afinch2678@gmail.com');
+    let active=!(u.isActive===false||u.is_active===false||lower(u.approvalStatus||u.approval_status)==='removed');
+    return approved && active;
+  }
+  window.buildChatContacts=function(){
+    let me=meEmail(), map={};
+    function add(email,u){email=lower(email); if(!email)return; if(!map[email])map[email]={email:email,user:u||findUser(email)||{email:email},unread:0,lastMessageAt:'',lastPreview:''};}
+    add(me, findUser(me)||{email:me,role:(currentUser&&currentUser.isAdmin)?'admin':'employee',fullName:window.cpcmStaffDisplayName(me)});
+    try{(appUsers||[]).forEach(function(u){if(isAllowedUser(u))add(userEmail(u),u)})}catch(e){}
+    try{(chatPresenceData||[]).forEach(function(p){add(p.userEmail||p.user_email,{email:p.userEmail||p.user_email})})}catch(e){}
+    try{(chatAllMessages||[]).forEach(function(m){add(m.fromEmail||m.from_email);add(m.toEmail||m.to_email)})}catch(e){}
+    Object.values(map).forEach(function(c){
+      c.self=(c.email===me);
+      c.online=c.self?true:onlineEmail(c.email);
+      let msgs=(chatAllMessages||[]).filter(function(m){let f=lower(m.fromEmail||m.from_email),t=lower(m.toEmail||m.to_email);return (f===me&&t===c.email)||(f===c.email&&t===me)});
+      c.unread=msgs.filter(function(m){let f=lower(m.fromEmail||m.from_email),t=lower(m.toEmail||m.to_email);return t===me && f!==me && !m.readAt && !m.read_at && String(m.status||'Open')!=='Closed'}).length;
+      let last=msgs[msgs.length-1]; if(last){c.lastMessageAt=last.createdAt||last.created_at||'';c.lastPreview=String(last.body||'').slice(0,70)}
+    });
+    window.chatContactsData=chatContactsData=Object.values(map).sort(function(a,b){
+      if(a.self!==b.self)return a.self?-1:1;
+      if(a.unread!==b.unread)return b.unread-a.unread;
+      if(a.online!==b.online)return a.online?-1:1;
+      return window.cpcmStaffDisplayName(a.email).localeCompare(window.cpcmStaffDisplayName(b.email));
+    });
+  };
+
+  window.renderPresenceBanner=function(){
+    let head=document.querySelector('.chatContactsHead'); if(!head)return;
+    let existing=document.getElementById('chatPresenceBanner');
+    if(!existing){existing=document.createElement('div');existing.id='chatPresenceBanner';existing.className='chatPresenceBanner';head.insertAdjacentElement('afterend',existing)}
+    let seen={};
+    let n=(chatContactsData||[]).filter(function(c){let e=lower(c.email); if(!e||seen[e])return false; seen[e]=true; return c.self||onlineEmail(e)}).length;
+    existing.innerHTML='<span><b>'+n+'</b> online</span><span>You are online 🟢</span>';
+  };
+
+  window.renderChatContacts=function(){
+    let list=document.getElementById('chatContactList'); if(!list)return;
+    let q=lower(document.getElementById('chatSearch')&&document.getElementById('chatSearch').value||'');
+    let rows=(chatContactsData||[]).filter(function(c){return !q || lower(c.email).includes(q) || lower(window.cpcmStaffDisplayName(c.email)).includes(q) || lower(staffRole(c.email)).includes(q)});
+    list.innerHTML=rows.map(function(c){
+      let online=c.self?true:onlineEmail(c.email);
+      let meta=(c.self?'You • ':'')+safe(staffRole(c.email))+' • <span class="'+(online?'onlineText':'offlineText')+'">'+(online?'Online':'Offline')+'</span>'+(c.lastPreview&&!c.self?' • '+safe(c.lastPreview):'');
+      let click=c.self?'onclick="window.cpcmOpenStaffNameModal(\''+safe(c.email)+'\')"':'onclick="selectChatContact(\''+safe(c.email)+'\')"';
+      return '<div class="chatContact '+(c.self?'self':'')+' '+(c.email===chatActiveEmail?'active':'')+' '+(c.unread?'hasUnread':'')+'" '+click+'>'+ 
+        '<div class="chatAvatar">'+safe(window.cpcmStaffInitials(c.email))+'<span class="chatOnlineDot '+(online?'live':'off')+'"></span></div>'+ 
+        '<div class="chatContactMain"><div class="chatContactName">'+safe(window.cpcmStaffDisplayName(c.email))+(c.self?' <span class="chatSelfBadge">You</span>':'')+'</div><div class="chatContactMeta">'+meta+'</div></div>'+ 
+        '<div class="chatContactUnread '+(c.unread?'':'zero')+'">'+(c.unread?(c.unread>99?'99+':c.unread):'')+'</div>'+ 
+      '</div>';
+    }).join('') || '<div class="tmEmpty">No employees/admin are available yet.</div>';
+    renderPresenceBanner();
+  };
+
+  function formatChatDate(v){let d=new Date(v||Date.now()); if(isNaN(d.getTime()))d=new Date(); return d.toLocaleDateString([], {month:'short',day:'numeric',year:'numeric'})+' '+d.toLocaleTimeString([], {hour:'numeric',minute:'2-digit'});}
+  window.chatMessageBubble=function(m){
+    let from=lower(m.fromEmail||m.from_email), mine=from===meEmail();
+    let seen=mine&&(m.readAt||m.read_at);
+    return '<div class="chatBubbleWrap '+(mine?'mine':'theirs')+'">'+
+      '<div class="chatSenderName '+(mine?'mine':'theirs')+'">'+safe(window.cpcmStaffDisplayName(from))+'</div>'+
+      '<div class="chatBubble">'+safe(m.body||'')+'</div>'+ 
+      '<div class="chatMetaLine">'+safe(formatChatDate(m.createdAt||m.created_at||Date.now()))+(seen?' • Seen':'')+'</div>'+ 
+    '</div>';
+  };
+
+  window.renderChatConversation=function(){
+    let msgs=typeof activeChatMessages==='function'?activeChatMessages():[];
+    let box=document.getElementById('chatMessages'), nameEl=document.getElementById('chatActiveName'), statusEl=document.getElementById('chatActiveStatus'), av=document.getElementById('chatActiveAvatar'), btn=document.getElementById('chatSendBtn');
+    if(!box)return;
+    if(!chatActiveEmail || lower(chatActiveEmail)===meEmail()){
+      box.innerHTML='<div class="chatEmpty">Pick an employee or admin to start a direct chat.</div>'; if(btn)btn.disabled=true; chatActiveEmail=''; return;
+    }
+    if(btn)btn.disabled=false;
+    if(nameEl)nameEl.textContent=window.cpcmStaffDisplayName(chatActiveEmail);
+    let online=onlineEmail(chatActiveEmail);
+    if(statusEl)statusEl.innerHTML=safe(staffRole(chatActiveEmail))+' • <span class="'+(online?'onlineText':'offlineText')+'">'+(online?'Online':'Offline')+'</span>';
+    if(av)av.innerHTML=safe(window.cpcmStaffInitials(chatActiveEmail))+'<span class="chatOnlineDot '+(online?'live':'off')+'"></span>';
+    box.innerHTML=msgs.map(function(m){return chatMessageBubble(m)}).join('')||'<div class="chatEmpty">No messages yet. Type below to start the conversation.</div>';
+    box.scrollTop=box.scrollHeight;
+    try{loadTypingStatus()}catch(e){}
+  };
+
+  window.attachCurrentAccountToChat=function(){ alert('Attached accounts were removed from Messenger. Send only staff/admin messages here.'); };
+  window.sendChatMessage=async function(){
+    let input=document.getElementById('chatInput');
+    let body=String(input&&input.value||'').trim();
+    if(!chatActiveEmail)return alert('Select an employee/admin first.');
+    if(lower(chatActiveEmail)===meEmail())return alert('You cannot send a message to yourself.');
+    if(!body)return;
+    let row={account_id:null,account_name:'',account_number:'',from_email:currentUser.email,to_email:chatActiveEmail,message_type:'Direct Message',priority:'Normal',subject:'Direct Message',body:body,phone_number:'',status:'Open',created_by_email:currentUser.email,updated_at:new Date().toISOString()};
+    await dbFetch('/team_messages',{method:'POST',body:JSON.stringify([row])});
+    if(input)input.value='';
+    try{await setTyping(false)}catch(e){}
+    await chatRefreshAll(false);
+  };
+  window.openChatDock=async function(){
+    let dock=document.getElementById('chatDock'); if(!dock)return alert('Chat dock not found.');
+    chatAttachedAccountId='';
+    ensureMessengerNameUi();
+    dock.classList.add('open');
+    await chatRefreshAll(false);
+    if(lower(chatActiveEmail)===meEmail())chatActiveEmail='';
+    if(!chatActiveEmail){let first=(chatContactsData||[]).find(function(c){return !c.self&&c.email!==meEmail()}); if(first)await selectChatContact(first.email)}
+    try{startChatPolling()}catch(e){}
+  };
+
+  async function saveName(targetEmail,newName){
+    targetEmail=lower(targetEmail); newName=cleanName(newName);
+    if(!targetEmail)return alert('No user selected.');
+    if(!newName)return alert('Enter a display name.');
+    try{localStorage.setItem('cpcmStaffName:'+targetEmail,newName)}catch(e){}
+    let ok=false;
+    try{await dbFetch('/rpc/cpcm_update_staff_display_name',{method:'POST',body:JSON.stringify({target_email:targetEmail,new_full_name:newName})}); ok=true;}catch(e){}
+    if(!ok){
+      try{await dbFetch('/app_users?email=eq.'+encodeURIComponent(targetEmail),{method:'PATCH',body:JSON.stringify({full_name:newName,updated_at:new Date().toISOString()})}); ok=true;}catch(e){}
+    }
+    try{
+      let u=findUser(targetEmail); if(u){u.fullName=newName;u.full_name=newName;u.displayName=newName;u.display_name=newName}
+      if(currentUser&&lower(currentUser.email)===targetEmail){currentUser.fullName=newName;currentUser.full_name=newName;currentUser.displayName=newName;currentUser.display_name=newName}
+    }catch(e){}
+    await loadAppUsers().catch(function(){});
+    buildChatContacts(); renderChatContacts(); if(chatActiveEmail)renderChatConversation();
+    alert(ok?'Name saved.':'Name saved in this browser. Run the Messenger Names SQL so names save globally.');
+  }
+  window.cpcmSaveStaffDisplayName=async function(){
+    let target=(document.getElementById('cpcmNameTarget')&&document.getElementById('cpcmNameTarget').value)||meEmail();
+    let name=(document.getElementById('cpcmNameValue')&&document.getElementById('cpcmNameValue').value)||'';
+    await saveName(target,name);
+  };
+  window.cpcmOpenStaffNameModal=function(targetEmail){
+    ensureNameModal();
+    let sel=document.getElementById('cpcmNameTarget'), inp=document.getElementById('cpcmNameValue');
+    let isAdm=false; try{isAdm=currentUser&&currentUser.isAdmin===true}catch(e){}
+    let rows=[]; try{rows=(appUsers||[]).filter(isAllowedUser)}catch(e){}
+    if(!rows.some(function(u){return userEmail(u)===meEmail()}))rows.unshift({email:meEmail(),role:(currentUser&&currentUser.isAdmin)?'admin':'employee',fullName:window.cpcmStaffDisplayName(meEmail())});
+    if(sel){
+      sel.disabled=!isAdm;
+      sel.innerHTML=rows.sort(function(a,b){return window.cpcmStaffDisplayName(userEmail(a)).localeCompare(window.cpcmStaffDisplayName(userEmail(b)))}).map(function(u){let e=userEmail(u);return '<option value="'+safe(e)+'">'+safe(window.cpcmStaffDisplayName(e))+' — '+safe(e)+'</option>'}).join('');
+      sel.value=lower(targetEmail)||meEmail();
+      if(!isAdm)sel.value=meEmail();
+    }
+    if(inp)inp.value=window.cpcmStaffDisplayName(sel&&sel.value||meEmail());
+    document.getElementById('cpcmNameModal').classList.add('open');
+  };
+  window.cpcmNameTargetChanged=function(){let sel=document.getElementById('cpcmNameTarget'), inp=document.getElementById('cpcmNameValue'); if(inp&&sel)inp.value=window.cpcmStaffDisplayName(sel.value)};
+  window.cpcmCloseNameModal=function(){let m=document.getElementById('cpcmNameModal'); if(m)m.classList.remove('open')};
+  function ensureNameModal(){
+    if(document.getElementById('cpcmNameModal'))return;
+    let div=document.createElement('div'); div.id='cpcmNameModal'; div.className='modal';
+    div.innerHTML='<div class="modalbox" style="max-width:620px"><div class="modalhead"><h2>Staff Display Name</h2><button class="gray" onclick="cpcmCloseNameModal()">Close</button></div><div class="modalbody"><div class="notice">Names saved here are used by Team Messenger, Scorecards, Staff, and internal activity screens. Admin can rename any employee. Employees can rename themselves.</div><div class="grid"><div class="full"><label>Staff User</label><select id="cpcmNameTarget" onchange="cpcmNameTargetChanged()"></select></div><div class="full"><label>Display Name</label><input id="cpcmNameValue" placeholder="Example: Antonio Finch"></div><div class="full" style="display:flex;gap:10px;justify-content:flex-end"><button class="gray" onclick="cpcmCloseNameModal()">Cancel</button><button class="green" onclick="cpcmSaveStaffDisplayName()">Save Name</button></div></div></div></div>';
+    document.body.appendChild(div);
+  }
+  function ensureMessengerNameUi(){
+    let attach=document.querySelector('.chatAttachAccount'); if(attach){attach.style.display='none'; attach.textContent='Account Attach Removed'}
+    let actions=document.querySelector('.chatTopActions');
+    if(actions && !document.getElementById('cpcmNameBtn')){let b=document.createElement('button');b.id='cpcmNameBtn';b.title='Edit staff display name';b.textContent='Name';b.onclick=function(){cpcmOpenStaffNameModal(meEmail())};actions.insertBefore(b,actions.firstChild)}
+    let empTop=document.querySelector('#employeeAdminModal .employeeAdminTop');
+    if(empTop && !document.getElementById('cpcmStaffNamesBtn')){let b=document.createElement('button');b.id='cpcmStaffNamesBtn';b.className='outline';b.textContent='Edit Staff Names';b.onclick=function(){cpcmOpenStaffNameModal(meEmail())};empTop.appendChild(b)}
+  }
+  const _oldOpenEmp=window.openEmployeeAdminModal;
+  window.openEmployeeAdminModal=async function(){ if(_oldOpenEmp)await _oldOpenEmp.apply(this,arguments); ensureMessengerNameUi(); };
+
+  function injectCss(){
+    if(document.getElementById('cpcmMessengerNamesCss'))return;
+    let st=document.createElement('style'); st.id='cpcmMessengerNamesCss';
+    st.textContent='.chatAttachAccount,.chatAttachedLine{display:none!important}.chatSenderName{font-size:10.5px;font-weight:1000;color:#334155;margin:0 6px 3px}.chatSenderName.mine{text-align:right;color:#1d4ed8}.chatSenderName.theirs{text-align:left}.chatMetaLine{font-size:10px!important;color:#64748b!important;font-weight:800!important;margin-top:4px!important}.chatContact.self{background:#f8fafc;border-style:dashed}.chatSelfBadge{margin-left:6px;background:#dbeafe;color:#1d4ed8;border-radius:999px;padding:2px 6px;font-size:9px;font-weight:1000}.chatOnlineDot.live{background:#22c55e!important;box-shadow:0 0 0 2px #dcfce7}.chatOnlineDot.off{background:#94a3b8!important}#cpcmNameBtn{background:#0f766e!important;color:white!important}';
+    document.head.appendChild(st);
+  }
+  injectCss();
+  setTimeout(function(){try{ensureMessengerNameUi(); if(typeof buildChatContacts==='function'){buildChatContacts();renderChatContacts();if(chatActiveEmail)renderChatConversation();}}catch(e){}},1000);
+  window.CPCM_MESSENGER_NAMES_FIX_BUILD=BUILD;
+})();
+</script>
+
 </body>
 </html>
