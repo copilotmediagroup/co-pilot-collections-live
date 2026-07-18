@@ -1,4 +1,6 @@
 <!doctype html>
+<!-- LIVE_DATA_CLEANUP_DUPLICATE_FINDER_MARKER: admin cleanup dashboard + duplicate scan -->
+
 <!-- PAYMENT_PROMISE_PLAN_SAVE_FIX_MARKER: payment promise, payment plan, and notes save repair -->
 <!-- LIVE_CALL_INTELLIGENCE_MARKER: call logging + contact intelligence -->
 <!-- LIVE_PROMISE_AUTOMATION_ALERTS_MARKER: promise automation + collector alerts -->
@@ -3483,6 +3485,27 @@ button {
 .planProHeader .planProActions .red{background:#dc2626!important;color:#fff!important}
 .planProHeader .planProActions .outline{background:#fff!important;color:#1d4ed8!important;border:1px solid #bfdbfe!important}
 </style>
+
+<style id="dataCleanupDuplicateFinderStyles">
+/* DATA CLEANUP + DUPLICATE FINDER */
+.dcPage{position:fixed;inset:0;background:#f3f7fc;z-index:9000;display:none;overflow:auto;color:#0f172a}
+.dcPage.open{display:block}
+.dcShell{padding:18px 20px 32px;max-width:1520px;margin:0 auto}
+.dcHero{display:flex;justify-content:space-between;gap:14px;align-items:flex-start;background:linear-gradient(135deg,#06245d,#1457ff);color:white;border-radius:18px;padding:18px 20px;box-shadow:0 12px 32px rgba(15,23,42,.18);margin-bottom:14px}
+.dcTitle{font-size:24px;font-weight:1000;letter-spacing:-.03em;margin-bottom:4px}
+.dcSub{color:#dbeafe;font-size:13px;max-width:900px;line-height:1.4}
+.dcActions{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}.dcActions button{height:38px;border-radius:10px;font-size:12px}
+.dcBack{background:white!important;color:#1457ff!important}.dcRefresh{background:#0f172a!important}.dcExport{background:#16a34a!important}.dcDanger{background:#dc2626!important}
+.dcStats{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:10px;margin:12px 0}.dcStat{background:white;border:1px solid #dbe3ef;border-radius:14px;padding:12px;box-shadow:0 3px 10px rgba(15,23,42,.04)}.dcStatLabel{font-size:10px;text-transform:uppercase;color:#64748b;font-weight:1000;letter-spacing:.03em;margin-bottom:5px}.dcStatVal{font-size:20px;font-weight:1000;color:#0f172a}.dcStatHint{font-size:11px;color:#64748b;margin-top:3px}
+.dcTabs{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}.dcTab{border:1px solid #bfdbfe;background:#eff6ff;color:#1d4ed8;border-radius:999px;padding:8px 12px;font-size:12px;font-weight:1000;cursor:pointer}.dcTab.active{background:#2563eb;color:white}
+.dcGrid{display:grid;grid-template-columns:1.35fr .65fr;gap:12px}.dcPanel{background:white;border:1px solid #dbe3ef;border-radius:16px;box-shadow:0 4px 16px rgba(15,23,42,.05);overflow:hidden}.dcPanelHead{padding:14px 16px;border-bottom:1px solid #e5edf7;display:flex;justify-content:space-between;gap:10px;align-items:center}.dcPanelTitle{font-weight:1000;font-size:16px}.dcPanelSub{font-size:12px;color:#64748b;margin-top:3px}.dcPanelBody{padding:14px 16px}
+.dcTableWrap{max-height:560px;overflow:auto;border:1px solid #e2e8f0;border-radius:12px;background:white}.dcTable{width:100%;border-collapse:collapse;font-size:12px}.dcTable th{position:sticky;top:0;background:#f8fafc;text-align:left;padding:9px;border-bottom:1px solid #e2e8f0;color:#334155;font-size:10px;text-transform:uppercase;z-index:1}.dcTable td{padding:9px;border-bottom:1px solid #edf2f8;vertical-align:top}.dcMini{font-size:11px;color:#64748b;margin-top:3px;line-height:1.35}.dcPill{display:inline-block;border-radius:999px;padding:4px 8px;font-size:10px;font-weight:1000;background:#eef2ff;color:#1d4ed8;margin:1px}.dcPill.red{background:#fee2e2;color:#991b1b}.dcPill.orange{background:#fff7ed;color:#9a3412}.dcPill.green{background:#dcfce7;color:#166534}.dcPill.gray{background:#f1f5f9;color:#334155}
+.dcRowActions{display:flex;gap:6px;flex-wrap:wrap}.dcRowActions button{height:30px;border-radius:8px;padding:0 9px;font-size:11px}.dcLink{background:white!important;color:#1d4ed8!important;border:1px solid #bfdbfe!important}.dcMerge{background:#7c3aed!important}.dcMark{background:#dc2626!important}
+.dcQualityList{display:grid;gap:8px}.dcQualityItem{border:1px solid #e2e8f0;border-radius:12px;padding:10px;background:#f8fbff;display:flex;justify-content:space-between;gap:10px}.dcQTitle{font-weight:1000}.dcQMeta{font-size:12px;color:#64748b;margin-top:3px}.dcEmpty{border:1px dashed #cbd5e1;background:#f8fafc;color:#64748b;border-radius:14px;padding:20px;text-align:center;font-weight:900}.dcWarn{background:#fff7ed;border:1px solid #fed7aa;color:#9a3412;border-radius:12px;padding:10px;font-size:12px;font-weight:850;margin-bottom:10px}.dcGood{background:#dcfce7;border:1px solid #bbf7d0;color:#166534;border-radius:12px;padding:10px;font-size:12px;font-weight:850;margin-bottom:10px}.dcSearch{height:38px;border:1px solid #cbd5e1;border-radius:10px;padding:0 11px;min-width:260px}.navIcon.teal{background:linear-gradient(145deg,#0f766e,#14b8a6)!important;color:white!important}
+@media(max-width:1200px){.dcStats{grid-template-columns:repeat(3,1fr)}.dcGrid{grid-template-columns:1fr}.dcHero{display:block}.dcActions{justify-content:flex-start;margin-top:12px}}
+@media(max-width:760px){.dcStats{grid-template-columns:1fr}.dcShell{padding:10px}.dcTitle{font-size:20px}.dcSearch{min-width:0;width:100%}}
+</style>
+
 </head>
 <body>
 <div id="loginScreen" class="loginScreen open">
@@ -3560,6 +3583,7 @@ button {
       <button class="gray adminOnly hidden" onclick="openPermissionsModal()">Perms</button>
       <button class="gray adminOnly hidden" onclick="openEmployeeMonitorModal()">Monitor</button>
       <button class="gray adminOnly hidden" onclick="openReportsPageStable()">Reports</button>
+      <button class="gray adminOnly hidden" onclick="openDataCleanupDashboard()">Cleanup</button>
       <button class="gray" onclick="openComplianceGuard()">Guard</button>
       <button class="gray adminOnly hidden" onclick="openEmployeeAdminModal()">Staff</button>
       <button class="gray adminOnly hidden" onclick="openBrandingSettingsModal()">Brand</button>
@@ -3580,6 +3604,7 @@ button {
       <button class="navIcon purple" data-nav="messages" title="Team Chat / Messenger" onclick="toggleChatDock()"><span class="navEmoji">💬</span><span class="msgUnreadBadge">0</span></button>
       <button class="navIcon gold" title="Collector Leaderboard" onclick="openLeaderboard()"><span class="navEmoji">🏆</span></button>
       <button class="navIcon purple adminOnly hidden" title="Admin Reports" onclick="openReportsPageStable()"><span class="navEmoji">📊</span></button>
+      <button class="navIcon teal adminOnly hidden" title="Data Cleanup / Duplicate Finder" onclick="openDataCleanupDashboard()"><span class="navEmoji">🧹</span></button>
       <button class="navIcon red" title="Compliance Guard" onclick="openComplianceGuard()"><span class="navEmoji">🛡️</span></button>
       <button class="navIcon sky" title="Call Intelligence" onclick="openContactIntelligence()"><span class="navEmoji">☎</span></button>
       <button class="navIcon money" title="Pay Desk" onclick="openPaymentTracker()"><span class="navEmoji">💵</span></button>
@@ -11267,5 +11292,134 @@ function exportContactIntelligenceCSV(){let calls=filteredContactCalls();let row
   window.reportsPageRangeChanged = reportsPageRangeChanged;
 })();
 </script>
+
+<script id="dataCleanupDuplicateFinderScript">
+(function(){
+  var state={scan:null,tab:'duplicates',search:''};
+  function isAdmin(){
+    try{
+      var email=String((typeof currentUser!=='undefined'&&currentUser&&currentUser.email)||'').toLowerCase().trim();
+      var role=String((typeof currentUser!=='undefined'&&currentUser&&currentUser.role)||'').toLowerCase().trim();
+      var badge=(document.getElementById('roleBadge')?.textContent||'').toLowerCase();
+      return email==='afinch2678@gmail.com' || (typeof currentUser!=='undefined'&&currentUser&&currentUser.isAdmin===true) || role==='admin' || badge.includes('admin');
+    }catch(e){return false;}
+  }
+  function esc(v){return String(v==null?'':v).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+  function digits(v){return String(v==null?'':v).replace(/\D/g,'');}
+  function money(v){var n=Number(String(v==null?'':v).replace(/[^0-9.-]/g,''));return isFinite(n)?n:0;}
+  function usd(n){n=Number(n||0);return n.toLocaleString(undefined,{style:'currency',currency:'USD'});}
+  function val(a,keys){for(var i=0;i<keys.length;i++){var k=keys[i];if(a&&a[k]!=null&&String(a[k]).trim()!=='')return a[k];}return '';}
+  function acctNum(a){return String(val(a,['accountNumber','accountId','clientAccountNumber','account','acct','accountNo'])||'').trim();}
+  function name(a){try{if(typeof nameOf==='function')return nameOf(a);}catch(e){} return String(val(a,['fullName','name','debtorName'])||[a.firstName,a.lastName].filter(Boolean).join(' ')||'Unknown Account').trim();}
+  function portfolio(a){return String(val(a,['portfolio','creditor','creditorName','sourceFile','source','accountDescription'])||'Unknown').trim();}
+  function dob(a){return String(val(a,['dob','dateOfBirth','birthdate','birthDate'])||'').trim();}
+  function ssn(a){return digits(val(a,['ssn','socialSecurityNumber','social','taxId']));}
+  function bal(a){return money(val(a,['balance','currentBalance','principal','originalLoanAmount','amount','totalBalance','accountBalance']));}
+  function getAccounts(){try{return Array.isArray(accounts)?accounts.slice():[];}catch(e){return [];}}
+  function allPhones(a){
+    var out=[]; var seen={};
+    Object.keys(a||{}).forEach(function(k){
+      if(/phone|mobile|cell|telephone|tel|homePhone|workPhone|alternate/i.test(k)){
+        var raw=a[k]; if(raw==null)return;
+        String(raw).split(/[;,|\/]+/).forEach(function(part){
+          var d=digits(part); if(d.length>11&&d[0]==='1')d=d.slice(1); if(d.length>=7&&!seen[d]){seen[d]=true;out.push(d);}
+        });
+      }
+    });
+    return out;
+  }
+  function badPhone(d){return !d || d.length<10 || /(\d)\1{6,}/.test(d) || /^0+$/.test(d) || /^1+$/.test(d) || /^1234567/.test(d);}
+  function groupBy(records, keyFn, type){
+    var map={};
+    records.forEach(function(a){
+      var keys=keyFn(a)||[]; if(!Array.isArray(keys))keys=[keys];
+      var used={};
+      keys.forEach(function(k){k=String(k||'').trim().toLowerCase(); if(!k||used[k])return; used[k]=true; (map[k]=map[k]||[]).push(a);});
+    });
+    return Object.keys(map).filter(function(k){return map[k].length>1;}).map(function(k){
+      var items=map[k];
+      return {type:type,key:k,count:items.length,totalBalance:items.reduce(function(s,a){return s+bal(a);},0),items:items};
+    });
+  }
+  function scan(){
+    var accs=getAccounts();
+    var dup=[];
+    dup=dup.concat(groupBy(accs,function(a){var s=ssn(a);return s.length>=4?s:'';},'SSN'));
+    dup=dup.concat(groupBy(accs,function(a){return acctNum(a);},'Account #'));
+    dup=dup.concat(groupBy(accs,function(a){return allPhones(a).filter(function(p){return p.length>=10&&!badPhone(p);});},'Phone'));
+    dup=dup.concat(groupBy(accs,function(a){var d=dob(a);var n=name(a).toLowerCase().replace(/[^a-z0-9]/g,'');return (d&&n&&n!=='unknownaccount')?n+' | '+d:'';},'Name + DOB'));
+    dup.sort(function(a,b){return b.totalBalance-a.totalBalance || b.count-a.count;});
+    var missingPhone=[], badPhones=[], missingSSN=[], missingDOB=[], invalidBalance=[];
+    accs.forEach(function(a){
+      var ps=allPhones(a); if(!ps.length)missingPhone.push(a); else if(ps.some(badPhone))badPhones.push(a);
+      if(!ssn(a))missingSSN.push(a); if(!dob(a))missingDOB.push(a);
+      var raw=val(a,['balance','currentBalance','principal','originalLoanAmount','amount','totalBalance','accountBalance']); var n=Number(String(raw==null?'':raw).replace(/[^0-9.-]/g,'')); if(raw!==''&&(!isFinite(n)||n<0))invalidBalance.push(a);
+    });
+    var ports={};
+    accs.forEach(function(a){var p=portfolio(a);var o=ports[p]||(ports[p]={name:p,count:0,balance:0,missingPhone:0,duplicates:0,importedBy:{}});o.count++;o.balance+=bal(a);if(!allPhones(a).length)o.missingPhone++;var by=String(val(a,['importedBy','createdByEmail','created_by_email','assignedToEmail'])||'Unknown').trim();o.importedBy[by]=(o.importedBy[by]||0)+1;});
+    var dupIds={}; dup.forEach(function(g){g.items.forEach(function(a){dupIds[String(a.id)]=true;});}); Object.keys(ports).forEach(function(p){ports[p].duplicates=accs.filter(function(a){return portfolio(a)===p&&dupIds[String(a.id)];}).length;});
+    state.scan={accounts:accs,duplicates:dup,quality:{missingPhone:missingPhone,badPhones:badPhones,missingSSN:missingSSN,missingDOB:missingDOB,invalidBalance:invalidBalance},portfolios:Object.keys(ports).map(function(k){return ports[k];}).sort(function(a,b){return b.balance-a.balance;})};
+    window.dataCleanupLastScan=state.scan;
+    return state.scan;
+  }
+  function ensurePage(){
+    var el=document.getElementById('dataCleanupPage'); if(el)return el;
+    el=document.createElement('div'); el.id='dataCleanupPage'; el.className='dcPage';
+    el.innerHTML='<div class="dcShell"><div class="dcHero"><div><div class="dcTitle">Data Cleanup + Duplicate Finder</div><div class="dcSub">Admin-only portfolio cleanup center. Find duplicate debtors, bad/missing phone numbers, missing SSN/DOB, invalid balances, and portfolio import quality issues before collectors work the file.</div></div><div class="dcActions"><button class="dcBack" onclick="closeDataCleanupDashboard()">Back to Queue</button><button class="dcRefresh" onclick="refreshDataCleanupDashboard()">Refresh Scan</button><button class="dcExport" onclick="exportDataCleanupCSV()">Export CSV</button></div></div><div id="dataCleanupBody"><div class="dcEmpty">Loading cleanup scan...</div></div></div>';
+    document.body.appendChild(el); return el;
+  }
+  function stat(label,val,hint){return '<div class="dcStat"><div class="dcStatLabel">'+esc(label)+'</div><div class="dcStatVal">'+esc(val)+'</div><div class="dcStatHint">'+esc(hint||'')+'</div></div>';}
+  function tabs(){var t=[['duplicates','Duplicates'],['quality','Data Quality'],['portfolio','Portfolio Summary'],['merge','Merge Tools']];return '<div class="dcTabs">'+t.map(function(x){return '<button class="dcTab '+(state.tab===x[0]?'active':'')+'" onclick="setDataCleanupTab(\''+x[0]+'\')">'+x[1]+'</button>';}).join('')+'<input class="dcSearch" placeholder="Search cleanup results..." value="'+esc(state.search)+'" oninput="setDataCleanupSearch(this.value)"></div>';}
+  function filterText(s){var q=String(state.search||'').toLowerCase().trim(); if(!q)return true; return String(s||'').toLowerCase().includes(q);}
+  function render(){var sc=state.scan||scan(); var q=sc.quality; var body=document.getElementById('dataCleanupBody'); if(!body)return;
+    var duplicateAccounts={}; sc.duplicates.forEach(function(g){g.items.forEach(function(a){duplicateAccounts[String(a.id)]=true;});});
+    var html='<div class="dcStats">'+[
+      stat('Total Accounts',sc.accounts.length,'Loaded in this portfolio set'),
+      stat('Duplicate Groups',sc.duplicates.length,'SSN, phone, account #, name+DOB'),
+      stat('Duplicate Accounts',Object.keys(duplicateAccounts).length,'Accounts appearing in duplicate groups'),
+      stat('Missing Phones',q.missingPhone.length,'Accounts with no detected phone'),
+      stat('Bad Phones',q.badPhones.length,'Short, fake, or invalid-looking numbers'),
+      stat('Missing SSN/DOB',q.missingSSN.length+' / '+q.missingDOB.length,'Missing identity fields')
+    ].join('')+'</div>'+tabs();
+    if(state.tab==='duplicates')html+=renderDuplicates(sc);
+    if(state.tab==='quality')html+=renderQuality(sc);
+    if(state.tab==='portfolio')html+=renderPortfolio(sc);
+    if(state.tab==='merge')html+=renderMerge(sc);
+    body.innerHTML=html;
+  }
+  function sampleNames(items){return items.slice(0,4).map(function(a){return name(a)+' <span class="dcMini">#'+esc(acctNum(a)||a.id)+'</span>';}).join('<br>');}
+  function renderDuplicates(sc){var rows=sc.duplicates.filter(function(g){return filterText(g.type+' '+g.key+' '+g.items.map(name).join(' '));});
+    if(!rows.length)return '<div class="dcEmpty">No duplicate groups found for the current search.</div>';
+    return '<div class="dcGrid"><div class="dcPanel"><div class="dcPanelHead"><div><div class="dcPanelTitle">Duplicate Groups</div><div class="dcPanelSub">The first account in each group is treated as the survivor when using merge/mark actions.</div></div><span class="dcPill orange">Admin only</span></div><div class="dcPanelBody"><div class="dcTableWrap"><table class="dcTable"><thead><tr><th>Match Type</th><th>Match Value</th><th>Accounts</th><th>Total Balance</th><th>Sample</th><th>Actions</th></tr></thead><tbody>'+rows.map(function(g,i){return '<tr><td><span class="dcPill">'+esc(g.type)+'</span></td><td>'+esc(g.key)+'</td><td>'+g.count+'</td><td><b>'+usd(g.totalBalance)+'</b></td><td>'+sampleNames(g.items)+'</td><td><div class="dcRowActions"><button class="dcLink" onclick="openDataCleanupAccount(\''+esc(g.items[0].id)+'\')">Open First</button><button class="dcMerge" onclick="mergeDataCleanupGroup('+i+')">Merge</button><button class="dcMark" onclick="markDataCleanupDuplicates('+i+')">Mark Dups</button></div></td></tr>';}).join('')+'</tbody></table></div></div></div>'+renderSideHelp(sc)+'</div>';}
+  function renderSideHelp(sc){return '<div class="dcPanel"><div class="dcPanelHead"><div><div class="dcPanelTitle">Cleanup Rules</div><div class="dcPanelSub">How groups are detected.</div></div></div><div class="dcPanelBody"><div class="dcWarn">Review duplicate groups before merging. This tool does not delete debtor records automatically.</div><div class="dcQualityList"><div class="dcQualityItem"><div><div class="dcQTitle">SSN Match</div><div class="dcQMeta">Same SSN or last-four style value.</div></div><span class="dcPill">High confidence</span></div><div class="dcQualityItem"><div><div class="dcQTitle">Phone Match</div><div class="dcQMeta">Same clean 10-digit phone across accounts.</div></div><span class="dcPill orange">Review</span></div><div class="dcQualityItem"><div><div class="dcQTitle">Name + DOB</div><div class="dcQMeta">Normalized name plus date of birth.</div></div><span class="dcPill">Strong</span></div><div class="dcQualityItem"><div><div class="dcQTitle">Account # Match</div><div class="dcQMeta">Same account number/client account number.</div></div><span class="dcPill green">Portfolio cleanup</span></div></div></div></div>';}
+  function renderQuality(sc){var groups=[['Missing Phone',sc.quality.missingPhone,'red'],['Bad Phone',sc.quality.badPhones,'orange'],['Missing SSN',sc.quality.missingSSN,'gray'],['Missing DOB',sc.quality.missingDOB,'gray'],['Invalid Balance',sc.quality.invalidBalance,'red']];
+    var rows=[];groups.forEach(function(g){g[1].forEach(function(a){var txt=g[0]+' '+name(a)+' '+acctNum(a)+' '+portfolio(a); if(filterText(txt))rows.push({type:g[0],cls:g[2],a:a});});});
+    if(!rows.length)return '<div class="dcGood">No matching data quality issues found.</div>';
+    return '<div class="dcPanel"><div class="dcPanelHead"><div><div class="dcPanelTitle">Data Quality Issues</div><div class="dcPanelSub">Bad records slow collectors down. Export this list or open accounts directly to fix them.</div></div></div><div class="dcPanelBody"><div class="dcTableWrap"><table class="dcTable"><thead><tr><th>Issue</th><th>Account</th><th>Portfolio</th><th>Balance</th><th>Phones</th><th>Action</th></tr></thead><tbody>'+rows.slice(0,800).map(function(r){return '<tr><td><span class="dcPill '+r.cls+'">'+esc(r.type)+'</span></td><td><b>'+esc(name(r.a))+'</b><div class="dcMini">#'+esc(acctNum(r.a)||r.a.id)+' · SSN '+esc(ssn(r.a)||'—')+' · DOB '+esc(dob(r.a)||'—')+'</div></td><td>'+esc(portfolio(r.a))+'</td><td>'+usd(bal(r.a))+'</td><td>'+esc(allPhones(r.a).join(', ')||'—')+'</td><td><button class="dcLink" onclick="openDataCleanupAccount(\''+esc(r.a.id)+'\')">Open</button></td></tr>';}).join('')+'</tbody></table></div><div class="dcMini">Showing up to 800 matching quality rows.</div></div></div>';}
+  function renderPortfolio(sc){var rows=sc.portfolios.filter(function(p){return filterText(p.name);}); if(!rows.length)return '<div class="dcEmpty">No portfolios found.</div>';
+    return '<div class="dcPanel"><div class="dcPanelHead"><div><div class="dcPanelTitle">Portfolio Import Summary</div><div class="dcPanelSub">Use this to judge import quality by source/portfolio.</div></div></div><div class="dcPanelBody"><div class="dcTableWrap"><table class="dcTable"><thead><tr><th>Portfolio / Source</th><th>Accounts</th><th>Total Balance</th><th>Duplicate Accounts</th><th>Missing Phones</th><th>Imported / Assigned By</th></tr></thead><tbody>'+rows.map(function(p){var by=Object.keys(p.importedBy||{}).sort(function(a,b){return p.importedBy[b]-p.importedBy[a];}).slice(0,3).map(function(k){return esc(k)+' ('+p.importedBy[k]+')';}).join('<br>');return '<tr><td><b>'+esc(p.name)+'</b></td><td>'+p.count+'</td><td><b>'+usd(p.balance)+'</b></td><td>'+p.duplicates+'</td><td>'+p.missingPhone+'</td><td>'+by+'</td></tr>';}).join('')+'</tbody></table></div></div></div>';}
+  function renderMerge(sc){return '<div class="dcGrid"><div class="dcPanel"><div class="dcPanelHead"><div><div class="dcPanelTitle">Merge Tools</div><div class="dcPanelSub">Safe merge approach: keep one survivor account, mark the rest as Duplicate, and write activity history.</div></div></div><div class="dcPanelBody"><div class="dcWarn">This does not hard-delete records. It changes duplicate records to status <b>Duplicate</b> and logs what happened.</div><div class="dcQualityList"><div class="dcQualityItem"><div><div class="dcQTitle">1. Review duplicate group</div><div class="dcQMeta">Use Duplicate Groups tab and open the survivor account.</div></div></div><div class="dcQualityItem"><div><div class="dcQTitle">2. Merge group</div><div class="dcQMeta">The first account remains active. Other accounts are marked duplicate.</div></div></div><div class="dcQualityItem"><div><div class="dcQTitle">3. Export cleanup report</div><div class="dcQMeta">Keep CSV proof of what was found and cleaned.</div></div></div></div></div></div>'+renderSideHelp(sc)+'</div>';}
+  async function patchAccount(id,body){return await dbFetch('/accounts?id=eq.'+encodeURIComponent(id),{method:'PATCH',body:JSON.stringify(body)});}
+  async function doMarkGroup(index,merge){var sc=state.scan||scan(); var g=sc.duplicates[index]; if(!g)return alert('Duplicate group not found. Refresh and try again.'); if(!isAdmin())return alert('Admin only.'); var keep=g.items[0]; var dups=g.items.slice(1); if(!dups.length)return alert('Nothing to mark.'); var msg=(merge?'Merge':'Mark')+' '+dups.length+' duplicate account(s) into survivor '+name(keep)+'?'; if(!confirm(msg))return;
+    try{setBusy(true,'Cleaning duplicates','Updating duplicate statuses...');
+      for(var i=0;i<dups.length;i++){var a=dups[i]; await patchAccount(a.id,{status:'Duplicate',disposition:'Duplicate',updated_at:new Date().toISOString()}).catch(async function(){await patchAccount(a.id,{status:'Duplicate',updated_at:new Date().toISOString()});}); try{await insertActivity(a.id,merge?'Duplicate Merged':'Duplicate Marked','Marked as duplicate of '+name(keep)+' / '+(acctNum(keep)||keep.id),'');}catch(e){} }
+      try{await insertActivity(keep.id,merge?'Duplicate Merge Survivor':'Duplicate Review','Kept as survivor for '+dups.length+' duplicate account(s). Match: '+g.type+' '+g.key,'');}catch(e){}
+      if(typeof loadAccounts==='function')await loadAccounts(); state.scan=null; refreshDataCleanupDashboard(); alert('Cleanup complete. Duplicate records were marked.');
+    }catch(e){alert('Cleanup failed: '+(e.message||String(e)));}finally{setBusy(false);}}
+  function setBusy(show,t,x){try{if(typeof setGlobalBusy==='function')setGlobalBusy(show,t||'Working...',x||'Please wait...');}catch(e){}}
+  function openAccount(id){try{currentAccountId=id;if(typeof render==='function')render();closeDataCleanupDashboard();}catch(e){alert('Could not open account: '+(e.message||String(e)));}}
+  function csv(){var sc=state.scan||scan(); var rows=[['Section','Issue/Type','Match/Portfolio','Account Name','Account Number','Balance','Extra']]; sc.duplicates.forEach(function(g){g.items.forEach(function(a){rows.push(['Duplicate',g.type,g.key,name(a),acctNum(a),bal(a),portfolio(a)]);});}); Object.keys(sc.quality).forEach(function(k){sc.quality[k].forEach(function(a){rows.push(['Data Quality',k,'',name(a),acctNum(a),bal(a),portfolio(a)]);});}); sc.portfolios.forEach(function(p){rows.push(['Portfolio','Summary',p.name,'',p.count,p.balance,'Missing phones: '+p.missingPhone+'; duplicate accounts: '+p.duplicates]);}); var out=rows.map(function(r){return r.map(function(c){return '"'+String(c==null?'':c).replace(/"/g,'""')+'"';}).join(',');}).join('\n'); var blob=new Blob([out],{type:'text/csv'}); var a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='co-pilot-data-cleanup-report.csv'; a.click(); setTimeout(function(){URL.revokeObjectURL(a.href);},1000);}
+  window.openDataCleanupDashboard=async function(){if(!isAdmin())return alert('Admin only.'); ensurePage().classList.add('open'); try{if(!getAccounts().length && typeof loadAccounts==='function')await loadAccounts();}catch(e){} state.scan=null; refreshDataCleanupDashboard();};
+  window.closeDataCleanupDashboard=function(){var el=document.getElementById('dataCleanupPage'); if(el)el.classList.remove('open');};
+  window.refreshDataCleanupDashboard=function(){scan();render();};
+  window.setDataCleanupTab=function(t){state.tab=t;render();};
+  window.setDataCleanupSearch=function(q){state.search=q;render();};
+  window.openDataCleanupAccount=openAccount;
+  window.markDataCleanupDuplicates=function(i){doMarkGroup(i,false);};
+  window.mergeDataCleanupGroup=function(i){doMarkGroup(i,true);};
+  window.exportDataCleanupCSV=csv;
+})();
+</script>
+
 </body>
 </html>
