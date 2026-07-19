@@ -35,8 +35,12 @@ R5 CLIENT / PORTFOLIO OWNER PORTAL MVP:
 - Clients cannot enter collector queue, notes, Messenger, scorecards, compliance, or admin tools.
 
 
-R6 STAFF ACCESS FIX:
+R7 STAFF ACCESS FIX:
 - Approve, Hold/Pending, Reject, Activate/Pause, and Remove now use an admin-only Supabase RPC.
 - Fixes action buttons that were blocked by direct table PATCH/RLS behavior.
 - Staff controls are compact, status-aware, and display success/error feedback.
 - Remove returns assigned accounts to the unassigned queue.
+
+R7 REQUIRED INCREMENTAL SQL:
+SQL_TO_RUN_IN_SUPABASE/RUN_THIS_CLIENT_PORTAL_LEDGER_SCHEMA_FIX_R7.sql
+Run it in this package's matching Supabase project before client portal testing.

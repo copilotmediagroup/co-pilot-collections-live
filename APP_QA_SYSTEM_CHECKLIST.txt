@@ -57,7 +57,7 @@ CLIENT PORTAL MVP R5:
 - Confirm client CSV and PDF reports download.
 
 
-STAFF APPROVAL ACTIONS R6:
+STAFF APPROVAL ACTIONS R7:
 - Run RUN_THIS_STAFF_APPROVAL_ACTIONS_FIX_SQL.sql.
 - Open Staff / Manage Employees.
 - Approve a pending employee and confirm status becomes Approved and access becomes Active.
@@ -65,3 +65,10 @@ STAFF APPROVAL ACTIONS R6:
 - Pause and Activate a user; confirm Access pill changes.
 - Remove a test employee and confirm assigned accounts return to unassigned.
 - Confirm action buttons are compact and success/error feedback appears above the table.
+
+
+CLIENT_PORTAL_LEDGER_SCHEMA_FIX_R7:
+- Run RUN_THIS_CLIENT_PORTAL_LEDGER_SCHEMA_FIX_R7.sql after R5/R6.
+- Log in as an approved client.
+- Confirm no payment_type column error appears.
+- Confirm assigned portfolios, account totals, recent payments, and performance summary load.

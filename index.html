@@ -12240,7 +12240,7 @@ function exportContactIntelligenceCSV(){let calls=filteredContactCalls();let row
   if(window.__cpcmSystemQaVersionLockLoaded) return;
   window.__cpcmSystemQaVersionLockLoaded = true;
   var BUILD_NAME = "Co Pilot Collections Manager — Stability QA / Version Lock";
-  var BUILD_VERSION = "STABLE_SINGLE_FILE_QA_LOCK_2026_07_18_R6";
+  var BUILD_VERSION = "STABLE_SINGLE_FILE_QA_LOCK_2026_07_18_R7";
   var EXPECTED_ENV = "LIVE";
   var EXPECTED_URL = "https://bwvufgzbkaymffwxuuzr.supabase.co";
   var EXPECTED_KEY_PREFIX = "sb_publishable_cvwkN3fOovsYvAvzXvrmRA";
@@ -12912,7 +12912,7 @@ function exportContactIntelligenceCSV(){let calls=filteredContactCalls();let row
     try{
       let data=cJson(await dbFetch('/rpc/cpcm_client_portal_snapshot',{method:'POST',body:'{}'}));clientPortalData=data;
       renderClientPortal();if(n)n.textContent='Data refreshed '+new Date().toLocaleString()+'. Only portfolios assigned to this login are included.';
-    }catch(e){if(n)n.textContent='Client Portal could not load. Run RUN_THIS_CLIENT_PORTAL_MVP_SQL.sql in the matching Supabase project, then reload. '+(e.message||e);}
+    }catch(e){if(n)n.textContent='Client Portal could not load. Run RUN_THIS_CLIENT_PORTAL_LEDGER_SCHEMA_FIX_R7.sql in the matching Supabase project, then reload. '+(e.message||e);}
   };
 
   function renderClientPortal(){
