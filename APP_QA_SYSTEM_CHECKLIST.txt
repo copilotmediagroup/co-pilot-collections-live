@@ -89,3 +89,19 @@ SILENT LOGGED-OUT STARTUP FIX R8N1:
 - Opening or refreshing the login page while logged out must not show a 'Could not load accounts / Not logged in' alert.
 - Account-loading errors still display after an authenticated login.
 - Only one startup boot sequence should run.
+
+
+LIVE DEMO-ACCESS EXCLUSION R8N2:
+- Login remains normal email/password with Access Type for new requests.
+- No one-click Admin Demo or Employee Demo buttons appear.
+- No demo emails or passwords exist in index.html.
+- Import and Add Account remain available to authorized LIVE admins.
+- No DEMO guard SQL is included.
+
+
+CONTACT ACTIONS / SOFTPHONE REMOVAL R8N8:
+- Confirm the fake keypad and Connected/End Call controls are gone.
+- Confirm Contact Actions shows the current account, primary phone, phone count, last result, and compliance status.
+- Confirm Call Primary launches the device or configured phone application through the existing tel link and Compliance Guard.
+- Confirm Other Numbers scrolls to the account phone list.
+- Confirm Log Call Result and Schedule Callback open their existing workflows.

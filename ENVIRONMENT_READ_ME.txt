@@ -49,7 +49,7 @@ Run it in this package's matching Supabase project before client portal testing.
 R8 CLIENT REMITTANCE + AGENCY FEE ACCOUNTING:
 Run SQL_TO_RUN_IN_SUPABASE/RUN_THIS_CLIENT_REMITTANCE_AGENCY_FEE_R8.sql in this matching LIVE Supabase project before testing.
 This release adds fee schedules, remittance batches, batch payment detail, client statements, branded PDF/CSV exports, and processor-fee capture.
-Build marker: STABLE_SINGLE_FILE_QA_LOCK_2026_07_19_R8N1
+Build marker: STABLE_SINGLE_FILE_QA_LOCK_2026_07_19_R8N2
 
 
 NETLIFY DEPLOYMENT FIX:
@@ -63,3 +63,9 @@ R8N1 SILENT LOGIN STARTUP FIX:
 - The logged-out login page no longer displays 'Could not load accounts: Not logged in.'
 - Real account-loading errors still display after authentication.
 - No Supabase SQL is required for this fix.
+
+
+R8N2 LIVE ENVIRONMENT PROTECTION:
+- LIVE keeps the standard email/password and access-request login.
+- LIVE contains no Demo Admin/Employee buttons, embedded demo credentials, or public-demo import restrictions.
+- The R8N2 demo guard SQL must never be run in LIVE.
