@@ -50,3 +50,9 @@ R8 CLIENT REMITTANCE + AGENCY FEE ACCOUNTING:
 Run SQL_TO_RUN_IN_SUPABASE/RUN_THIS_CLIENT_REMITTANCE_AGENCY_FEE_R8.sql in this matching LIVE Supabase project before testing.
 This release adds fee schedules, remittance batches, batch payment detail, client statements, branded PDF/CSV exports, and processor-fee capture.
 Build marker: STABLE_SINGLE_FILE_QA_LOCK_2026_07_18_R8
+
+
+NETLIFY DEPLOYMENT FIX:
+- package-lock.json uses only https://registry.npmjs.org/
+- .npmrc forces the public npm registry
+- netlify.toml sets npm run build and publishes dist
