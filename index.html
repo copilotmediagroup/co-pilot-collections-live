@@ -1,23 +1,23 @@
 <!doctype html>
 <!-- PRODUCTION_STABILITY_REFACTOR_PHASE_1_MARKER: legacy reports modal removed, no watcher loops, stable full-page navigation -->
-<!-- DEMO_DATA_CLEANUP_DUPLICATE_FINDER_MARKER: admin cleanup dashboard + duplicate scan -->
+<!-- LIVE_DATA_CLEANUP_DUPLICATE_FINDER_MARKER: admin cleanup dashboard + duplicate scan -->
 
 <!-- PAYMENT_PROMISE_PLAN_SAVE_FIX_MARKER: payment promise, payment plan, and notes save repair -->
-<!-- DEMO_CALL_INTELLIGENCE_MARKER: call logging + contact intelligence -->
-<!-- DEMO_PROMISE_AUTOMATION_ALERTS_MARKER: promise automation + collector alerts -->
+<!-- LIVE_CALL_INTELLIGENCE_MARKER: call logging + contact intelligence -->
+<!-- LIVE_PROMISE_AUTOMATION_ALERTS_MARKER: promise automation + collector alerts -->
 <html>
 <!-- DOCUMENT_BRANDING_TYPED_ESIGN_R4_2026_07_18: brand logo/name on documents + company Created By + DocuSign-style typed signature chooser -->
 
 <head>
 <!-- STABLE_SINGLE_FILE_QA_LOCK_2026_07_18: System Check + Version Lock build -->
-<!-- DEMO_COMPLIANCE_GUARD_MARKER: compliance guard + call rules -->
-<!-- DEMO_REPORTING_CLEAN_PACKAGE_MARKER: clean demo package + admin reports -->
-<!-- DEMO_REPORTING_CLEAN_PACKAGE_MARKER: clean demo package + admin reports -->
-<!-- DEMO_REPORTING_CLEAN_PACKAGE_MARKER: clean demo package + admin reports -->
-<!-- DEMO_REPORTING_CLEAN_PACKAGE_MARKER: clean demo package + admin reports -->
-<!-- DEMO_REPORTING_CLEAN_PACKAGE_MARKER: clean demo package + admin reports -->
-<!-- DEMO_REPORTING_CLEAN_PACKAGE_MARKER: clean demo package + admin reports -->
-<!-- DEMO_REPORTING_CLEAN_PACKAGE_MARKER: clean demo package + admin reports -->
+<!-- LIVE_COMPLIANCE_GUARD_MARKER: compliance guard + call rules -->
+<!-- LIVE_REPORTING_CLEAN_PACKAGE_MARKER: clean live package + admin reports -->
+<!-- LIVE_REPORTING_CLEAN_PACKAGE_MARKER: clean live package + admin reports -->
+<!-- LIVE_REPORTING_CLEAN_PACKAGE_MARKER: clean live package + admin reports -->
+<!-- LIVE_REPORTING_CLEAN_PACKAGE_MARKER: clean live package + admin reports -->
+<!-- LIVE_REPORTING_CLEAN_PACKAGE_MARKER: clean live package + admin reports -->
+<!-- LIVE_REPORTING_CLEAN_PACKAGE_MARKER: clean live package + admin reports -->
+<!-- LIVE_REPORTING_CLEAN_PACKAGE_MARKER: clean live package + admin reports -->
   <!-- REPORTS_PAGE_REBUILD_STABLE_MARKER: reports rebuilt as full page, no modal stacking -->
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -4829,8 +4829,8 @@ button {
   // Inline fallback config for published Bolt/Vite builds.
   // This is the Supabase publishable key only, not the secret service-role key.
   window.CO_PILOT_SUPABASE_CONFIG = window.CO_PILOT_SUPABASE_CONFIG || {
-    url: "https://nixqpmgkmrzjsaqhqqew.supabase.co",
-    publishableKey: "sb_publishable_g4D2rVDfqyGJLe1yhShBjQ_t6Oobilb"
+    url: "https://bwvufgzbkaymffwxuuzr.supabase.co",
+    publishableKey: "sb_publishable_cvwkN3fOovsYvAvzXvrmRA_TKauXT_d"
   };
 </script>
 <script src="/config.js"></script>
@@ -4868,11 +4868,11 @@ const FIELDS=["portfolio", "accountDescription", "clientAccountNumber", "account
 const map={"portfolio": "portfolio", "accountDescription": "account_description", "clientAccountNumber": "client_account_number", "accountId": "source_account_id", "accountNumber": "account_number", "issuerName": "issuer_name", "firstName": "first_name", "middleName": "middle_name", "lastName": "last_name", "fullName": "full_name", "ssn": "ssn", "dob": "dob", "address": "address", "address2": "address2", "city": "city", "state": "state", "zip": "zip", "employer": "employer", "occupation": "occupation", "description": "description", "email": "email", "originalCreditor": "original_creditor", "typeOfDebt": "type_of_debt", "originalBalance": "original_balance", "principal": "principal", "currentBalance": "current_balance", "openDate": "open_date", "dateAccountOpened": "date_account_opened", "accountReceiveDate": "account_receive_date", "delinquencyDate": "delinquency_date", "chargeOffDate": "charge_off_date", "origLastPmtDate": "orig_last_pmt_date", "lastPaymentDate": "last_payment_date", "lastPaymentAmount": "last_payment_amount", "bankRoutingNumber": "bank_routing_number", "bankAccountNumber": "bank_account_number", "origEmployer": "orig_employer", "origStoreName": "orig_store_name", "origStoreCity": "orig_store_city", "origStoreState": "orig_store_state", "origBankName": "orig_bank_name", "origBankAcctLast4Digits": "orig_bank_acct_last4_digits", "origPrincipalBalance": "orig_principal_balance", "origOriginalLoanAmount": "orig_original_loan_amount", "origChargeOffBalance": "orig_chargeoff_balance", "origLoanType": "orig_loan_type", "origPrincipalLoanAmount": "orig_principal_loan_amount", "origInterestAmount": "orig_interest_amount", "origReturnFee": "orig_return_fee", "rawData": "raw_data", "status": "status", "disposition": "disposition", "lastContactNumber": "last_contact_number", "phone1": "phone1", "phone1Type": "phone1_type", "phone1LineType": "phone1_line_type", "phone1Source": "phone1_source", "phone1Note": "phone1_note", "phone1Status": "phone1_status", "phone2": "phone2", "phone2Type": "phone2_type", "phone2LineType": "phone2_line_type", "phone2Source": "phone2_source", "phone2Note": "phone2_note", "phone2Status": "phone2_status", "phone3": "phone3", "phone3Type": "phone3_type", "phone3LineType": "phone3_line_type", "phone3Source": "phone3_source", "phone3Note": "phone3_note", "phone3Status": "phone3_status", "phone4": "phone4", "phone4Type": "phone4_type", "phone4LineType": "phone4_line_type", "phone4Source": "phone4_source", "phone4Note": "phone4_note", "phone4Status": "phone4_status", "phone5": "phone5", "phone5Type": "phone5_type", "phone5LineType": "phone5_line_type", "phone5Source": "phone5_source", "phone5Note": "phone5_note", "phone5Status": "phone5_status", "phone6": "phone6", "phone6Type": "phone6_type", "phone6LineType": "phone6_line_type", "phone6Source": "phone6_source", "phone6Note": "phone6_note", "phone6Status": "phone6_status", "phone7": "phone7", "phone7Type": "phone7_type", "phone7LineType": "phone7_line_type", "phone7Source": "phone7_source", "phone7Note": "phone7_note", "phone7Status": "phone7_status", "phone8": "phone8", "phone8Type": "phone8_type", "phone8LineType": "phone8_line_type", "phone8Source": "phone8_source", "phone8Note": "phone8_note", "phone8Status": "phone8_status", "phone9": "phone9", "phone9Type": "phone9_type", "phone9LineType": "phone9_line_type", "phone9Source": "phone9_source", "phone9Note": "phone9_note", "phone9Status": "phone9_status", "phone10": "phone10", "phone10Type": "phone10_type", "phone10LineType": "phone10_line_type", "phone10Source": "phone10_source", "phone10Note": "phone10_note", "phone10Status": "phone10_status","assignedToEmail":"assigned_to_email","assignedByEmail":"assigned_by_email","assignedAt":"assigned_at","assignmentMethod":"assignment_method","assignmentGroupId":"assignment_group_id"};
 const reverse=Object.fromEntries(Object.entries(map).map(([k,v])=>[v,k]));
 function cfg(){
-  if(!window.CO_PILOT_SUPABASE_CONFIG)window.CO_PILOT_SUPABASE_CONFIG={url: "https://nixqpmgkmrzjsaqhqqew.supabase.co",publishableKey: "sb_publishable_g4D2rVDfqyGJLe1yhShBjQ_t6Oobilb"};
+  if(!window.CO_PILOT_SUPABASE_CONFIG)window.CO_PILOT_SUPABASE_CONFIG={url: "https://bwvufgzbkaymffwxuuzr.supabase.co",publishableKey: "sb_publishable_cvwkN3fOovsYvAvzXvrmRA_TKauXT_d"};
   return window.CO_PILOT_SUPABASE_CONFIG||{};
 }
-function url(){return String(cfg().url||localStorage.getItem(URL_KEY)||"https://nixqpmgkmrzjsaqhqqew.supabase.co").replace(/\/$/,'')}
-function pubKey(){return String(cfg().publishableKey||localStorage.getItem(PUB_KEY)||"sb_publishable_g4D2rVDfqyGJLe1yhShBjQ_t6Oobilb")}
+function url(){return String(cfg().url||localStorage.getItem(URL_KEY)||"https://bwvufgzbkaymffwxuuzr.supabase.co").replace(/\/$/,'')}
+function pubKey(){return String(cfg().publishableKey||localStorage.getItem(PUB_KEY)||"sb_publishable_cvwkN3fOovsYvAvzXvrmRA_TKauXT_d")}
 function token(){return localStorage.getItem(TOKEN_KEY)||''}
 function connectionIsReady(){
   return Boolean(url() && pubKey() && !pubKey().includes('PASTE_YOUR') && pubKey().startsWith('sb_publishable_'));
@@ -9305,8 +9305,8 @@ LETTERS
 [ ] File/account number uses debtor account number.
 [ ] PDF spacing looks professional.
 
-DEMO
-[ ] Use test/demo debtor data only.
+LIVE
+[ ] No real debtor data is used.
 [ ] Company logo uploaded.
 [ ] Admin login works.
 [ ] Employee login works.
@@ -12016,7 +12016,7 @@ function exportContactIntelligenceCSV(){let calls=filteredContactCalls();let row
 })();
 </script>
 
-<!-- DEMO_STABLE_BOUNDARY_REPAIR_2026_07_18: repaired Receipts/Letters script boundary; removed exact duplicate messenger patch -->
+<!-- LIVE_STABLE_BOUNDARY_REPAIR_2026_07_18: repaired Receipts/Letters script boundary; removed exact duplicate messenger patch -->
 <script id="productionStabilityPhase1Script">
 (function(){
   if(window.__cpcmProductionStabilityPhase1Loaded) return;
@@ -12195,9 +12195,9 @@ function exportContactIntelligenceCSV(){let calls=filteredContactCalls();let row
   window.__cpcmSystemQaVersionLockLoaded = true;
   var BUILD_NAME = "Co Pilot Collections Manager — Stability QA / Version Lock";
   var BUILD_VERSION = "STABLE_SINGLE_FILE_QA_LOCK_2026_07_18_R4";
-  var EXPECTED_ENV = "DEMO";
-  var EXPECTED_URL = "https://nixqpmgkmrzjsaqhqqew.supabase.co";
-  var EXPECTED_KEY_PREFIX = "sb_publishable_g4D2rVDfqyGJLe1yhShBjQ";
+  var EXPECTED_ENV = "LIVE";
+  var EXPECTED_URL = "https://bwvufgzbkaymffwxuuzr.supabase.co";
+  var EXPECTED_KEY_PREFIX = "sb_publishable_cvwkN3fOovsYvAvzXvrmRA";
   function esc(v){return String(v==null?'':v).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
   function lower(v){return String(v==null?'':v).toLowerCase().trim();}
   function cfg(){try{return window.CO_PILOT_SUPABASE_CONFIG||{}}catch(e){return {}}}

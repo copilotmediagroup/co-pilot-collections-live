@@ -1,5 +1,5 @@
--- Co Pilot Collections Manager - Messenger Staff Names SQL (DEMO)
--- Run this in the DEMO Supabase SQL Editor before testing the Messenger Names package.
+-- Co Pilot Collections Manager - Messenger Staff Names SQL (LIVE)
+-- Run this in the LIVE Supabase SQL Editor before testing the Messenger Names package.
 
 alter table public.app_users add column if not exists full_name text;
 
@@ -51,7 +51,7 @@ $$;
 
 grant execute on function public.cpcm_update_staff_display_name(text,text) to authenticated;
 
--- Keep the DEMO admin's real name set by default.
+-- Keep the LIVE admin's real name set by default.
 update public.app_users
    set full_name = coalesce(nullif(full_name,''),'Antonio Finch'),
        role = 'admin',

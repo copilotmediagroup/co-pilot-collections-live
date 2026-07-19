@@ -26,10 +26,13 @@ MESSENGER_PRESENCE_CONTACTS_FB_LAYOUT_FIX:
 - Message bubbles show sender name, timestamp/date, and seen status. Debtor/account attachments must not appear in Messenger.
 
 
-DEMO_STABLE_BOUNDARY_REPAIR_2026_07_18_R1:
-- Receipts/Letters print script boundary repaired.
-- Exact duplicate Messenger Names patch removed; one final override remains after presence layout logic.
-- DEMO environment lock preserved.
+DOCUMENT_PDF_SIGNATURE_2026_07_18_R3:
+- Direct Download PDF uses PDF libraries embedded directly in index.html.
+- Downloaded PDF is rendered from the right-side document Preview.
+- Mouse/touch electronic signature pad added above Authorized Representative.
+- Typed authorized-name signature option and Clear Signature added.
+- Existing Print / Save PDF fallback remains available.
+- Environment lock preserved.
 
 R3 PDF ENGINE CHECK:
 - Open System Check and confirm Document PDF engine loaded passes.
