@@ -46,3 +46,12 @@ DOCUMENT_BRANDING_TYPED_ESIGN_R4:
 - User must select a style, check approval, and click Adopt & Apply Signature.
 - Applied signature, signer name, company role, and electronic-sign timestamp appear in preview and PDF.
 - Freehand mouse signature pad has been removed.
+
+
+CLIENT PORTAL MVP R5:
+- Run RUN_THIS_CLIENT_PORTAL_MVP_SQL.sql.
+- Request a Client / Portfolio Owner login.
+- Admin opens Clients and assigns one or more portfolio names.
+- Confirm client sees only assigned portfolios.
+- Confirm client cannot see collector queue, internal notes, Messenger, scorecards, compliance, SSN, bank data, or admin tools.
+- Confirm client CSV and PDF reports download.

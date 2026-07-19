@@ -10457,7 +10457,7 @@ renderChatConversation = function(){
 
 startPresenceHeartbeat();
 
-boot();
+setTimeout(()=>boot(),0);
 
 
 /* CALL LOGGING + CONTACT INTELLIGENCE */
@@ -12194,7 +12194,7 @@ function exportContactIntelligenceCSV(){let calls=filteredContactCalls();let row
   if(window.__cpcmSystemQaVersionLockLoaded) return;
   window.__cpcmSystemQaVersionLockLoaded = true;
   var BUILD_NAME = "Co Pilot Collections Manager — Stability QA / Version Lock";
-  var BUILD_VERSION = "STABLE_SINGLE_FILE_QA_LOCK_2026_07_18_R4";
+  var BUILD_VERSION = "STABLE_SINGLE_FILE_QA_LOCK_2026_07_18_R5";
   var EXPECTED_ENV = "LIVE";
   var EXPECTED_URL = "https://bwvufgzbkaymffwxuuzr.supabase.co";
   var EXPECTED_KEY_PREFIX = "sb_publishable_cvwkN3fOovsYvAvzXvrmRA";
@@ -12779,6 +12779,201 @@ function exportContactIntelligenceCSV(){let calls=filteredContactCalls();let row
   injectCss();
   setTimeout(function(){try{ensureMessengerNameUi(); if(typeof buildChatContacts==='function'){buildChatContacts();renderChatContacts();if(chatActiveEmail)renderChatConversation();}}catch(e){}},1000);
   window.CPCM_MESSENGER_NAMES_FIX_BUILD=BUILD;
+})();
+</script>
+
+
+<script>
+/* CLIENT_PORTFOLIO_OWNER_PORTAL_MVP_R5 — isolated client-safe portal, admin assignment, no collector UI */
+(function(){
+  'use strict';
+  const BUILD='CLIENT_PORTFOLIO_OWNER_PORTAL_MVP_R5';
+  let clientPortalData=null;
+  let clientAdminData=null;
+
+  function ce(id){return document.getElementById(id)}
+  function cEsc(v){return String(v==null?'':v).replace(/[&<>"']/g,function(ch){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]})}
+  function cNum(v){let n=Number(String(v==null?'0':v).replace(/[$,]/g,''));return Number.isFinite(n)?n:0}
+  function cMoney(v){return '$'+cNum(v).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2})}
+  function cPct(v){return cNum(v).toLocaleString(undefined,{minimumFractionDigits:1,maximumFractionDigits:1})+'%'}
+  function cDate(v){if(!v)return '—';try{return new Date(v).toLocaleDateString()}catch(e){return String(v).slice(0,10)||'—'}}
+  function cJson(res){if(Array.isArray(res)&&res.length===1&&res[0]&&typeof res[0]==='object')return res[0];return res||{}}
+  function currentRole(profile){return String(profile?.role||currentUser?.role||'').toLowerCase().trim()}
+  function isClientProfile(profile){return currentRole(profile)==='client'}
+  function hideCollectorApp(hide){let app=document.querySelector('.app');if(app)app.style.display=hide?'none':''}
+
+  function injectPortalCss(){
+    if(ce('cpcmClientPortalCss'))return;
+    let s=document.createElement('style');s.id='cpcmClientPortalCss';s.textContent=`
+      #clientPortalPage{position:fixed;inset:0;z-index:70000;background:#eef3f9;color:#0f172a;font-family:Arial,Helvetica,sans-serif;display:none;overflow:hidden}
+      #clientPortalPage.open{display:flex;flex-direction:column}
+      .cpTop{min-height:72px;background:linear-gradient(90deg,#05225f,#0b45c6);color:#fff;display:flex;align-items:center;justify-content:space-between;gap:16px;padding:10px 20px;box-shadow:0 5px 22px rgba(15,23,42,.2)}
+      .cpBrand{display:flex;align-items:center;gap:12px;min-width:0}.cpLogo{width:44px;height:44px;border-radius:12px;background:#fff;color:#1d4ed8;display:grid;place-items:center;font-size:24px;font-weight:1000;overflow:hidden;flex:0 0 auto}.cpLogo img{width:100%;height:100%;object-fit:contain}.cpBrandName{font-size:19px;font-weight:1000;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.cpBrandSub{font-size:12px;color:#dbeafe;margin-top:3px}.cpActions{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.cpActions button{height:38px;border:0;border-radius:10px;padding:0 12px;font-weight:900;cursor:pointer;background:#2563eb;color:#fff}.cpActions .cpWhite{background:#fff;color:#1d4ed8}.cpActions .cpDark{background:#334155}.cpActions .cpRed{background:#dc2626}
+      .cpBody{padding:16px 18px 30px;overflow:auto}.cpWelcome{background:#fff;border:1px solid #dbe3ef;border-radius:16px;padding:16px;display:flex;justify-content:space-between;align-items:flex-start;gap:14px;box-shadow:0 3px 14px rgba(15,23,42,.05);margin-bottom:12px}.cpWelcome h2{margin:0;font-size:21px}.cpWelcome p{margin:5px 0 0;color:#64748b;font-size:13px}.cpSafe{background:#ecfdf5;border:1px solid #bbf7d0;color:#166534;border-radius:999px;padding:7px 10px;font-size:11px;font-weight:1000;white-space:nowrap}
+      .cpKpis{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:10px;margin-bottom:12px}.cpKpi{background:#fff;border:1px solid #dbe3ef;border-radius:14px;padding:12px;min-height:86px;box-shadow:0 2px 10px rgba(15,23,42,.04)}.cpKpi.blue{background:#eff6ff;border-color:#bfdbfe}.cpKpi.green{background:#f0fdf4;border-color:#bbf7d0}.cpKpi.orange{background:#fff7ed;border-color:#fed7aa}.cpKpi.purple{background:#f5f3ff;border-color:#ddd6fe}.cpKpiLabel{font-size:10px;font-weight:1000;text-transform:uppercase;letter-spacing:.04em;color:#64748b}.cpKpiValue{font-size:20px;font-weight:1000;margin-top:6px}.cpKpiHint{font-size:11px;color:#64748b;margin-top:5px}
+      .cpGrid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.cpCard{background:#fff;border:1px solid #dbe3ef;border-radius:16px;overflow:hidden;box-shadow:0 2px 12px rgba(15,23,42,.04)}.cpCard.full{grid-column:1/-1}.cpCardHead{padding:12px 14px;background:#f8fbff;border-bottom:1px solid #e5edf7;display:flex;align-items:center;justify-content:space-between;gap:10px}.cpCardHead h3{margin:0;font-size:15px}.cpPill{display:inline-block;border-radius:999px;background:#eef2ff;color:#1d4ed8;padding:4px 8px;font-size:10px;font-weight:1000}.cpCardBody{padding:12px;overflow:auto}.cpPortfolioGrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}.cpPortfolio{border:1px solid #dbe3ef;border-radius:13px;padding:11px;background:#fff}.cpPortfolioName{font-weight:1000}.cpPortfolioStats{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:9px}.cpPortfolioStat{background:#f8fafc;border-radius:9px;padding:7px}.cpPortfolioStat b{display:block;font-size:12px}.cpPortfolioStat span{font-size:9px;color:#64748b;text-transform:uppercase;font-weight:900}
+      .cpFilters{display:grid;grid-template-columns:2fr 1fr 1fr auto;gap:9px;align-items:end;margin-bottom:10px}.cpFilters label{font-size:10px;font-weight:900;color:#475569;margin-bottom:4px;display:block}.cpFilters input,.cpFilters select{height:38px;border:1px solid #cbd5e1;border-radius:10px;padding:8px;width:100%;background:#fff}.cpFilters button{height:38px;border:0;border-radius:10px;padding:0 12px;background:#334155;color:#fff;font-weight:900;cursor:pointer}.cpTableWrap{max-height:430px;overflow:auto;border:1px solid #e2e8f0;border-radius:12px}.cpTable{width:100%;border-collapse:collapse;font-size:12px}.cpTable th{position:sticky;top:0;background:#f8fafc;color:#334155;text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:.03em;padding:9px;border-bottom:1px solid #e2e8f0}.cpTable td{padding:9px;border-bottom:1px solid #edf2f8;vertical-align:top}.cpMoney{font-weight:1000}.cpStatus{display:inline-block;border-radius:999px;background:#eef2ff;color:#1d4ed8;padding:3px 7px;font-size:10px;font-weight:900}.cpEmpty{border:1px dashed #cbd5e1;border-radius:13px;background:#f8fafc;padding:18px;text-align:center;color:#64748b;font-weight:850}.cpNotice{background:#eff6ff;border:1px solid #bfdbfe;color:#1e3a8a;border-radius:12px;padding:10px 12px;font-size:12px;font-weight:850;margin-bottom:12px}
+      #clientPortalAdminModal{z-index:71000}.cpAdminBox{max-width:1280px}.cpAdminLayout{display:grid;grid-template-columns:390px 1fr;gap:12px}.cpAdminPanel{border:1px solid #e2e8f0;border-radius:14px;padding:12px;background:#fff}.cpAdminPanel h3{margin:0 0 10px;font-size:15px}.cpAdminForm{display:grid;gap:10px}.cpAdminForm label{font-size:11px;font-weight:900;color:#334155;margin-bottom:4px}.cpAdminForm input,.cpAdminForm select{height:40px;border:1px solid #cbd5e1;border-radius:10px;padding:8px;width:100%}.cpPortfolioChecks{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;max-height:360px;overflow:auto}.cpPortfolioCheck{display:flex;align-items:flex-start;gap:7px;border:1px solid #e2e8f0;border-radius:10px;padding:9px;background:#f8fbff;font-size:12px;font-weight:800}.cpPortfolioCheck input{width:auto;margin-top:2px}.cpAdminBtns{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.cpAdminBtns button{height:38px;border:0;border-radius:10px;padding:0 12px;font-weight:900;cursor:pointer;background:#2563eb;color:#fff}.cpAdminBtns .green{background:#16a34a}.cpAdminBtns .red{background:#dc2626}.cpAdminBtns .gray{background:#334155}.cpClientList{max-height:520px;overflow:auto}.cpClientRow{border:1px solid #e2e8f0;border-radius:12px;padding:10px;margin-bottom:8px;background:#f8fbff;cursor:pointer}.cpClientRow:hover{border-color:#2563eb}.cpClientRow b{display:block}.cpClientMeta{font-size:11px;color:#64748b;margin-top:4px;line-height:1.35}
+      #loginAccessType{margin-bottom:10px}
+      @media(max-width:1250px){.cpKpis{grid-template-columns:repeat(3,1fr)}.cpPortfolioGrid{grid-template-columns:repeat(2,1fr)}.cpAdminLayout{grid-template-columns:1fr}.cpPortfolioChecks{grid-template-columns:repeat(2,1fr)}}
+      @media(max-width:760px){.cpTop{align-items:flex-start;flex-direction:column}.cpKpis,.cpGrid,.cpPortfolioGrid,.cpFilters,.cpPortfolioChecks{grid-template-columns:1fr}.cpCard.full{grid-column:auto}.cpSafe{white-space:normal}}
+    `;document.head.appendChild(s);
+  }
+
+  function injectAccessType(){
+    if(ce('loginAccessType'))return;
+    let pass=ce('loginPassword');if(!pass)return;
+    let label=document.createElement('label');label.textContent='Access Type (new request)';label.htmlFor='loginAccessType';
+    let select=document.createElement('select');select.id='loginAccessType';select.innerHTML='<option value="employee">Employee / Collector</option><option value="client">Client / Portfolio Owner</option>';
+    pass.insertAdjacentElement('afterend',select);select.insertAdjacentElement('beforebegin',label);
+    let mini=document.querySelector('.loginMiniBrand p');if(mini)mini.textContent='Admin, employee, or approved client access.';
+    let notice=document.querySelector('#loginScreen .cleanNotice');if(notice)notice.textContent='Employees and portfolio owners can request access. Admin approval is required before the account can enter the software.';
+  }
+
+  function ensureClientPortal(){
+    injectPortalCss();
+    if(ce('clientPortalPage'))return;
+    let p=document.createElement('div');p.id='clientPortalPage';p.innerHTML=`
+      <div class="cpTop">
+        <div class="cpBrand"><div class="cpLogo" id="cpLogo">C</div><div><div class="cpBrandName" id="cpBrandName">Client Portal</div><div class="cpBrandSub">Portfolio Owner Reporting Center</div></div></div>
+        <div class="cpActions"><button class="cpWhite" onclick="refreshClientPortal()">Refresh</button><button id="cpPdfBtn" onclick="downloadClientPortalPDF()">Download PDF Report</button><button id="cpCsvBtn" class="cpDark" onclick="exportClientPortalCSV()">Export Accounts CSV</button><button class="cpRed" onclick="logout()">Logout</button></div>
+      </div>
+      <div class="cpBody">
+        <div class="cpWelcome"><div><h2 id="cpWelcomeTitle">Welcome</h2><p id="cpWelcomeSub">Your assigned portfolio performance and account reporting.</p></div><div class="cpSafe">Client-safe view • Internal notes and staff tools excluded</div></div>
+        <div id="cpNotice" class="cpNotice">Loading your assigned portfolios...</div>
+        <div id="cpKpis" class="cpKpis"></div>
+        <div class="cpGrid">
+          <section class="cpCard full"><div class="cpCardHead"><h3>Assigned Portfolios</h3><span class="cpPill" id="cpPortfolioCount">0 portfolios</span></div><div class="cpCardBody"><div id="cpPortfolios" class="cpPortfolioGrid"></div></div></section>
+          <section class="cpCard full"><div class="cpCardHead"><h3>Client Account Report</h3><span class="cpPill" id="cpAccountCount">0 accounts</span></div><div class="cpCardBody"><div class="cpFilters"><div><label>Search</label><input id="cpSearch" placeholder="Consumer, account number, creditor..." oninput="renderClientPortalAccounts()"></div><div><label>Portfolio</label><select id="cpPortfolioFilter" onchange="renderClientPortalAccounts()"><option value="">All Portfolios</option></select></div><div><label>Status</label><select id="cpStatusFilter" onchange="renderClientPortalAccounts()"><option value="">All Statuses</option></select></div><button onclick="clearClientPortalFilters()">Clear</button></div><div class="cpTableWrap"><table class="cpTable"><thead><tr><th>Consumer</th><th>Account #</th><th>Portfolio</th><th>Original Creditor</th><th>Original Placed</th><th>Current Balance</th><th>Collected</th><th>Status</th><th>Payment Plan</th><th>Last Payment</th></tr></thead><tbody id="cpAccountsBody"></tbody></table></div></div></section>
+          <section class="cpCard"><div class="cpCardHead"><h3>Recent Payments</h3><span class="cpPill">Completed</span></div><div class="cpCardBody"><div class="cpTableWrap"><table class="cpTable"><thead><tr><th>Date</th><th>Consumer</th><th>Portfolio</th><th>Amount</th><th>Method</th><th>Receipt</th></tr></thead><tbody id="cpPaymentsBody"></tbody></table></div></div></section>
+          <section class="cpCard"><div class="cpCardHead"><h3>Performance Summary</h3><span class="cpPill">Client View</span></div><div class="cpCardBody" id="cpPerformance"></div></section>
+        </div>
+      </div>`;document.body.appendChild(p);
+  }
+
+  function ensureClientAdmin(){
+    injectPortalCss();if(ce('clientPortalAdminModal'))return;
+    let m=document.createElement('div');m.id='clientPortalAdminModal';m.className='modal';m.innerHTML=`<div class="modalbox cpAdminBox"><div class="modalhead"><h2>Client / Portfolio Owner Portal Administration</h2><button class="gray" onclick="closeClientPortalAdmin()">Close</button></div><div class="modalbody"><div id="cpAdminNotice" class="cpNotice">Choose a signed-up user, identify the portfolio owner, and assign portfolio names. Clients see only assigned portfolio data.</div><div class="cpAdminLayout"><div class="cpAdminPanel"><h3>Client Access</h3><div class="cpAdminForm"><div><label>Signed-Up User</label><select id="cpAdminUser" onchange="clientAdminUserChanged()"></select></div><div><label>Client Contact Name</label><input id="cpAdminContact" placeholder="Example: John Smith"></div><div><label>Portfolio Owner / Company</label><input id="cpAdminCompany" placeholder="Example: ABC Funding LLC"></div><div><label>Access Status</label><select id="cpAdminApproved"><option value="true">Approved and Active</option><option value="false">Pending / Disabled</option></select></div><label class="cpPortfolioCheck"><input id="cpCanAccounts" type="checkbox" checked><span>Allow account-level report</span></label><label class="cpPortfolioCheck"><input id="cpCanPayments" type="checkbox" checked><span>Allow recent payment detail</span></label><label class="cpPortfolioCheck"><input id="cpCanDownloads" type="checkbox" checked><span>Allow CSV / PDF downloads</span></label></div><div class="cpAdminBtns"><button class="green" onclick="saveClientPortalAccess()">Save Client & Assignments</button><button class="red" onclick="disableClientPortalAccess()">Disable Client</button><button class="gray" onclick="refreshClientPortalAdmin()">Refresh</button></div><div style="margin-top:14px"><h3>Existing Client Users</h3><div id="cpClientList" class="cpClientList"></div></div></div><div class="cpAdminPanel"><h3>Portfolio Access</h3><div class="hint">Checked portfolios become visible to this client. Matching is based on the account Portfolio field.</div><div id="cpPortfolioChecks" class="cpPortfolioChecks"></div></div></div></div></div>`;document.body.appendChild(m);
+  }
+
+  function applyClientBranding(){
+    ensureClientPortal();let name=(typeof appBrandSettings!=='undefined'&&appBrandSettings.name)||'Co Pilot Collections Manager';let logo=(typeof appBrandSettings!=='undefined'&&appBrandSettings.logoDataUrl)||'';
+    if(ce('cpBrandName'))ce('cpBrandName').textContent=name+' — Client Portal';let el=ce('cpLogo');if(el){if(logo)el.innerHTML='<img src="'+cEsc(logo)+'" alt="Logo">';else el.textContent=(name.trim()[0]||'C').toUpperCase();}
+  }
+
+  window.refreshClientPortal=async function(){
+    ensureClientPortal();applyClientBranding();let n=ce('cpNotice');if(n)n.textContent='Loading assigned portfolios and client-safe reports...';
+    try{
+      let data=cJson(await dbFetch('/rpc/cpcm_client_portal_snapshot',{method:'POST',body:'{}'}));clientPortalData=data;
+      renderClientPortal();if(n)n.textContent='Data refreshed '+new Date().toLocaleString()+'. Only portfolios assigned to this login are included.';
+    }catch(e){if(n)n.textContent='Client Portal could not load. Run RUN_THIS_CLIENT_PORTAL_MVP_SQL.sql in the matching Supabase project, then reload. '+(e.message||e);}
+  };
+
+  function renderClientPortal(){
+    let d=clientPortalData||{}, profile=d.profile||{}, s=d.summary||{}, portfolios=d.portfolios||[], rows=d.accounts||[], payments=d.recent_payments||d.recentPayments||[],canAccounts=profile.can_view_accounts!==false&&profile.canViewAccounts!==false,canPayments=profile.can_view_payments!==false&&profile.canViewPayments!==false,canDownloads=profile.can_download_reports!==false&&profile.canDownloadReports!==false;if(ce('cpPdfBtn'))ce('cpPdfBtn').style.display=canDownloads?'':'none';if(ce('cpCsvBtn'))ce('cpCsvBtn').style.display=(canDownloads&&canAccounts)?'':'none';
+    ce('cpWelcomeTitle').textContent='Welcome, '+(profile.contact_name||profile.contactName||profile.full_name||profile.fullName||profile.email||'Portfolio Owner');
+    ce('cpWelcomeSub').textContent=(profile.company_name||profile.companyName||'Portfolio Owner')+' • '+(profile.email||currentUser.email||'');
+    ce('cpKpis').innerHTML=[
+      ['Total Placed',cMoney(s.total_placed||s.totalPlaced),'Original assigned balance','blue'],['Current Balance',cMoney(s.current_balance||s.currentBalance),'Remaining across portfolios',''],['Collected',cMoney(s.total_collected||s.totalCollected),'Completed ledger payments','green'],['Liquidation Rate',cPct(s.liquidation_rate||s.liquidationRate),'Collected ÷ placed','purple'],['Active Plans',String(s.active_plans||s.activePlans||0),'Open payment arrangements','orange'],['Settlements',String(s.approved_settlements||s.approvedSettlements||0),'Approved / paid / settled','green']
+    ].map(x=>'<div class="cpKpi '+x[3]+'"><div class="cpKpiLabel">'+cEsc(x[0])+'</div><div class="cpKpiValue">'+cEsc(x[1])+'</div><div class="cpKpiHint">'+cEsc(x[2])+'</div></div>').join('');
+    ce('cpPortfolioCount').textContent=portfolios.length+' portfolio'+(portfolios.length===1?'':'s');
+    ce('cpPortfolios').innerHTML=portfolios.length?portfolios.map(p=>'<div class="cpPortfolio"><div class="cpPortfolioName">'+cEsc(p.portfolio_name||p.portfolioName||'Portfolio')+'</div><div class="cpPortfolioStats"><div class="cpPortfolioStat"><span>Accounts</span><b>'+cEsc(p.account_count||p.accountCount||0)+'</b></div><div class="cpPortfolioStat"><span>Placed</span><b>'+cMoney(p.total_placed||p.totalPlaced)+'</b></div><div class="cpPortfolioStat"><span>Balance</span><b>'+cMoney(p.current_balance||p.currentBalance)+'</b></div><div class="cpPortfolioStat"><span>Collected</span><b>'+cMoney(p.collected||0)+'</b></div></div></div>').join(''):'<div class="cpEmpty">No portfolios are assigned yet. Contact the agency administrator.</div>';
+    let pf=ce('cpPortfolioFilter'), st=ce('cpStatusFilter');let currentPf=pf.value,currentSt=st.value;
+    pf.innerHTML='<option value="">All Portfolios</option>'+[...new Set(rows.map(r=>r.portfolio).filter(Boolean))].sort().map(v=>'<option>'+cEsc(v)+'</option>').join('');
+    st.innerHTML='<option value="">All Statuses</option>'+[...new Set(rows.map(r=>r.status).filter(Boolean))].sort().map(v=>'<option>'+cEsc(v)+'</option>').join('');pf.value=currentPf;st.value=currentSt;
+    renderClientPortalAccounts();
+    ce('cpPaymentsBody').innerHTML=payments.length?payments.map(p=>'<tr><td>'+cEsc(cDate(p.payment_date||p.paymentDate))+'</td><td>'+cEsc(p.consumer_name||p.consumerName||'—')+'</td><td>'+cEsc(p.portfolio||'—')+'</td><td class="cpMoney">'+cMoney(p.amount)+'</td><td>'+cEsc(p.payment_method||p.paymentMethod||'—')+'</td><td>'+cEsc(p.receipt_number||p.receiptNumber||'—')+'</td></tr>').join(''):'<tr><td colspan="6"><div class="cpEmpty">No completed payments are available for assigned portfolios.</div></td></tr>';
+    ce('cpPerformance').innerHTML='<div class="cpPortfolioStats"><div class="cpPortfolioStat"><span>Accounts Placed</span><b>'+cEsc(s.account_count||s.accountCount||rows.length)+'</b></div><div class="cpPortfolioStat"><span>Paid in Full</span><b>'+cEsc(s.paid_accounts||s.paidAccounts||0)+'</b></div><div class="cpPortfolioStat"><span>Broken Promises</span><b>'+cEsc(s.broken_promises||s.brokenPromises||0)+'</b></div><div class="cpPortfolioStat"><span>Plan Performance</span><b>'+cPct(s.plan_performance||s.planPerformance||0)+'</b></div><div class="cpPortfolioStat"><span>Settlement Amount</span><b>'+cMoney(s.approved_settlement_amount||s.approvedSettlementAmount)+'</b></div><div class="cpPortfolioStat"><span>Last Updated</span><b>'+cEsc(new Date().toLocaleDateString())+'</b></div></div><div class="cpNotice" style="margin-top:12px;margin-bottom:0">This portal intentionally excludes internal collector notes, call recordings, staff messages, employee rankings, SSNs, banking details, compliance flags, and administrative controls.</div>';
+  }
+
+  window.renderClientPortalAccounts=function(){
+    let rows=(clientPortalData&&clientPortalData.accounts)||[],q=String(ce('cpSearch')?.value||'').toLowerCase().trim(),pf=ce('cpPortfolioFilter')?.value||'',st=ce('cpStatusFilter')?.value||'';
+    rows=rows.filter(r=>(!pf||r.portfolio===pf)&&(!st||r.status===st)&&(!q||[r.consumer_name,r.consumerName,r.account_number,r.accountNumber,r.portfolio,r.original_creditor,r.originalCreditor].some(v=>String(v||'').toLowerCase().includes(q))));
+    ce('cpAccountCount').textContent=rows.length+' account'+(rows.length===1?'':'s');
+    ce('cpAccountsBody').innerHTML=rows.length?rows.map(r=>'<tr><td><b>'+cEsc(r.consumer_name||r.consumerName||'—')+'</b></td><td>'+cEsc(r.account_number||r.accountNumber||'—')+'</td><td>'+cEsc(r.portfolio||'—')+'</td><td>'+cEsc(r.original_creditor||r.originalCreditor||'—')+'</td><td class="cpMoney">'+cMoney(r.original_balance||r.originalBalance)+'</td><td class="cpMoney">'+cMoney(r.current_balance||r.currentBalance)+'</td><td class="cpMoney">'+cMoney(r.collected)+'</td><td><span class="cpStatus">'+cEsc(r.status||'New')+'</span></td><td>'+cEsc(r.plan_status||r.planStatus||'—')+'</td><td>'+cEsc(cDate(r.last_payment_date||r.lastPaymentDate))+'</td></tr>').join(''):'<tr><td colspan="10"><div class="cpEmpty">No accounts match this filter.</div></td></tr>';
+  };
+  window.clearClientPortalFilters=function(){if(ce('cpSearch'))ce('cpSearch').value='';if(ce('cpPortfolioFilter'))ce('cpPortfolioFilter').value='';if(ce('cpStatusFilter'))ce('cpStatusFilter').value='';renderClientPortalAccounts()};
+  function clientFilteredRows(){let rows=(clientPortalData&&clientPortalData.accounts)||[],q=String(ce('cpSearch')?.value||'').toLowerCase().trim(),pf=ce('cpPortfolioFilter')?.value||'',st=ce('cpStatusFilter')?.value||'';return rows.filter(r=>(!pf||r.portfolio===pf)&&(!st||r.status===st)&&(!q||[r.consumer_name,r.consumerName,r.account_number,r.accountNumber,r.portfolio,r.original_creditor,r.originalCreditor].some(v=>String(v||'').toLowerCase().includes(q))))}
+  window.exportClientPortalCSV=function(){let rows=clientFilteredRows(),out=[['Consumer','Account Number','Portfolio','Original Creditor','Original Placed','Current Balance','Collected','Status','Payment Plan','Last Payment']];rows.forEach(r=>out.push([r.consumer_name||r.consumerName||'',r.account_number||r.accountNumber||'',r.portfolio||'',r.original_creditor||r.originalCreditor||'',r.original_balance||r.originalBalance||0,r.current_balance||r.currentBalance||0,r.collected||0,r.status||'',r.plan_status||r.planStatus||'',r.last_payment_date||r.lastPaymentDate||'']));let csv=out.map(row=>row.map(v=>'"'+String(v==null?'':v).replace(/"/g,'""')+'"').join(',')).join('\n');download('client-portfolio-account-report-'+new Date().toISOString().slice(0,10)+'.csv',csv,'text/csv;charset=utf-8')};
+  window.downloadClientPortalPDF=async function(){
+    let page=ce('clientPortalPage');if(!page)return;let notice=ce('cpNotice');try{if(!(window.html2canvas&&window.jspdf&&window.jspdf.jsPDF))throw new Error('PDF engine is not ready. Refresh and try again.');if(notice)notice.textContent='Preparing client portfolio PDF report...';let body=page.querySelector('.cpBody');let canvas=await window.html2canvas(body,{scale:1.3,useCORS:true,backgroundColor:'#eef3f9',logging:false});let img=canvas.toDataURL('image/jpeg',.92),jsPDF=window.jspdf.jsPDF,pdf=new jsPDF({orientation:'portrait',unit:'pt',format:'letter'}),pw=pdf.internal.pageSize.getWidth(),ph=pdf.internal.pageSize.getHeight(),margin=24,w=pw-margin*2,h=canvas.height*w/canvas.width,y=margin,remaining=h;while(remaining>0){pdf.addImage(img,'JPEG',margin,y,w,h);remaining-=ph-margin*2;if(remaining>0){pdf.addPage();y=margin-((h-remaining));}}pdf.save('client-portfolio-report-'+new Date().toISOString().slice(0,10)+'.pdf');if(notice)notice.textContent='PDF downloaded. The report contains client-safe portfolio data only.';}catch(e){if(notice)notice.textContent='PDF failed: '+(e.message||e);alert('Download PDF failed: '+(e.message||e));}
+  };
+
+  window.openClientPortal=async function(){ensureClientPortal();hideCollectorApp(true);ce('clientPortalPage').classList.add('open');applyClientBranding();await refreshClientPortal()};
+  window.closeClientPortal=function(){let p=ce('clientPortalPage');if(p)p.classList.remove('open');if(!currentUser.isClient)hideCollectorApp(false)};
+
+  function adminUserEmail(){return String(ce('cpAdminUser')?.value||'').toLowerCase().trim()}
+  function selectedPortfolios(){return Array.from(document.querySelectorAll('#cpPortfolioChecks input:checked')).map(x=>x.value)}
+  window.refreshClientPortalAdmin=async function(){
+    ensureClientAdmin();let n=ce('cpAdminNotice');if(n)n.textContent='Loading client candidates, portfolio names, and existing assignments...';
+    try{clientAdminData=cJson(await dbFetch('/rpc/cpcm_admin_client_portal_snapshot',{method:'POST',body:'{}'}));renderClientPortalAdmin();if(n)n.textContent='Assign only the portfolios this owner is authorized to see. Changes take effect on the client’s next refresh.';}catch(e){if(n)n.textContent='Client administration could not load. Run RUN_THIS_CLIENT_PORTAL_MVP_SQL.sql in the matching Supabase project. '+(e.message||e);}
+  };
+  function renderClientPortalAdmin(){
+    let d=clientAdminData||{},users=d.users||[],portfolios=d.portfolios||[],assignments=d.assignments||[];let sel=ce('cpAdminUser'),keep=sel.value;
+    sel.innerHTML='<option value="">Choose a signed-up user...</option>'+users.map(u=>'<option value="'+cEsc(u.email)+'">'+cEsc((u.full_name||u.fullName||u.email)+' — '+u.email+' ['+(u.role||'employee')+']')+'</option>').join('');if(users.some(u=>u.email===keep))sel.value=keep;
+    ce('cpPortfolioChecks').innerHTML=portfolios.length?portfolios.map(p=>'<label class="cpPortfolioCheck"><input type="checkbox" value="'+cEsc(p)+'"><span>'+cEsc(p)+'</span></label>').join(''):'<div class="cpEmpty">No portfolio values were found in accounts.</div>';
+    let clients=users.filter(u=>String(u.role||'').toLowerCase()==='client');ce('cpClientList').innerHTML=clients.length?clients.map(u=>{let a=assignments.filter(x=>String(x.client_email||x.clientEmail).toLowerCase()===String(u.email).toLowerCase()).map(x=>x.portfolio_name||x.portfolioName);return '<div class="cpClientRow" onclick="selectClientAdminUser(\''+cEsc(u.email)+'\')"><b>'+cEsc(u.client_company_name||u.clientCompanyName||u.full_name||u.fullName||u.email)+'</b><div class="cpClientMeta">'+cEsc(u.email)+'<br>Status: '+cEsc(u.approval_status||u.approvalStatus||'pending')+' • '+a.length+' assigned portfolio'+(a.length===1?'':'s')+'<br>'+cEsc(a.join(', ')||'No portfolios assigned')+'</div></div>'}).join(''):'<div class="cpEmpty">No client users configured yet.</div>';
+    if(sel.value)clientAdminUserChanged();
+  }
+  window.selectClientAdminUser=function(email){ce('cpAdminUser').value=email;clientAdminUserChanged()};
+  window.clientAdminUserChanged=function(){let d=clientAdminData||{},email=adminUserEmail(),u=(d.users||[]).find(x=>String(x.email).toLowerCase()===email)||{},assigned=(d.assignments||[]).filter(x=>String(x.client_email||x.clientEmail).toLowerCase()===email).map(x=>x.portfolio_name||x.portfolioName);ce('cpAdminContact').value=u.client_contact_name||u.clientContactName||u.full_name||u.fullName||'';ce('cpAdminCompany').value=u.client_company_name||u.clientCompanyName||'';ce('cpAdminApproved').value=(u.is_approved===true||u.isApproved===true||String(u.approval_status||u.approvalStatus).toLowerCase()==='approved')?'true':'false';if(ce('cpCanAccounts'))ce('cpCanAccounts').checked=u.client_can_view_accounts!==false&&u.clientCanViewAccounts!==false;if(ce('cpCanPayments'))ce('cpCanPayments').checked=u.client_can_view_payments!==false&&u.clientCanViewPayments!==false;if(ce('cpCanDownloads'))ce('cpCanDownloads').checked=u.client_can_download_reports!==false&&u.clientCanDownloadReports!==false;document.querySelectorAll('#cpPortfolioChecks input').forEach(x=>x.checked=assigned.includes(x.value))};
+  window.saveClientPortalAccess=async function(){let email=adminUserEmail();if(!email)return alert('Choose a signed-up user.');let body={target_email:email,contact_name:String(ce('cpAdminContact').value||'').trim(),company_name:String(ce('cpAdminCompany').value||'').trim(),approved:ce('cpAdminApproved').value==='true',portfolio_names:selectedPortfolios(),can_view_accounts:!!ce('cpCanAccounts')?.checked,can_view_payments:!!ce('cpCanPayments')?.checked,can_download_reports:!!ce('cpCanDownloads')?.checked};if(!body.company_name)return alert('Enter the portfolio owner / company name.');try{await dbFetch('/rpc/cpcm_admin_save_client_portal_access',{method:'POST',body:JSON.stringify(body)});alert('Client access and portfolio assignments saved.');await refreshClientPortalAdmin();}catch(e){alert('Save client access failed: '+(e.message||e))}};
+  window.disableClientPortalAccess=async function(){let email=adminUserEmail();if(!email)return alert('Choose a client user.');if(!confirm('Disable Client Portal access for '+email+'? Portfolio assignments will remain saved but the user cannot enter the portal.'))return;try{await dbFetch('/rpc/cpcm_admin_disable_client_portal_access',{method:'POST',body:JSON.stringify({target_email:email})});await refreshClientPortalAdmin();alert('Client Portal access disabled.');}catch(e){alert('Disable failed: '+(e.message||e))}};
+  window.openClientPortalAdmin=async function(){if(!currentUser.isAdmin)return alert('Admin only.');ensureClientAdmin();ce('clientPortalAdminModal').classList.add('open');await refreshClientPortalAdmin()};
+  window.closeClientPortalAdmin=function(){let m=ce('clientPortalAdminModal');if(m)m.classList.remove('open')};
+
+  function injectAdminButtons(){
+    let staff=Array.from(document.querySelectorAll('.topActions button')).find(b=>b.textContent.trim()==='Staff');if(staff&&!ce('clientPortalAdminBtn')){let b=document.createElement('button');b.id='clientPortalAdminBtn';b.className='gray adminOnly hidden';b.textContent='Clients';b.onclick=openClientPortalAdmin;staff.insertAdjacentElement('afterend',b)}
+    let nav=document.querySelector('.navRail'),sp=nav&&nav.querySelector('.navSpacer');if(nav&&sp&&!ce('clientPortalAdminNav')){let b=document.createElement('button');b.id='clientPortalAdminNav';b.className='navIcon teal adminOnly hidden';b.title='Client / Portfolio Owner Portal';b.innerHTML='<span class="navEmoji">🏢</span>';b.onclick=openClientPortalAdmin;nav.insertBefore(b,sp)}
+  }
+
+  const originalForce=forceCurrentUserRole;
+  forceCurrentUserRole=function(profile=null){
+    let role=String(profile?.role||currentUser?.requestedRole||'employee').toLowerCase().trim();
+    if(isAdminEmail(currentUser.email)||isAdminProfile(profile))role='admin';
+    currentUser.role=role;currentUser.profile=profile||currentUser.profile||null;currentUser.isAdmin=role==='admin';currentUser.isClient=role==='client';return role;
+  };
+  applyRoleUI=function(){
+    forceCurrentUserRole(currentUser.profile||null);let badge=ce('roleBadge');if(badge){badge.textContent=currentUser.isAdmin?'Admin':currentUser.isClient?'Client / Portfolio Owner':'Employee';badge.title=currentUser.email||''}
+    document.querySelectorAll('.adminOnly').forEach(el=>el.classList.toggle('hidden',!currentUser.isAdmin));
+    if(currentUser.isClient)hideCollectorApp(true);else if(!ce('clientPortalPage')?.classList.contains('open'))hideCollectorApp(false);
+  };
+
+  upsertCurrentUser=async function(){
+    if(!currentUser.email)return null;let requested=String(currentUser.requestedRole||'employee').toLowerCase()==='client'?'client':'employee';
+    try{
+      let existing=await dbFetch('/app_users?email=eq.'+encodeURIComponent(currentUser.email)+'&select=*').catch(()=>[]);
+      if(existing&&existing[0]){
+        let profile=toCamel(existing[0]);
+        if(isAdminEmail(currentUser.email)){let rows=await dbFetch('/app_users?email=eq.'+encodeURIComponent(currentUser.email),{method:'PATCH',body:JSON.stringify({role:'admin',approval_status:'approved',is_approved:true,is_active:true,last_seen_at:new Date().toISOString(),updated_at:new Date().toISOString()})}).catch(()=>null);return rows&&rows[0]?toCamel(rows[0]):{...profile,role:'admin',approvalStatus:'approved',isApproved:true,isActive:true};}
+        let pRole=String(profile.role||'').toLowerCase();
+        if(requested==='client'&&(!pRole||pRole==='employee')&&!isUserApproved(profile)){let rows=await dbFetch('/app_users?email=eq.'+encodeURIComponent(currentUser.email),{method:'PATCH',body:JSON.stringify({role:'client',client_portal_enabled:false,last_seen_at:new Date().toISOString(),updated_at:new Date().toISOString()})}).catch(()=>null);if(rows&&rows[0])profile=toCamel(rows[0]);}
+        else dbFetch('/app_users?email=eq.'+encodeURIComponent(currentUser.email),{method:'PATCH',body:JSON.stringify({last_seen_at:new Date().toISOString(),updated_at:new Date().toISOString()})}).catch(()=>{});
+        return profile;
+      }
+      let admin=isAdminEmail(currentUser.email),role=admin?'admin':requested,row={email:currentUser.email,role,approval_status:admin?'approved':'pending',is_approved:admin,is_active:admin,client_portal_enabled:false,created_at:new Date().toISOString(),updated_at:new Date().toISOString(),last_seen_at:new Date().toISOString()};
+      let rows=await dbFetch('/app_users',{method:'POST',body:JSON.stringify([row])}).catch(async()=>await dbFetch('/app_users?email=eq.'+encodeURIComponent(currentUser.email)+'&select=*').catch(()=>[]));return rows&&rows[0]?toCamel(rows[0]):null;
+    }catch(err){console.warn('Client-aware profile upsert failed',err);return isAdminEmail(currentUser.email)?{email:currentUser.email,role:'admin',approvalStatus:'approved',isApproved:true,isActive:true}:null;}
+  };
+
+  boot=async function(){
+    fillConnection();if(!connectionIsReady()||!token()){hideCollectorApp(false);ce('loginScreen').classList.add('open');return;}
+    try{
+      clearLoginError();let user=await getUser();let requested=String(user?.user_metadata?.requested_role||user?.user_metadata?.requestedRole||'employee').toLowerCase();currentUser={email:String(user.email||'').toLowerCase(),isAdmin:isAdminEmail(user.email||''),isClient:false,requestedRole:requested};let profile=await upsertCurrentUser();forceCurrentUserRole(profile);
+      if(!isUserApproved(profile)){ce('loginScreen').classList.remove('open');ce('pendingScreen').classList.add('open');hideCollectorApp(true);return;}
+      ce('pendingScreen').classList.remove('open');ce('loginScreen').classList.remove('open');applyRoleUI();await loadAppBrandSettings(true);await loadPdfLetterSettings(true);
+      if(currentUser.isClient){await openClientPortal();return;}
+      closeClientPortal();await loadAccounts();
+    }catch(e){let msg=e.message||String(e);if(/expired|jwt|token|session/i.test(msg)){clearSession();msg='Your login session expired. Please log in again.'}showLoginError(friendlyError(msg));ce('pendingScreen').classList.remove('open');ce('loginScreen').classList.add('open');hideCollectorApp(false);}
+  };
+
+  signup=async function(){
+    try{clearLoginError();setLoginBusy(true,'Creating access request...');let email=val('loginEmail').toLowerCase().trim(),password=val('loginPassword'),requested=ce('loginAccessType')?.value==='client'?'client':'employee';if(!email||!password)throw new Error('Enter email and password.');if(password.length<6)throw new Error('Password must be at least 6 characters.');let data=await authFetch('/auth/v1/signup',{email,password,data:{requested_role:requested}});currentUser={email,isAdmin:isAdminEmail(email),isClient:false,requestedRole:requested};if(data.access_token){storeSession(data);let profile=await upsertCurrentUser();forceCurrentUserRole(profile);ce('loginScreen').classList.remove('open');if(currentUser.isAdmin||isUserApproved(profile)){ce('pendingScreen').classList.remove('open');applyRoleUI();if(currentUser.isClient)await openClientPortal();else await loadAccounts();}else ce('pendingScreen').classList.add('open');}else{ce('loginScreen').classList.remove('open');ce('pendingScreen').classList.add('open')}}catch(e){showLoginError(friendlyError(e.message||String(e)))}finally{setLoginBusy(false,'')}
+  };
+
+  function init(){injectPortalCss();injectAccessType();injectAdminButtons();ensureClientPortal();ensureClientAdmin();applyClientBranding();try{applyRoleUI()}catch(e){}setTimeout(function(){injectAdminButtons();try{applyRoleUI()}catch(e){}},800);if(token())setTimeout(function(){boot().catch(function(){})},50);}
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
+  window.CPCM_CLIENT_PORTAL_BUILD=BUILD;
 })();
 </script>
 
