@@ -44,3 +44,9 @@ R7 STAFF ACCESS FIX:
 R7 REQUIRED INCREMENTAL SQL:
 SQL_TO_RUN_IN_SUPABASE/RUN_THIS_CLIENT_PORTAL_LEDGER_SCHEMA_FIX_R7.sql
 Run it in this package's matching Supabase project before client portal testing.
+
+
+R8 CLIENT REMITTANCE + AGENCY FEE ACCOUNTING:
+Run SQL_TO_RUN_IN_SUPABASE/RUN_THIS_CLIENT_REMITTANCE_AGENCY_FEE_R8.sql in this matching LIVE Supabase project before testing.
+This release adds fee schedules, remittance batches, batch payment detail, client statements, branded PDF/CSV exports, and processor-fee capture.
+Build marker: STABLE_SINGLE_FILE_QA_LOCK_2026_07_18_R8
