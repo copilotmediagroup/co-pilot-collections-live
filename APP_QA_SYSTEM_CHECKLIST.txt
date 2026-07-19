@@ -83,3 +83,9 @@ CLIENT REMITTANCE + AGENCY FEE ACCOUNTING R8 (LIVE):
 - Confirm processor fee entered in Payment Ledger is used; otherwise configured percentage/fixed fee is used.
 - Client Portal shows only Approved/Paid remittance statements for that client and supports branded PDF/CSV downloads.
 - Confirm clients cannot see other clients, draft batches, internal notes, or admin controls.
+
+
+SILENT LOGGED-OUT STARTUP FIX R8N1:
+- Opening or refreshing the login page while logged out must not show a 'Could not load accounts / Not logged in' alert.
+- Account-loading errors still display after an authenticated login.
+- Only one startup boot sequence should run.

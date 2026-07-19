@@ -49,10 +49,17 @@ Run it in this package's matching Supabase project before client portal testing.
 R8 CLIENT REMITTANCE + AGENCY FEE ACCOUNTING:
 Run SQL_TO_RUN_IN_SUPABASE/RUN_THIS_CLIENT_REMITTANCE_AGENCY_FEE_R8.sql in this matching LIVE Supabase project before testing.
 This release adds fee schedules, remittance batches, batch payment detail, client statements, branded PDF/CSV exports, and processor-fee capture.
-Build marker: STABLE_SINGLE_FILE_QA_LOCK_2026_07_18_R8
+Build marker: STABLE_SINGLE_FILE_QA_LOCK_2026_07_19_R8N1
 
 
 NETLIFY DEPLOYMENT FIX:
 - package-lock.json uses only https://registry.npmjs.org/
 - .npmrc forces the public npm registry
 - netlify.toml sets npm run build and publishes dist
+
+
+R8N1 SILENT LOGIN STARTUP FIX:
+- Removes the duplicate startup boot that could race against an expired or cleared session.
+- The logged-out login page no longer displays 'Could not load accounts: Not logged in.'
+- Real account-loading errors still display after authentication.
+- No Supabase SQL is required for this fix.

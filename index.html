@@ -10,7 +10,7 @@
 <!-- DOCUMENT_BRANDING_TYPED_ESIGN_R4_2026_07_18: brand logo/name on documents + company Created By + DocuSign-style typed signature chooser -->
 
 <head>
-<!-- STABLE_SINGLE_FILE_QA_LOCK_2026_07_18_R8: Client Remittance + Agency Fee Accounting -->
+<!-- STABLE_SINGLE_FILE_QA_LOCK_2026_07_19_R8N1: Silent Logged-Out Startup Fix -->
 <!-- LIVE_COMPLIANCE_GUARD_MARKER: compliance guard + call rules -->
 <!-- LIVE_REPORTING_CLEAN_PACKAGE_MARKER: clean live package + admin reports -->
 <!-- LIVE_REPORTING_CLEAN_PACKAGE_MARKER: clean live package + admin reports -->
@@ -5505,6 +5505,12 @@ function snakeToCamel(k){return String(k).replace(/_([a-z])/g,(_,c)=>c.toUpperCa
 function toRow(a){let r={};Object.entries(map).forEach(([k,v])=>{if(a[k]!==undefined)r[v]=numKey(k)?num(a[k]):a[k]});r.full_name=r.full_name||[r.first_name,r.middle_name,r.last_name].filter(Boolean).join(' ');r.account_number=r.account_number||r.client_account_number||r.source_account_id||'';r.portfolio=r.portfolio||r.issuer_name||r.account_description||r.original_creditor||'Imported Portfolio';r.original_creditor=r.original_creditor||r.issuer_name||r.account_description||r.portfolio;r.status=r.status||'New';r.updated_at=new Date().toISOString();r.created_by_email=currentUser.email;return r}
 function numKey(k){return ['originalBalance','principal','currentBalance','lastPaymentAmount','origPrincipalBalance','origOriginalLoanAmount','origChargeOffBalance','origPrincipalLoanAmount','origInterestAmount','origReturnFee'].includes(k)}function num(v){if(v===''||v==null)return null;let n=Number(String(v).replace(/[$,]/g,''));return Number.isFinite(n)?n:null}
 async function loadAccounts(){
+ if(!token()){
+   accounts=[];
+   currentAccountId='';
+   render();
+   return;
+ }
  try{
    setGlobalBusy(true,'Loading accounts','Refreshing queue and dashboards...');
    accounts=(await dbFetch('/accounts?select=*&order=created_at.asc&limit=20000')).map(toCamel);
@@ -5516,7 +5522,15 @@ async function loadAccounts(){
    if(typeof refreshCollectorAlertBadge==='function')refreshCollectorAlertBadge().catch(()=>{});
    render();
  }catch(e){
-   alert('Could not load accounts:\n\n'+friendlyError(e.message||String(e)));
+   let loadMessage=String(e?.message||e||'');
+   if(/not logged in|no refresh token|session expired|login session expired/i.test(loadMessage)){
+     console.info('Account loading skipped because no authenticated session is active.');
+     accounts=[];
+     currentAccountId='';
+     render();
+     return;
+   }
+   alert('Could not load accounts:\n\n'+friendlyError(loadMessage));
    accounts=[];
    currentAccountId='';
    render();
@@ -12243,7 +12257,7 @@ function exportContactIntelligenceCSV(){let calls=filteredContactCalls();let row
   if(window.__cpcmSystemQaVersionLockLoaded) return;
   window.__cpcmSystemQaVersionLockLoaded = true;
   var BUILD_NAME = "Co Pilot Collections Manager — Stability QA / Version Lock";
-  var BUILD_VERSION = "STABLE_SINGLE_FILE_QA_LOCK_2026_07_18_R8";
+  var BUILD_VERSION = "STABLE_SINGLE_FILE_QA_LOCK_2026_07_19_R8N1";
   var EXPECTED_ENV = "LIVE";
   var EXPECTED_URL = "https://bwvufgzbkaymffwxuuzr.supabase.co";
   var EXPECTED_KEY_PREFIX = "sb_publishable_cvwkN3fOovsYvAvzXvrmRA";
@@ -13021,7 +13035,7 @@ function exportContactIntelligenceCSV(){let calls=filteredContactCalls();let row
     try{clearLoginError();setLoginBusy(true,'Creating access request...');let email=val('loginEmail').toLowerCase().trim(),password=val('loginPassword'),requested=ce('loginAccessType')?.value==='client'?'client':'employee';if(!email||!password)throw new Error('Enter email and password.');if(password.length<6)throw new Error('Password must be at least 6 characters.');let data=await authFetch('/auth/v1/signup',{email,password,data:{requested_role:requested}});currentUser={email,isAdmin:isAdminEmail(email),isClient:false,requestedRole:requested};if(data.access_token){storeSession(data);let profile=await upsertCurrentUser();forceCurrentUserRole(profile);ce('loginScreen').classList.remove('open');if(currentUser.isAdmin||isUserApproved(profile)){ce('pendingScreen').classList.remove('open');applyRoleUI();if(currentUser.isClient)await openClientPortal();else await loadAccounts();}else ce('pendingScreen').classList.add('open');}else{ce('loginScreen').classList.remove('open');ce('pendingScreen').classList.add('open')}}catch(e){showLoginError(friendlyError(e.message||String(e)))}finally{setLoginBusy(false,'')}
   };
 
-  function init(){injectPortalCss();injectAccessType();injectAdminButtons();ensureClientPortal();ensureClientAdmin();applyClientBranding();try{applyRoleUI()}catch(e){}setTimeout(function(){injectAdminButtons();try{applyRoleUI()}catch(e){}},800);if(token())setTimeout(function(){boot().catch(function(){})},50);}
+  function init(){injectPortalCss();injectAccessType();injectAdminButtons();ensureClientPortal();ensureClientAdmin();applyClientBranding();try{applyRoleUI()}catch(e){}setTimeout(function(){injectAdminButtons();try{applyRoleUI()}catch(e){}},800);}
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
   window.CPCM_CLIENT_PORTAL_BUILD=BUILD;
 })();
