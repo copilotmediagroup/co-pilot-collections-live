@@ -6,9 +6,10 @@ co-pilot-collections-live
 Supabase project locked to:
 https://bwvufgzbkaymffwxuuzr.supabase.co
 
-Before testing, run BOTH SQL files in this order:
+Before testing, run ALL SQL files in this order:
 1. SQL_TO_RUN_IN_SUPABASE/RUN_THIS_MESSENGER_STAFF_NAMES_SQL.sql
 2. SQL_TO_RUN_IN_SUPABASE/RUN_THIS_CLIENT_PORTAL_MVP_SQL.sql
+3. SQL_TO_RUN_IN_SUPABASE/RUN_THIS_STAFF_APPROVAL_ACTIONS_FIX_SQL.sql
 in the matching LIVE Supabase SQL Editor.
 
 Do not upload this package to the DEMO repo.
@@ -32,3 +33,10 @@ R5 CLIENT / PORTFOLIO OWNER PORTAL MVP:
 - Admin assigns portfolio names to client users.
 - Client-safe dashboard, accounts, payments, performance, CSV, and PDF report.
 - Clients cannot enter collector queue, notes, Messenger, scorecards, compliance, or admin tools.
+
+
+R6 STAFF ACCESS FIX:
+- Approve, Hold/Pending, Reject, Activate/Pause, and Remove now use an admin-only Supabase RPC.
+- Fixes action buttons that were blocked by direct table PATCH/RLS behavior.
+- Staff controls are compact, status-aware, and display success/error feedback.
+- Remove returns assigned accounts to the unassigned queue.

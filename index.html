@@ -6,6 +6,7 @@
 <!-- LIVE_CALL_INTELLIGENCE_MARKER: call logging + contact intelligence -->
 <!-- LIVE_PROMISE_AUTOMATION_ALERTS_MARKER: promise automation + collector alerts -->
 <html>
+<!-- STAFF_APPROVAL_ACTIONS_R6_2026_07_18: secure admin RPC + compact professional staff controls -->
 <!-- DOCUMENT_BRANDING_TYPED_ESIGN_R4_2026_07_18: brand logo/name on documents + company Created By + DocuSign-style typed signature chooser -->
 
 <head>
@@ -290,6 +291,57 @@ header.topbar{height:66px;background:linear-gradient(90deg,#05225f,#07379a,#0b45
 .manualEmployeeRow input{flex:1}
 .assignmentNoMatch{background:#fee2e2;border:1px solid #fecaca;color:#991b1b;border-radius:12px;padding:10px;font-size:12px;font-weight:900;margin:10px 0}
 
+
+
+/* STAFF APPROVAL ACTIONS R6 — compact professional controls */
+.employeeAdminBox{max-width:1180px!important;border-radius:18px!important;overflow:hidden}
+.employeeAdminBox .modalhead{padding:16px 18px!important;background:linear-gradient(180deg,#ffffff,#f8fbff)!important}
+.employeeAdminBox .modalhead h2{margin:0!important;font-size:20px!important;letter-spacing:-.25px}
+.employeeAdminSubtitle{font-size:11px;color:#64748b;font-weight:700;margin-top:3px}
+.employeeCloseBtn{height:34px!important;padding:0 12px!important;border-radius:8px!important;font-size:11px!important}
+.employeeAdminTop{display:grid!important;grid-template-columns:minmax(0,1fr) auto auto!important;gap:12px!important;align-items:center!important;margin-bottom:10px!important}
+.employeeAdminIntro b{display:block;font-size:15px;color:#0f172a;margin-bottom:3px}
+.employeeAdminIntro .hint{margin:0!important;max-width:620px;line-height:1.35}
+.employeeAdminStats{display:flex!important;gap:6px!important;flex-wrap:nowrap!important}
+.employeeAdminStat{padding:5px 9px!important;border-radius:999px!important;background:#f1f5f9!important;border:1px solid #e2e8f0!important;color:#334155!important;font-size:10px!important;white-space:nowrap}
+.employeeAdminStat.pending{background:#fff7ed!important;border-color:#fed7aa!important;color:#9a3412!important}
+.employeeAdminStat.approved{background:#ecfdf5!important;border-color:#a7f3d0!important;color:#166534!important}
+.employeeRefreshBtn{height:32px!important;padding:0 10px!important;border-radius:8px!important;background:#eff6ff!important;color:#1d4ed8!important;border:1px solid #bfdbfe!important;font-size:10px!important;font-weight:900!important}
+.employeeAdminActionNotice{margin:0 0 10px;padding:9px 11px;border-radius:10px;border:1px solid #bfdbfe;background:#eff6ff;color:#1e40af;font-size:11px;font-weight:800}
+.employeeAdminActionNotice.success{border-color:#a7f3d0;background:#ecfdf5;color:#166534}
+.employeeAdminActionNotice.error{border-color:#fecaca;background:#fef2f2;color:#991b1b}
+.employeeAdminActionNotice.working{border-color:#c7d2fe;background:#eef2ff;color:#3730a3}
+.employeeAccessTableWrap{max-height:500px!important;border-radius:12px!important}
+.employeeAccessTable{font-size:11px!important;min-width:1030px!important}
+.employeeAccessTable th{padding:8px 9px!important;font-size:9px!important;letter-spacing:.06em!important;background:#f8fafc!important}
+.employeeAccessTable td{padding:8px 9px!important;vertical-align:middle!important}
+.employeeAccessTable th:last-child,.employeeAccessTable td:last-child{width:286px!important;min-width:286px!important}
+.empIdentity{min-width:150px}
+.empIdentityName{font-size:11px;font-weight:950;color:#0f172a;line-height:1.2}
+.empIdentityEmail{font-size:9px;color:#64748b;margin-top:3px;word-break:break-all}
+.empRolePill{display:inline-flex;align-items:center;height:22px;padding:0 7px;border-radius:999px;background:#eef2ff;color:#3730a3;font-size:9px;font-weight:900;text-transform:capitalize;border:1px solid #c7d2fe}
+.empAccessPill{display:inline-flex;align-items:center;gap:5px;height:22px;padding:0 7px;border-radius:999px;font-size:9px;font-weight:900;border:1px solid}
+.empAccessPill.on{background:#ecfdf5;color:#166534;border-color:#a7f3d0}
+.empAccessPill.off{background:#f8fafc;color:#64748b;border-color:#cbd5e1}
+.empAccessDot{width:6px;height:6px;border-radius:99px;background:currentColor}
+.empDate{font-size:9px;color:#334155;line-height:1.35;white-space:nowrap}
+.empDateSub{font-size:8px;color:#94a3b8;margin-top:2px}
+.empActions{display:flex!important;align-items:center!important;gap:4px!important;flex-wrap:wrap!important;min-width:270px}
+.empActionBtn{height:27px!important;min-width:0!important;padding:0 7px!important;border-radius:7px!important;font-size:9px!important;line-height:1!important;font-weight:950!important;letter-spacing:0!important;box-shadow:none!important;border:1px solid transparent!important;display:inline-flex!important;align-items:center!important;justify-content:center!important;gap:4px!important;transition:.12s ease!important}
+.empActionBtn:hover:not(:disabled){transform:translateY(-1px)!important;filter:brightness(.98)}
+.empActionBtn:disabled{opacity:.48!important;cursor:default!important;transform:none!important}
+.empActionBtn.approve{background:#ecfdf5!important;color:#166534!important;border-color:#a7f3d0!important}
+.empActionBtn.pending{background:#fff7ed!important;color:#9a3412!important;border-color:#fed7aa!important}
+.empActionBtn.reject{background:#fef2f2!important;color:#991b1b!important;border-color:#fecaca!important}
+.empActionBtn.activate{background:#eff6ff!important;color:#1d4ed8!important;border-color:#bfdbfe!important}
+.empActionBtn.deactivate{background:#f8fafc!important;color:#475569!important;border-color:#cbd5e1!important}
+.empActionBtn.remove{background:#fff1f2!important;color:#be123c!important;border-color:#fecdd3!important}
+.empActionBtn.isCurrent{box-shadow:inset 0 0 0 1px currentColor!important}
+.empActionIcon{font-size:10px;line-height:1}
+.employeeStatus{font-size:9px!important;padding:4px 7px!important;text-transform:capitalize}
+.removedEmployeeRow{background:#fafafa!important}
+.fireNote{font-size:8px!important;line-height:1.3!important;margin-top:3px!important}
+@media(max-width:1050px){.employeeAdminTop{grid-template-columns:1fr!important}.employeeAdminStats{flex-wrap:wrap!important}.employeeAccessTable{min-width:980px!important}}
 
 /* EMPLOYEE APPROVAL WORKFLOW */
 .pendingScreenContent{text-align:center;max-width:560px;margin:auto}
@@ -4083,23 +4135,24 @@ button {
 </div></div>
 
 <div id="employeeAdminModal" class="modal"><div class="modalbox employeeAdminBox">
-  <div class="modalhead"><h2>Manage Employees</h2><button class="gray" onclick="closeModal('employeeAdminModal')">Close</button></div>
+  <div class="modalhead"><div><h2>Staff Access</h2><div class="employeeAdminSubtitle">Approve, pause, reject, activate, or remove signed-up users.</div></div><button class="gray employeeCloseBtn" onclick="closeModal('employeeAdminModal')">Close</button></div>
   <div class="modalbody">
     <div class="employeeAdminTop">
-      <div>
-        <b>Employee Approval</b>
-        <div class="hint">Employees can sign up, but they cannot access the app until admin approves them. Fired employees can be removed, blocked from access, hidden from assignment, and their accounts returned to the unassigned queue.</div>
+      <div class="employeeAdminIntro">
+        <b>User Approval & Access</b>
+        <div class="hint">Approval controls login access. Removing a staff member also returns their assigned accounts to the unassigned queue.</div>
       </div>
       <div class="employeeAdminStats">
         <span class="employeeAdminStat" id="empStatAll">0 users</span>
-        <span class="employeeAdminStat" id="empStatPending">0 pending</span>
-        <span class="employeeAdminStat" id="empStatApproved">0 approved</span>
+        <span class="employeeAdminStat pending" id="empStatPending">0 pending</span>
+        <span class="employeeAdminStat approved" id="empStatApproved">0 approved</span>
       </div>
-      <button class="outline" onclick="loadEmployeeAdminList()">Refresh</button>
+      <button class="employeeRefreshBtn" onclick="loadEmployeeAdminList()">↻ Refresh</button>
     </div>
-    <div class="employeeTableWrap">
-      <table class="employeeTable">
-        <thead><tr><th>Email</th><th>Role</th><th>Status</th><th>Active</th><th>Created</th><th>Last Seen</th><th>Actions</th></tr></thead>
+    <div id="employeeAdminActionNotice" class="employeeAdminActionNotice hidden" role="status" aria-live="polite"></div>
+    <div class="employeeTableWrap employeeAccessTableWrap">
+      <table class="employeeTable employeeAccessTable">
+        <thead><tr><th>User</th><th>Role</th><th>Status</th><th>Access</th><th>Created</th><th>Last Seen</th><th>Actions</th></tr></thead>
         <tbody id="employeeAdminBody"></tbody>
       </table>
     </div>
@@ -6349,96 +6402,89 @@ async function loadEmployeeAdminList(){
  document.getElementById('empStatApproved').textContent=approved+' approved'+(removed?` / ${removed} removed`:'');
  body.innerHTML=users.map(u=>{
    let email=(u.email||'').toLowerCase();
+   let name=String(u.fullName||u.full_name||'').trim()||email.split('@')[0]||email;
+   let role=String(u.role||'employee').toLowerCase();
    let status=userApprovalStatus(u);
    let statusClass=status==='approved'?'statusApproved':status==='admin'?'statusAdmin':status==='rejected'?'statusRejected':status==='removed'?'statusRemoved':'statusPending';
    let active=(u.isActive!==false && u.is_active!==false);
    let assignedCount=accounts.filter(a=>(a.assignedToEmail||'').toLowerCase()===email).length;
-   let removedInfo=status==='removed'?`<div class="fireNote">Removed by: ${esc(u.removedByEmail||u.removed_by_email||'—')}<br>Removed at: ${esc(String(u.removedAt||u.removed_at||'').slice(0,19)||'—')}</div>`:'';
+   let removedInfo=status==='removed'?`<div class="fireNote">Removed ${esc(String(u.removedAt||u.removed_at||'').slice(0,10)||'—')} · ${esc(u.removalReason||u.removal_reason||'No reason entered')}</div>`:'';
+   let statusButton=(kind,label,icon,title)=>{let visual=kind==='approved'?'approve':kind;return `<button class="empActionBtn ${visual} ${status===kind?'isCurrent':''}" title="${esc(title)}" ${status===kind?'disabled':''} onclick="setEmployeeApproval('${esc(email)}','${kind}')"><span class="empActionIcon">${icon}</span>${label}</button>`};
    let actions=isProtectedAdminEmail(email)
-     ? '<span class="muted">Admin account</span>'
-     : `<div class="empActions">
-          <button class="green" onclick="setEmployeeApproval('${esc(email)}','approved')">Approve</button>
-          <button class="gray" onclick="setEmployeeApproval('${esc(email)}','pending')">Pending</button>
-          <button class="red" onclick="setEmployeeApproval('${esc(email)}','rejected')">Reject</button>
-          <button class="outline" onclick="toggleEmployeeActive('${esc(email)}',${active?'false':'true'})">${active?'Deactivate':'Activate'}</button>
-          <button class="red" onclick="removeEmployeeFromSoftware('${esc(email)}')">Remove / Fired</button>
+     ? '<span class="empRolePill">Protected admin</span>'
+     : `<div class="empActions" data-emp-email="${esc(email)}">
+          ${statusButton('approved','Approve','✓','Approve access')}
+          ${statusButton('pending','Hold','◷','Return to pending')}
+          ${statusButton('rejected','Reject','×','Reject access')}
+          <button class="empActionBtn ${active?'deactivate':'activate'}" title="${active?'Temporarily block login':'Restore active login'}" onclick="toggleEmployeeActive('${esc(email)}',${active?'false':'true'})"><span class="empActionIcon">${active?'○':'●'}</span>${active?'Pause':'Activate'}</button>
+          <button class="empActionBtn remove" title="Remove user and unassign their accounts" onclick="removeEmployeeFromSoftware('${esc(email)}')"><span class="empActionIcon">⌫</span>Remove</button>
         </div>`;
+   let created=String(u.createdAt||u.created_at||'');
+   let lastSeen=String(u.lastSeenAt||u.last_seen_at||'');
    return `<tr class="${status==='removed'?'removedEmployeeRow':''}">
-     <td><b>${esc(email)}</b>${removedInfo}</td>
-     <td>${esc(u.role||'employee')}</td>
+     <td><div class="empIdentity"><div class="empIdentityName">${esc(name)}</div><div class="empIdentityEmail">${esc(email)}</div>${removedInfo}</div></td>
+     <td><span class="empRolePill">${esc(role)}</span></td>
      <td><span class="employeeStatus ${statusClass}">${esc(status)}</span></td>
-     <td>${active?'Yes':'No'}</td>
-     <td>${esc(String(u.createdAt||u.created_at||'').slice(0,19))}</td>
-     <td>${esc(String(u.lastSeenAt||u.last_seen_at||'').slice(0,19))}<div class="fireNote">Assigned accounts: ${assignedCount}</div></td>
+     <td><span class="empAccessPill ${active?'on':'off'}"><span class="empAccessDot"></span>${active?'Active':'Blocked'}</span></td>
+     <td><div class="empDate">${esc(created.slice(0,10)||'—')}</div><div class="empDateSub">${esc(created.slice(11,19)||'')}</div></td>
+     <td><div class="empDate">${esc(lastSeen.slice(0,10)||'—')}</div><div class="empDateSub">${esc(lastSeen.slice(11,19)||'Never seen')} · ${assignedCount} assigned</div></td>
      <td>${actions}</td>
    </tr>`;
  }).join('')||'<tr><td colspan="7">No signed-up users yet.</td></tr>';
  populateEmployeeSelect();
  previewAssignment();
 }
-async function setEmployeeApproval(email,status){
+let employeeAdminActionBusy='';
+function showEmployeeAdminNotice(message,type='working'){
+ let n=document.getElementById('employeeAdminActionNotice');if(!n)return;
+ n.textContent=message;n.className='employeeAdminActionNotice '+type;
+}
+function hideEmployeeAdminNotice(){let n=document.getElementById('employeeAdminActionNotice');if(n)n.className='employeeAdminActionNotice hidden'}
+function setEmployeeActionButtonsBusy(email,busy){
+ document.querySelectorAll('.empActions').forEach(g=>{if(String(g.dataset.empEmail||'').toLowerCase()===String(email||'').toLowerCase())g.querySelectorAll('button').forEach(b=>b.disabled=busy)});
+}
+async function runEmployeeAdminAction(email,action,reason=''){
  if(!currentUser.isAdmin)return alert('Admin only');
- email=String(email||'').toLowerCase();
- if(isProtectedAdminEmail(email))return alert('Cannot change admin approval.');
- let body={
-   approval_status:status,
-   is_approved:status==='approved',
-   is_active:status==='approved',
-   updated_at:new Date().toISOString()
- };
- if(status!=='removed'){
-   body.removed_at=null;
-   body.removed_by_email=null;
-   body.removal_reason=null;
- }
- await dbFetch('/app_users?email=eq.'+encodeURIComponent(email),{method:'PATCH',body:JSON.stringify(body)});
- await loadEmployeeAdminList();
+ email=String(email||'').toLowerCase();action=String(action||'').toLowerCase();
+ if(isProtectedAdminEmail(email))return alert('The protected admin account cannot be changed.');
+ if(employeeAdminActionBusy)return;
+ employeeAdminActionBusy=email;setEmployeeActionButtonsBusy(email,true);
+ let labels={approved:'Approving',pending:'Moving to pending',rejected:'Rejecting',activate:'Activating',deactivate:'Pausing',remove:'Removing'};
+ showEmployeeAdminNotice((labels[action]||'Updating')+' '+email+'…','working');
+ try{
+   let result=await dbFetch('/rpc/cpcm_admin_manage_staff_user',{method:'POST',body:JSON.stringify({target_email:email,requested_action:action,removal_reason_text:reason||null})});
+   let row=Array.isArray(result)?result[0]:result;
+   let released=Number(row?.assigned_accounts_released||row?.assignedAccountsReleased||0);
+   let done={approved:'Access approved',pending:'User moved to pending',rejected:'Access rejected',activate:'Login activated',deactivate:'Login paused',remove:'User removed'}[action]||'User updated';
+   showEmployeeAdminNotice(done+' for '+email+(released?' · '+released+' account'+(released===1?'':'s')+' returned to unassigned queue':''),'success');
+   if(action==='remove')await loadAccounts();
+   await loadEmployeeAdminList();
+ }catch(e){
+   console.error('Staff action failed',e);
+   let msg=String(e?.message||e||'Unknown error');
+   showEmployeeAdminNotice('Action failed: '+msg,'error');
+   alert('Staff action failed. Run RUN_THIS_STAFF_APPROVAL_ACTIONS_FIX_SQL.sql in the matching Supabase project, then try again.\n\n'+msg);
+ }finally{employeeAdminActionBusy='';setEmployeeActionButtonsBusy(email,false)}
+}
+async function setEmployeeApproval(email,status){
+ let action=String(status||'').toLowerCase();
+ if(!['approved','pending','rejected'].includes(action))return;
+ await runEmployeeAdminAction(email,action);
 }
 async function toggleEmployeeActive(email,active){
- if(!currentUser.isAdmin)return alert('Admin only');
- email=String(email||'').toLowerCase();
- if(isProtectedAdminEmail(email))return alert('Cannot deactivate admin.');
- await dbFetch('/app_users?email=eq.'+encodeURIComponent(email),{method:'PATCH',body:JSON.stringify({is_active:active,updated_at:new Date().toISOString()})});
- await loadEmployeeAdminList();
+ await runEmployeeAdminAction(email,active?'activate':'deactivate');
 }
 
 async function removeEmployeeFromSoftware(email){
  if(!currentUser.isAdmin)return alert('Admin only');
  email=String(email||'').toLowerCase();
- if(isProtectedAdminEmail(email))return alert('You cannot remove the admin account.');
- let assigned=accounts.filter(a=>(a.assignedToEmail||'').toLowerCase()===email);
- let msg='Remove '+email+' from the software?\n\nThis will:\n- Block this employee from logging into the CRM\n- Remove them from assignment dropdowns\n- Mark them as Removed / Fired\n- Return '+assigned.length+' assigned account(s) back to unassigned queue';
+ if(isProtectedAdminEmail(email))return alert('You cannot remove the protected admin account.');
+ let assigned=accounts.filter(a=>(a.assignedToEmail||'').toLowerCase()===email).length;
+ let msg='Remove '+email+' from the software?\n\nThis will block login, remove the user from assignment lists, and return '+assigned+' assigned account'+(assigned===1?'':'s')+' to the unassigned queue.';
  if(!confirm(msg))return;
- let reason=prompt('Optional removal reason:', 'Fired / no longer with company')||'Fired / removed';
- await dbFetch('/app_users?email=eq.'+encodeURIComponent(email),{
-   method:'PATCH',
-   body:JSON.stringify({
-     approval_status:'removed',
-     is_approved:false,
-     is_active:false,
-     removed_at:new Date().toISOString(),
-     removed_by_email:currentUser.email,
-     removal_reason:reason,
-     updated_at:new Date().toISOString()
-   })
- });
- if(assigned.length){
-   await dbFetch('/accounts?assigned_to_email=eq.'+encodeURIComponent(email),{
-     method:'PATCH',
-     body:JSON.stringify({
-       assigned_to_email:null,
-       assigned_by_email:currentUser.email,
-       assigned_at:null,
-       assignment_method:'employee_removed',
-       assignment_group_id:null,
-       updated_at:new Date().toISOString()
-     })
-   });
- }
- alert(email+' was removed. '+assigned.length+' account(s) returned to unassigned queue.');
- await loadAccounts();
- await loadEmployeeAdminList();
- if(document.getElementById('employeeMonitorModal')?.classList.contains('open'))await loadEmployeeMonitor();
+ let reason=prompt('Optional removal reason:','Fired / no longer with company');
+ if(reason===null)return;
+ await runEmployeeAdminAction(email,'remove',String(reason||'Fired / removed').trim());
 }
 
 
@@ -12194,7 +12240,7 @@ function exportContactIntelligenceCSV(){let calls=filteredContactCalls();let row
   if(window.__cpcmSystemQaVersionLockLoaded) return;
   window.__cpcmSystemQaVersionLockLoaded = true;
   var BUILD_NAME = "Co Pilot Collections Manager — Stability QA / Version Lock";
-  var BUILD_VERSION = "STABLE_SINGLE_FILE_QA_LOCK_2026_07_18_R5";
+  var BUILD_VERSION = "STABLE_SINGLE_FILE_QA_LOCK_2026_07_18_R6";
   var EXPECTED_ENV = "LIVE";
   var EXPECTED_URL = "https://bwvufgzbkaymffwxuuzr.supabase.co";
   var EXPECTED_KEY_PREFIX = "sb_publishable_cvwkN3fOovsYvAvzXvrmRA";

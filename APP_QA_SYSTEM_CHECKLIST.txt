@@ -55,3 +55,13 @@ CLIENT PORTAL MVP R5:
 - Confirm client sees only assigned portfolios.
 - Confirm client cannot see collector queue, internal notes, Messenger, scorecards, compliance, SSN, bank data, or admin tools.
 - Confirm client CSV and PDF reports download.
+
+
+STAFF APPROVAL ACTIONS R6:
+- Run RUN_THIS_STAFF_APPROVAL_ACTIONS_FIX_SQL.sql.
+- Open Staff / Manage Employees.
+- Approve a pending employee and confirm status becomes Approved and access becomes Active.
+- Move a user to Hold/Pending and Reject; confirm login access is blocked.
+- Pause and Activate a user; confirm Access pill changes.
+- Remove a test employee and confirm assigned accounts return to unassigned.
+- Confirm action buttons are compact and success/error feedback appears above the table.
