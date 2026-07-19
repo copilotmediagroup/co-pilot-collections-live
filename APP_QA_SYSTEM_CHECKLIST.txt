@@ -37,3 +37,12 @@ DOCUMENT_PDF_SIGNATURE_2026_07_18_R3:
 R3 PDF ENGINE CHECK:
 - Open System Check and confirm Document PDF engine loaded passes.
 - Download PDF must work in Bolt preview without loading any CDN or /vendor script.
+
+DOCUMENT_BRANDING_TYPED_ESIGN_R4:
+- Receipt/letter header uses the saved app brand name, subtitle, and navigation logo.
+- Created By on the customer-facing receipt shows the company brand name, never the staff email.
+- Footer uses the saved company brand name.
+- Signature area uses typed-name previews with four built-in signature styles.
+- User must select a style, check approval, and click Adopt & Apply Signature.
+- Applied signature, signer name, company role, and electronic-sign timestamp appear in preview and PDF.
+- Freehand mouse signature pad has been removed.

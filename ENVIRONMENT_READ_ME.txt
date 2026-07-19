@@ -22,3 +22,5 @@ DOCUMENT PDF + SIGNATURE R3:
 R3 BOLT PREVIEW FIX:
 - Fixes “The PDF engine did not load” in Bolt preview.
 - The PDF engine is decoded from the app itself, so preview does not depend on /vendor paths.
+
+R4 document update: saved app branding is used on receipts/letters; customer-facing Created By is the brand name; typed electronic signature chooser replaces freehand signing. No new SQL is required.
