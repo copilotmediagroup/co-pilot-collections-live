@@ -5,12 +5,13 @@
 <!-- PAYMENT_PROMISE_PLAN_SAVE_FIX_MARKER: payment promise, payment plan, and notes save repair -->
 <!-- LIVE_CALL_INTELLIGENCE_MARKER: call logging + contact intelligence -->
 <!-- LIVE_PROMISE_AUTOMATION_ALERTS_MARKER: promise automation + collector alerts -->
+<!-- LIVE_DEMO_ONE_CLICK_LOGIN_EXCLUSION_R8N2: no demo credentials, buttons, or public-demo restrictions -->
 <html>
 <!-- STAFF_APPROVAL_ACTIONS_R6_2026_07_18: secure admin RPC + compact professional staff controls -->
 <!-- DOCUMENT_BRANDING_TYPED_ESIGN_R4_2026_07_18: brand logo/name on documents + company Created By + DocuSign-style typed signature chooser -->
 
 <head>
-<!-- STABLE_SINGLE_FILE_QA_LOCK_2026_07_19_R8N1: Silent Logged-Out Startup Fix -->
+<!-- STABLE_SINGLE_FILE_QA_LOCK_2026_07_20_R8N11: LIVE Dynamic Activity + Live Statistics -->
 <!-- LIVE_COMPLIANCE_GUARD_MARKER: compliance guard + call rules -->
 <!-- LIVE_REPORTING_CLEAN_PACKAGE_MARKER: clean live package + admin reports -->
 <!-- LIVE_REPORTING_CLEAN_PACKAGE_MARKER: clean live package + admin reports -->
@@ -99,7 +100,7 @@ header.topbar{height:66px;background:linear-gradient(90deg,#05225f,#07379a,#0b45
 .dispoPanel{grid-column:1/-1}.dispoGrid{grid-template-columns:repeat(8,1fr);gap:8px}.dispo{height:44px;font-size:12px;border-radius:10px;padding:0 8px}
 .notePanel{grid-column:1/2}.notePanel textarea{height:90px;background:#fffdf3;border-color:#f3d38a}.centerActivity{grid-column:2/3}.timeline{max-height:160px;overflow:auto}
 .mappedPanel{display:none}
-.right{padding:16px 14px 84px;background:#f8fbff;overflow:auto}.right .panel{border-radius:14px}.softphone{padding:14px}.ready{border-radius:10px}.dialer{grid-template-columns:1fr;gap:10px}.keys{grid-template-columns:repeat(3,1fr)}.key{height:46px;background:#fff;color:#0f172a;border:1px solid var(--line);border-radius:9px}.callBox{border:0;padding:0}.callBox button{width:100%;justify-content:center;border-radius:8px}.quickActions{padding:14px;margin-top:12px}.qaItem{height:42px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #e5edf7;font-weight:800;font-size:13px}.qaItem:last-child{border-bottom:0}.qaIcon{width:26px;height:26px;border-radius:8px;background:#e0ecff;color:#1457ff;display:grid;place-items:center;margin-right:8px}.qaLeft{display:flex;align-items:center}
+.right{padding:16px 14px 84px;background:#f8fbff;overflow:auto}.right .panel{border-radius:14px}.softphone{padding:14px}.ready{border-radius:10px}.dialer{grid-template-columns:1fr;gap:10px}.keys{grid-template-columns:repeat(3,1fr)}.key{height:46px;background:#fff;color:#0f172a;border:1px solid var(--line);border-radius:9px}.callBox{border:0;padding:0}.callBox button{width:100%;justify-content:center;border-radius:8px}.quickActions{padding:14px;margin-top:0}.qaItem{height:42px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #e5edf7;font-weight:800;font-size:13px}.qaItem:last-child{border-bottom:0}.qaIcon{width:26px;height:26px;border-radius:8px;background:#e0ecff;color:#1457ff;display:grid;place-items:center;margin-right:8px}.qaLeft{display:flex;align-items:center}
 .bottom{height:70px;background:white;border-top:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:12px 18px;box-shadow:0 -4px 18px rgba(15,23,42,.06);z-index:6}.rightBtns{gap:14px}.big,.primaryBig{min-width:165px;height:48px;justify-content:center;border-radius:10px}.primaryBig{background:#1457ff}
 .importProgressBox{z-index:99999}
 @media(max-width:1400px){.main{grid-template-columns:50px 300px 1fr 260px}.summaryGrid{grid-template-columns:repeat(3,1fr)}.allFieldsGrid{grid-template-columns:repeat(3,1fr)}.allFieldCard:nth-child(4n){border-right:1px solid #e5edf7}.allFieldCard:nth-child(3n){border-right:0}.phoneGrid{grid-template-columns:repeat(3,1fr)}.dispoGrid{grid-template-columns:repeat(4,1fr)}}
@@ -3591,6 +3592,10 @@ button {
     }
   })();
   </script>
+<style>
+/* QUICK ACTIONS TOP — CONTACT PANEL REMOVED — R8N9 */
+.right > .quickActions{margin-top:0!important;order:-10}
+</style>
 </head>
 <body>
 <div id="loginScreen" class="loginScreen open">
@@ -3776,12 +3781,8 @@ button {
     </main>
 
     <aside class="right">
-      <section class="panel softphone">
-        <div class="softTop"><b>Softphone</b><span class="connected">● Connected</span></div>
-        <div class="ready"><b>Ready to call</b><br><span id="lastDialed">Click a number to dial</span></div>
-        <div class="dialer"><div class="keys"><button class="key">1</button><button class="key">2<br><small>ABC</small></button><button class="key">3<br><small>DEF</small></button><button class="key">4<br><small>GHI</small></button><button class="key">5<br><small>JKL</small></button><button class="key">6<br><small>MNO</small></button><button class="key">7<br><small>PQRS</small></button><button class="key">8<br><small>TUV</small></button><button class="key">9<br><small>WXYZ</small></button><button class="key">*</button><button class="key">0</button><button class="key">#</button></div><div class="callBox"><div>No active call</div><div class="callNumber" id="callNumber">—</div><button class="green" onclick="callPrimary()">Call</button><br><br><button class="red" onclick="endCall()">End Call</button></div></div>
-      </section>
-      <section class="panel quickActions">
+<section class="panel quickActions">
+        <span id="callNumber" hidden>—</span><span id="lastDialed" hidden></span>
         <div class="panelTitle"><h3>Quick Actions</h3></div>
         <div class="qaItem" onclick="openPaymentTrackerForCurrent()"><span class="qaLeft"><span class="qaIcon">🧾</span>Record Payment Promise</span><span>›</span></div>
         <div class="qaItem" onclick="openPaymentPlan()"><span class="qaLeft"><span class="qaIcon">💳</span>Payment Plan Schedule</span><span>›</span></div>
@@ -5761,7 +5762,7 @@ function displayVal(k,v,a){
  if(typeof v==='object')return '';
  let val=String(v);
  let phone=normPhone(val);
- if(phone.length>=10 && phone.length<=11 && /phone/i.test(k))return `<a href="tel:${phone}" onclick="recordDial('${a.id}','${phone}')">${fmtPhone(phone)}</a>`;
+ if(phone.length>=10 && phone.length<=11 && /phone/i.test(k))return `<a href="tel:${phone}" onclick="event.preventDefault(); return dialPhone('${a.id}','${phone}')">${fmtPhone(phone)}</a>`;
  return esc(val);
 }
 function mappedEntries(a){
@@ -5992,12 +5993,13 @@ function renderCurrent(a,q){
  renderPhones(a);
  renderDispos(a);
 }
+
 function renderPhones(a){
  let ps=phones(a).map(p=>normPhone(p)).filter(p=>p.length>=10);
  let seen=new Set();
  ps=ps.filter(p=>{let key=p.slice(-10); if(seen.has(key))return false; seen.add(key); return true;}).slice(0,6);
  let blocked=phoneIsBlocked(a);
- document.getElementById('phoneGrid').innerHTML=ps.map((p,i)=>`<a class="phoneChip ${blocked?'blocked':''}" href="tel:${normPhone(p)}" data-ringcentral-extension-number="${normPhone(p)}" onclick="event.preventDefault(); return dialPhone('${a.id}','${normPhone(p)}')"><div class="phoneIcon">☎</div><div><div class="phoneNum">${fmtPhone(p)}</div><div class="phoneType">${i===0?'Primary':i===1?'Mobile':'Alternate'}</div>${blocked?'<div class="callBlockedNote">Compliance review required</div>':''}</div></a>`).join('')||'<div class="muted">No phone numbers on this account.</div>'
+ document.getElementById('phoneGrid').innerHTML=ps.map((p,i)=>`<a class="phoneChip ${blocked?'blocked':''}" href="tel:${normPhone(p)}" data-ringcentral-extension-number="${normPhone(p)}" onclick="event.preventDefault(); return dialPhone('${a.id}','${normPhone(p)}')"><div class="phoneIcon">☎</div><div><div class="phoneNum">${fmtPhone(p)}</div><div class="phoneType">${i===0?'Primary':i===1?'Mobile':'Alternate'}</div>${blocked?'<div class="callBlockedNote">Compliance review required</div>':''}</div></a>`).join('')||'<div class="muted">No phone numbers on this account.</div>';
 }
 function renderDispos(a){document.getElementById('selectedDisposition').textContent=currentDisposition||a?.disposition||'Select one';document.getElementById('dispoGrid').innerHTML=DISPOS.map(d=>`<button class="dispo ${d==='Disputed'?'orangeText':['Promise to Pay','Settled'].includes(d)?'greenText':['Bad Number','DNC'].includes(d)?'redText':d==='Callback'?'purpleText':''} ${(currentDisposition||a?.disposition)===d?'selected':''}" onclick="selectDisposition('${d}')">${d}</button>`).join('')}
 async function selectDisposition(d){let cur=getCurrent();if(!cur)return;currentDisposition=d;let old=cur.status,newStatus=d==='Disputed'?'Disputed':d;let body={status:newStatus,disposition:d,updated_at:new Date().toISOString()};if(d==='DNC')body.do_not_call=true;if(d==='Disputed')body.disputed_flag=true;if(d==='Bad Number')body.wrong_number_flag=true;let updated;try{updated=(await dbFetch(`/accounts?id=eq.${cur.id}`,{method:'PATCH',body:JSON.stringify(body)}))[0]}catch(e){delete body.do_not_call;delete body.disputed_flag;delete body.wrong_number_flag;updated=(await dbFetch(`/accounts?id=eq.${cur.id}`,{method:'PATCH',body:JSON.stringify(body)}))[0]}await insertActivity(cur.id,'Status Updated','Disposition set to '+d,'',old,newStatus);await insertAudit('Status Updated','Disposition set to '+d,'account',cur.id);let i=accounts.findIndex(a=>a.id===cur.id);if(i>=0)accounts[i]=toCamel(updated);render();if(d==='Callback')openFollowUpModal('Callback');if(d==='Disputed')openDisputeModal();if(d==='Promise to Pay')openPaymentPlan();}
@@ -6645,7 +6647,7 @@ function monitorAccountCard(a){
      </div>
      <div style="text-align:right">
        <div class="monitorMoney">${money(accountBalance(a))}</div>
-       ${phone?`<a href="tel:${phone}" onclick="recordDial('${a.id}','${phone}')">Call ${fmtPhone(phone)}</a>`:''}
+       ${phone?`<a href="tel:${phone}" onclick="event.preventDefault(); return dialPhone('${a.id}','${phone}')">Call ${fmtPhone(phone)}</a>`:''}
      </div>
    </div>
  </div>`;
@@ -10540,7 +10542,7 @@ function callDateRange(){let range=document.getElementById('contactRange')?.valu
 function callDateOnly(v){let d=String(v||'').slice(0,10);return /^\d{4}-\d{2}-\d{2}$/.test(d)?d:''}
 function callTs(v){let t=Date.parse(v||'');return isNaN(t)?0:t}
 function contactSetText(id,text){let el=document.getElementById(id);if(el)el.textContent=text}
-function renderCallInsight(a){let box=document.getElementById('callInsightPanel');if(!box)return;if(!a){box.innerHTML='<div class="callInsightTop"><div><div class="callInsightTitle">☎ Call Intelligence</div><div class="hint">No account selected.</div></div></div>';return}let last=a.lastCalledAt||a.last_called_at||'';let next=a.nextCallAt||a.next_call_at||'';let result=a.lastCallResult||a.last_call_result||a.lastCallOutcome||a.last_call_outcome||a.disposition||'—';let callCount=Number(a.callCount||a.call_count||0),contacts=Number(a.contactCount||a.contact_count||0),rpc=Number(a.rpcCount||a.rpc_count||0);box.innerHTML=`<div class="callInsightTop"><div><div class="callInsightTitle">☎ Call Intelligence</div><div class="hint">Auto-updates when call outcomes are saved.</div></div><button class="outline" onclick="openContactIntelligence()">Open Calls</button></div><div class="callInsightGrid"><div class="callInsightStat"><div class="callInsightLabel">Last Called</div><div class="callInsightValue">${esc(last?new Date(last).toLocaleString():'Never')}</div></div><div class="callInsightStat"><div class="callInsightLabel">Last Result</div><div class="callInsightValue">${esc(result)}</div></div><div class="callInsightStat"><div class="callInsightLabel">Next Call</div><div class="callInsightValue">${esc(next?new Date(next).toLocaleString():'—')}</div></div><div class="callInsightStat"><div class="callInsightLabel">Calls</div><div class="callInsightValue">${callCount}</div></div><div class="callInsightStat"><div class="callInsightLabel">Contacts</div><div class="callInsightValue">${contacts}</div></div><div class="callInsightStat"><div class="callInsightLabel">RPC</div><div class="callInsightValue">${rpc}</div></div></div>`}
+function renderCallInsight(a){let box=document.getElementById('callInsightPanel');if(!box)return;if(!a){box.innerHTML='<div class="callInsightTop"><div><div class="callInsightTitle">☎ Call Intelligence</div><div class="hint">No account selected.</div></div></div>';return}let last=a.lastCalledAt||a.last_called_at||'';let next=a.nextCallAt||a.next_call_at||'';let result=a.lastCallResult||a.last_call_result||a.lastCallOutcome||a.last_call_outcome||a.disposition||'—';let callCount=Number(a.callCount||a.call_count||0),contacts=Number(a.contactCount||a.contact_count||0),rpc=Number(a.rpcCount||a.rpc_count||0);box.innerHTML=`<div class="callInsightTop"><div><div class="callInsightTitle">☎ Call Intelligence</div><div class="hint">Auto-updates when a phone number is launched and when the outcome is saved.</div></div><button class="outline" onclick="openContactIntelligence()">Open Calls</button></div><div class="callInsightGrid"><div class="callInsightStat"><div class="callInsightLabel">Last Called</div><div class="callInsightValue">${esc(last?new Date(last).toLocaleString():'Never')}</div></div><div class="callInsightStat"><div class="callInsightLabel">Last Result</div><div class="callInsightValue">${esc(result)}</div></div><div class="callInsightStat"><div class="callInsightLabel">Next Call</div><div class="callInsightValue">${esc(next?new Date(next).toLocaleString():'—')}</div></div><div class="callInsightStat"><div class="callInsightLabel">Calls</div><div class="callInsightValue">${callCount}</div></div><div class="callInsightStat"><div class="callInsightLabel">Contacts</div><div class="callInsightValue">${contacts}</div></div><div class="callInsightStat"><div class="callInsightLabel">RPC</div><div class="callInsightValue">${rpc}</div></div></div>`}
 function syncCallOutcomeFields(){let result=val('callResultStatus')||'No Answer';let cat=callOutcomeCategory(result);let el=document.getElementById('callOutcomeCategory');if(el)el.value=cat;let notice=document.getElementById('callOutcomeNotice');if(notice){notice.className='callOutcomeNotice';let msg='Log what happened on the call. This updates activity, reports, callback queue, and contact intelligence.';if(result==='Promise to Pay')msg='Promise to Pay selected. Save the outcome, then create/update the payment promise or payment plan.';if(result==='Dispute'){msg='Dispute selected. Saving will mark this account disputed and open the dispute tracker.';notice.classList.add('warn')}if(result==='Wrong Number'){msg='Wrong Number selected. Saving will mark this number/account as bad number for compliance protection.';notice.classList.add('block')}if(result==='DNC'){msg='DNC selected. Saving will mark this account Do Not Call.';notice.classList.add('block')}notice.textContent=msg}}
 function openCallResultModal(opts={}){let a=getCurrent();if(opts.accountId)a=accountById(opts.accountId)||a;if(!a)return alert('No account selected.');let phone=normPhone(opts.phone||lastDialContext.phone||a.lastContactNumber||phones(a)[0]||'');document.getElementById('callResultPhone').value=phone;document.getElementById('callDirection').value=opts.direction||'Outbound';document.getElementById('callResultStatus').value=opts.defaultResult||'No Answer';document.getElementById('callDuration').value=opts.durationSeconds||'0';document.getElementById('callAnsweredBy').value='';document.getElementById('callCallbackDate').value='';document.getElementById('callCallbackTime').value='';document.getElementById('callResultNotes').value=opts.auto?'Auto-opened after phone click. Add call result notes here.':'';contactSetText('callOutcomeAccount',`${nameOf(a)} · ${acctNo(a)||'—'}`);contactSetText('callOutcomePhonePreview',phone?fmtPhone(phone):'—');contactSetText('callOutcomeLastResult',a.lastCallResult||a.last_call_result||a.disposition||'—');contactSetText('callOutcomeNextCall',(a.nextCallAt||a.next_call_at)?new Date(a.nextCallAt||a.next_call_at).toLocaleString():'—');syncCallOutcomeFields();document.getElementById('callResultModal').classList.add('open')}
 async function recordDial(id,phone){phone=normPhone(phone);lastDialContext={accountId:id,phone,startedAt:new Date()};document.getElementById('callNumber').textContent=fmtPhone(phone);document.getElementById('lastDialed').textContent='Dialing '+fmtPhone(phone);await dbFetch(`/accounts?id=eq.${id}`,{method:'PATCH',body:JSON.stringify({last_contact_number:phone,last_called_at:new Date().toISOString(),updated_at:new Date().toISOString()})}).catch(async()=>{await dbFetch(`/accounts?id=eq.${id}`,{method:'PATCH',body:JSON.stringify({last_contact_number:phone,updated_at:new Date().toISOString()})}).catch(()=>{})});await insertActivity(id,'Outbound Call','Clicked phone number '+fmtPhone(phone),phone);await insertAudit('Outbound Call','Clicked phone '+fmtPhone(phone),'account',id);setTimeout(()=>{try{let cur=getCurrent();if(cur&&String(cur.id)===String(id)&&!document.getElementById('callResultModal')?.classList.contains('open'))openCallResultModal({accountId:id,phone,auto:true})}catch(e){}},1500)}
@@ -12257,7 +12259,7 @@ function exportContactIntelligenceCSV(){let calls=filteredContactCalls();let row
   if(window.__cpcmSystemQaVersionLockLoaded) return;
   window.__cpcmSystemQaVersionLockLoaded = true;
   var BUILD_NAME = "Co Pilot Collections Manager — Stability QA / Version Lock";
-  var BUILD_VERSION = "STABLE_SINGLE_FILE_QA_LOCK_2026_07_19_R8N1";
+  var BUILD_VERSION = "STABLE_SINGLE_FILE_QA_LOCK_2026_07_20_R8N11";
   var EXPECTED_ENV = "LIVE";
   var EXPECTED_URL = "https://bwvufgzbkaymffwxuuzr.supabase.co";
   var EXPECTED_KEY_PREFIX = "sb_publishable_cvwkN3fOovsYvAvzXvrmRA";
@@ -12302,7 +12304,7 @@ function exportContactIntelligenceCSV(){let calls=filteredContactCalls();let row
     checks.push(line('Account details area found', !!(qs('.accountCard')||visibleTextIncludes('Account Details')), 'Account card/details check'));
     checks.push(line('Payment Plan area found', visibleTextIncludes('Payment Plan')||!!qs('.paymentPlanPanel'), 'Payment Plan card check'));
     checks.push(line('Compliance Guard found', visibleTextIncludes('Compliance Guard'), 'Compliance card/check'));
-    checks.push(line('Softphone found', visibleTextIncludes('Softphone')||!!qs('.softphone'), 'Softphone/right panel check'));
+    checks.push(line('Quick Actions at top', !!qs('.right > .quickActions:first-child'), 'Right column starts with Quick Actions'));
     checks.push(line('Team Messenger available', visibleTextIncludes('Team Messenger')||visibleTextIncludes('Messenger'), 'Chat/messenger check'));
     checks.push(line('Reports button/page present', btnByText('reports')||visibleTextIncludes('Reports'), 'Reports nav/text check'));
     checks.push(line('Cleanup button/page present', btnByText('cleanup')||visibleTextIncludes('Cleanup'), 'Cleanup nav/text check'));
@@ -12311,6 +12313,7 @@ function exportContactIntelligenceCSV(){let calls=filteredContactCalls();let row
     checks.push(line('Professional CSS appears active', bodyFont.indexOf('Arial')>=0 || !!qs('style'), bodyFont||'No computed font', bodyFont && /Times/i.test(bodyFont)));
     checks.push(line('Build marker installed', !!window.__cpcmSystemQaVersionLockLoaded, BUILD_VERSION));
     checks.push(line('Client remittance module installed', !!window.CPCM_CLIENT_REMITTANCE_BUILD, window.CPCM_CLIENT_REMITTANCE_BUILD||'Missing R8 module'));
+    checks.push(line('Dynamic call attempts + live statistics installed', !!window.CPCM_DYNAMIC_ACTIVITY_STATS_BUILD, window.CPCM_DYNAMIC_ACTIVITY_STATS_BUILD||'Missing R8N11 dynamic statistics module'));
     checks.push(line('Document PDF engine loaded', !!(window.html2canvas&&window.jspdf&&window.jspdf.jsPDF), 'Local html2canvas + jsPDF'));
     checks.push(line('DocuSign-style typed signature controls loaded', !!(window.downloadCurrentDocumentPDF&&window.clearDocumentSignature&&window.applyTypedDocumentSignature&&window.selectDocumentSignatureStyle), 'Document Builder PDF + typed signature chooser'));
     return checks;
@@ -12344,7 +12347,7 @@ function exportContactIntelligenceCSV(){let calls=filteredContactCalls();let row
   function ensurePage(){
     var p=document.getElementById('cpcmSystemQaPage'); if(p) return p;
     p=document.createElement('div'); p.id='cpcmSystemQaPage';
-    p.innerHTML='<div class="cpcmQaTop"><div><div class="cpcmQaTitle">System Check + Version Lock</div><div class="cpcmQaSub">'+esc(BUILD_NAME)+' • '+esc(BUILD_VERSION)+' • '+esc(EXPECTED_ENV)+'</div></div><div class="cpcmQaActions"><button class="cpcmQaBtn green" onclick="window.cpcmRunSystemCheck()">Run Check</button><button class="cpcmQaBtn white" onclick="window.cpcmCopySystemDiagnostics()">Copy Diagnostics</button><button class="cpcmQaBtn gray" onclick="window.cpcmCloseSystemCheck()">Back to App</button></div></div><div class="cpcmQaWrap"><div class="cpcmQaNote">This screen is a safe admin QA checklist. It does not change account data. Use it after every ZIP upload to verify environment, layout, admin detection, and core app sections before adding new features.</div><div id="cpcmQaMetrics" class="cpcmQaGrid"></div><div class="cpcmQaCard"><div class="cpcmQaCardHead"><div class="cpcmQaCardTitle">Automatic Checks</div><span class="cpcmQaPill info">Safe read-only</span></div><div class="cpcmQaCardBody" id="cpcmQaChecks"></div></div><div class="cpcmQaCard"><div class="cpcmQaCardHead"><div class="cpcmQaCardTitle">Manual Smoke Test Checklist</div><span class="cpcmQaPill warn">Click through after upload</span></div><div class="cpcmQaCardBody"><div class="cpcmQaManual"><div>1. Login works</div><div>2. Queue opens first 5 accounts</div><div>3. Notes save and stay after refresh</div><div>4. Employee can create payment plan</div><div>5. Admin can edit/delete payment plan</div><div>6. Compliance Guard opens</div><div>7. Reports full page opens and Back works</div><div>8. Chat opens without blocking screen</div><div>9. Pay Desk / Ledger open</div><div>10. Tickler opens</div><div>11. Scorecards opens</div><div>12. Receipt downloads as a PDF matching Preview</div><div>13. Electronic signature appears above Authorized Representative</div><div>14. No plain raw HTML layout</div></div></div></div><div class="cpcmQaCard"><div class="cpcmQaCardHead"><div class="cpcmQaCardTitle">Diagnostics</div><button class="cpcmQaBtn" onclick="window.cpcmCopySystemDiagnostics()">Copy</button></div><div class="cpcmQaCardBody"><pre id="cpcmQaDiag" class="cpcmQaCode"></pre></div></div></div>';
+    p.innerHTML='<div class="cpcmQaTop"><div><div class="cpcmQaTitle">System Check + Version Lock</div><div class="cpcmQaSub">'+esc(BUILD_NAME)+' • '+esc(BUILD_VERSION)+' • '+esc(EXPECTED_ENV)+'</div></div><div class="cpcmQaActions"><button class="cpcmQaBtn green" onclick="window.cpcmRunSystemCheck()">Run Check</button><button class="cpcmQaBtn white" onclick="window.cpcmCopySystemDiagnostics()">Copy Diagnostics</button><button class="cpcmQaBtn gray" onclick="window.cpcmCloseSystemCheck()">Back to App</button></div></div><div class="cpcmQaWrap"><div class="cpcmQaNote">This screen is a safe admin QA checklist. It does not change account data. Use it after every ZIP upload to verify environment, layout, admin detection, and core app sections before adding new features.</div><div id="cpcmQaMetrics" class="cpcmQaGrid"></div><div class="cpcmQaCard"><div class="cpcmQaCardHead"><div class="cpcmQaCardTitle">Automatic Checks</div><span class="cpcmQaPill info">Safe read-only</span></div><div class="cpcmQaCardBody" id="cpcmQaChecks"></div></div><div class="cpcmQaCard"><div class="cpcmQaCardHead"><div class="cpcmQaCardTitle">Manual Smoke Test Checklist</div><span class="cpcmQaPill warn">Click through after upload</span></div><div class="cpcmQaCardBody"><div class="cpcmQaManual"><div>1. Login works</div><div>2. Queue opens first 5 accounts</div><div>3. Notes save and stay after refresh</div><div>4. Employee can create payment plan</div><div>5. Admin can edit/delete payment plan</div><div>6. Compliance Guard opens</div><div>7. Reports full page opens and Back works</div><div>8. Chat opens without blocking screen</div><div>9. Pay Desk / Ledger open</div><div>10. Tickler opens</div><div>11. Scorecards opens</div><div>12. Receipt downloads as a PDF matching Preview</div><div>13. Electronic signature appears above Authorized Representative</div><div>14. No plain raw HTML layout</div><div>15. Clicking a phone number adds exactly one Call Attempt</div><div>16. Saving the outcome updates that same call instead of adding a second call</div><div>17. Calls, Monitor, Reports, and Scorecards refresh after activity</div></div></div></div><div class="cpcmQaCard"><div class="cpcmQaCardHead"><div class="cpcmQaCardTitle">Diagnostics</div><button class="cpcmQaBtn" onclick="window.cpcmCopySystemDiagnostics()">Copy</button></div><div class="cpcmQaCardBody"><pre id="cpcmQaDiag" class="cpcmQaCode"></pre></div></div></div>';
     document.body.appendChild(p); return p;
   }
   function addButton(){
@@ -13139,5 +13142,320 @@ function exportContactIntelligenceCSV(){let calls=filteredContactCalls();let row
 })();
 </script>
 
+
+<script>
+/* DYNAMIC ACTIVITY + STATISTICS R8N11
+   One call attempt per phone launch, one outcome update per attempt,
+   automatic account/activity refresh, and live open-dashboard refresh. */
+(function(){
+  if(window.__cpcmDynamicActivityStatsR8N11)return;
+  window.__cpcmDynamicActivityStatsR8N11=true;
+  const BUILD='DYNAMIC_ACTIVITY_STATS_CALL_DEDUPE_R8N11';
+  const PENDING_PREFIX='cpcm.pending.call.r8n11.';
+  const OPEN_PREFIX='cpcm.account.open.r8n11.';
+  const originalDbFetch=window.dbFetch;
+  const originalSetCurrent=window.setCurrent;
+  const recentDial=new Map();
+  let refreshTimer=0;
+  let refreshRunning=false;
+  let refreshAgain=false;
+  let callSaveBusy=false;
+
+  function nowIso(){return new Date().toISOString()}
+  function email(){try{return String((typeof currentUser!=='undefined'&&currentUser&&currentUser.email)||'').trim().toLowerCase()}catch(e){return ''}}
+  function cleanPhone(v){try{return normPhone(v)}catch(e){return String(v||'').replace(/\D/g,'')}}
+  function account(id){try{return accountById(id)||((typeof getCurrent==='function')?getCurrent():null)}catch(e){return null}}
+  function isOpen(id){const el=document.getElementById(id);return !!(el&&el.classList.contains('open'))}
+  function safeJson(v){try{return JSON.parse(v)}catch(e){return null}}
+  function uuid(){try{return crypto.randomUUID()}catch(e){return 'cpcm-'+Date.now()+'-'+Math.random().toString(36).slice(2)}}
+  function pendingKey(accountId,phone){return PENDING_PREFIX+email()+'.'+String(accountId||'')+'.'+cleanPhone(phone)}
+  function rememberPending(row){
+    if(!row||!row.accountId)return;
+    try{localStorage.setItem(pendingKey(row.accountId,row.phone),JSON.stringify(row))}catch(e){}
+    try{lastDialContext={accountId:row.accountId,phone:row.phone,startedAt:new Date(row.startedAt||Date.now()),attemptId:row.attemptId,callResultId:row.callResultId||''}}catch(e){}
+  }
+  function pendingFor(accountId,phone){
+    const exact=safeJson(localStorage.getItem(pendingKey(accountId,phone))||'');
+    const fresh=function(r){return r&&r.accountId&&Date.now()-Number(r.startedMs||Date.parse(r.startedAt)||0)<6*60*60*1000};
+    if(fresh(exact))return exact;
+    let best=null;
+    try{
+      const prefix=PENDING_PREFIX+email()+'.'+String(accountId||'')+'.';
+      for(let i=0;i<localStorage.length;i++){
+        const k=localStorage.key(i)||'';
+        if(!k.startsWith(prefix))continue;
+        const r=safeJson(localStorage.getItem(k)||'');
+        if(fresh(r)&&(!best||Number(r.startedMs||0)>Number(best.startedMs||0)))best=r;
+      }
+    }catch(e){}
+    return best;
+  }
+  function clearPending(row){
+    if(!row)return;
+    try{localStorage.removeItem(pendingKey(row.accountId,row.phone))}catch(e){}
+    try{if(lastDialContext&&String(lastDialContext.attemptId||'')===String(row.attemptId||''))lastDialContext={accountId:'',phone:'',startedAt:null,attemptId:'',callResultId:''}}catch(e){}
+  }
+  function resultObject(v){if(Array.isArray(v))return v[0]||{};return v||{}}
+  function updateLocalAccount(id,patch){
+    try{
+      const i=accounts.findIndex(function(x){return String(x.id)===String(id)});
+      if(i>=0)accounts[i]=Object.assign({},accounts[i],patch||{});
+      return i>=0?accounts[i]:null;
+    }catch(e){return null}
+  }
+  async function fetchCurrentAccount(){
+    if(!currentAccountId||!originalDbFetch)return null;
+    try{
+      const rows=await originalDbFetch('/accounts?id=eq.'+encodeURIComponent(currentAccountId)+'&select=*&limit=1');
+      if(rows&&rows[0]){
+        const row=typeof toCamel==='function'?toCamel(rows[0]):rows[0];
+        updateLocalAccount(currentAccountId,row);
+        return row;
+      }
+    }catch(e){}
+    return null;
+  }
+  async function refreshOpenSurfaces(reason){
+    if(refreshRunning){refreshAgain=true;return}
+    if(!email()||!(typeof token==='function'&&token()))return;
+    refreshRunning=true;
+    try{
+      const row=await fetchCurrentAccount();
+      if(row&&typeof render==='function')render();
+      if(currentAccountId&&typeof loadHistory==='function')await loadHistory(currentAccountId).catch(function(){});
+      const jobs=[];
+      if(isOpen('contactIntelligenceModal')&&typeof loadContactIntelligence==='function')jobs.push(loadContactIntelligence());
+      if(isOpen('employeeMonitorModal')&&typeof loadEmployeeMonitor==='function'&&currentUser.isAdmin)jobs.push(loadEmployeeMonitor());
+      if(isOpen('todayDashboardModal')&&typeof openTodayDashboard==='function')jobs.push(openTodayDashboard());
+      if(isOpen('leaderboardModal')&&typeof loadLeaderboard==='function')jobs.push(loadLeaderboard());
+      if(isOpen('paymentsDashboardModal')&&typeof loadPaymentsDashboard==='function')jobs.push(loadPaymentsDashboard());
+      if(isOpen('promiseDashboardModal')&&typeof loadPromiseDashboard==='function')jobs.push(loadPromiseDashboard());
+      if(isOpen('dailyWorkQueueModal')&&typeof loadDailyWorkQueue==='function')jobs.push(loadDailyWorkQueue());
+      if(isOpen('paymentTrackerModal')&&typeof loadPaymentTracker==='function')jobs.push(loadPaymentTracker());
+      if(isOpen('reportsPageStable')&&typeof refreshReportsPageStable==='function')jobs.push(refreshReportsPageStable());
+      if(isOpen('managerQaPage')&&typeof refreshManagerQaScorecards==='function')jobs.push(refreshManagerQaScorecards());
+      await Promise.allSettled(jobs);
+      window.dispatchEvent(new CustomEvent('cpcm:stats-refreshed',{detail:{reason:reason||'activity',at:nowIso()}}));
+    }finally{
+      refreshRunning=false;
+      if(refreshAgain){refreshAgain=false;setTimeout(function(){refreshOpenSurfaces('queued')},250)}
+    }
+  }
+  function queueRefresh(reason,delay){
+    clearTimeout(refreshTimer);
+    refreshTimer=setTimeout(function(){refreshOpenSurfaces(reason)},Number(delay||450));
+  }
+  window.cpcmRefreshDynamicStats=function(){return refreshOpenSurfaces('manual')};
+  window.cpcmQueueDynamicStatsRefresh=queueRefresh;
+
+  if(typeof originalDbFetch==='function'){
+    window.dbFetch=async function(path,opt){
+      const options=opt||{};
+      const data=await originalDbFetch(path,options);
+      const method=String(options.method||'GET').toUpperCase();
+      if(method!=='GET'&&method!=='HEAD'){
+        window.dispatchEvent(new CustomEvent('cpcm:data-changed',{detail:{path:path,method:method,at:nowIso()}}));
+        queueRefresh(path,500);
+      }
+      return data;
+    };
+  }
+
+  async function fallbackCallAttempt(a,phone,attemptId,startedAt){
+    let inserted=null;
+    const enhanced={account_id:a.id,phone_number:phone,call_result:'Call Attempt',disposition:'Pending Outcome',notes:'Phone application launched from Co Pilot Collections Manager.',result_at:startedAt,created_by_email:email(),attempt_id:attemptId,attempt_status:'pending',event_type:'attempt',dialed_at:startedAt,direction:'Outbound',outcome_category:'Pending Outcome',call_source:'Phone Link',updated_at:startedAt};
+    try{inserted=resultObject(await dbFetch('/call_results',{method:'POST',body:JSON.stringify([enhanced])}))}catch(e){
+      inserted=resultObject(await dbFetch('/call_results',{method:'POST',body:JSON.stringify([{account_id:a.id,phone_number:phone,call_result:'Call Attempt',disposition:'Pending Outcome',notes:'Phone application launched from Co Pilot Collections Manager.',result_at:startedAt,created_by_email:email()}])}));
+    }
+    const nextCount=Number(a.callCount||a.call_count||0)+1;
+    try{await dbFetch('/accounts?id=eq.'+encodeURIComponent(a.id),{method:'PATCH',body:JSON.stringify({last_contact_number:phone,last_called_at:startedAt,call_count:nextCount,last_worked_at:startedAt,updated_at:startedAt})})}catch(e){
+      await dbFetch('/accounts?id=eq.'+encodeURIComponent(a.id),{method:'PATCH',body:JSON.stringify({last_contact_number:phone,updated_at:startedAt})}).catch(function(){})
+    }
+    try{await dbFetch('/activity_logs',{method:'POST',body:JSON.stringify([{account_id:a.id,action_type:'Call Attempt',action_text:'Outbound call attempt launched to '+(typeof fmtPhone==='function'?fmtPhone(phone):phone),phone_number:phone,created_by_email:email(),event_key:'call-attempt:'+attemptId,metadata:{attempt_id:attemptId,source:'Phone Link'}}])})}catch(e){
+      if(typeof insertActivity==='function')await insertActivity(a.id,'Call Attempt','Outbound call attempt launched to '+(typeof fmtPhone==='function'?fmtPhone(phone):phone),phone).catch(function(){})
+    }
+    return {call_result_id:inserted&&inserted.id,attempt_id:attemptId,call_count:nextCount,inserted:true};
+  }
+
+  async function logCallAttempt(id,phone){
+    const a=account(id);
+    phone=cleanPhone(phone);
+    if(!a||phone.length<7)return null;
+    const rapidKey=String(id)+'|'+phone+'|'+email();
+    const prior=recentDial.get(rapidKey);
+    if(prior&&Date.now()-prior.at<3000)return prior.row;
+    const attemptId='call-'+uuid();
+    const startedAt=nowIso();
+    let result={};
+    try{
+      result=resultObject(await dbFetch('/rpc/cpcm_record_call_attempt',{method:'POST',body:JSON.stringify({p_account_id:a.id,p_phone_number:phone,p_attempt_id:attemptId,p_created_by_email:email(),p_call_source:'Phone Link'})}));
+    }catch(e){
+      result=await fallbackCallAttempt(a,phone,attemptId,startedAt);
+    }
+    const row={accountId:a.id,phone:phone,attemptId:attemptId,callResultId:result.call_result_id||result.callResultId||'',startedAt:result.dialed_at||startedAt,startedMs:Date.now()};
+    rememberPending(row);
+    recentDial.set(rapidKey,{at:Date.now(),row:row});
+    const count=Number(result.call_count||result.callCount||Number(a.callCount||a.call_count||0)+1);
+    const local=updateLocalAccount(a.id,{lastContactNumber:phone,last_contact_number:phone,lastCalledAt:row.startedAt,last_called_at:row.startedAt,callCount:count,call_count:count,lastWorkedAt:row.startedAt,last_worked_at:row.startedAt});
+    try{if(local&&typeof renderCallInsight==='function')renderCallInsight(local)}catch(e){}
+    try{if(typeof insertAudit==='function')await insertAudit('Call Attempt','Phone application launched for '+(typeof fmtPhone==='function'?fmtPhone(phone):phone),'account',a.id)}catch(e){}
+    const number=document.getElementById('callNumber');if(number)number.textContent=typeof fmtPhone==='function'?fmtPhone(phone):phone;
+    const last=document.getElementById('lastDialed');if(last)last.textContent='Call attempt logged · '+(typeof fmtPhone==='function'?fmtPhone(phone):phone);
+    setTimeout(function(){
+      try{
+        const cur=typeof getCurrent==='function'?getCurrent():null;
+        if(cur&&String(cur.id)===String(a.id)&&!isOpen('callResultModal')&&typeof openCallResultModal==='function')openCallResultModal({accountId:a.id,phone:phone,auto:true});
+      }catch(e){}
+    },1500);
+    queueRefresh('call-attempt',250);
+    return row;
+  }
+  window.cpcmLogCallAttempt=logCallAttempt;
+  window.recordDial=async function(id,phone){return logCallAttempt(id,phone)};
+  window.dialPhone=async function(id,phone){
+    const a=account(id);
+    phone=cleanPhone(phone);
+    if(!a||phone.length<7)return false;
+    if(typeof complianceCheckBeforeCall==='function'){
+      const ok=await complianceCheckBeforeCall(a,phone);
+      if(!ok)return false;
+    }
+    await logCallAttempt(a.id,phone);
+    try{
+      const link=document.createElement('a');
+      link.href='tel:'+phone;
+      link.style.display='none';
+      document.body.appendChild(link);
+      link.click();
+      setTimeout(function(){link.remove()},250);
+    }catch(e){window.location.href='tel:'+phone}
+    return false;
+  };
+
+  async function fallbackComplete(a,pending,details){
+    let rowId=pending&&pending.callResultId;
+    let usedPending=!!rowId;
+    const enhanced={phone_number:details.phone,call_result:details.result,disposition:details.status,notes:details.notes,result_at:details.attemptAt,attempt_status:'completed',event_type:'result',direction:details.direction,outcome_category:details.category,duration_seconds:details.duration,answered_by:details.answeredBy,is_contact:details.flags.is_contact,is_rpc:details.flags.is_rpc,is_promise:details.flags.is_promise,is_callback:details.flags.is_callback,is_wrong_number:details.flags.is_wrong_number,next_call_at:details.nextAt,account_balance_snapshot:details.balance,updated_at:details.attemptAt};
+    if(rowId){
+      try{await dbFetch('/call_results?id=eq.'+encodeURIComponent(rowId),{method:'PATCH',body:JSON.stringify(enhanced)})}catch(e){
+        await dbFetch('/call_results?id=eq.'+encodeURIComponent(rowId),{method:'PATCH',body:JSON.stringify({phone_number:details.phone,call_result:details.result,disposition:details.status,notes:details.notes,result_at:details.attemptAt})})
+      }
+    }else{
+      usedPending=false;
+      const insert=Object.assign({account_id:a.id,created_by_email:email(),attempt_id:pending&&pending.attemptId||'result-'+uuid(),attempt_status:'completed',event_type:'result',dialed_at:details.attemptAt,call_source:'Manual Call Result'},enhanced);
+      try{rowId=resultObject(await dbFetch('/call_results',{method:'POST',body:JSON.stringify([insert])})).id}catch(e){
+        rowId=resultObject(await dbFetch('/call_results',{method:'POST',body:JSON.stringify([{account_id:a.id,phone_number:details.phone,call_result:details.result,disposition:details.status,duration_seconds:details.duration,notes:details.notes,result_at:details.attemptAt,created_by_email:email()}])})).id
+      }
+    }
+    const addCall=usedPending?0:1;
+    const patch={status:details.status,disposition:details.status,last_contact_number:details.phone,last_called_at:details.attemptAt,last_call_result:details.result,last_call_outcome:details.category,next_call_at:details.nextAt,call_count:Number(a.callCount||a.call_count||0)+addCall,contact_count:Number(a.contactCount||a.contact_count||0)+(details.flags.is_contact?1:0),rpc_count:Number(a.rpcCount||a.rpc_count||0)+(details.flags.is_rpc?1:0),voicemail_count:Number(a.voicemailCount||a.voicemail_count||0)+(/voicemail/i.test(details.result)?1:0),no_answer_count:Number(a.noAnswerCount||a.no_answer_count||0)+(details.result==='No Answer'?1:0),wrong_number_count:Number(a.wrongNumberCount||a.wrong_number_count||0)+(details.flags.is_wrong_number?1:0),refused_count:Number(a.refusedCount||a.refused_count||0)+(details.result==='Refused to Pay'?1:0),last_worked_at:details.attemptAt,updated_at:details.attemptAt};
+    if(details.result==='DNC')patch.do_not_call=true;
+    if(details.result==='Dispute')patch.disputed_flag=true;
+    if(details.flags.is_wrong_number)patch.wrong_number_flag=true;
+    try{await dbFetch('/accounts?id=eq.'+encodeURIComponent(a.id),{method:'PATCH',body:JSON.stringify(patch)})}catch(e){
+      await dbFetch('/accounts?id=eq.'+encodeURIComponent(a.id),{method:'PATCH',body:JSON.stringify({status:details.status,disposition:details.status,last_contact_number:details.phone,updated_at:details.attemptAt})}).catch(function(){})
+    }
+    if(typeof insertActivity==='function')await insertActivity(a.id,'Call Result',(details.result+' '+(details.phone?(typeof fmtPhone==='function'?fmtPhone(details.phone):details.phone):'')+(details.duration?' · '+details.duration+'s':'')+'. '+details.notes).trim(),details.phone,a.status||a.disposition,details.status).catch(function(){});
+    return {call_result_id:rowId,completed:true,created_without_attempt:!usedPending};
+  }
+
+  window.saveCallResult=async function(){
+    if(callSaveBusy)return;
+    callSaveBusy=true;
+    const btn=document.querySelector('#callResultModal button.green,#callResultModal button[onclick="saveCallResult()"]');
+    if(btn)btn.disabled=true;
+    try{
+      let a=typeof getCurrent==='function'?getCurrent():null;
+      try{if(lastDialContext&&lastDialContext.accountId)a=accountById(lastDialContext.accountId)||a}catch(e){}
+      if(!a)return alert('No account selected.');
+      const result=(typeof val==='function'?val('callResultStatus'):'')||'No Answer';
+      const phone=cleanPhone((typeof val==='function'?val('callResultPhone'):'')||(lastDialContext&&lastDialContext.phone)||'');
+      const duration=Number((typeof val==='function'?val('callDuration'):'')||0);
+      const notes=(typeof val==='function'?val('callResultNotes'):'')||'';
+      const direction=(typeof val==='function'?val('callDirection'):'')||'Outbound';
+      const answeredBy=(typeof val==='function'?val('callAnsweredBy'):'')||'';
+      const category=(typeof val==='function'?val('callOutcomeCategory'):'')||(typeof callOutcomeCategory==='function'?callOutcomeCategory(result):'No Contact');
+      const nextDate=(typeof val==='function'?val('callCallbackDate'):'')||'';
+      const nextTime=(typeof val==='function'?val('callCallbackTime'):'')||'09:00';
+      const nextAt=nextDate?new Date(nextDate+'T'+nextTime+':00').toISOString():null;
+      if(typeof complianceCheckBeforeCallResultSave==='function'){
+        const ok=await complianceCheckBeforeCallResultSave(a,result,phone);
+        if(!ok)return;
+      }
+      const flags={
+        is_contact:typeof isContactOutcome==='function'?isContactOutcome(result):false,
+        is_rpc:typeof isRpcOutcome==='function'?isRpcOutcome(result):false,
+        is_promise:typeof isPromiseOutcome==='function'?isPromiseOutcome(result):false,
+        is_callback:typeof isCallbackOutcome==='function'?isCallbackOutcome(result):false,
+        is_wrong_number:typeof isWrongNumberOutcome==='function'?isWrongNumberOutcome(result):false
+      };
+      const status=typeof callStatusForResult==='function'?callStatusForResult(result):result;
+      const pending=pendingFor(a.id,phone)||(lastDialContext&&lastDialContext.attemptId?{accountId:a.id,phone:phone,attemptId:lastDialContext.attemptId,callResultId:lastDialContext.callResultId||'',startedAt:lastDialContext.startedAt,startedMs:Date.parse(lastDialContext.startedAt)||Date.now()}:null);
+      const details={phone:phone,result:result,status:status,direction:direction,category:category,duration:duration,answeredBy:answeredBy,flags:flags,nextAt:nextAt,balance:typeof accountBalance==='function'?accountBalance(a):0,notes:notes,attemptAt:nowIso()};
+      let completed={};
+      try{
+        completed=resultObject(await dbFetch('/rpc/cpcm_complete_call_attempt',{method:'POST',body:JSON.stringify({p_account_id:a.id,p_attempt_id:pending&&pending.attemptId||null,p_phone_number:phone,p_call_result:result,p_disposition:status,p_direction:direction,p_outcome_category:category,p_duration_seconds:duration,p_answered_by:answeredBy||null,p_is_contact:flags.is_contact,p_is_rpc:flags.is_rpc,p_is_promise:flags.is_promise,p_is_callback:flags.is_callback,p_is_wrong_number:flags.is_wrong_number,p_next_call_at:nextAt,p_account_balance_snapshot:details.balance,p_notes:notes,p_created_by_email:email()})}));
+      }catch(e){
+        completed=await fallbackComplete(a,pending,details);
+      }
+      if(pending)clearPending(pending);
+      if(nextAt){
+        await dbFetch('/follow_ups',{method:'POST',body:JSON.stringify([{account_id:a.id,follow_up_type:'Callback',due_date:nextDate,due_time:nextTime,status:'Open',assigned_to_email:typeof currentAssignee==='function'?currentAssignee(a):email(),reason:'Callback from call outcome',notes:(nextTime+' - '+notes).trim(),created_by_email:email()}])}).catch(function(){})
+      }
+      try{if(typeof insertAudit==='function')await insertAudit('Call Result',result+' for '+(typeof nameOf==='function'?nameOf(a):'account'),'account',a.id)}catch(e){}
+      await fetchCurrentAccount();
+      if(typeof closeModal==='function')closeModal('callResultModal');
+      if(typeof render==='function')render();
+      queueRefresh('call-result',150);
+      if(result==='Promise to Pay')setTimeout(function(){try{if(confirm('Open Pay Desk / Payment Promise now?'))openPaymentTrackerForCurrent()}catch(e){}},150);
+      if(result==='Dispute')setTimeout(function(){try{openDisputeModal()}catch(e){}},150);
+    }finally{
+      callSaveBusy=false;
+      if(btn)btn.disabled=false;
+    }
+  };
+
+  window.isCallActivity=function(row){
+    const type=String((row&&(row.actionType||row.action_type))||'').toLowerCase();
+    const text=String((row&&(row.actionText||row.action_text))||'').toLowerCase();
+    if(type.indexOf('call result')>=0)return false;
+    return /call attempt|outbound call|dial/.test(type)||/clicked phone|phone application launched|call attempt launched/.test(text);
+  };
+
+  async function logAccountOpened(id){
+    if(!id||!email())return;
+    const bucket=Math.floor(Date.now()/(10*60*1000));
+    const key=OPEN_PREFIX+email()+'.'+id+'.'+bucket;
+    try{if(sessionStorage.getItem(key))return;sessionStorage.setItem(key,'1')}catch(e){}
+    const at=nowIso();
+    try{
+      await dbFetch('/activity_logs',{method:'POST',body:JSON.stringify([{account_id:id,action_type:'Account Opened',action_text:'Collector opened the account workspace.',created_by_email:email(),event_key:'account-open:'+email()+':'+id+':'+bucket,metadata:{source:'Queue',bucket:bucket}}])});
+    }catch(e){
+      if(typeof insertActivity==='function')await insertActivity(id,'Account Opened','Collector opened the account workspace.').catch(function(){})
+    }
+    await dbFetch('/accounts?id=eq.'+encodeURIComponent(id),{method:'PATCH',body:JSON.stringify({last_worked_at:at,updated_at:at})}).catch(function(){});
+  }
+  if(typeof originalSetCurrent==='function'){
+    window.setCurrent=function(id){
+      const before=String((typeof currentAccountId!=='undefined'&&currentAccountId)||'');
+      const out=originalSetCurrent.apply(this,arguments);
+      if(id&&String(id)!==before)setTimeout(function(){logAccountOpened(id)},30);
+      return out;
+    };
+  }
+
+  document.addEventListener('visibilitychange',function(){if(!document.hidden)queueRefresh('visibility',250)});
+  window.addEventListener('focus',function(){queueRefresh('focus',300)});
+  setInterval(function(){
+    if(document.hidden||!email()||!(typeof token==='function'&&token()))return;
+    const analyticsOpen=isOpen('contactIntelligenceModal')||isOpen('employeeMonitorModal')||isOpen('todayDashboardModal')||isOpen('leaderboardModal')||isOpen('paymentsDashboardModal')||isOpen('promiseDashboardModal')||isOpen('dailyWorkQueueModal')||isOpen('paymentTrackerModal')||isOpen('reportsPageStable')||isOpen('managerQaPage');
+    if(analyticsOpen)refreshOpenSurfaces('live-poll');
+  },12000);
+
+  window.CPCM_DYNAMIC_ACTIVITY_STATS_BUILD=BUILD;
+  window.dispatchEvent(new CustomEvent('cpcm:dynamic-stats-ready',{detail:{build:BUILD}}));
+})();
+
+</script>
 </body>
 </html>

@@ -89,3 +89,29 @@ SILENT LOGGED-OUT STARTUP FIX R8N1:
 - Opening or refreshing the login page while logged out must not show a 'Could not load accounts / Not logged in' alert.
 - Account-loading errors still display after an authenticated login.
 - Only one startup boot sequence should run.
+
+
+LIVE DEMO-ACCESS EXCLUSION R8N2:
+- Login remains normal email/password with Access Type for new requests.
+- No one-click Admin Demo or Employee Demo buttons appear.
+- No demo emails or passwords exist in index.html.
+- Import and Add Account remain available to authorized LIVE admins.
+- No DEMO guard SQL is included.
+
+
+QUICK ACTIONS TOP / CONTACT PANEL REMOVAL R8N9:
+- Confirm the right column begins with Quick Actions at the top.
+- Confirm no Softphone or Contact Actions panel appears.
+- Confirm every Quick Action still opens its existing workflow.
+- Confirm clicking debtor phone numbers still launches the device or configured phone app and records the dial attempt.
+- Confirm Log Call Result, Schedule Callback, Call Intelligence, payments, documents, disputes, settlements, and contact updates still open.
+
+
+R8N11 DYNAMIC ACTIVITY + STATISTICS (LIVE)
+[ ] Run RUN_THIS_DYNAMIC_ACTIVITY_STATS_CALL_DEDUPE_R8N11.sql in the matching Supabase project
+[ ] One phone click creates one Call Attempt before the phone app opens
+[ ] Saving the outcome updates the same call row; total stays one
+[ ] Employee Monitor shows the call once, not attempt + result twice
+[ ] Call Intelligence, Reports, and Scorecards refresh after activity
+[ ] Account timeline shows Call Attempt and Call Result
+[ ] Second-browser activity appears on an open admin analytics screen within about 12 seconds
