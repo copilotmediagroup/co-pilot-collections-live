@@ -1,0 +1,132 @@
+CO PILOT COLLECTIONS MANAGER — NEW THREAD HANDOFF
+CURRENT BASELINE: R8N18.1 LIVE
+BUILD MARKER: RINGCENTRAL_POWER_DIALER_PHASE1_2026_07_20_R8N18
+
+============================================================
+1. BASELINE AND ENVIRONMENT
+============================================================
+
+This is the consolidated LIVE source package for Co Pilot Collections Manager.
+Use it only for:
+
+- GitHub repo: co-pilot-collections-live
+- LIVE Supabase: https://bwvufgzbkaymffwxuuzr.supabase.co
+- LIVE administrator: afinch2678@gmail.com
+
+Never mix this package with the DEMO repo or DEMO Supabase project.
+Preserve the existing LIVE public/nmi-config.js when uploading future packages.
+
+R8N17 remains the payment baseline: employees submit card information through
+NMI Collect.js for administrator approval; only administrators process sales.
+Do not alter or bypass that architecture.
+
+============================================================
+2. WHAT R8N18 ADDED
+============================================================
+
+R8N18 adds Phase 1 of the real RingCentral-connected power dialer:
+
+- Admin campaign creation from phone numbers on existing uploaded accounts
+- Portfolio/client, employee, balance, state, status, last-call, attempt, and
+  schedule filters
+- One Co Pilot employee mapped to one RingCentral user and extension
+- Per-employee RingCentral user JWT lookup from LIVE Edge Function Secrets
+- Employee Available, Unavailable, Dialing, Connected, and Wrap-Up states
+- Server-side compliance check immediately before every call
+- One call per available employee
+- RingOut provider call creation
+- One telephony-session webhook subscription per connected employee user
+- Answer/disconnect event processing
+- Supabase Realtime account screen pop into the existing browser tab
+- Live connected banner and timer
+- Mandatory disposition before another call
+- Existing account call-result/activity integration
+- Admin Start, Pause, Resume, Stop and live campaign/agent views
+
+New database objects:
+
+- ringcentral_user_mappings
+- dialer_campaigns
+- dialer_campaign_accounts
+- dialer_agent_status
+- dialer_calls
+- dialer_screen_pops
+- ringcentral_webhook_subscriptions
+
+New Edge Functions:
+
+- ringcentral-dialer
+- ringcentral-webhook
+
+Incremental SQL:
+
+SQL_TO_RUN_IN_SUPABASE/R8N18_RINGCENTRAL_POWER_DIALER.sql
+
+Do not blindly rerun the R8N17 combined reference migration.
+
+============================================================
+3. PRIVATE PROVIDER CONFIGURATION
+============================================================
+
+RingCentral private values remain only in LIVE Supabase Edge Function Secrets:
+
+- RC_APP_CLIENT_ID
+- RC_APP_CLIENT_SECRET
+- RC_USER_JWTS_JSON
+- RC_WEBHOOK_VALIDATION_TOKEN
+- Optional RC_SERVER_URL
+- Single-user test fallback only: RC_USER_JWT + RC_DEFAULT_USER_EMAIL
+
+RC_USER_JWTS_JSON is keyed by exact lowercase Co Pilot employee email. Never
+reuse one employee's RingCentral JWT for another employee.
+
+Read R8N18_RINGCENTRAL_SETUP.txt before deployment or troubleshooting.
+
+============================================================
+4. CURRENT LIMITS
+============================================================
+
+R8N18 is a power dialer, not a predictive dialer or voice broadcaster.
+It does not yet include:
+
+- Multiple simultaneous calls per employee
+- Answering-machine/voicemail detection
+- Prerecorded voice broadcasts
+- Press-1 live transfer campaigns
+- Automated voicemail drops
+- Predictive pacing or abandoned-call controls
+
+Those belong to later phases only after Phase 1 live provider behavior,
+screen pops, compliance, reports, and dispositions are verified.
+
+============================================================
+5. DEVELOPMENT RULES
+============================================================
+
+- Start only from this R8N18.1 LIVE package.
+- Preserve strict LIVE/DEMO separation.
+- Preserve public/nmi-config.js already in LIVE GitHub.
+- Preserve the R8N17 employee-to-admin NMI approval flow.
+- Keep provider private credentials in Supabase Edge Function Secrets.
+- Never put RingCentral JWTs or secrets in frontend code or GitHub.
+- Keep one employee mapped to one RingCentral user and extension.
+- Keep Compliance Guard immediately before every provider call.
+- Keep mandatory disposition before the next call.
+- Feed calls into the existing shared activity/statistics architecture.
+- Build incremental, testable releases and avoid broad refactors.
+- Add a visible build marker to every release.
+- Run production build, JavaScript syntax checks, Edge TypeScript checks,
+  credential scans, and ZIP integrity checks.
+- Keep consolidated handoff ZIPs below 20 files.
+
+============================================================
+6. NEXT DEVELOPMENT STEP
+============================================================
+
+Deploy and live-test R8N18 with one RingCentral employee and one test account.
+Fix any provider-specific event matching, extension permission, caller-ID, or
+forwarding-number behavior found during that test before adding features.
+
+After Phase 1 is stable, Phase 2 may add voicemail detection, controlled pacing,
+and enhanced answer routing. Voice broadcasting must remain a later compliance-
+gated phase with prerecorded-message consent and abandoned-call safeguards.
