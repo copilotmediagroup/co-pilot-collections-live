@@ -5,13 +5,12 @@
 <!-- PAYMENT_PROMISE_PLAN_SAVE_FIX_MARKER: payment promise, payment plan, and notes save repair -->
 <!-- LIVE_CALL_INTELLIGENCE_MARKER: call logging + contact intelligence -->
 <!-- LIVE_PROMISE_AUTOMATION_ALERTS_MARKER: promise automation + collector alerts -->
-<!-- LIVE_DEMO_ONE_CLICK_LOGIN_EXCLUSION_R8N2: no demo credentials, buttons, or public-demo restrictions -->
 <html>
 <!-- STAFF_APPROVAL_ACTIONS_R6_2026_07_18: secure admin RPC + compact professional staff controls -->
 <!-- DOCUMENT_BRANDING_TYPED_ESIGN_R4_2026_07_18: brand logo/name on documents + company Created By + DocuSign-style typed signature chooser -->
 
 <head>
-<!-- STABLE_SINGLE_FILE_QA_LOCK_2026_07_19_R8N9: LIVE Quick Actions Top / Contact Panel Removed -->
+<!-- STABLE_SINGLE_FILE_QA_LOCK_2026_07_19_R8N1: Silent Logged-Out Startup Fix -->
 <!-- LIVE_COMPLIANCE_GUARD_MARKER: compliance guard + call rules -->
 <!-- LIVE_REPORTING_CLEAN_PACKAGE_MARKER: clean live package + admin reports -->
 <!-- LIVE_REPORTING_CLEAN_PACKAGE_MARKER: clean live package + admin reports -->
@@ -100,7 +99,7 @@ header.topbar{height:66px;background:linear-gradient(90deg,#05225f,#07379a,#0b45
 .dispoPanel{grid-column:1/-1}.dispoGrid{grid-template-columns:repeat(8,1fr);gap:8px}.dispo{height:44px;font-size:12px;border-radius:10px;padding:0 8px}
 .notePanel{grid-column:1/2}.notePanel textarea{height:90px;background:#fffdf3;border-color:#f3d38a}.centerActivity{grid-column:2/3}.timeline{max-height:160px;overflow:auto}
 .mappedPanel{display:none}
-.right{padding:16px 14px 84px;background:#f8fbff;overflow:auto}.right .panel{border-radius:14px}.softphone{padding:14px}.ready{border-radius:10px}.dialer{grid-template-columns:1fr;gap:10px}.keys{grid-template-columns:repeat(3,1fr)}.key{height:46px;background:#fff;color:#0f172a;border:1px solid var(--line);border-radius:9px}.callBox{border:0;padding:0}.callBox button{width:100%;justify-content:center;border-radius:8px}.quickActions{padding:14px;margin-top:0}.qaItem{height:42px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #e5edf7;font-weight:800;font-size:13px}.qaItem:last-child{border-bottom:0}.qaIcon{width:26px;height:26px;border-radius:8px;background:#e0ecff;color:#1457ff;display:grid;place-items:center;margin-right:8px}.qaLeft{display:flex;align-items:center}
+.right{padding:16px 14px 84px;background:#f8fbff;overflow:auto}.right .panel{border-radius:14px}.softphone{padding:14px}.ready{border-radius:10px}.dialer{grid-template-columns:1fr;gap:10px}.keys{grid-template-columns:repeat(3,1fr)}.key{height:46px;background:#fff;color:#0f172a;border:1px solid var(--line);border-radius:9px}.callBox{border:0;padding:0}.callBox button{width:100%;justify-content:center;border-radius:8px}.quickActions{padding:14px;margin-top:12px}.qaItem{height:42px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #e5edf7;font-weight:800;font-size:13px}.qaItem:last-child{border-bottom:0}.qaIcon{width:26px;height:26px;border-radius:8px;background:#e0ecff;color:#1457ff;display:grid;place-items:center;margin-right:8px}.qaLeft{display:flex;align-items:center}
 .bottom{height:70px;background:white;border-top:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:12px 18px;box-shadow:0 -4px 18px rgba(15,23,42,.06);z-index:6}.rightBtns{gap:14px}.big,.primaryBig{min-width:165px;height:48px;justify-content:center;border-radius:10px}.primaryBig{background:#1457ff}
 .importProgressBox{z-index:99999}
 @media(max-width:1400px){.main{grid-template-columns:50px 300px 1fr 260px}.summaryGrid{grid-template-columns:repeat(3,1fr)}.allFieldsGrid{grid-template-columns:repeat(3,1fr)}.allFieldCard:nth-child(4n){border-right:1px solid #e5edf7}.allFieldCard:nth-child(3n){border-right:0}.phoneGrid{grid-template-columns:repeat(3,1fr)}.dispoGrid{grid-template-columns:repeat(4,1fr)}}
@@ -3592,10 +3591,6 @@ button {
     }
   })();
   </script>
-<style>
-/* QUICK ACTIONS TOP — CONTACT PANEL REMOVED — R8N9 */
-.right > .quickActions{margin-top:0!important;order:-10}
-</style>
 </head>
 <body>
 <div id="loginScreen" class="loginScreen open">
@@ -3781,8 +3776,12 @@ button {
     </main>
 
     <aside class="right">
-<section class="panel quickActions">
-        <span id="callNumber" hidden>—</span><span id="lastDialed" hidden></span>
+      <section class="panel softphone">
+        <div class="softTop"><b>Softphone</b><span class="connected">● Connected</span></div>
+        <div class="ready"><b>Ready to call</b><br><span id="lastDialed">Click a number to dial</span></div>
+        <div class="dialer"><div class="keys"><button class="key">1</button><button class="key">2<br><small>ABC</small></button><button class="key">3<br><small>DEF</small></button><button class="key">4<br><small>GHI</small></button><button class="key">5<br><small>JKL</small></button><button class="key">6<br><small>MNO</small></button><button class="key">7<br><small>PQRS</small></button><button class="key">8<br><small>TUV</small></button><button class="key">9<br><small>WXYZ</small></button><button class="key">*</button><button class="key">0</button><button class="key">#</button></div><div class="callBox"><div>No active call</div><div class="callNumber" id="callNumber">—</div><button class="green" onclick="callPrimary()">Call</button><br><br><button class="red" onclick="endCall()">End Call</button></div></div>
+      </section>
+      <section class="panel quickActions">
         <div class="panelTitle"><h3>Quick Actions</h3></div>
         <div class="qaItem" onclick="openPaymentTrackerForCurrent()"><span class="qaLeft"><span class="qaIcon">🧾</span>Record Payment Promise</span><span>›</span></div>
         <div class="qaItem" onclick="openPaymentPlan()"><span class="qaLeft"><span class="qaIcon">💳</span>Payment Plan Schedule</span><span>›</span></div>
@@ -5993,13 +5992,12 @@ function renderCurrent(a,q){
  renderPhones(a);
  renderDispos(a);
 }
-
 function renderPhones(a){
  let ps=phones(a).map(p=>normPhone(p)).filter(p=>p.length>=10);
  let seen=new Set();
  ps=ps.filter(p=>{let key=p.slice(-10); if(seen.has(key))return false; seen.add(key); return true;}).slice(0,6);
  let blocked=phoneIsBlocked(a);
- document.getElementById('phoneGrid').innerHTML=ps.map((p,i)=>`<a class="phoneChip ${blocked?'blocked':''}" href="tel:${normPhone(p)}" data-ringcentral-extension-number="${normPhone(p)}" onclick="event.preventDefault(); return dialPhone('${a.id}','${normPhone(p)}')"><div class="phoneIcon">☎</div><div><div class="phoneNum">${fmtPhone(p)}</div><div class="phoneType">${i===0?'Primary':i===1?'Mobile':'Alternate'}</div>${blocked?'<div class="callBlockedNote">Compliance review required</div>':''}</div></a>`).join('')||'<div class="muted">No phone numbers on this account.</div>';
+ document.getElementById('phoneGrid').innerHTML=ps.map((p,i)=>`<a class="phoneChip ${blocked?'blocked':''}" href="tel:${normPhone(p)}" data-ringcentral-extension-number="${normPhone(p)}" onclick="event.preventDefault(); return dialPhone('${a.id}','${normPhone(p)}')"><div class="phoneIcon">☎</div><div><div class="phoneNum">${fmtPhone(p)}</div><div class="phoneType">${i===0?'Primary':i===1?'Mobile':'Alternate'}</div>${blocked?'<div class="callBlockedNote">Compliance review required</div>':''}</div></a>`).join('')||'<div class="muted">No phone numbers on this account.</div>'
 }
 function renderDispos(a){document.getElementById('selectedDisposition').textContent=currentDisposition||a?.disposition||'Select one';document.getElementById('dispoGrid').innerHTML=DISPOS.map(d=>`<button class="dispo ${d==='Disputed'?'orangeText':['Promise to Pay','Settled'].includes(d)?'greenText':['Bad Number','DNC'].includes(d)?'redText':d==='Callback'?'purpleText':''} ${(currentDisposition||a?.disposition)===d?'selected':''}" onclick="selectDisposition('${d}')">${d}</button>`).join('')}
 async function selectDisposition(d){let cur=getCurrent();if(!cur)return;currentDisposition=d;let old=cur.status,newStatus=d==='Disputed'?'Disputed':d;let body={status:newStatus,disposition:d,updated_at:new Date().toISOString()};if(d==='DNC')body.do_not_call=true;if(d==='Disputed')body.disputed_flag=true;if(d==='Bad Number')body.wrong_number_flag=true;let updated;try{updated=(await dbFetch(`/accounts?id=eq.${cur.id}`,{method:'PATCH',body:JSON.stringify(body)}))[0]}catch(e){delete body.do_not_call;delete body.disputed_flag;delete body.wrong_number_flag;updated=(await dbFetch(`/accounts?id=eq.${cur.id}`,{method:'PATCH',body:JSON.stringify(body)}))[0]}await insertActivity(cur.id,'Status Updated','Disposition set to '+d,'',old,newStatus);await insertAudit('Status Updated','Disposition set to '+d,'account',cur.id);let i=accounts.findIndex(a=>a.id===cur.id);if(i>=0)accounts[i]=toCamel(updated);render();if(d==='Callback')openFollowUpModal('Callback');if(d==='Disputed')openDisputeModal();if(d==='Promise to Pay')openPaymentPlan();}
@@ -12259,7 +12257,7 @@ function exportContactIntelligenceCSV(){let calls=filteredContactCalls();let row
   if(window.__cpcmSystemQaVersionLockLoaded) return;
   window.__cpcmSystemQaVersionLockLoaded = true;
   var BUILD_NAME = "Co Pilot Collections Manager — Stability QA / Version Lock";
-  var BUILD_VERSION = "STABLE_SINGLE_FILE_QA_LOCK_2026_07_19_R8N9";
+  var BUILD_VERSION = "STABLE_SINGLE_FILE_QA_LOCK_2026_07_19_R8N1";
   var EXPECTED_ENV = "LIVE";
   var EXPECTED_URL = "https://bwvufgzbkaymffwxuuzr.supabase.co";
   var EXPECTED_KEY_PREFIX = "sb_publishable_cvwkN3fOovsYvAvzXvrmRA";
@@ -12304,7 +12302,7 @@ function exportContactIntelligenceCSV(){let calls=filteredContactCalls();let row
     checks.push(line('Account details area found', !!(qs('.accountCard')||visibleTextIncludes('Account Details')), 'Account card/details check'));
     checks.push(line('Payment Plan area found', visibleTextIncludes('Payment Plan')||!!qs('.paymentPlanPanel'), 'Payment Plan card check'));
     checks.push(line('Compliance Guard found', visibleTextIncludes('Compliance Guard'), 'Compliance card/check'));
-    checks.push(line('Quick Actions at top', !!qs('.right > .quickActions:first-child'), 'Right column starts with Quick Actions'));
+    checks.push(line('Softphone found', visibleTextIncludes('Softphone')||!!qs('.softphone'), 'Softphone/right panel check'));
     checks.push(line('Team Messenger available', visibleTextIncludes('Team Messenger')||visibleTextIncludes('Messenger'), 'Chat/messenger check'));
     checks.push(line('Reports button/page present', btnByText('reports')||visibleTextIncludes('Reports'), 'Reports nav/text check'));
     checks.push(line('Cleanup button/page present', btnByText('cleanup')||visibleTextIncludes('Cleanup'), 'Cleanup nav/text check'));
