@@ -11,7 +11,7 @@
 <!-- DOCUMENT_BRANDING_TYPED_ESIGN_R4_2026_07_18: brand logo/name on documents + company Created By + DocuSign-style typed signature chooser -->
 
 <head>
-<!-- RINGCENTRAL_POWER_DIALER_PHASE1_2026_07_20_R8N18: LIVE RingCentral Power Dialer + preserved NMI approval queue -->
+<!-- STABLE_SINGLE_FILE_QA_LOCK_2026_07_20_R8N12: LIVE NMI Phase 1 Secure Card Payments -->
 <!-- LIVE_COMPLIANCE_GUARD_MARKER: compliance guard + call rules -->
 <!-- LIVE_REPORTING_CLEAN_PACKAGE_MARKER: clean live package + admin reports -->
 <!-- LIVE_REPORTING_CLEAN_PACKAGE_MARKER: clean live package + admin reports -->
@@ -3541,36 +3541,6 @@ button {
 .planProHeader .planProActions{display:flex!important;gap:10px!important;align-items:center!important;justify-content:flex-end!important;flex-wrap:wrap!important}
 .planProHeader .planProActions .red{background:#dc2626!important;color:#fff!important}
 .planProHeader .planProActions .outline{background:#fff!important;color:#1d4ed8!important;border:1px solid #bfdbfe!important}
-
-/* NMI ADMIN ACTIONS + POLISHED TOASTS — R8N16 */
-.nmiToastStack{position:fixed;top:18px;right:18px;z-index:2147483647;display:flex;flex-direction:column;gap:10px;width:min(390px,calc(100vw - 36px));pointer-events:none}
-.nmiToast{pointer-events:auto;background:#fff;border:1px solid #dbe4ee;border-left:5px solid #2563eb;border-radius:12px;box-shadow:0 18px 50px rgba(15,23,42,.22);padding:13px 42px 13px 14px;position:relative;animation:nmiToastIn .2s ease-out}
-.nmiToast.success{border-left-color:#16a34a}.nmiToast.error{border-left-color:#dc2626}.nmiToast.warning{border-left-color:#d97706}.nmiToast.info{border-left-color:#2563eb}
-.nmiToastTitle{font-size:13px;font-weight:900;color:#0f172a;margin-bottom:3px}.nmiToastMessage{font-size:12px;line-height:1.45;color:#475569;font-weight:650}
-.nmiToastClose{position:absolute;right:10px;top:9px;border:0;background:transparent;color:#64748b;font-size:20px;line-height:1;cursor:pointer;padding:2px 5px}
-@keyframes nmiToastIn{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
-@media(max-width:650px){.nmiToastStack{top:10px;right:10px;width:calc(100vw - 20px)}}
-
-
-/* NMI EMPLOYEE → ADMIN PAYMENT APPROVAL QUEUE — R8N17 */
-.nmiApprovalBox{width:min(1180px,96vw);max-height:92vh}
-.nmiApprovalHero{display:flex;justify-content:space-between;gap:16px;align-items:center;padding:14px 16px;border:1px solid #bfdbfe;background:#eff6ff;border-radius:12px;margin-bottom:12px}
-.nmiApprovalHero b{display:block;color:#0f3d78;font-size:14px}.nmiApprovalHero span{display:block;color:#475569;font-size:12px;margin-top:3px;font-weight:650}
-.nmiApprovalStats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-bottom:12px}
-.nmiApprovalStats>div{border:1px solid #dbe4ee;background:#fff;border-radius:11px;padding:11px 13px}.nmiApprovalStats span{display:block;color:#64748b;font-size:10px;font-weight:850;text-transform:uppercase;letter-spacing:.04em}.nmiApprovalStats b{display:block;color:#0f172a;font-size:20px;margin-top:3px}
-.nmiApprovalList{display:flex;flex-direction:column;gap:10px;margin-top:12px}
-.nmiApprovalCard{border:1px solid #dbe4ee;background:#fff;border-radius:13px;padding:14px;box-shadow:0 6px 18px rgba(15,23,42,.06)}
-.nmiApprovalCard.pending{border-left:5px solid #d97706}.nmiApprovalCard.processing{border-left:5px solid #2563eb}.nmiApprovalCard.approved{border-left:5px solid #16a34a}.nmiApprovalCard.declined,.nmiApprovalCard.expired,.nmiApprovalCard.cancelled,.nmiApprovalCard.gateway_declined,.nmiApprovalCard.failed{border-left:5px solid #dc2626}.nmiApprovalCard.needs_review{border-left:5px solid #7c3aed}
-.nmiApprovalTop{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}.nmiApprovalName{font-size:15px;font-weight:900;color:#0f172a}.nmiApprovalAccount{font-size:11px;color:#64748b;margin-top:2px;font-weight:700}
-.nmiApprovalAmount{text-align:right;font-size:20px;font-weight:950;color:#0f172a}.nmiApprovalStatus{display:inline-flex;margin-top:4px;padding:4px 8px;border-radius:999px;background:#f1f5f9;color:#334155;font-size:9px;font-weight:900;text-transform:uppercase;letter-spacing:.04em}
-.nmiApprovalGrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px;margin-top:12px}.nmiApprovalGrid>div{background:#f8fafc;border:1px solid #e2e8f0;border-radius:9px;padding:8px 10px}.nmiApprovalGrid span{display:block;color:#64748b;font-size:9px;font-weight:850;text-transform:uppercase}.nmiApprovalGrid b{display:block;color:#1e293b;font-size:11px;margin-top:3px;word-break:break-word}
-.nmiApprovalNotes{margin-top:10px;padding:9px 11px;border:1px solid #e2e8f0;background:#fafafa;border-radius:9px;color:#475569;font-size:11px;line-height:1.4}
-.nmiApprovalActions{display:flex;justify-content:flex-end;gap:8px;flex-wrap:wrap;margin-top:12px}.nmiApprovalActions button{min-width:120px}
-.nmiApprovalEmpty{border:1px dashed #cbd5e1;background:#f8fafc;border-radius:12px;padding:28px;text-align:center;color:#64748b;font-weight:750}
-.nmiEmployeeApprovalBanner{border:1px solid #fde68a;background:#fffbeb;color:#92400e;border-radius:10px;padding:10px 12px;margin:10px 0;font-size:11px;font-weight:750;line-height:1.4}
-@media(max-width:850px){.nmiApprovalGrid{grid-template-columns:repeat(2,minmax(0,1fr))}}
-@media(max-width:600px){.nmiApprovalStats,.nmiApprovalGrid{grid-template-columns:1fr}.nmiApprovalTop{flex-direction:column}.nmiApprovalAmount{text-align:left}.nmiApprovalHero{align-items:flex-start;flex-direction:column}}
-
 </style>
 
 <style id="dataCleanupDuplicateFinderStyles">
@@ -3629,47 +3599,11 @@ button {
 
 <style id="cpcmNmiPhase1Style">
 .nmiQuickAction{background:linear-gradient(90deg,#eefbf5,#f8fffc);border-color:#b7ead2!important}.nmiQuickAction .qaIcon{background:#0f9f6e!important;color:#fff!important}
-.nmiBox{width:min(980px,96vw)!important;max-width:980px!important}.nmiModalSub{font-size:11px;color:#64748b;font-weight:800;margin-top:3px}.nmiAccountStrip{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:12px}.nmiAccountStrip>div{border:1px solid #dbe5f1;background:#f8fbff;border-radius:12px;padding:11px}.nmiAccountStrip span{display:block;font-size:9px;font-weight:1000;letter-spacing:.06em;color:#64748b;text-transform:uppercase;margin-bottom:5px}.nmiAccountStrip b{font-size:14px;color:#0f172a;word-break:break-word}.nmiSecurityNote{border:1px solid #b7ead2;background:#ecfdf5;color:#065f46;border-radius:12px;padding:10px 12px;font-size:12px;margin-bottom:12px}.nmiGrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:11px}.nmiGrid label{font-size:10px;font-weight:950;color:#334155;text-transform:uppercase;letter-spacing:.03em}.nmiGrid input,.nmiGrid textarea{width:100%;box-sizing:border-box}.nmiWide{grid-column:1/-1}.nmiCardFields{display:grid;grid-template-columns:2fr 1fr 1fr;gap:11px;padding:12px;border:1px solid #cbd8e7;background:#f8fafc;border-radius:14px}.nmiHostedField{height:44px;border:1px solid #cbd5e1;border-radius:9px;background:#fff;overflow:hidden;box-shadow:inset 0 1px 2px rgba(15,23,42,.04);position:relative;isolation:isolate;cursor:text}.nmiHostedField iframe{display:block!important;position:absolute!important;inset:0!important;width:100%!important;height:44px!important;border:0!important;z-index:5!important;pointer-events:auto!important;background:#fff!important}.nmiFieldTools{display:flex;gap:9px;align-items:center;justify-content:flex-end;flex-wrap:wrap;margin-top:-2px}.nmiFieldTools span{font-size:10px;color:#64748b;font-weight:800}.nmiFieldTools button{padding:7px 10px;font-size:10px}.nmiConsent{display:flex;gap:9px;align-items:flex-start;margin-top:13px;padding:11px;border:1px solid #dbe5f1;background:#f8fafc;border-radius:12px;font-size:12px;font-weight:800;color:#334155}.nmiConsent input{margin-top:2px}.nmiPaymentStatus{margin-top:10px;border-radius:10px;padding:10px 12px;background:#eff6ff;border:1px solid #bfdbfe;color:#1e40af;font-size:12px;font-weight:850}.nmiPaymentStatus.processing{background:#fff7ed;border-color:#fed7aa;color:#9a3412}.nmiPaymentStatus.success{background:#ecfdf5;border-color:#a7f3d0;color:#065f46}.nmiPaymentStatus.error{background:#fef2f2;border-color:#fecaca;color:#991b1b}.nmiPaymentResult{margin-top:10px;border-radius:12px;border:1px solid #a7f3d0;background:#ecfdf5;padding:12px;color:#064e3b;font-size:12px}.nmiPaymentResult h4{margin:0 0 8px;font-size:15px}.nmiResultGrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.nmiResultGrid div{background:#fff;border:1px solid #d1fae5;border-radius:9px;padding:8px}.nmiResultGrid span{display:block;font-size:9px;text-transform:uppercase;color:#64748b;font-weight:900}.nmiResultGrid b{display:block;margin-top:4px;word-break:break-word}.nmiFooterActions{display:flex;gap:9px;justify-content:flex-end;flex-wrap:wrap;margin-top:13px}.nmiSetupWarning{border:1px solid #fdba74;background:#fff7ed;color:#9a3412;border-radius:12px;padding:11px;margin-bottom:12px;font-size:12px;font-weight:850}.nmiGatewayPill{display:inline-flex;align-items:center;border-radius:999px;padding:4px 8px;background:#dcfce7;color:#166534;font-size:10px;font-weight:950}.nmiActionButtons{display:flex;gap:5px;flex-wrap:wrap}.nmiActionButtons button{padding:6px 8px;font-size:10px}.nmiActionButtons .danger{background:#fee2e2;color:#991b1b;border:1px solid #fecaca}.hidden{display:none!important}
+.nmiBox{width:min(980px,96vw)!important;max-width:980px!important}.nmiModalSub{font-size:11px;color:#64748b;font-weight:800;margin-top:3px}.nmiAccountStrip{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:12px}.nmiAccountStrip>div{border:1px solid #dbe5f1;background:#f8fbff;border-radius:12px;padding:11px}.nmiAccountStrip span{display:block;font-size:9px;font-weight:1000;letter-spacing:.06em;color:#64748b;text-transform:uppercase;margin-bottom:5px}.nmiAccountStrip b{font-size:14px;color:#0f172a;word-break:break-word}.nmiSecurityNote{border:1px solid #b7ead2;background:#ecfdf5;color:#065f46;border-radius:12px;padding:10px 12px;font-size:12px;margin-bottom:12px}.nmiGrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:11px}.nmiGrid label{font-size:10px;font-weight:950;color:#334155;text-transform:uppercase;letter-spacing:.03em}.nmiGrid input,.nmiGrid textarea{width:100%;box-sizing:border-box}.nmiWide{grid-column:1/-1}.nmiCardFields{display:grid;grid-template-columns:2fr 1fr 1fr;gap:11px;padding:12px;border:1px solid #cbd8e7;background:#f8fafc;border-radius:14px}.nmiHostedField{height:44px;border:1px solid #cbd5e1;border-radius:9px;background:#fff;overflow:hidden;box-shadow:inset 0 1px 2px rgba(15,23,42,.04)}.nmiHostedField iframe{width:100%!important;height:44px!important;border:0!important}.nmiConsent{display:flex;gap:9px;align-items:flex-start;margin-top:13px;padding:11px;border:1px solid #dbe5f1;background:#f8fafc;border-radius:12px;font-size:12px;font-weight:800;color:#334155}.nmiConsent input{margin-top:2px}.nmiPaymentStatus{margin-top:10px;border-radius:10px;padding:10px 12px;background:#eff6ff;border:1px solid #bfdbfe;color:#1e40af;font-size:12px;font-weight:850}.nmiPaymentStatus.processing{background:#fff7ed;border-color:#fed7aa;color:#9a3412}.nmiPaymentStatus.success{background:#ecfdf5;border-color:#a7f3d0;color:#065f46}.nmiPaymentStatus.error{background:#fef2f2;border-color:#fecaca;color:#991b1b}.nmiPaymentResult{margin-top:10px;border-radius:12px;border:1px solid #a7f3d0;background:#ecfdf5;padding:12px;color:#064e3b;font-size:12px}.nmiPaymentResult h4{margin:0 0 8px;font-size:15px}.nmiResultGrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.nmiResultGrid div{background:#fff;border:1px solid #d1fae5;border-radius:9px;padding:8px}.nmiResultGrid span{display:block;font-size:9px;text-transform:uppercase;color:#64748b;font-weight:900}.nmiResultGrid b{display:block;margin-top:4px;word-break:break-word}.nmiFooterActions{display:flex;gap:9px;justify-content:flex-end;flex-wrap:wrap;margin-top:13px}.nmiSetupWarning{border:1px solid #fdba74;background:#fff7ed;color:#9a3412;border-radius:12px;padding:11px;margin-bottom:12px;font-size:12px;font-weight:850}.nmiGatewayPill{display:inline-flex;align-items:center;border-radius:999px;padding:4px 8px;background:#dcfce7;color:#166534;font-size:10px;font-weight:950}.nmiActionButtons{display:flex;gap:5px;flex-wrap:wrap}.nmiActionButtons button{padding:6px 8px;font-size:10px}.nmiActionButtons .danger{background:#fee2e2;color:#991b1b;border:1px solid #fecaca}.hidden{display:none!important}
 @media(max-width:820px){.nmiAccountStrip{grid-template-columns:repeat(2,1fr)}.nmiGrid{grid-template-columns:1fr 1fr}.nmiCardFields{grid-template-columns:1fr 1fr}.nmiCardFields>div:first-child{grid-column:1/-1}.nmiResultGrid{grid-template-columns:1fr}}
 @media(max-width:560px){.nmiAccountStrip,.nmiGrid,.nmiCardFields{grid-template-columns:1fr}.nmiCardFields>div:first-child{grid-column:auto}.nmiFooterActions button{width:100%}}
 </style>
 
-<style id="cpcmRingCentralDialerStylesR8N18">
-/* R8N18 RINGCENTRAL POWER DIALER */
-.dialerModalBox{max-width:1460px!important;border-radius:18px!important;overflow:hidden}
-.dialerSub{font-size:11px;color:#64748b;font-weight:750;margin-top:3px}
-.dialerBody{background:#f4f7fb;display:flex;flex-direction:column;gap:12px}
-.dialerHero{display:flex;align-items:center;justify-content:space-between;gap:14px;background:linear-gradient(135deg,#05225f,#0b45c6);color:#fff;border-radius:16px;padding:17px 19px;box-shadow:0 8px 24px rgba(5,34,95,.18)}
-.dialerHeroTitle{font-size:18px;font-weight:1000}.dialerHeroSub{font-size:12px;color:#dbeafe;margin-top:4px}
-.dialerProviderChip{border-radius:999px;padding:7px 11px;font-size:11px;font-weight:900;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);max-width:480px}
-.dialerProviderChip.connected{background:#dcfce7;color:#166534;border-color:#86efac}.dialerProviderChip.error{background:#fee2e2;color:#991b1b;border-color:#fecaca}
-.dialerAgentConsole{display:grid;grid-template-columns:1.1fr .7fr auto 1.5fr;gap:12px;align-items:end;background:#fff;border:1px solid #dbe3ef;border-radius:16px;padding:14px 16px;box-shadow:0 3px 14px rgba(15,23,42,.05)}
-.dialerAgentConsole label,.dialerFormGrid label{display:block;font-size:11px;font-weight:900;color:#475569;margin-bottom:5px}
-.dialerAgentConsole select,.dialerFormGrid input,.dialerFormGrid select{height:40px;border:1px solid #cbd5e1;border-radius:10px;padding:8px 10px;background:#fff;width:100%;font:inherit}
-.dialerStatusButtons{display:flex;gap:7px;flex-wrap:wrap}.dialerStatusButtons button{height:40px;padding:0 11px;font-size:11px}
-.dialerCurrentCall{min-height:40px;border:1px solid #dbe3ef;background:#f8fafc;border-radius:10px;padding:8px 10px;font-size:12px;color:#334155}.dialerCurrentCall small{color:#64748b}
-.dialerAdminGrid{display:grid;grid-template-columns:1.25fr .75fr;gap:12px}
-.dialerPanel{background:#fff;border:1px solid #dbe3ef;border-radius:16px;padding:15px 16px;box-shadow:0 3px 14px rgba(15,23,42,.05)}
-.dialerPanelHead{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:12px}.dialerPanelHead h3{margin:0;font-size:16px;color:#0f172a}.dialerPanelHead span{display:block;font-size:11px;color:#64748b;margin-top:4px}
-.dialerFormGrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}.dialerWide{grid-column:1/-1}
-.dialerEmployeeChecks{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;max-height:180px;overflow:auto;border:1px solid #e2e8f0;border-radius:12px;padding:8px;background:#f8fafc}
-.dialerEmployeeChecks label{display:flex;align-items:center;gap:8px;border:1px solid #e2e8f0;border-radius:10px;padding:8px;background:#fff;margin:0;cursor:pointer}.dialerEmployeeChecks input{width:auto;height:auto}.dialerEmployeeChecks b,.dialerEmployeeChecks small{display:block}.dialerEmployeeChecks small{font-size:10px;color:#64748b;margin-top:2px}
-.dialerPreview{margin-top:10px;border:1px solid #bfdbfe;background:#eff6ff;color:#1e3a8a;border-radius:12px;padding:10px 12px;font-size:12px;line-height:1.45}.dialerPreview span{color:#475569}
-.dialerActions{display:flex;justify-content:flex-end;gap:8px;flex-wrap:wrap;margin-top:11px}.dialerActions button{height:38px;padding:0 12px;font-size:11px}
-.dialerMappingTable{display:grid;gap:7px;margin-top:12px;max-height:210px;overflow:auto}.dialerMappingTable>div{border:1px solid #e2e8f0;border-radius:11px;padding:9px;background:#f8fafc}.dialerMappingTable b,.dialerMappingTable span,.dialerMappingTable small{display:block}.dialerMappingTable span{font-size:11px;color:#334155;margin-top:3px}.dialerMappingTable small{font-size:10px;color:#64748b;margin-top:2px}
-.dialerStats{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:8px;margin-bottom:12px}.dialerStats>div{border:1px solid #e2e8f0;border-radius:12px;background:#f8fafc;padding:10px}.dialerStats span{display:block;font-size:10px;color:#64748b;font-weight:900;text-transform:uppercase}.dialerStats b{display:block;font-size:18px;color:#0f172a;margin-top:4px}
-.dialerCampaignList{display:flex;flex-direction:column;gap:9px}.dialerCampaignCard{border:1px solid #dbe3ef;border-left:5px solid #64748b;border-radius:13px;padding:11px 12px;background:#fff}.dialerCampaignCard.running{border-left-color:#16a34a}.dialerCampaignCard.paused{border-left-color:#7c3aed}.dialerCampaignCard.completed{border-left-color:#2563eb}.dialerCampaignCard.stopped{border-left-color:#dc2626}
-.dialerCampaignTop{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}.dialerCampaignTop b{font-size:14px}.dialerCampaignTop small{display:block;font-size:10px;color:#64748b;margin-top:5px;word-break:break-word}.dialerCampaignActions{display:flex;gap:6px;flex-wrap:wrap}.dialerCampaignActions button{height:32px;padding:0 9px;font-size:10px}
-.dialerCampaignMetrics{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:7px;margin-top:10px}.dialerCampaignMetrics span{border:1px solid #e2e8f0;background:#f8fafc;border-radius:9px;padding:7px;font-size:10px;color:#64748b}.dialerCampaignMetrics b{display:block;color:#0f172a;font-size:13px;margin-top:3px}.dialerCampaignMeta{font-size:10px;color:#94a3b8;margin-top:7px}
-.dialerStatusPill{display:inline-flex;align-items:center;justify-content:center;border-radius:999px;padding:6px 9px;font-size:10px;font-weight:1000;text-transform:capitalize;background:#e2e8f0;color:#334155;margin-left:7px}.dialerStatusPill.available,.dialerStatusPill.running,.dialerStatusPill.connected{background:#dcfce7;color:#166534}.dialerStatusPill.dialing,.dialerStatusPill.ringing,.dialerStatusPill.scheduled{background:#dbeafe;color:#1d4ed8}.dialerStatusPill.wrap_up,.dialerStatusPill.paused{background:#ede9fe;color:#6d28d9}.dialerStatusPill.unavailable,.dialerStatusPill.stopped{background:#fee2e2;color:#991b1b}.dialerStatusPill.completed{background:#e0f2fe;color:#075985}.dialerAgentConsole .dialerStatusPill{margin:0;min-height:40px;border-radius:10px;width:100%}
-.dialerAgentList{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.dialerAgentCard{display:flex;align-items:center;justify-content:space-between;gap:8px;border:1px solid #e2e8f0;border-radius:12px;padding:9px 10px;background:#f8fafc}.dialerAgentCard b,.dialerAgentCard small{display:block}.dialerAgentCard b{font-size:11px}.dialerAgentCard small{font-size:10px;color:#64748b;margin-top:3px}
-.dialerEmpty{border:1px dashed #cbd5e1;border-radius:12px;background:#f8fafc;color:#64748b;padding:14px;font-size:12px;text-align:center}
-.dialerLiveBanner{grid-column:1/-1;display:flex;align-items:center;gap:12px;border-radius:15px;padding:12px 14px;background:#eff6ff;border:2px solid #3b82f6;box-shadow:0 5px 18px rgba(37,99,235,.14);position:sticky;top:0;z-index:8}.dialerLiveBanner.connected{background:#ecfdf5;border-color:#22c55e}.dialerLiveBanner.wrap_up{background:#fff7ed;border-color:#f59e0b}.dialerLivePulse{width:14px;height:14px;border-radius:999px;background:#3b82f6;box-shadow:0 0 0 0 rgba(59,130,246,.5);animation:dialerPulse 1.4s infinite}.dialerLiveBanner.connected .dialerLivePulse{background:#16a34a}.dialerLiveBanner.wrap_up .dialerLivePulse{background:#f59e0b;animation:none}.dialerLiveCopy{display:flex;flex-direction:column;min-width:0;flex:1}.dialerLiveCopy b{font-size:13px}.dialerLiveCopy span{font-size:11px;color:#475569;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.dialerLiveTimer{font-size:20px;font-weight:1000;font-variant-numeric:tabular-nums}.dialerWrapButton{background:#f59e0b;color:#fff}
-@keyframes dialerPulse{0%{box-shadow:0 0 0 0 rgba(59,130,246,.5)}70%{box-shadow:0 0 0 10px rgba(59,130,246,0)}100%{box-shadow:0 0 0 0 rgba(59,130,246,0)}}
-@media(max-width:1200px){.dialerAdminGrid{grid-template-columns:1fr}.dialerAgentConsole{grid-template-columns:1fr 1fr}.dialerFormGrid{grid-template-columns:repeat(2,minmax(0,1fr))}.dialerStats,.dialerCampaignMetrics{grid-template-columns:repeat(3,minmax(0,1fr))}.dialerAgentList{grid-template-columns:repeat(2,minmax(0,1fr))}}
-@media(max-width:760px){.dialerAgentConsole,.dialerFormGrid,.dialerStats,.dialerCampaignMetrics,.dialerAgentList,.dialerEmployeeChecks{grid-template-columns:1fr}.dialerLiveBanner{flex-wrap:wrap}.dialerLiveTimer{margin-left:auto}}
-
-</style>
 </head>
 <body>
 <div id="loginScreen" class="loginScreen open">
@@ -3738,7 +3672,6 @@ button {
       <button class="gray todayBtn" onclick="openTodayDashboard()">Today</button>
       <button class="gray" onclick="openPaymentTracker()">Pay Desk</button>
       <button class="gray" onclick="openPaymentsDashboard()">Ledger</button>
-      <button class="gray" id="nmiApprovalNavButton" onclick="openNmiApprovalQueue()">Approvals <span id="nmiApprovalBadge" class="alertBadge hidden">0</span></button>
       <button class="gray" onclick="runPromiseAutomation(true,true)">Broken</button>
       <button class="gray" onclick="openDailyWorkQueue()">Queue</button>
       <button class="gray" onclick="openPromiseDashboard()">Promises</button>
@@ -4445,7 +4378,7 @@ button {
 
 <div id="nmiPaymentModal" class="modal"><div class="modalbox nmiBox">
   <div class="modalhead">
-    <div><h2 id="nmiPaymentModalTitle">Secure Card Payment</h2><div id="nmiPaymentModalSub" class="nmiModalSub">NMI hosted card fields • Administrator-controlled card processing</div></div>
+    <div><h2>Secure Card Payment</h2><div class="nmiModalSub">NMI hosted card fields • One-time credit/debit payment</div></div>
     <button class="gray" onclick="closeModal('nmiPaymentModal')">Close</button>
   </div>
   <div class="modalbody">
@@ -4456,7 +4389,7 @@ button {
       <div><span>Current Balance</span><b id="nmiCurrentBalance">$0.00</b></div>
       <div><span>Balance After</span><b id="nmiBalanceAfter">$0.00</b></div>
     </div>
-    <div id="nmiSecurityNote" class="nmiSecurityNote"><b>Secure card entry:</b> Card number, expiration date, and CVV are entered inside NMI-hosted fields. Co Pilot does not store the full card number or CVV.</div>
+    <div class="nmiSecurityNote"><b>Secure card entry:</b> Card number, expiration date, and CVV are entered inside NMI-hosted fields. Co Pilot does not store the full card number or CVV.</div>
     <div class="nmiGrid">
       <div><label>Payment Amount</label><input id="nmiAmount" type="number" min="0.01" step="0.01" oninput="updateNmiPaymentPreview()" placeholder="0.00"></div>
       <div><label>Cardholder Name</label><input id="nmiCardholderName" autocomplete="cc-name"></div>
@@ -4467,14 +4400,13 @@ button {
       <div><label>Email for Account Record</label><input id="nmiEmail" type="email" autocomplete="email"></div>
       <div><label>Phone</label><input id="nmiPhone" autocomplete="tel"></div>
       <div class="nmiWide nmiCardFields">
-        <div><label>Card Number</label><div id="ccnumber" class="nmiHostedField" aria-label="Secure card number field"></div></div>
-        <div><label>Expiration</label><div id="ccexp" class="nmiHostedField" aria-label="Secure expiration field"></div></div>
-        <div><label>CVV</label><div id="cvv" class="nmiHostedField" aria-label="Secure CVV field"></div></div>
+        <div><label>Card Number</label><div id="nmiCcNumber" class="nmiHostedField"></div></div>
+        <div><label>Expiration</label><div id="nmiCcExp" class="nmiHostedField"></div></div>
+        <div><label>CVV</label><div id="nmiCvv" class="nmiHostedField"></div></div>
       </div>
-      <div class="nmiWide nmiFieldTools"><span id="nmiFieldDiagnostic">NMI secure fields initialize when this screen opens.</span><button type="button" class="outline" onclick="reloadNmiSecureFields()">Reload Secure Fields</button></div>
       <div class="nmiWide"><label>Internal Notes</label><textarea id="nmiNotes" placeholder="Optional authorization or payment notes. Do not enter full card information."></textarea></div>
     </div>
-    <label class="nmiConsent"><input id="nmiAuthorization" type="checkbox"> <span id="nmiConsentText">I confirm the consumer authorized this one-time card charge for the amount shown.</span></label>
+    <label class="nmiConsent"><input id="nmiAuthorization" type="checkbox"> I confirm the consumer authorized this one-time card charge for the amount shown.</label>
     <div id="nmiPaymentStatus" class="nmiPaymentStatus">Ready for secure card entry.</div>
     <div id="nmiPaymentResult" class="nmiPaymentResult hidden"></div>
     <div class="nmiFooterActions">
@@ -4482,26 +4414,6 @@ button {
       <button class="outline" id="nmiReceiptButton" style="display:none" onclick="openNmiReceiptCenter()">Open Receipt Center</button>
       <button class="green" id="nmiPayButton" onclick="startNmiPayment()">Process Secure Payment</button>
     </div>
-  </div>
-</div></div>
-
-<div id="nmiApprovalModal" class="modal"><div class="modalbox nmiApprovalBox">
-  <div class="modalhead">
-    <div><h2 id="nmiApprovalTitle">Payment Approvals</h2><div id="nmiApprovalSub" class="nmiModalSub">Employee-submitted card requests waiting for administrator action.</div></div>
-    <button class="gray" onclick="closeModal('nmiApprovalModal')">Close</button>
-  </div>
-  <div class="modalbody">
-    <div class="nmiApprovalHero">
-      <div><b id="nmiApprovalHeroTitle">Administrator approval is required before a card is charged.</b><span id="nmiApprovalHeroText">Employees may securely capture payment information, but they cannot run a sale.</span></div>
-      <button class="outline" onclick="loadNmiApprovalQueue(true)">Refresh</button>
-    </div>
-    <div class="nmiApprovalStats">
-      <div><span>Pending</span><b id="nmiApprovalPendingStat">0</b></div>
-      <div><span>Approved</span><b id="nmiApprovalApprovedStat">0</b></div>
-      <div><span>Declined / Expired</span><b id="nmiApprovalClosedStat">0</b></div>
-    </div>
-    <div id="nmiApprovalQueueStatus" class="nmiPaymentStatus">Loading payment requests…</div>
-    <div id="nmiApprovalList" class="nmiApprovalList"></div>
   </div>
 </div></div>
 
@@ -12400,7 +12312,7 @@ function exportContactIntelligenceCSV(){let calls=filteredContactCalls();let row
   if(window.__cpcmSystemQaVersionLockLoaded) return;
   window.__cpcmSystemQaVersionLockLoaded = true;
   var BUILD_NAME = "Co Pilot Collections Manager — Stability QA / Version Lock";
-  var BUILD_VERSION = "RINGCENTRAL_POWER_DIALER_PHASE1_2026_07_20_R8N18";
+  var BUILD_VERSION = "STABLE_SINGLE_FILE_QA_LOCK_2026_07_20_R8N12";
   var EXPECTED_ENV = "LIVE";
   var EXPECTED_URL = "https://bwvufgzbkaymffwxuuzr.supabase.co";
   var EXPECTED_KEY_PREFIX = "sb_publishable_cvwkN3fOovsYvAvzXvrmRA";
@@ -12455,7 +12367,7 @@ function exportContactIntelligenceCSV(){let calls=filteredContactCalls();let row
     checks.push(line('Build marker installed', !!window.__cpcmSystemQaVersionLockLoaded, BUILD_VERSION));
     checks.push(line('Client remittance module installed', !!window.CPCM_CLIENT_REMITTANCE_BUILD, window.CPCM_CLIENT_REMITTANCE_BUILD||'Missing R8 module'));
     checks.push(line('Dynamic call attempts + live statistics installed', !!window.CPCM_DYNAMIC_ACTIVITY_STATS_BUILD, window.CPCM_DYNAMIC_ACTIVITY_STATS_BUILD||'Missing R8N11 dynamic statistics module'));
-    checks.push(line('NMI admin approval payment queue installed', !!window.CPCM_NMI_APPROVAL_QUEUE_BUILD&&!!document.getElementById('nmiApprovalModal')&&!!document.getElementById('nmiPaymentModal'), window.CPCM_NMI_APPROVAL_QUEUE_BUILD||'Missing NMI approval queue module'));
+    checks.push(line('NMI Phase 1 secure payments installed', !!window.CPCM_NMI_PHASE1_BUILD&&!!document.getElementById('nmiPaymentModal'), window.CPCM_NMI_PHASE1_BUILD||'Missing NMI payment module'));
     checks.push(line('NMI private key excluded from browser', !String(document.documentElement.innerHTML).includes('NMI_PRIVATE_API_KEY='), 'Private API key must remain in Supabase Secrets only'));
     checks.push(line('Document PDF engine loaded', !!(window.html2canvas&&window.jspdf&&window.jspdf.jsPDF), 'Local html2canvas + jsPDF'));
     checks.push(line('DocuSign-style typed signature controls loaded', !!(window.downloadCurrentDocumentPDF&&window.clearDocumentSignature&&window.applyTypedDocumentSignature&&window.selectDocumentSignatureStyle), 'Document Builder PDF + typed signature chooser'));
@@ -12490,7 +12402,7 @@ function exportContactIntelligenceCSV(){let calls=filteredContactCalls();let row
   function ensurePage(){
     var p=document.getElementById('cpcmSystemQaPage'); if(p) return p;
     p=document.createElement('div'); p.id='cpcmSystemQaPage';
-    p.innerHTML='<div class="cpcmQaTop"><div><div class="cpcmQaTitle">System Check + Version Lock</div><div class="cpcmQaSub">'+esc(BUILD_NAME)+' • '+esc(BUILD_VERSION)+' • '+esc(EXPECTED_ENV)+'</div></div><div class="cpcmQaActions"><button class="cpcmQaBtn green" onclick="window.cpcmRunSystemCheck()">Run Check</button><button class="cpcmQaBtn white" onclick="window.cpcmCopySystemDiagnostics()">Copy Diagnostics</button><button class="cpcmQaBtn gray" onclick="window.cpcmCloseSystemCheck()">Back to App</button></div></div><div class="cpcmQaWrap"><div class="cpcmQaNote">This screen is a safe admin QA checklist. It does not change account data. Use it after every ZIP upload to verify environment, layout, admin detection, and core app sections before adding new features.</div><div id="cpcmQaMetrics" class="cpcmQaGrid"></div><div class="cpcmQaCard"><div class="cpcmQaCardHead"><div class="cpcmQaCardTitle">Automatic Checks</div><span class="cpcmQaPill info">Safe read-only</span></div><div class="cpcmQaCardBody" id="cpcmQaChecks"></div></div><div class="cpcmQaCard"><div class="cpcmQaCardHead"><div class="cpcmQaCardTitle">Manual Smoke Test Checklist</div><span class="cpcmQaPill warn">Click through after upload</span></div><div class="cpcmQaCardBody"><div class="cpcmQaManual"><div>1. Login works</div><div>2. Queue opens first 5 accounts</div><div>3. Notes save and stay after refresh</div><div>4. Employee can create payment plan</div><div>5. Admin can edit/delete payment plan</div><div>6. Compliance Guard opens</div><div>7. Reports full page opens and Back works</div><div>8. Chat opens without blocking screen</div><div>9. Pay Desk / Ledger open</div><div>10. Tickler opens</div><div>11. Scorecards opens</div><div>12. Receipt downloads as a PDF matching Preview</div><div>13. Electronic signature appears above Authorized Representative</div><div>14. No plain raw HTML layout</div><div>15. Clicking a phone number adds exactly one Call Attempt</div><div>16. Saving the outcome updates that same call instead of adding a second call</div><div>17. Calls, Monitor, Reports, and Scorecards refresh after activity</div><div>18. NMI secure card fields load and Card Number accepts keyboard input</div><div>19. Approved NMI test payment posts once to ledger and balance</div><div>20. Admin refund/void changes balance only after NMI approval</div></div></div></div><div class="cpcmQaCard"><div class="cpcmQaCardHead"><div class="cpcmQaCardTitle">Diagnostics</div><button class="cpcmQaBtn" onclick="window.cpcmCopySystemDiagnostics()">Copy</button></div><div class="cpcmQaCardBody"><pre id="cpcmQaDiag" class="cpcmQaCode"></pre></div></div></div>';
+    p.innerHTML='<div class="cpcmQaTop"><div><div class="cpcmQaTitle">System Check + Version Lock</div><div class="cpcmQaSub">'+esc(BUILD_NAME)+' • '+esc(BUILD_VERSION)+' • '+esc(EXPECTED_ENV)+'</div></div><div class="cpcmQaActions"><button class="cpcmQaBtn green" onclick="window.cpcmRunSystemCheck()">Run Check</button><button class="cpcmQaBtn white" onclick="window.cpcmCopySystemDiagnostics()">Copy Diagnostics</button><button class="cpcmQaBtn gray" onclick="window.cpcmCloseSystemCheck()">Back to App</button></div></div><div class="cpcmQaWrap"><div class="cpcmQaNote">This screen is a safe admin QA checklist. It does not change account data. Use it after every ZIP upload to verify environment, layout, admin detection, and core app sections before adding new features.</div><div id="cpcmQaMetrics" class="cpcmQaGrid"></div><div class="cpcmQaCard"><div class="cpcmQaCardHead"><div class="cpcmQaCardTitle">Automatic Checks</div><span class="cpcmQaPill info">Safe read-only</span></div><div class="cpcmQaCardBody" id="cpcmQaChecks"></div></div><div class="cpcmQaCard"><div class="cpcmQaCardHead"><div class="cpcmQaCardTitle">Manual Smoke Test Checklist</div><span class="cpcmQaPill warn">Click through after upload</span></div><div class="cpcmQaCardBody"><div class="cpcmQaManual"><div>1. Login works</div><div>2. Queue opens first 5 accounts</div><div>3. Notes save and stay after refresh</div><div>4. Employee can create payment plan</div><div>5. Admin can edit/delete payment plan</div><div>6. Compliance Guard opens</div><div>7. Reports full page opens and Back works</div><div>8. Chat opens without blocking screen</div><div>9. Pay Desk / Ledger open</div><div>10. Tickler opens</div><div>11. Scorecards opens</div><div>12. Receipt downloads as a PDF matching Preview</div><div>13. Electronic signature appears above Authorized Representative</div><div>14. No plain raw HTML layout</div><div>15. Clicking a phone number adds exactly one Call Attempt</div><div>16. Saving the outcome updates that same call instead of adding a second call</div><div>17. Calls, Monitor, Reports, and Scorecards refresh after activity</div><div>18. NMI secure card fields load after public key is pasted</div><div>19. Approved NMI test payment posts once to ledger and balance</div><div>20. Admin refund/void changes balance only after NMI approval</div></div></div></div><div class="cpcmQaCard"><div class="cpcmQaCardHead"><div class="cpcmQaCardTitle">Diagnostics</div><button class="cpcmQaBtn" onclick="window.cpcmCopySystemDiagnostics()">Copy</button></div><div class="cpcmQaCardBody"><pre id="cpcmQaDiag" class="cpcmQaCode"></pre></div></div></div>';
     document.body.appendChild(p); return p;
   }
   function addButton(){
@@ -13604,8 +13516,8 @@ function exportContactIntelligenceCSV(){let calls=filteredContactCalls();let row
 <script id="cpcmNmiPhase1Module">
 (function(){
   'use strict';
-  var BUILD='RINGCENTRAL_POWER_DIALER_PHASE1_2026_07_20_R8N18';
-  var collectScriptPromise=null, collectReadyPromise=null, collectConfigured=false, paymentBusy=false, paymentContext=null, lastReceipt=null, collectGeneration=0;
+  var BUILD='STABLE_SINGLE_FILE_QA_LOCK_2026_07_20_R8N12';
+  var collectPromise=null, collectConfigured=false, paymentBusy=false, paymentContext=null, lastReceipt=null;
   function byId(id){return document.getElementById(id)}
   function cfg(){return window.CO_PILOT_NMI_CONFIG||{}}
   function str(v){return String(v==null?'':v)}
@@ -13614,30 +13526,7 @@ function exportContactIntelligenceCSV(){let calls=filteredContactCalls();let row
   function nmiKey(){return str(cfg().publicTokenizationKey).trim()}
   function keyReady(){var key=nmiKey();return !!key&&!/PASTE_|YOUR_|REPLACE_/i.test(key)&&key.length>12}
   function uuid(){return (window.crypto&&crypto.randomUUID)?crypto.randomUUID():'nmi-'+Date.now()+'-'+Math.random().toString(36).slice(2)}
-  function isAdmin(){
-    var u=(typeof currentUser!=='undefined'&&currentUser)?currentUser:null;
-    return !!(u&&(u.isAdmin===true||str(u.role).toLowerCase()==='admin'||str(u.email).toLowerCase()==='afinch2678@gmail.com'));
-  }
-
-  function nmiToast(message,type,title,timeout){
-    var stack=byId('nmiToastStack');
-    if(!stack){
-      stack=document.createElement('div');
-      stack.id='nmiToastStack';
-      stack.className='nmiToastStack';
-      document.body.appendChild(stack);
-    }
-    type=type||'info';
-    title=title||(type==='success'?'Success':type==='error'?'Action Required':type==='warning'?'Please Review':'Notice');
-    var item=document.createElement('div');
-    item.className='nmiToast '+type;
-    item.innerHTML='<button class="nmiToastClose" aria-label="Close">×</button><div class="nmiToastTitle">'+safeHtml(title)+'</div><div class="nmiToastMessage">'+safeHtml(message)+'</div>';
-    var remove=function(){if(item&&item.parentNode)item.parentNode.removeChild(item)};
-    item.querySelector('.nmiToastClose').onclick=remove;
-    stack.appendChild(item);
-    setTimeout(remove,Number(timeout||6000));
-  }
-
+  function isAdmin(){return !!(window.currentUser&&(currentUser.isAdmin||str(currentUser.role).toLowerCase()==='admin'||str(currentUser.email).toLowerCase()==='afinch2678@gmail.com'))}
   function status(text,type){var el=byId('nmiPaymentStatus');if(!el)return;el.textContent=text;el.className='nmiPaymentStatus'+(type?' '+type:'')}
   function setBusy(on){paymentBusy=!!on;var btn=byId('nmiPayButton');if(btn){btn.disabled=!!on;btn.textContent=on?'Processing — Do Not Close':'Process Secure Payment'}}
   function field(id){return byId(id)?byId(id).value.trim():''}
@@ -13652,104 +13541,50 @@ function exportContactIntelligenceCSV(){let calls=filteredContactCalls();let row
     if(byId('nmiBalanceAfter'))byId('nmiBalanceAfter').textContent=usd(Math.max(0,bal-pay));
   };
 
-  function collectHosts(){return ['ccnumber','ccexp','cvv'].map(byId)}
-  function collectFramesReady(){
-    var hosts=collectHosts();
-    return hosts.every(function(host){
-      if(!host)return false;
-      var frame=host.querySelector('iframe');
-      if(!frame)return false;
-      var rect=frame.getBoundingClientRect();
-      return rect.width>20&&rect.height>20;
-    });
-  }
-  function setFieldDiagnostic(text,isError){
-    var el=byId('nmiFieldDiagnostic');
-    if(!el)return;
-    el.textContent=text;
-    el.style.color=isError?'#b91c1c':'#64748b';
-  }
-  function clearCollectHosts(){
-    collectHosts().forEach(function(host){if(host)host.replaceChildren()});
-    collectConfigured=false;
-  }
-  function configureCollect(force){
-    if(!window.CollectJS||!byId('ccnumber'))return Promise.reject(new Error('NMI Collect.js is not ready.'));
-    if(!force&&collectConfigured&&collectFramesReady())return Promise.resolve(true);
-    if(collectReadyPromise&&!force)return collectReadyPromise;
-    var generation=++collectGeneration;
-    clearCollectHosts();
-    setFieldDiagnostic('Loading fresh NMI-hosted card fields…',false);
-    collectReadyPromise=new Promise(function(resolve,reject){
-      var finished=false;
-      var finish=function(ok,error){
-        if(finished||generation!==collectGeneration)return;
-        finished=true;
-        collectReadyPromise=null;
-        if(ok){collectConfigured=true;setFieldDiagnostic('All three secure fields are ready.',false);resolve(true)}
-        else{collectConfigured=false;setFieldDiagnostic(error||'Secure fields did not initialize.',true);reject(new Error(error||'Secure fields did not initialize.'))}
-      };
-      var watchdog=setTimeout(function(){finish(false,'NMI secure fields timed out. Click Reload Secure Fields.')},16000);
-      try{
-        CollectJS.configure({
-          variant:'inline',
-          styleSniffer:false,
-          customCss:{'background-color':'#ffffff','color':'#0f172a','font-size':'15px','font-family':'Arial, Helvetica, sans-serif','padding':'12px','height':'42px','line-height':'20px','box-sizing':'border-box','width':'100%'},
-          invalidCss:{'color':'#b91c1c','background-color':'#fff7f7'},
-          validCss:{'color':'#0f172a','background-color':'#ffffff'},
-          focusCss:{'color':'#0f172a','background-color':'#ffffff','outline':'none'},
-          placeholderCss:{'color':'#94a3b8'},
-          fields:{
-            ccnumber:{selector:'#ccnumber',title:'Card Number',placeholder:'0000 0000 0000 0000'},
-            ccexp:{selector:'#ccexp',title:'Expiration Date',placeholder:'MM / YY'},
-            cvv:{selector:'#cvv',title:'CVV',placeholder:'CVV'}
-          },
-          timeoutDuration:15000,
-          timeoutCallback:function(){clearTimeout(watchdog);setBusy(false);finish(false,'NMI secure fields did not respond. Check the public key or click Reload Secure Fields.')},
-          fieldsAvailableCallback:function(){
-            setTimeout(function(){
-              clearTimeout(watchdog);
-              if(collectFramesReady()){
-                status('Secure card fields loaded. Click Card Number and enter the card information.','');
-                finish(true);
-              }else finish(false,'One or more NMI fields did not render correctly. Click Reload Secure Fields.');
-            },180);
-          },
-          callback:window.cpcmNmiCollectCallback
-        });
-      }catch(e){clearTimeout(watchdog);finish(false,'Unable to configure NMI secure fields: '+(e.message||e))}
-    });
-    return collectReadyPromise;
+  function configureCollect(){
+    if(!window.CollectJS||!byId('nmiCcNumber'))return false;
+    try{
+      CollectJS.configure({
+        variant:'inline',
+        styleSniffer:false,
+        customCss:{'background-color':'#ffffff','color':'#0f172a','font-size':'15px','font-family':'Arial, Helvetica, sans-serif','padding':'12px','height':'42px','line-height':'20px'},
+        invalidCss:{'color':'#b91c1c','background-color':'#fff7f7'},
+        validCss:{'color':'#0f172a','background-color':'#ffffff'},
+        placeholderCss:{'color':'#94a3b8'},
+        fields:{
+          ccnumber:{selector:'#nmiCcNumber',title:'Card Number',placeholder:'0000 0000 0000 0000'},
+          ccexp:{selector:'#nmiCcExp',title:'Expiration Date',placeholder:'MM / YY'},
+          cvv:{selector:'#nmiCvv',title:'CVV',placeholder:'CVV'}
+        },
+        timeoutDuration:15000,
+        timeoutCallback:function(){setBusy(false);status('NMI secure fields did not respond. Check the public tokenization key and internet connection.','error')},
+        fieldsAvailableCallback:function(){status('Secure card fields loaded. Enter payment information and confirm authorization.','')},
+        callback:window.cpcmNmiCollectCallback
+      });
+      collectConfigured=true;
+      return true;
+    }catch(e){status('Unable to configure NMI secure fields: '+(e.message||e),'error');return false}
   }
 
-  function loadCollect(force){
+  function loadCollect(){
+    if(window.CollectJS){configureCollect();return Promise.resolve(true)}
+    if(collectPromise)return collectPromise;
     if(!keyReady())return Promise.reject(new Error('Paste the NMI public tokenization key into public/nmi-config.js first.'));
-    if(window.CollectJS)return configureCollect(!!force);
-    if(!collectScriptPromise){
-      collectScriptPromise=new Promise(function(resolve,reject){
-        var prior=byId('cpcmNmiCollectScript');
-        if(prior)prior.remove();
-        var script=document.createElement('script');
-        script.id='cpcmNmiCollectScript';
-        script.src='https://secure.nmi.com/token/Collect.js';
-        script.setAttribute('data-tokenization-key',nmiKey());
-        script.async=true;
-        script.onload=function(){resolve(true)};
-        script.onerror=function(){reject(new Error('NMI Collect.js could not be loaded.'))};
-        document.head.appendChild(script);
-      }).catch(function(e){collectScriptPromise=null;throw e});
-    }
-    return collectScriptPromise.then(function(){return configureCollect(!!force)});
+    collectPromise=new Promise(function(resolve,reject){
+      var prior=byId('cpcmNmiCollectScript');
+      if(prior)prior.remove();
+      var script=document.createElement('script');
+      script.id='cpcmNmiCollectScript';
+      script.src='https://secure.nmi.com/token/Collect.js';
+      script.setAttribute('data-tokenization-key',nmiKey());
+      script.setAttribute('data-variant','inline');
+      script.async=true;
+      script.onload=function(){setTimeout(function(){if(configureCollect())resolve(true);else reject(new Error('Collect.js loaded but could not configure the card fields.'))},50)};
+      script.onerror=function(){reject(new Error('NMI Collect.js could not be loaded.'))};
+      document.head.appendChild(script);
+    }).catch(function(e){collectPromise=null;throw e});
+    return collectPromise;
   }
-
-  window.reloadNmiSecureFields=async function(){
-    if(paymentBusy)return;
-    setBusy(true);
-    status('Reloading NMI secure card fields…','processing');
-    try{await loadCollect(true);status('Secure fields reloaded. Click Card Number and try again.','')}
-    catch(e){status(e.message||String(e),'error')}
-    finally{setBusy(false)}
-  };
 
   window.openNmiPayment=async function(){
     var a=current();if(!a)return alert('No account selected.');
@@ -13769,7 +13604,7 @@ function exportContactIntelligenceCSV(){let calls=filteredContactCalls();let row
     modal.classList.add('open');
     if(!keyReady()){status('NMI setup is incomplete. No payment can be submitted.','error');return}
     status('Loading NMI secure card fields…','processing');
-    try{await loadCollect(true)}catch(e){status(e.message||String(e),'error')}
+    try{await loadCollect();if(window.CollectJS&&CollectJS.clearInputs)CollectJS.clearInputs()}catch(e){status(e.message||String(e),'error')}
   };
 
   window.startNmiPayment=async function(){
@@ -13783,8 +13618,7 @@ function exportContactIntelligenceCSV(){let calls=filteredContactCalls();let row
     if(!field('nmiZip'))return status('Enter the billing ZIP code.','error');
     if(!byId('nmiAuthorization').checked)return status('Confirm the consumer authorized this one-time charge.','error');
     try{
-      await loadCollect(false);
-      if(!collectFramesReady())throw new Error('The NMI card fields are not ready. Click Reload Secure Fields and try again.');
+      await loadCollect();
       paymentContext={
         accountId:a.id,amount:pay,idempotencyKey:'sale-'+uuid(),
         billing:{cardholderName:field('nmiCardholderName'),address1:field('nmiAddress1'),city:field('nmiCity'),state:field('nmiState'),zip:field('nmiZip'),email:field('nmiEmail'),phone:field('nmiPhone')},
@@ -13819,7 +13653,6 @@ function exportContactIntelligenceCSV(){let calls=filteredContactCalls();let row
       var result=await invokeNmi({action:'sale',accountId:ctx.accountId,amount:ctx.amount,paymentToken:tokenized,idempotencyKey:ctx.idempotencyKey,billing:ctx.billing,metadata:ctx.metadata,cardMetadata:{brand:str(response&&response.card&&response.card.type),last4:digits.slice(-4)}});
       lastReceipt=result.receipt_number||result.receiptNumber||'';
       status('Payment approved and posted to the account ledger.','success');
-      nmiToast(usd(result.amount||ctx.amount)+' was approved and posted. Receipt '+str(result.receipt_number||result.receiptNumber||lastReceipt||'generated')+'.','success','Payment Approved',7000);
       var box=byId('nmiPaymentResult');
       if(box){box.classList.remove('hidden');box.innerHTML='<h4>Payment Approved</h4><div class="nmiResultGrid"><div><span>Amount</span><b>'+safeHtml(usd(result.amount||ctx.amount))+'</b></div><div><span>Receipt</span><b>'+safeHtml(lastReceipt||'Generated')+'</b></div><div><span>Balance After</span><b>'+safeHtml(usd(result.balance_after!=null?result.balance_after:result.balanceAfter))+'</b></div><div><span>NMI Transaction</span><b>'+safeHtml(result.transactionId||result.gateway_transaction_id||'')+'</b></div><div><span>Authorization</span><b>'+safeHtml(result.authorizationCode||'—')+'</b></div><div><span>Card</span><b>'+safeHtml([result.card_brand||result.cardBrand||'',(result.card_last4||result.cardLast4)?'•••• '+(result.card_last4||result.cardLast4):''].filter(Boolean).join(' ')||'Masked by NMI')+'</b></div></div>'}
       if(byId('nmiReceiptButton'))byId('nmiReceiptButton').style.display='inline-flex';
@@ -13857,38 +13690,32 @@ function exportContactIntelligenceCSV(){let calls=filteredContactCalls();let row
   }
 
   window.nmiVoidPayment=async function(ledgerId){
-    if(!isAdmin())return nmiToast('Only an administrator can void an NMI payment.','error','Admin Required');
-    var row=(window.paymentLedgerData||[]).find(function(x){return str(x.id)===str(ledgerId)});if(!row)return nmiToast('The payment ledger row could not be found. Refresh the ledger and try again.','error','Payment Not Found');
+    if(!isAdmin())return alert('Admin only.');
+    var row=(window.paymentLedgerData||[]).find(function(x){return str(x.id)===str(ledgerId)});if(!row)return alert('Payment ledger row not found.');
     if(!confirm('Void this NMI payment? A void is intended for an unsettled transaction and will add the amount back to the account balance only after NMI approves it.'))return;
     try{
-      nmiToast('The void request is being sent to NMI. Do not click again.','info','Processing Void',9000);
       var result=await invokeNmi({action:'void',originalLedgerId:ledgerId,idempotencyKey:'void-'+uuid(),metadata:{source:'Payment Ledger',accountNumber:typeof acctNo==='function'?acctNo(current()):''}});
-      nmiToast('NMI approved the void. '+usd(result.amount)+' was added back to the account balance.','success','Payment Voided',8000);
+      alert('NMI void approved. '+usd(result.amount)+' was added back to the account balance.');
       await refreshAfterAdjustment(row.accountId||row.account_id);
-    }catch(e){nmiToast(e.message||String(e),'error','Void Not Completed',10000)}
+    }catch(e){alert(e.message||String(e))}
   };
 
   window.nmiRefundPayment=async function(ledgerId){
-    if(!isAdmin())return nmiToast('Only an administrator can refund an NMI payment.','error','Admin Required');
-    var row=(window.paymentLedgerData||[]).find(function(x){return str(x.id)===str(ledgerId)});if(!row)return nmiToast('The payment ledger row could not be found. Refresh the ledger and try again.','error','Payment Not Found');
+    if(!isAdmin())return alert('Admin only.');
+    var row=(window.paymentLedgerData||[]).find(function(x){return str(x.id)===str(ledgerId)});if(!row)return alert('Payment ledger row not found.');
     var remaining=Math.max(0,amount(row.amount)-amount(row.refundedAmount||row.refunded_amount));
     var requested=prompt('Refund amount (maximum '+usd(remaining)+'):',remaining.toFixed(2));if(requested===null)return;
-    var refund=amount(requested);if(refund<=0||refund>remaining+0.01)return nmiToast('Enter a refund amount from $0.01 to '+usd(remaining)+'.','error','Invalid Refund Amount');
+    var refund=amount(requested);if(refund<=0||refund>remaining+0.01)return alert('Enter a refund amount from $0.01 to '+usd(remaining)+'.');
     if(!confirm('Refund '+usd(refund)+' through NMI and add it back to the account balance?'))return;
     try{
-      nmiToast('The refund request is being sent to NMI. Do not click again.','info','Processing Refund',9000);
       var result=await invokeNmi({action:'refund',originalLedgerId:ledgerId,amount:refund,idempotencyKey:'refund-'+uuid(),metadata:{source:'Payment Ledger',accountNumber:typeof acctNo==='function'?acctNo(current()):''}});
-      nmiToast('NMI approved the refund. '+usd(result.amount)+' was added back to the account balance.','success','Refund Approved',8000);
+      alert('NMI refund approved. '+usd(result.amount)+' was added back to the account balance.');
       await refreshAfterAdjustment(row.accountId||row.account_id);
-    }catch(e){nmiToast(e.message||String(e),'error','Refund Not Completed',10000)}
+    }catch(e){alert(e.message||String(e))}
   };
 
   window.nmiLedgerActions=function(row){
-    var provider=str(row.gatewayProvider||row.gateway_provider).toUpperCase();
-    var type=str(row.paymentType||row.payment_type).toLowerCase();
-    var gatewayId=str(row.gatewayTransactionId||row.gateway_transaction_id);
-    if(!isAdmin()||provider!=='NMI'||type!=='payment')return '—';
-    if(!gatewayId)return '<span style="font-size:10px;font-weight:800;color:#b45309">Gateway link missing</span>';
+    if(!isAdmin()||str(row.gatewayProvider||row.gateway_provider).toUpperCase()!=='NMI'||str(row.paymentType||row.payment_type).toLowerCase()!=='payment'||!str(row.gatewayTransactionId||row.gateway_transaction_id))return '—';
     var remaining=Math.max(0,amount(row.amount)-amount(row.refundedAmount||row.refunded_amount));
     if(remaining<=0.009)return '<span class="nmiGatewayPill">Fully reversed</span>';
     return '<div class="nmiActionButtons"><button class="outline" onclick="nmiVoidPayment(\''+safeHtml(row.id)+'\')">Void</button><button class="danger" onclick="nmiRefundPayment(\''+safeHtml(row.id)+'\')">Refund</button></div>';
@@ -13907,401 +13734,10 @@ function exportContactIntelligenceCSV(){let calls=filteredContactCalls();let row
     }).join('')||'<tr><td colspan="12"><div class="powerEmpty">No payment ledger entries yet.</div></td></tr>';
   };
 
-
-  // Keep the ledger balance preview synchronized with the latest database state.
-  var cpcmOriginalOpenPaymentLedger=window.openPaymentLedger;
-  if(typeof cpcmOriginalOpenPaymentLedger==='function'){
-    window.openPaymentLedger=async function(){
-      try{if(typeof loadAccounts==='function')await loadAccounts()}catch(e){}
-      return cpcmOriginalOpenPaymentLedger.apply(this,arguments);
-    };
-  }
-
   window.CPCM_NMI_PHASE1_BUILD=BUILD;
   window.dispatchEvent(new CustomEvent('cpcm:nmi-phase1-ready',{detail:{build:BUILD}}));
 })();
 </script>
 
-
-<script id="cpcmNmiApprovalQueueR8N17">
-(function(){
-  'use strict';
-  var BUILD='RINGCENTRAL_POWER_DIALER_PHASE1_2026_07_20_R8N18';
-  var approvalContext=null, approvalActionBusy={};
-  function el(id){return document.getElementById(id)}
-  function s(v){return String(v==null?'':v)}
-  function num(v){var n=Number(s(v).replace(/[^0-9.-]/g,''));return isFinite(n)?Math.round(n*100)/100:0}
-  function cash(v){return num(v).toLocaleString('en-US',{style:'currency',currency:'USD'})}
-  function h(v){return typeof esc==='function'?esc(v):s(v).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
-  function actor(){return (typeof currentUser!=='undefined'&&currentUser)?currentUser:{}}
-  function admin(){var u=actor();return !!(u.isAdmin===true||s(u.role).toLowerCase()==='admin'||s(u.email).toLowerCase()==='afinch2678@gmail.com')}
-  function currentAccount(){return typeof getCurrent==='function'?getCurrent():null}
-  function val(id){return el(id)?el(id).value.trim():''}
-  function uid(){return (window.crypto&&crypto.randomUUID)?crypto.randomUUID():'cpcm-'+Date.now()+'-'+Math.random().toString(36).slice(2)}
-  function payStatus(message,type){var node=el('nmiPaymentStatus');if(!node)return;node.textContent=message;node.className='nmiPaymentStatus'+(type?' '+type:'')}
-  function toast(message,type,title,timeout){
-    if(typeof nmiToast==='function')return nmiToast(message,type,title,timeout);
-    var stack=el('nmiToastStack');if(!stack){stack=document.createElement('div');stack.id='nmiToastStack';stack.className='nmiToastStack';document.body.appendChild(stack)}
-    type=type||'info';var item=document.createElement('div');item.className='nmiToast '+type;item.innerHTML='<button class="nmiToastClose">×</button><div class="nmiToastTitle">'+h(title||'Notice')+'</div><div class="nmiToastMessage">'+h(message)+'</div>';item.querySelector('button').onclick=function(){item.remove()};stack.appendChild(item);setTimeout(function(){item.remove()},timeout||6500)
-  }
-  function setPayBusy(on){var b=el('nmiPayButton');if(!b)return;b.disabled=!!on;b.textContent=on?'Securing Payment Information…':(admin()?'Process Secure Payment':'Submit for Admin Approval');var reload=el('nmiPaymentModal')&&el('nmiPaymentModal').querySelector('.nmiFieldTools button');if(reload)reload.disabled=!!on}
-  async function invoke(body){
-    if(typeof ensureFreshToken==='function')await ensureFreshToken();
-    var config=window.CO_PILOT_NMI_CONFIG||{};var fn=s(config.edgeFunctionName||'nmi-payments');
-    var response=await fetch(url()+'/functions/v1/'+encodeURIComponent(fn),{method:'POST',headers:{'Content-Type':'application/json','apikey':pubKey(),'Authorization':'Bearer '+token()},body:JSON.stringify(body)});
-    var data={};try{data=await response.json()}catch(e){data={error:'The secure payment service returned an unreadable response.'}}
-    if(!response.ok||!data.success){var error=new Error(data.error||'The payment request could not be completed.');error.details=data;throw error}return data;
-  }
-  function applyRolePaymentUI(){
-    var isAdmin=admin();
-    if(el('nmiPaymentModalTitle'))el('nmiPaymentModalTitle').textContent=isAdmin?'Secure Card Payment':'Submit Card Payment for Approval';
-    if(el('nmiPaymentModalSub'))el('nmiPaymentModalSub').textContent=isAdmin?'Administrator processing • NMI hosted card fields':'Employee capture • Administrator approval required before any charge';
-    if(el('nmiConsentText'))el('nmiConsentText').textContent=isAdmin?'I confirm the consumer authorized this one-time card charge for the amount shown.':'I confirm the consumer authorized this exact amount and understands an administrator will review and process the card.';
-    if(el('nmiSecurityNote'))el('nmiSecurityNote').innerHTML=isAdmin?'<b>Secure card entry:</b> NMI-hosted fields protect the full card number and CVV. As an administrator, you may process the authorized charge.':'<b>Approval protection:</b> NMI securely stores a temporary payment reference. You cannot charge the card. An administrator must approve and process the exact authorized amount.';
-    setPayBusy(false);
-    if(!isAdmin&&el('nmiPaymentResult')){el('nmiPaymentResult').classList.remove('hidden');el('nmiPaymentResult').innerHTML='<div class="nmiEmployeeApprovalBanner"><b>Employee restriction:</b> Submitting this form creates an approval request only. It does not charge the card or change the account balance.</div>'}
-  }
-  var originalOpenNmiPayment=window.openNmiPayment;
-  if(typeof originalOpenNmiPayment==='function')window.openNmiPayment=async function(){var result=await originalOpenNmiPayment.apply(this,arguments);applyRolePaymentUI();return result};
-
-  window.startNmiPayment=async function(){
-    if(approvalContext)return;
-    var a=currentAccount();if(!a)return toast('Select an account before entering a card payment.','error','No Account Selected');
-    var amount=num(val('nmiAmount')), balance=typeof accountBalance==='function'?accountBalance(a):0;
-    if(amount<=0)return payStatus('Enter a payment amount greater than zero.','error');
-    if(amount>balance+0.01)return payStatus('Payment cannot exceed the current balance of '+cash(balance)+'.','error');
-    if(!val('nmiCardholderName'))return payStatus('Enter the cardholder name.','error');
-    if(!val('nmiZip'))return payStatus('Enter the billing ZIP code.','error');
-    if(!el('nmiAuthorization')||!el('nmiAuthorization').checked)return payStatus('Confirm the consumer authorized the exact amount shown.','error');
-    var frames=['ccnumber','ccexp','cvv'].every(function(id){var host=el(id),frame=host&&host.querySelector('iframe');return !!frame});
-    if(!frames)return payStatus('The NMI card fields are not ready. Click Reload Secure Fields and try again.','error');
-    approvalContext={
-      mode:admin()?'sale':'submit_for_approval',accountId:a.id,amount:amount,
-      idempotencyKey:(admin()?'sale-':'approval-')+uid(),
-      billing:{cardholderName:val('nmiCardholderName'),address1:val('nmiAddress1'),city:val('nmiCity'),state:val('nmiState'),zip:val('nmiZip'),email:val('nmiEmail'),phone:val('nmiPhone')},
-      metadata:{source:admin()?'Co Pilot LIVE Admin Payment':'Co Pilot LIVE Employee Approval Request',notes:val('nmiNotes'),billingEmail:val('nmiEmail'),billingPhone:val('nmiPhone'),accountNumber:typeof acctNo==='function'?acctNo(a):s(a.accountNumber),consumerName:typeof nameOf==='function'?nameOf(a):s(a.fullName)}
-    };
-    setPayBusy(true);payStatus(admin()?'Securing card information with NMI before processing…':'Securing a temporary NMI payment reference for administrator review…','processing');
-    try{CollectJS.startPaymentRequest()}catch(error){approvalContext=null;setPayBusy(false);payStatus(error.message||s(error),'error')}
-  };
-
-  window.cpcmNmiCollectCallback=async function(response){
-    var ctx=approvalContext;approvalContext=null;
-    if(!ctx){setPayBusy(false);return payStatus('Payment context expired. Reopen the payment screen and try again.','error')}
-    var paymentToken=response&&response.token;if(!paymentToken){setPayBusy(false);return payStatus('NMI did not return a secure payment token. Check the card fields and try again.','error')}
-    var masked=s(response&&response.card&&response.card.number),digits=masked.replace(/\D/g,''),card={brand:s(response&&response.card&&response.card.type),last4:digits.slice(-4)};
-    try{
-      if(ctx.mode==='submit_for_approval'){
-        payStatus('Creating the administrator approval request. The card is not being charged.','processing');
-        var request=await invoke({action:'submit_for_approval',accountId:ctx.accountId,amount:ctx.amount,paymentToken:paymentToken,idempotencyKey:ctx.idempotencyKey,billing:ctx.billing,metadata:ctx.metadata,cardMetadata:card,authorizationConfirmed:true});
-        payStatus('Submitted for administrator approval. No card charge has occurred.','success');
-        var box=el('nmiPaymentResult');if(box){box.classList.remove('hidden');box.innerHTML='<h4>Submitted for Admin Approval</h4><div class="nmiResultGrid"><div><span>Amount</span><b>'+h(cash(request.amount||ctx.amount))+'</b></div><div><span>Status</span><b>Waiting for Administrator</b></div><div><span>Card</span><b>'+h([request.cardBrand||card.brand,(request.cardLast4||card.last4)?'•••• '+(request.cardLast4||card.last4):''].filter(Boolean).join(' ')||'Securely vaulted by NMI')+'</b></div><div><span>Expires</span><b>'+h(formatApprovalDate(request.expiresAt))+'</b></div></div><div class="nmiEmployeeApprovalBanner">The account balance has not changed. An administrator will receive this request in Payment Approvals.</div>'}
-        toast(cash(request.amount||ctx.amount)+' was submitted for administrator approval. The card was not charged.','success','Approval Request Submitted',8000);
-        try{if(window.CollectJS&&CollectJS.clearInputs)CollectJS.clearInputs()}catch(e){}
-        refreshNmiApprovalBadge();
-      }else{
-        payStatus('NMI is processing the administrator-approved card charge. Do not retry.','processing');
-        var result=await invoke({action:'sale',accountId:ctx.accountId,amount:ctx.amount,paymentToken:paymentToken,idempotencyKey:ctx.idempotencyKey,billing:ctx.billing,metadata:ctx.metadata,cardMetadata:card});
-        payStatus('Payment approved and posted to the account ledger.','success');
-        var resultBox=el('nmiPaymentResult');if(resultBox){resultBox.classList.remove('hidden');resultBox.innerHTML='<h4>Payment Approved</h4><div class="nmiResultGrid"><div><span>Amount</span><b>'+h(cash(result.amount||ctx.amount))+'</b></div><div><span>Receipt</span><b>'+h(result.receipt_number||result.receiptNumber||'Generated')+'</b></div><div><span>Balance After</span><b>'+h(cash(result.balance_after!=null?result.balance_after:result.balanceAfter))+'</b></div><div><span>NMI Transaction</span><b>'+h(result.transactionId||'')+'</b></div></div>'}
-        if(el('nmiReceiptButton'))el('nmiReceiptButton').style.display='inline-flex';
-        toast(cash(result.amount||ctx.amount)+' was approved and posted to the ledger.','success','Payment Approved',8000);
-        try{if(window.CollectJS&&CollectJS.clearInputs)CollectJS.clearInputs()}catch(e){}
-        await refreshPaymentAccount(ctx.accountId,'nmi-admin-sale');
-      }
-    }catch(error){var d=error.details||{};if(d.gatewayApproved||d.needsReview){payStatus((error.message||s(error))+' Transaction: '+s(d.transactionId)+' — DO NOT RETRY.','error');toast('NMI may have approved this transaction. Do not retry. Review transaction '+s(d.transactionId||'')+'.','error','Manual Review Required',12000)}else{payStatus(error.message||s(error),'error');toast(error.message||s(error),'error','Payment Request Not Completed',9000)}}finally{setPayBusy(false)}
-  };
-
-  async function refreshPaymentAccount(accountId,source){
-    try{if(typeof loadAccounts==='function')await loadAccounts()}catch(e){}
-    if(typeof currentAccountId!=='undefined'&&accountId)currentAccountId=accountId;
-    try{if(typeof loadPaymentLedgerForCurrent==='function')await loadPaymentLedgerForCurrent()}catch(e){}
-    try{if(typeof renderPaymentPlanSummary==='function')await renderPaymentPlanSummary(accountId)}catch(e){}
-    try{if(typeof loadHistory==='function')await loadHistory(accountId)}catch(e){}
-    try{if(typeof render==='function')render()}catch(e){}
-    try{if(typeof cpcmQueueDynamicStatsRefresh==='function')cpcmQueueDynamicStatsRefresh(source||'nmi-approval',100)}catch(e){}
-  }
-  function formatApprovalDate(value){if(!value)return '—';var d=new Date(value);return isNaN(d.getTime())?s(value):d.toLocaleString()}
-  function statusClass(value){return s(value).toLowerCase().replace(/[^a-z_]/g,'_')}
-  function approvalLabel(value){var x=s(value).toLowerCase();return {pending:'Waiting for Admin',processing:'Processing',approved:'Approved',declined:'Declined by Admin',cancelled:'Cancelled',expired:'Expired',gateway_declined:'Gateway Declined',failed:'Failed',needs_review:'Needs Review',vaulting:'Securing Card'}[x]||s(value||'Unknown')}
-  function setQueueStatus(message,type){var node=el('nmiApprovalQueueStatus');if(!node)return;node.textContent=message;node.className='nmiPaymentStatus'+(type?' '+type:'')}
-
-  window.openNmiApprovalQueue=async function(){
-    var modal=el('nmiApprovalModal');if(!modal)return toast('The Payment Approvals screen is unavailable.','error','Missing Approval Screen');
-    var isAdmin=admin();
-    if(el('nmiApprovalTitle'))el('nmiApprovalTitle').textContent=isAdmin?'Payment Approvals':'My Payment Requests';
-    if(el('nmiApprovalSub'))el('nmiApprovalSub').textContent=isAdmin?'Review employee-submitted card requests and decide whether to charge the card.':'Track payment information you submitted for administrator review.';
-    if(el('nmiApprovalHeroTitle'))el('nmiApprovalHeroTitle').textContent=isAdmin?'Only an administrator can process a submitted card.':'Your submitted card information cannot be charged by an employee.';
-    if(el('nmiApprovalHeroText'))el('nmiApprovalHeroText').textContent=isAdmin?'Approving processes the exact employee-entered amount. Declining removes the temporary NMI vault record.':'An administrator must approve the exact amount before NMI processes a sale.';
-    modal.classList.add('open');await window.loadNmiApprovalQueue(true);
-  };
-  window.loadNmiApprovalQueue=async function(showLoading){
-    if(showLoading)setQueueStatus('Loading secure payment requests…','processing');
-    try{var data=await invoke({action:'list_approval_requests'});renderApprovalRequests(data.requests||[]);setQueueStatus((data.requests||[]).length?'Payment requests are current.':'No payment requests were found.','');refreshNmiApprovalBadgeFromData(data)}catch(error){setQueueStatus(error.message||s(error),'error');if(el('nmiApprovalList'))el('nmiApprovalList').innerHTML='<div class="nmiApprovalEmpty">Unable to load payment requests.</div>'}
-  };
-  function refreshNmiApprovalBadgeFromData(data){var count=Number(data.pendingCount||0),badge=el('nmiApprovalBadge'),button=el('nmiApprovalNavButton');if(badge){badge.textContent=count>99?'99+':s(count);badge.classList.toggle('hidden',count<1)}if(button)button.childNodes[0].nodeValue=admin()?'Approvals ':'My Payments '}
-  window.refreshNmiApprovalBadge=async function(){if(!s(actor().email))return;try{var data=await invoke({action:'approval_count'});refreshNmiApprovalBadgeFromData(data)}catch(e){}}
-  function renderApprovalRequests(rows){
-    var list=el('nmiApprovalList');if(!list)return;var pending=0,approved=0,closed=0;
-    rows.forEach(function(r){var st=s(r.status).toLowerCase();if(st==='pending'||st==='processing'||st==='vaulting')pending++;else if(st==='approved')approved++;else closed++});
-    if(el('nmiApprovalPendingStat'))el('nmiApprovalPendingStat').textContent=pending;if(el('nmiApprovalApprovedStat'))el('nmiApprovalApprovedStat').textContent=approved;if(el('nmiApprovalClosedStat'))el('nmiApprovalClosedStat').textContent=closed;
-    list.innerHTML=rows.map(function(r){
-      var st=s(r.status).toLowerCase(),canApprove=admin()&&st==='pending',canCancel=!admin()&&st==='pending';
-      var actions='';if(canApprove)actions='<div class="nmiApprovalActions"><button class="danger" onclick="declineNmiApproval(\''+h(r.id)+'\')">Decline Request</button><button class="green" onclick="approveNmiApproval(\''+h(r.id)+'\')">Approve & Process</button></div>';else if(canCancel)actions='<div class="nmiApprovalActions"><button class="danger" onclick="cancelNmiApproval(\''+h(r.id)+'\')">Cancel Request</button></div>';
-      return '<div class="nmiApprovalCard '+statusClass(st)+'"><div class="nmiApprovalTop"><div><div class="nmiApprovalName">'+h(r.consumerName||'Consumer')+'</div><div class="nmiApprovalAccount">Account '+h(r.accountNumber||'—')+'</div><span class="nmiApprovalStatus">'+h(approvalLabel(st))+'</span></div><div class="nmiApprovalAmount">'+h(cash(r.amount))+'</div></div><div class="nmiApprovalGrid"><div><span>Submitted By</span><b>'+h(r.requestedByEmail||'—')+'</b></div><div><span>Submitted</span><b>'+h(formatApprovalDate(r.createdAt))+'</b></div><div><span>Card</span><b>'+h([r.cardBrand,r.cardLast4?'•••• '+r.cardLast4:''].filter(Boolean).join(' ')||'NMI secure reference')+'</b></div><div><span>Expires</span><b>'+h(formatApprovalDate(r.expiresAt))+'</b></div><div><span>Reviewed By</span><b>'+h(r.reviewedByEmail||'—')+'</b></div><div><span>Reviewed</span><b>'+h(formatApprovalDate(r.reviewedAt))+'</b></div><div><span>NMI Transaction</span><b>'+h(r.gatewayTransactionId||'—')+'</b></div><div><span>Balance at Request</span><b>'+h(cash(r.balanceAtRequest))+'</b></div></div>'+(r.authorizationNotes?'<div class="nmiApprovalNotes"><b>Authorization / Notes:</b> '+h(r.authorizationNotes)+'</div>':'')+(r.decisionNotes?'<div class="nmiApprovalNotes"><b>Decision:</b> '+h(r.decisionNotes)+'</div>':'')+actions+'</div>';
-    }).join('')||'<div class="nmiApprovalEmpty">No payment requests yet.</div>';
-  }
-  window.approveNmiApproval=async function(id){if(!admin())return toast('Only an administrator can approve and process a card.','error','Admin Required');if(approvalActionBusy[id])return;if(!confirm('Approve this exact payment request and process the card through NMI now?'))return;approvalActionBusy[id]=true;setQueueStatus('Processing the approved payment through NMI. Do not click again…','processing');try{var result=await invoke({action:'approve_request',requestId:id,idempotencyKey:'approve-'+id});toast(cash(result.amount)+' was approved, charged, and posted to the ledger.','success','Payment Approved',9000);await window.loadNmiApprovalQueue(false);await refreshPaymentAccount(result.accountId,'nmi-approved-request')}catch(error){var d=error.details||{};if(d.gatewayApproved||d.needsReview)toast('NMI may have approved this card. Do not retry. Review transaction '+s(d.transactionId||'')+'.','error','Manual Review Required',13000);else toast(error.message||s(error),'error','Approval Not Completed',10000);await window.loadNmiApprovalQueue(false)}finally{approvalActionBusy[id]=false;setQueueStatus('Payment requests are current.','')}};
-  window.declineNmiApproval=async function(id){if(!admin())return;var notes=prompt('Reason for declining this payment request:','');if(notes===null)return;if(!confirm('Decline this request and remove the temporary NMI card reference?'))return;try{await invoke({action:'decline_request',requestId:id,decisionNotes:notes,idempotencyKey:'decline-'+id});toast('The payment request was declined. No card charge occurred.','success','Request Declined',7000);await window.loadNmiApprovalQueue(false)}catch(error){toast(error.message||s(error),'error','Decline Not Completed',9000)}};
-  window.cancelNmiApproval=async function(id){if(admin())return;if(!confirm('Cancel this pending payment request? No card charge will occur.'))return;try{await invoke({action:'cancel_request',requestId:id,idempotencyKey:'cancel-'+id});toast('Your pending payment request was cancelled.','success','Request Cancelled',6500);await window.loadNmiApprovalQueue(false)}catch(error){toast(error.message||s(error),'error','Cancellation Not Completed',9000)}};
-
-  function initialize(){if(el('nmiApprovalNavButton'))el('nmiApprovalNavButton').childNodes[0].nodeValue=admin()?'Approvals ':'My Payments ';setTimeout(window.refreshNmiApprovalBadge,1200);setInterval(window.refreshNmiApprovalBadge,20000)}
-  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',initialize);else initialize();
-  window.CPCM_NMI_APPROVAL_QUEUE_BUILD=BUILD;
-  window.dispatchEvent(new CustomEvent('cpcm:nmi-approval-queue-ready',{detail:{build:BUILD}}));
-})();
-</script>
-
-
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" crossorigin="anonymous"></script>
-<script id="cpcmRingCentralPowerDialerR8N18">
-(function(){
-  if(window.__cpcmRingCentralPowerDialerR8N18)return;
-  window.__cpcmRingCentralPowerDialerR8N18=true;
-  const BUILD='RINGCENTRAL_POWER_DIALER_PHASE1_2026_07_20_R8N18';
-  const ds={campaigns:[],campaignAccounts:[],agentStatuses:[],mappings:[],calls:[],activeCall:null,pendingDispositionCallId:'',realtimeClient:null,realtimeChannel:null,timer:null,timerStart:0,bootedFor:'',lastDispositionOpened:'',provider:null};
-  const de=id=>document.getElementById(id);
-  const dv=id=>String(de(id)?.value||'').trim();
-  const dn=v=>{let n=Number(String(v??'').replace(/[$,]/g,''));return Number.isFinite(n)?n:0};
-  const dh=v=>String(v??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
-  const dphone=v=>{let x=String(v||'').replace(/\D/g,'');if(x.length===11&&x[0]==='1')x=x.slice(1);return x.length===10?`(${x.slice(0,3)}) ${x.slice(3,6)}-${x.slice(6)}`:String(v||'')};
-  const ddate=v=>{if(!v)return '—';let d=new Date(v);return isNaN(d)?String(v):d.toLocaleString()};
-  const dcamel=row=>typeof toCamel==='function'?toCamel(row):row;
-  const dcurrentEmail=()=>String((typeof currentUser!=='undefined'&&currentUser?.email)||'').toLowerCase();
-  const disAdmin=()=>Boolean(typeof currentUser!=='undefined'&&currentUser?.isAdmin);
-
-  async function dinvoke(payload){
-    if(typeof ensureFreshToken==='function')await ensureFreshToken();
-    let res=await fetch(url()+'/functions/v1/ringcentral-dialer',{method:'POST',headers:{apikey:pubKey(),Authorization:'Bearer '+token(),'Content-Type':'application/json'},body:JSON.stringify(payload||{})});
-    let data=await res.json().catch(()=>({}));
-    if(!res.ok)throw new Error(data.error||data.message||'RingCentral dialer request failed.');
-    return data;
-  }
-
-  function installUi(){
-    if(de('powerDialerButton'))return;
-    const actions=document.querySelector('.topActions');
-    if(actions){
-      const button=document.createElement('button');
-      button.className='gray';button.id='powerDialerButton';button.innerHTML='Dialer <span id="dialerHeaderBadge" class="alertBadge hidden">0</span>';button.onclick=window.openPowerDialer;
-      const role=de('roleBadge');actions.insertBefore(button,role||actions.firstChild);
-      const old=[...actions.children].find(node=>node.tagName==='SPAN'&&/Available/i.test(node.textContent||''));
-      if(old)old.id='dialerHeaderAgentState';
-    }
-    const rail=document.querySelector('.navRail');
-    if(rail){
-      const button=document.createElement('button');button.className='navIcon green';button.title='RingCentral Power Dialer';button.innerHTML='<span class="navEmoji">📲</span>';button.onclick=window.openPowerDialer;
-      const spacer=rail.querySelector('.navSpacer');rail.insertBefore(button,spacer||null);
-    }
-    const center=document.querySelector('main.center');
-    if(center){
-      const banner=document.createElement('section');banner.id='dialerLiveBanner';banner.className='dialerLiveBanner hidden';banner.innerHTML='<div class="dialerLivePulse"></div><div class="dialerLiveCopy"><b id="dialerLiveTitle">RingCentral Power Dialer</b><span id="dialerLiveSub">Waiting for a call.</span></div><div id="dialerLiveTimer" class="dialerLiveTimer">00:00</div><button id="dialerWrapButton" class="dialerWrapButton hidden" onclick="openDialerDisposition()">Complete Disposition</button><button class="outline" onclick="openPowerDialer()">Open Dialer</button>';
-      center.insertBefore(banner,center.firstChild);
-    }
-    document.body.insertAdjacentHTML('beforeend',modalHtml());
-    try{if(typeof applyRoleUI==='function')applyRoleUI()}catch(e){}
-  }
-
-  function modalHtml(){return `
-  <div id="powerDialerModal" class="modal"><div class="modalbox dialerModalBox">
-    <div class="modalhead"><div><h2 style="margin:0">RingCentral Power Dialer</h2><div class="dialerSub">LIVE Phase 1 · one account per available employee · forced disposition before next call</div></div><button class="gray" onclick="closeModal('powerDialerModal')">Close</button></div>
-    <div class="modalbody dialerBody">
-      <section class="dialerHero">
-        <div><div class="dialerHeroTitle">Agent Console</div><div class="dialerHeroSub">Your RingCentral user and extension stay unique to your Co Pilot login.</div></div>
-        <div id="dialerProviderChip" class="dialerProviderChip">Provider status not checked</div>
-      </section>
-      <div class="dialerAgentConsole">
-        <div><label>Running Campaign</label><select id="dialerAgentCampaign"></select></div>
-        <div><label>My Dialer Status</label><div id="dialerMyStatus" class="dialerStatusPill unavailable">Unavailable</div></div>
-        <div class="dialerStatusButtons"><button class="green" onclick="setDialerAgentStatus('available')">Available</button><button class="gray" onclick="setDialerAgentStatus('unavailable')">Unavailable</button><button class="purple" onclick="setDialerAgentStatus('wrap_up')">Wrap-Up</button></div>
-        <div><label>Current Call</label><div id="dialerCurrentCall" class="dialerCurrentCall">No active dialer call.</div></div>
-      </div>
-
-      <section class="dialerAdminGrid adminOnly hidden">
-        <div class="dialerPanel">
-          <div class="dialerPanelHead"><div><h3>Create Campaign</h3><span>Uses phone numbers already stored on assigned accounts.</span></div><button class="outline" onclick="previewDialerCampaign()">Preview</button></div>
-          <div class="dialerFormGrid">
-            <div class="dialerWide"><label>Campaign Name</label><input id="dialerCampaignName" placeholder="Example: Monday Florida Portfolio"></div>
-            <div><label>Portfolio / Client</label><select id="dialerPortfolioFilter"><option value="">All Portfolios</option></select></div>
-            <div><label>Account Status</label><select id="dialerStatusFilter"><option value="">All Statuses</option></select></div>
-            <div><label>State</label><select id="dialerStateFilter"><option value="">All States</option></select></div>
-            <div><label>Last Called Before</label><input id="dialerLastCalledBefore" type="date"></div>
-            <div><label>Minimum Balance</label><input id="dialerMinBalance" type="number" step="0.01" min="0"></div>
-            <div><label>Maximum Balance</label><input id="dialerMaxBalance" type="number" step="0.01" min="0"></div>
-            <div><label>Maximum Campaign Attempts</label><input id="dialerMaxAttempts" type="number" min="1" max="20" value="2"></div>
-            <div><label>Schedule Start</label><input id="dialerScheduleStart" type="datetime-local"></div>
-            <div><label>Schedule End</label><input id="dialerScheduleEnd" type="datetime-local"></div>
-            <div class="dialerWide"><label>Participating Employees</label><div id="dialerEmployeeChecks" class="dialerEmployeeChecks"></div></div>
-          </div>
-          <div id="dialerPreview" class="dialerPreview">Select employees, then preview the campaign.</div>
-          <div class="dialerActions"><button class="green" onclick="createDialerCampaign()">Create Campaign From Uploaded Accounts</button></div>
-        </div>
-
-        <div class="dialerPanel">
-          <div class="dialerPanelHead"><div><h3>RingCentral User Mapping</h3><span>One Co Pilot employee = one RingCentral user, one private credential, and one extension.</span></div><button class="outline" onclick="checkDialerProvider()">Check Connections</button></div>
-          <div class="dialerFormGrid">
-            <div class="dialerWide"><label>Employee</label><select id="dialerMappingEmployee" onchange="loadDialerMappingForm()"></select></div>
-            <div><label>RingCentral Extension ID</label><input id="dialerExtensionId" placeholder="Numeric API extension ID"></div>
-            <div><label>Extension Number</label><input id="dialerExtensionNumber" placeholder="Example: 102"></div>
-            <div><label>Forwarding / Agent Phone</label><input id="dialerForwardPhone" placeholder="Phone RingOut calls first"></div>
-            <div><label>Caller ID (reference)</label><input id="dialerCallerId" placeholder="RingCentral outbound caller ID"></div>
-          </div>
-          <div class="dialerPreview">Private RingCentral user credentials are never entered here. Add each employee JWT to the <b>RC_USER_JWTS_JSON</b> LIVE Supabase Edge Function secret, keyed by the employee’s lowercase email.</div><div class="dialerActions"><button class="green" onclick="saveDialerMapping()">Save Employee Mapping</button><button class="purple" onclick="createRingCentralWebhook()">Create / Renew User Webhooks</button></div>
-          <div id="dialerMappingTable" class="dialerMappingTable"></div>
-        </div>
-      </section>
-
-      <section class="dialerPanel">
-        <div class="dialerPanelHead"><div><h3>Campaign Control</h3><span>Start, pause, resume, or stop campaigns. Employees cannot dial until a campaign is running.</span></div><button class="outline" onclick="loadDialerDashboard(true)">Refresh</button></div>
-        <div id="dialerStats" class="dialerStats"></div>
-        <div id="dialerCampaignList" class="dialerCampaignList"></div>
-      </section>
-
-      <section class="dialerPanel adminOnly hidden">
-        <div class="dialerPanelHead"><div><h3>Live Agent States</h3><span>Available, dialing, connected, and wrap-up update from the provider flow.</span></div></div>
-        <div id="dialerAgentList" class="dialerAgentList"></div>
-      </section>
-    </div>
-  </div></div>`}
-
-  async function approvedEmployees(){
-    try{if(typeof loadAppUsers==='function')await loadAppUsers()}catch(e){}
-    return (typeof appUsers!=='undefined'?appUsers:[]).filter(u=>{
-      let role=String(u.role||'employee').toLowerCase();let email=String(u.email||'').toLowerCase();
-      let approved=u.isApproved===true||u.is_approved===true||String(u.approvalStatus||u.approval_status||'').toLowerCase()==='approved';
-      let active=u.isActive!==false&&u.is_active!==false;
-      return role==='employee'&&approved&&active&&email&&email!=='afinch2678@gmail.com';
-    }).sort((a,b)=>String(a.email).localeCompare(String(b.email)));
-  }
-
-  async function populateDialerForm(){
-    const employees=await approvedEmployees();
-    let portfolios=[...new Set((typeof accounts!=='undefined'?accounts:[]).map(a=>String(a.portfolio||'').trim()).filter(Boolean))].sort();
-    let statuses=[...new Set((typeof accounts!=='undefined'?accounts:[]).map(a=>String(a.status||a.disposition||'').trim()).filter(Boolean))].sort();
-    let states=[...new Set((typeof accounts!=='undefined'?accounts:[]).map(a=>String(a.state||'').trim().toUpperCase()).filter(Boolean))].sort();
-    if(de('dialerPortfolioFilter'))de('dialerPortfolioFilter').innerHTML='<option value="">All Portfolios</option>'+portfolios.map(v=>`<option>${dh(v)}</option>`).join('');
-    if(de('dialerStatusFilter'))de('dialerStatusFilter').innerHTML='<option value="">All Statuses</option>'+statuses.map(v=>`<option>${dh(v)}</option>`).join('');
-    if(de('dialerStateFilter'))de('dialerStateFilter').innerHTML='<option value="">All States</option>'+states.map(v=>`<option>${dh(v)}</option>`).join('');
-    if(de('dialerEmployeeChecks'))de('dialerEmployeeChecks').innerHTML=employees.map(u=>`<label><input type="checkbox" value="${dh(String(u.email).toLowerCase())}"><span><b>${dh(u.fullName||u.full_name||u.email)}</b><small>${dh(u.email)}</small></span></label>`).join('')||'<div class="dialerEmpty">No approved employees are available. Approve staff first.</div>';
-    if(de('dialerMappingEmployee'))de('dialerMappingEmployee').innerHTML='<option value="">Choose employee</option>'+employees.map(u=>`<option value="${dh(String(u.email).toLowerCase())}">${dh(u.fullName||u.full_name||u.email)} · ${dh(u.email)}</option>`).join('');
-  }
-
-  function selectedCampaignEmployees(){return [...document.querySelectorAll('#dialerEmployeeChecks input:checked')].map(x=>String(x.value).toLowerCase())}
-  function accountHasPhone(a){try{return (typeof phones==='function'?phones(a):[]).some(Boolean)}catch(e){return [a.phone1,a.phone2,a.phone3,a.phone4,a.phone5,a.phone6,a.phone7,a.phone8,a.phone9,a.phone10].some(Boolean)}}
-  function candidateAccounts(){
-    let selected=new Set(selectedCampaignEmployees()),portfolio=dv('dialerPortfolioFilter'),status=dv('dialerStatusFilter'),state=dv('dialerStateFilter').toUpperCase(),before=dv('dialerLastCalledBefore');
-    let min=dv('dialerMinBalance')===''?null:dn(dv('dialerMinBalance')),max=dv('dialerMaxBalance')===''?null:dn(dv('dialerMaxBalance'));
-    return (typeof accounts!=='undefined'?accounts:[]).filter(a=>{
-      let assigned=String(a.assignedToEmail||a.assigned_to_email||'').toLowerCase();
-      let balance=typeof accountBalance==='function'?accountBalance(a):dn(a.currentBalance||a.current_balance);
-      let last=String(a.lastCalledAt||a.last_called_at||'').slice(0,10);
-      return selected.has(assigned)&&accountHasPhone(a)&&(!portfolio||a.portfolio===portfolio)&&(!status||String(a.status||a.disposition)===status)&&(!state||String(a.state||'').toUpperCase()===state)&&(min===null||balance>=min)&&(max===null||balance<=max)&&(!before||!last||last<=before);
-    });
-  }
-
-  window.previewDialerCampaign=function(){
-    let employees=selectedCampaignEmployees(),rows=candidateAccounts(),balance=rows.reduce((s,a)=>s+(typeof accountBalance==='function'?accountBalance(a):dn(a.currentBalance||a.current_balance)),0);
-    let assignedCounts={};rows.forEach(a=>{let e=String(a.assignedToEmail||a.assigned_to_email||'').toLowerCase();assignedCounts[e]=(assignedCounts[e]||0)+1});
-    de('dialerPreview').innerHTML=`<b>${rows.length.toLocaleString()} eligible assigned accounts</b> · ${typeof money==='function'?money(balance):'$'+balance.toFixed(2)} total balance<br><span>${employees.length?employees.map(e=>dh(e)+' ('+(assignedCounts[e]||0)+')').join(' · '):'Select at least one participating employee.'}</span>`;
-    return rows;
-  };
-
-  window.createDialerCampaign=async function(){
-    if(!disAdmin())return alert('Administrator access is required.');
-    let name=dv('dialerCampaignName'),employees=selectedCampaignEmployees(),rows=window.previewDialerCampaign();
-    if(!name)return alert('Enter a campaign name.');if(!employees.length)return alert('Select at least one participating employee.');if(!rows.length)return alert('No eligible assigned accounts match these filters.');
-    let start=dv('dialerScheduleStart'),end=dv('dialerScheduleEnd'),maxAttempts=Math.max(1,Math.min(20,dn(dv('dialerMaxAttempts'))||2));
-    let filters={portfolio:dv('dialerPortfolioFilter'),status:dv('dialerStatusFilter'),state:dv('dialerStateFilter'),lastCalledBefore:dv('dialerLastCalledBefore'),minBalance:dv('dialerMinBalance'),maxBalance:dv('dialerMaxBalance')};
-    if(!confirm(`Create “${name}” with ${rows.length.toLocaleString()} accounts?`))return;
-    try{
-      if(typeof setGlobalBusy==='function')setGlobalBusy(true,'Creating power dialer campaign','Saving filtered accounts and employee assignments...');
-      let saved=await dbFetch('/dialer_campaigns',{method:'POST',body:JSON.stringify([{name,status:start?'scheduled':'draft',filters,selected_employee_emails:employees,max_attempts:maxAttempts,schedule_start:start?new Date(start).toISOString():null,schedule_end:end?new Date(end).toISOString():null,created_by_email:dcurrentEmail(),updated_at:new Date().toISOString()}])});
-      let campaign=saved[0],payload=rows.map((a,i)=>({campaign_id:campaign.id,account_id:a.id,employee_email:String(a.assignedToEmail||a.assigned_to_email||'').toLowerCase(),status:'queued',sort_order:i+1}));
-      for(let i=0;i<payload.length;i+=400)await dbFetch('/dialer_campaign_accounts',{method:'POST',body:JSON.stringify(payload.slice(i,i+400))});
-      for(let email of employees)await dbFetch('/dialer_agent_status?on_conflict=employee_email',{method:'POST',headers:{Prefer:'resolution=merge-duplicates,return=representation'},body:JSON.stringify([{employee_email:email,status:'unavailable',campaign_id:campaign.id,last_seen_at:new Date().toISOString(),updated_at:new Date().toISOString()}])}).catch(()=>{});
-      de('dialerCampaignName').value='';alert(`Campaign created with ${rows.length.toLocaleString()} assigned accounts. Start it when your employees are ready.`);await window.loadDialerDashboard(true);
-    }catch(e){alert('Campaign could not be created:\n\n'+(e.message||e))}finally{if(typeof setGlobalBusy==='function')setGlobalBusy(false)}
-  };
-
-  async function fetchDashboardRows(){
-    let [campaigns,campaignAccounts,agents,mappings,calls]=await Promise.all([
-      dbFetch('/dialer_campaigns?select=*&order=created_at.desc&limit=200').catch(()=>[]),
-      dbFetch('/dialer_campaign_accounts?select=*&order=created_at.desc&limit=30000').catch(()=>[]),
-      dbFetch('/dialer_agent_status?select=*&order=employee_email.asc').catch(()=>[]),
-      dbFetch('/ringcentral_user_mappings?select=*&order=employee_email.asc').catch(()=>[]),
-      dbFetch('/dialer_calls?select=*&order=created_at.desc&limit=500').catch(()=>[])
-    ]);
-    ds.campaigns=(campaigns||[]).map(dcamel);ds.campaignAccounts=(campaignAccounts||[]).map(dcamel);ds.agentStatuses=(agents||[]).map(dcamel);ds.mappings=(mappings||[]).map(dcamel);ds.calls=(calls||[]).map(dcamel);
-  }
-
-  window.loadDialerDashboard=async function(checkProvider=false){
-    try{await fetchDashboardRows();renderDialerDashboard();if(checkProvider&&disAdmin())await window.checkDialerProvider()}catch(e){console.warn('Dialer dashboard load failed',e);let list=de('dialerCampaignList');if(list)list.innerHTML='<div class="dialerEmpty">Run the R8N18 dialer SQL migration, then reload. '+dh(e.message||e)+'</div>'}
-  };
-
-  function renderDialerDashboard(){
-    const email=dcurrentEmail(),mine=ds.agentStatuses.find(x=>String(x.employeeEmail||x.employee_email).toLowerCase()===email),status=String(mine?.status||'unavailable');
-    let statusEl=de('dialerMyStatus');if(statusEl){statusEl.textContent=status.replace('_',' ').replace(/\b\w/g,c=>c.toUpperCase());statusEl.className='dialerStatusPill '+status}
-    let header=de('dialerHeaderAgentState');if(header)header.innerHTML=`<span class="dot"></span> ${dh(status.replace('_',' '))}`;
-    let running=ds.campaigns.filter(c=>c.status==='running'&&(disAdmin()||(c.selectedEmployeeEmails||c.selected_employee_emails||[]).includes(email)));
-    let select=de('dialerAgentCampaign');if(select){let keep=mine?.campaignId||mine?.campaign_id||select.value;select.innerHTML='<option value="">Choose running campaign</option>'+running.map(c=>`<option value="${c.id}">${dh(c.name)}</option>`).join('');select.value=running.some(c=>c.id===keep)?keep:(running[0]?.id||'')}
-    let active=ds.calls.find(c=>String(c.employeeEmail||c.employee_email).toLowerCase()===email&&c.dispositionRequired!==false&&c.disposition_required!==false&&['initiated','ringing','answered','disconnected'].includes(c.status));
-    if(active){ds.activeCall=active;de('dialerCurrentCall').innerHTML=`<b>${dh(active.status)}</b> · ${dh(dphone(active.phoneNumber||active.phone_number))}<br><small>Started ${dh(ddate(active.startedAt||active.started_at))}</small>`}else de('dialerCurrentCall').textContent='No active dialer call.';
-    renderCampaignList();renderAgentList();renderMappings();renderStats();
-    let pending=ds.calls.filter(c=>c.dispositionRequired!==false&&c.disposition_required!==false&&c.status==='disconnected').length,badge=de('dialerHeaderBadge');if(badge){badge.textContent=String(pending);badge.classList.toggle('hidden',pending<1)}
-  }
-
-  function campaignCounts(id){let rows=ds.campaignAccounts.filter(r=>String(r.campaignId||r.campaign_id)===String(id)),o={total:rows.length,queued:0,active:0,completed:0,blocked:0,failed:0};rows.forEach(r=>{let s=r.status;if(s==='queued')o.queued++;else if(['dialing','ringing','connected','wrap_up'].includes(s))o.active++;else if(s==='completed')o.completed++;else if(['blocked','skipped'].includes(s))o.blocked++;else if(s==='failed')o.failed++});return o}
-  function renderStats(){let all=ds.campaignAccounts,activeCampaigns=ds.campaigns.filter(c=>c.status==='running').length,available=ds.agentStatuses.filter(a=>a.status==='available').length,connected=ds.agentStatuses.filter(a=>a.status==='connected').length,wrap=ds.agentStatuses.filter(a=>a.status==='wrap_up').length;de('dialerStats').innerHTML=[['Campaigns',ds.campaigns.length],['Running',activeCampaigns],['Queued',all.filter(x=>x.status==='queued').length],['Available Agents',available],['Connected',connected],['Wrap-Up',wrap]].map(x=>`<div><span>${x[0]}</span><b>${Number(x[1]).toLocaleString()}</b></div>`).join('')}
-  function renderCampaignList(){let list=de('dialerCampaignList');if(!list)return;list.innerHTML=ds.campaigns.map(c=>{let n=campaignCounts(c.id),emps=c.selectedEmployeeEmails||c.selected_employee_emails||[],can=disAdmin(),buttons='';if(can){if(['draft','scheduled','paused'].includes(c.status))buttons+=`<button class="green" onclick="controlDialerCampaign('${c.id}','${c.status==='paused'?'resume':'start'}')">${c.status==='paused'?'Resume':'Start'}</button>`;if(c.status==='running')buttons+=`<button class="purple" onclick="controlDialerCampaign('${c.id}','pause')">Pause</button>`;if(!['stopped','completed'].includes(c.status))buttons+=`<button class="red" onclick="controlDialerCampaign('${c.id}','stop')">Stop</button>`}return `<div class="dialerCampaignCard ${dh(c.status)}"><div class="dialerCampaignTop"><div><b>${dh(c.name)}</b><span class="dialerStatusPill ${dh(c.status)}">${dh(c.status)}</span><small>${dh(emps.join(' · '))}</small></div><div class="dialerCampaignActions">${buttons}</div></div><div class="dialerCampaignMetrics"><span>Total <b>${n.total}</b></span><span>Queued <b>${n.queued}</b></span><span>Active <b>${n.active}</b></span><span>Completed <b>${n.completed}</b></span><span>Blocked/Skipped <b>${n.blocked}</b></span><span>Failed <b>${n.failed}</b></span></div><div class="dialerCampaignMeta">Created ${dh(ddate(c.createdAt||c.created_at))}${c.scheduleStart||c.schedule_start?' · Scheduled '+dh(ddate(c.scheduleStart||c.schedule_start)):''}</div></div>`}).join('')||'<div class="dialerEmpty">No dialer campaigns have been created.</div>'}
-  function renderAgentList(){let list=de('dialerAgentList');if(!list)return;list.innerHTML=ds.agentStatuses.map(a=>{let email=a.employeeEmail||a.employee_email,mapping=ds.mappings.find(m=>String(m.employeeEmail||m.employee_email).toLowerCase()===String(email).toLowerCase());return `<div class="dialerAgentCard"><div><b>${dh(email)}</b><small>${mapping?'Extension '+dh(mapping.ringcentralExtensionNumber||mapping.ringcentral_extension_number||mapping.ringcentralExtensionId||mapping.ringcentral_extension_id):'RingCentral mapping missing'}</small></div><span class="dialerStatusPill ${dh(a.status)}">${dh(a.status)}</span></div>`}).join('')||'<div class="dialerEmpty">No employee dialer states yet.</div>'}
-  function renderMappings(){let box=de('dialerMappingTable');if(!box)return;box.innerHTML=ds.mappings.map(m=>{let email=String(m.employeeEmail||m.employee_email||'').toLowerCase(),state=ds.provider?.users?.find(u=>String(u.employeeEmail||'').toLowerCase()===email);return `<div><b>${dh(email)}</b><span>Ext ${dh(m.ringcentralExtensionNumber||m.ringcentral_extension_number||'—')} · API ID ${dh(m.ringcentralExtensionId||m.ringcentral_extension_id||'—')}</span><small>Agent phone ${dh(dphone(m.ringcentralForwardPhone||m.ringcentral_forward_phone||''))} · ${state?(state.connected?'Credential connected':'Credential error'):'Connection not checked'}</small></div>`}).join('')||'<div class="dialerEmpty">No RingCentral employee mappings saved.</div>'}
-
-  window.controlDialerCampaign=async function(id,command){try{await dinvoke({action:'campaign_control',campaignId:id,command});await window.loadDialerDashboard(true)}catch(e){alert(e.message||e)}};
-  window.setDialerAgentStatus=async function(status){let campaignId=dv('dialerAgentCampaign');if(status==='available'&&!campaignId)return alert('Choose a running campaign first.');try{await dinvoke({action:'set_agent_status',status,campaignId:campaignId||null});await window.loadDialerDashboard(false);if(status==='available')setTimeout(()=>window.dispatchDialerNext(),300)}catch(e){alert(e.message||e)}};
-  window.dispatchDialerNext=async function(){let campaignId=dv('dialerAgentCampaign');try{let r=await dinvoke({action:'dispatch_next',campaignId,employeeEmail:dcurrentEmail()});if(r.call){ds.activeCall=dcamel(r.call);showDialerBanner(ds.activeCall,'ringing');de('dialerCurrentCall').innerHTML=`Calling ${dh(dphone(r.call.phone_number||r.call.phoneNumber))}…`}else if(r.message){de('dialerCurrentCall').textContent=r.message}await window.loadDialerDashboard(false)}catch(e){de('dialerCurrentCall').textContent=e.message||String(e);console.warn(e)}};
-
-  window.loadDialerMappingForm=function(){let email=dv('dialerMappingEmployee'),m=ds.mappings.find(x=>String(x.employeeEmail||x.employee_email).toLowerCase()===email);de('dialerExtensionId').value=m?.ringcentralExtensionId||m?.ringcentral_extension_id||'';de('dialerExtensionNumber').value=m?.ringcentralExtensionNumber||m?.ringcentral_extension_number||'';de('dialerForwardPhone').value=m?.ringcentralForwardPhone||m?.ringcentral_forward_phone||'';de('dialerCallerId').value=m?.ringcentralCallerId||m?.ringcentral_caller_id||''};
-  window.saveDialerMapping=async function(){let employee=dv('dialerMappingEmployee');if(!employee)return alert('Choose an employee.');if(!dv('dialerExtensionId')||!dv('dialerForwardPhone'))return alert('Extension ID and forwarding/agent phone are required.');try{await dbFetch('/ringcentral_user_mappings?on_conflict=employee_email',{method:'POST',headers:{Prefer:'resolution=merge-duplicates,return=representation'},body:JSON.stringify([{employee_email:employee,ringcentral_extension_id:dv('dialerExtensionId'),ringcentral_extension_number:dv('dialerExtensionNumber')||null,ringcentral_forward_phone:dv('dialerForwardPhone'),ringcentral_caller_id:dv('dialerCallerId')||null,enabled:true,updated_by_email:dcurrentEmail(),created_by_email:dcurrentEmail(),updated_at:new Date().toISOString()}])});await window.loadDialerDashboard(true);alert('RingCentral employee mapping saved.')}catch(e){alert(e.message||e)}};
-  window.checkDialerProvider=async function(){try{let r=await dinvoke({action:'connection_status'});ds.provider=r;let chip=de('dialerProviderChip'),connected=Number(r.connectedCount||0),visible=Array.isArray(r.users)?r.users.length:Number(r.mappingCount||0);chip.textContent=r.providerConnected?`RingCentral connected · ${connected}/${visible} users`:`RingCentral ${connected}/${visible} users connected`;chip.className='dialerProviderChip '+(r.providerConnected?'connected':'error');renderMappings()}catch(e){let chip=de('dialerProviderChip');chip.textContent=e.message||e;chip.className='dialerProviderChip error'}};
-  window.createRingCentralWebhook=async function(){if(!confirm('Create or renew one RingCentral telephony-session webhook for each connected employee user?'))return;try{let r=await dinvoke({action:'create_webhook_subscription'}),failed=(r.results||[]).filter(x=>!x.success);alert(`RingCentral user webhooks created: ${r.subscriptionsCreated}/${r.totalMappings}`+(failed.length?'\n\nFailed: '+failed.map(x=>x.employeeEmail).join(', '):''));await window.checkDialerProvider()}catch(e){alert('Webhooks could not be created:\n\n'+(e.message||e))}};
-
-  window.openPowerDialer=async function(){installUi();de('powerDialerModal').classList.add('open');await populateDialerForm();await window.loadDialerDashboard(true)};
-
-  function showDialerBanner(call,state){let banner=de('dialerLiveBanner');if(!banner)return;banner.classList.remove('hidden','ringing','connected','wrap_up');banner.classList.add(state||call.status||'ringing');let phone=call.phoneNumber||call.phone_number||'',title=state==='connected'?'LIVE CONSUMER CONNECTED':state==='wrap_up'?'CALL ENDED — DISPOSITION REQUIRED':'RINGCENTRAL CALLING';de('dialerLiveTitle').textContent=title;de('dialerLiveSub').textContent=`${dphone(phone)} · ${call.employeeEmail||call.employee_email||dcurrentEmail()}`;de('dialerWrapButton').classList.toggle('hidden',state!=='wrap_up');let start=call.answeredAt||call.answered_at||call.startedAt||call.started_at||new Date().toISOString();startDialerTimer(start)}
-  function startDialerTimer(start){clearInterval(ds.timer);ds.timerStart=new Date(start).getTime()||Date.now();let tick=()=>{let sec=Math.max(0,Math.floor((Date.now()-ds.timerStart)/1000)),m=Math.floor(sec/60),s=sec%60;if(de('dialerLiveTimer'))de('dialerLiveTimer').textContent=String(m).padStart(2,'0')+':'+String(s).padStart(2,'0')};tick();ds.timer=setInterval(tick,1000)}
-  function hideDialerBanner(){clearInterval(ds.timer);de('dialerLiveBanner')?.classList.add('hidden')}
-
-  async function handleScreenPop(row){let pop=dcamel(row),callId=pop.callId||pop.call_id;if(callId&&callId===ds.lastScreenPop)return;ds.lastScreenPop=callId;let accountId=pop.accountId||pop.account_id;if(!(typeof accounts!=='undefined'?accounts:[]).some(a=>String(a.id)===String(accountId))){try{await loadAccounts()}catch(e){}}if((typeof accounts!=='undefined'?accounts:[]).some(a=>String(a.id)===String(accountId))){currentAccountId=accountId;try{render()}catch(e){}}
-    let call=ds.calls.find(c=>String(c.id)===String(callId));if(!call){let rows=await dbFetch('/dialer_calls?id=eq.'+encodeURIComponent(callId)+'&select=*').catch(()=>[]);call=rows[0]?dcamel(rows[0]):null}if(call){ds.activeCall=call;showDialerBanner(call,'connected')}
-    await dbFetch('/dialer_screen_pops?id=eq.'+encodeURIComponent(pop.id),{method:'PATCH',body:JSON.stringify({status:'delivered',delivered_at:new Date().toISOString(),updated_at:new Date().toISOString()})}).catch(()=>{});
-  }
-
-  async function handleCallUpdate(raw){let call=dcamel(raw);if(String(call.employeeEmail||call.employee_email).toLowerCase()!==dcurrentEmail())return;ds.activeCall=call;if(call.status==='answered'){showDialerBanner(call,'connected')}if(call.status==='disconnected'&&(call.dispositionRequired!==false&&call.disposition_required!==false)){let accountId=call.accountId||call.account_id;if(!(typeof accounts!=='undefined'?accounts:[]).some(a=>String(a.id)===String(accountId))){try{await loadAccounts()}catch(e){}}if((typeof accounts!=='undefined'?accounts:[]).some(a=>String(a.id)===String(accountId))){currentAccountId=accountId;try{render()}catch(e){}}showDialerBanner(call,'wrap_up');if(ds.lastDispositionOpened!==call.id){ds.lastDispositionOpened=call.id;setTimeout(()=>window.openDialerDisposition(),350)}}if(call.status==='completed'){hideDialerBanner();ds.activeCall=null}}
-
-  window.openDialerDisposition=function(){let call=ds.activeCall;if(!call)return alert('No dialer call is waiting for disposition.');let accountId=call.accountId||call.account_id,phone=call.phoneNumber||call.phone_number,duration=call.durationSeconds||call.duration_seconds||Math.max(0,Math.round((Date.now()-new Date(call.startedAt||call.started_at).getTime())/1000));currentAccountId=accountId;try{render()}catch(e){}ds.pendingDispositionCallId=call.id;openCallResultModal({accountId,phone,direction:'Outbound',durationSeconds:duration,defaultResult:call.answeredAt||call.answered_at?'Right Party Contact':'No Answer'});if(de('callResultNotes')&&!de('callResultNotes').value)de('callResultNotes').value='RingCentral power dialer call.'};
-
-  function wrapCallResultSave(){if(window.__cpcmDialerWrappedCallResult)return;let original=window.saveCallResult;if(typeof original!=='function')return;window.__cpcmDialerWrappedCallResult=true;window.saveCallResult=async function(){let pending=ds.pendingDispositionCallId,disposition=dv('callResultStatus')||'No Answer',notes=dv('callResultNotes'),duration=dn(dv('callDuration'));await original.apply(this,arguments);if(pending){try{await dinvoke({action:'complete_call',callId:pending,disposition,notes,durationSeconds:duration});ds.pendingDispositionCallId='';ds.lastDispositionOpened='';ds.activeCall=null;hideDialerBanner();await window.loadDialerDashboard(false);let mine=ds.agentStatuses.find(a=>String(a.employeeEmail||a.employee_email).toLowerCase()===dcurrentEmail());if(mine?.status==='available')setTimeout(()=>window.dispatchDialerNext(),500);else setTimeout(()=>window.setDialerAgentStatus('available'),500)}catch(e){alert('Call outcome saved, but dialer wrap-up could not complete:\n\n'+(e.message||e))}}}}
-
-  async function pollDialer(){if(!dcurrentEmail()||!token())return;try{let pops=await dbFetch('/dialer_screen_pops?employee_email=eq.'+encodeURIComponent(dcurrentEmail())+'&status=eq.pending&order=created_at.asc&limit=5');for(let p of pops||[])await handleScreenPop(p);let calls=await dbFetch('/dialer_calls?employee_email=eq.'+encodeURIComponent(dcurrentEmail())+'&disposition_required=eq.true&status=in.(initiated,ringing,answered,disconnected)&order=created_at.desc&limit=1');if(calls?.[0])await handleCallUpdate(calls[0])}catch(e){}}
-
-  function subscribeRealtime(){if(ds.realtimeChannel||!window.supabase||!dcurrentEmail()||!token())return;try{ds.realtimeClient=window.supabase.createClient(url(),pubKey(),{auth:{persistSession:false,autoRefreshToken:false},global:{headers:{Authorization:'Bearer '+token()}}});try{ds.realtimeClient.realtime.setAuth(token())}catch(e){}ds.realtimeChannel=ds.realtimeClient.channel('cpcm-dialer-'+dcurrentEmail()).on('postgres_changes',{event:'INSERT',schema:'public',table:'dialer_screen_pops',filter:'employee_email=eq.'+dcurrentEmail()},p=>handleScreenPop(p.new)).on('postgres_changes',{event:'UPDATE',schema:'public',table:'dialer_calls',filter:'employee_email=eq.'+dcurrentEmail()},p=>handleCallUpdate(p.new)).subscribe()}catch(e){console.warn('Dialer realtime unavailable; polling fallback remains active.',e)}}
-
-  async function sessionInit(){let email=dcurrentEmail();if(!email||!token()||ds.bootedFor===email)return;ds.bootedFor=email;wrapCallResultSave();subscribeRealtime();await pollDialer();try{await window.loadDialerDashboard(false)}catch(e){}}
-
-  function boot(){installUi();wrapCallResultSave();setInterval(()=>{sessionInit().catch(()=>{});pollDialer().catch(()=>{})},3000);setTimeout(()=>sessionInit().catch(()=>{}),800);window.CPCM_RINGCENTRAL_DIALER_BUILD=BUILD;window.dispatchEvent(new CustomEvent('cpcm:ringcentral-dialer-ready',{detail:{build:BUILD}}))}
-  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();
-})();
-
-</script>
 </body>
 </html>
