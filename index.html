@@ -11,7 +11,7 @@
 <!-- DOCUMENT_BRANDING_TYPED_ESIGN_R4_2026_07_18: brand logo/name on documents + company Created By + DocuSign-style typed signature chooser -->
 
 <head>
-<!-- STABLE_SINGLE_FILE_QA_LOCK_2026_07_20_R8N13: LIVE NMI Phase 1 Secure Card Payments -->
+<!-- STABLE_SINGLE_FILE_QA_LOCK_2026_07_20_R8N16: LIVE NMI Phase 1 Secure Card Payments -->
 <!-- LIVE_COMPLIANCE_GUARD_MARKER: compliance guard + call rules -->
 <!-- LIVE_REPORTING_CLEAN_PACKAGE_MARKER: clean live package + admin reports -->
 <!-- LIVE_REPORTING_CLEAN_PACKAGE_MARKER: clean live package + admin reports -->
@@ -3541,6 +3541,16 @@ button {
 .planProHeader .planProActions{display:flex!important;gap:10px!important;align-items:center!important;justify-content:flex-end!important;flex-wrap:wrap!important}
 .planProHeader .planProActions .red{background:#dc2626!important;color:#fff!important}
 .planProHeader .planProActions .outline{background:#fff!important;color:#1d4ed8!important;border:1px solid #bfdbfe!important}
+
+/* NMI ADMIN ACTIONS + POLISHED TOASTS — R8N16 */
+.nmiToastStack{position:fixed;top:18px;right:18px;z-index:2147483647;display:flex;flex-direction:column;gap:10px;width:min(390px,calc(100vw - 36px));pointer-events:none}
+.nmiToast{pointer-events:auto;background:#fff;border:1px solid #dbe4ee;border-left:5px solid #2563eb;border-radius:12px;box-shadow:0 18px 50px rgba(15,23,42,.22);padding:13px 42px 13px 14px;position:relative;animation:nmiToastIn .2s ease-out}
+.nmiToast.success{border-left-color:#16a34a}.nmiToast.error{border-left-color:#dc2626}.nmiToast.warning{border-left-color:#d97706}.nmiToast.info{border-left-color:#2563eb}
+.nmiToastTitle{font-size:13px;font-weight:900;color:#0f172a;margin-bottom:3px}.nmiToastMessage{font-size:12px;line-height:1.45;color:#475569;font-weight:650}
+.nmiToastClose{position:absolute;right:10px;top:9px;border:0;background:transparent;color:#64748b;font-size:20px;line-height:1;cursor:pointer;padding:2px 5px}
+@keyframes nmiToastIn{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
+@media(max-width:650px){.nmiToastStack{top:10px;right:10px;width:calc(100vw - 20px)}}
+
 </style>
 
 <style id="dataCleanupDuplicateFinderStyles">
@@ -12313,7 +12323,7 @@ function exportContactIntelligenceCSV(){let calls=filteredContactCalls();let row
   if(window.__cpcmSystemQaVersionLockLoaded) return;
   window.__cpcmSystemQaVersionLockLoaded = true;
   var BUILD_NAME = "Co Pilot Collections Manager — Stability QA / Version Lock";
-  var BUILD_VERSION = "STABLE_SINGLE_FILE_QA_LOCK_2026_07_20_R8N13";
+  var BUILD_VERSION = "STABLE_SINGLE_FILE_QA_LOCK_2026_07_20_R8N16";
   var EXPECTED_ENV = "LIVE";
   var EXPECTED_URL = "https://bwvufgzbkaymffwxuuzr.supabase.co";
   var EXPECTED_KEY_PREFIX = "sb_publishable_cvwkN3fOovsYvAvzXvrmRA";
@@ -13517,7 +13527,7 @@ function exportContactIntelligenceCSV(){let calls=filteredContactCalls();let row
 <script id="cpcmNmiPhase1Module">
 (function(){
   'use strict';
-  var BUILD='STABLE_SINGLE_FILE_QA_LOCK_2026_07_20_R8N13';
+  var BUILD='STABLE_SINGLE_FILE_QA_LOCK_2026_07_20_R8N16';
   var collectScriptPromise=null, collectReadyPromise=null, collectConfigured=false, paymentBusy=false, paymentContext=null, lastReceipt=null, collectGeneration=0;
   function byId(id){return document.getElementById(id)}
   function cfg(){return window.CO_PILOT_NMI_CONFIG||{}}
@@ -13527,7 +13537,30 @@ function exportContactIntelligenceCSV(){let calls=filteredContactCalls();let row
   function nmiKey(){return str(cfg().publicTokenizationKey).trim()}
   function keyReady(){var key=nmiKey();return !!key&&!/PASTE_|YOUR_|REPLACE_/i.test(key)&&key.length>12}
   function uuid(){return (window.crypto&&crypto.randomUUID)?crypto.randomUUID():'nmi-'+Date.now()+'-'+Math.random().toString(36).slice(2)}
-  function isAdmin(){return !!(window.currentUser&&(currentUser.isAdmin||str(currentUser.role).toLowerCase()==='admin'||str(currentUser.email).toLowerCase()==='afinch2678@gmail.com'))}
+  function isAdmin(){
+    var u=(typeof currentUser!=='undefined'&&currentUser)?currentUser:null;
+    return !!(u&&(u.isAdmin===true||str(u.role).toLowerCase()==='admin'||str(u.email).toLowerCase()==='afinch2678@gmail.com'));
+  }
+
+  function nmiToast(message,type,title,timeout){
+    var stack=byId('nmiToastStack');
+    if(!stack){
+      stack=document.createElement('div');
+      stack.id='nmiToastStack';
+      stack.className='nmiToastStack';
+      document.body.appendChild(stack);
+    }
+    type=type||'info';
+    title=title||(type==='success'?'Success':type==='error'?'Action Required':type==='warning'?'Please Review':'Notice');
+    var item=document.createElement('div');
+    item.className='nmiToast '+type;
+    item.innerHTML='<button class="nmiToastClose" aria-label="Close">×</button><div class="nmiToastTitle">'+safeHtml(title)+'</div><div class="nmiToastMessage">'+safeHtml(message)+'</div>';
+    var remove=function(){if(item&&item.parentNode)item.parentNode.removeChild(item)};
+    item.querySelector('.nmiToastClose').onclick=remove;
+    stack.appendChild(item);
+    setTimeout(remove,Number(timeout||6000));
+  }
+
   function status(text,type){var el=byId('nmiPaymentStatus');if(!el)return;el.textContent=text;el.className='nmiPaymentStatus'+(type?' '+type:'')}
   function setBusy(on){paymentBusy=!!on;var btn=byId('nmiPayButton');if(btn){btn.disabled=!!on;btn.textContent=on?'Processing — Do Not Close':'Process Secure Payment'}}
   function field(id){return byId(id)?byId(id).value.trim():''}
@@ -13709,6 +13742,7 @@ function exportContactIntelligenceCSV(){let calls=filteredContactCalls();let row
       var result=await invokeNmi({action:'sale',accountId:ctx.accountId,amount:ctx.amount,paymentToken:tokenized,idempotencyKey:ctx.idempotencyKey,billing:ctx.billing,metadata:ctx.metadata,cardMetadata:{brand:str(response&&response.card&&response.card.type),last4:digits.slice(-4)}});
       lastReceipt=result.receipt_number||result.receiptNumber||'';
       status('Payment approved and posted to the account ledger.','success');
+      nmiToast(usd(result.amount||ctx.amount)+' was approved and posted. Receipt '+str(result.receipt_number||result.receiptNumber||lastReceipt||'generated')+'.','success','Payment Approved',7000);
       var box=byId('nmiPaymentResult');
       if(box){box.classList.remove('hidden');box.innerHTML='<h4>Payment Approved</h4><div class="nmiResultGrid"><div><span>Amount</span><b>'+safeHtml(usd(result.amount||ctx.amount))+'</b></div><div><span>Receipt</span><b>'+safeHtml(lastReceipt||'Generated')+'</b></div><div><span>Balance After</span><b>'+safeHtml(usd(result.balance_after!=null?result.balance_after:result.balanceAfter))+'</b></div><div><span>NMI Transaction</span><b>'+safeHtml(result.transactionId||result.gateway_transaction_id||'')+'</b></div><div><span>Authorization</span><b>'+safeHtml(result.authorizationCode||'—')+'</b></div><div><span>Card</span><b>'+safeHtml([result.card_brand||result.cardBrand||'',(result.card_last4||result.cardLast4)?'•••• '+(result.card_last4||result.cardLast4):''].filter(Boolean).join(' ')||'Masked by NMI')+'</b></div></div>'}
       if(byId('nmiReceiptButton'))byId('nmiReceiptButton').style.display='inline-flex';
@@ -13746,32 +13780,38 @@ function exportContactIntelligenceCSV(){let calls=filteredContactCalls();let row
   }
 
   window.nmiVoidPayment=async function(ledgerId){
-    if(!isAdmin())return alert('Admin only.');
-    var row=(window.paymentLedgerData||[]).find(function(x){return str(x.id)===str(ledgerId)});if(!row)return alert('Payment ledger row not found.');
+    if(!isAdmin())return nmiToast('Only an administrator can void an NMI payment.','error','Admin Required');
+    var row=(window.paymentLedgerData||[]).find(function(x){return str(x.id)===str(ledgerId)});if(!row)return nmiToast('The payment ledger row could not be found. Refresh the ledger and try again.','error','Payment Not Found');
     if(!confirm('Void this NMI payment? A void is intended for an unsettled transaction and will add the amount back to the account balance only after NMI approves it.'))return;
     try{
+      nmiToast('The void request is being sent to NMI. Do not click again.','info','Processing Void',9000);
       var result=await invokeNmi({action:'void',originalLedgerId:ledgerId,idempotencyKey:'void-'+uuid(),metadata:{source:'Payment Ledger',accountNumber:typeof acctNo==='function'?acctNo(current()):''}});
-      alert('NMI void approved. '+usd(result.amount)+' was added back to the account balance.');
+      nmiToast('NMI approved the void. '+usd(result.amount)+' was added back to the account balance.','success','Payment Voided',8000);
       await refreshAfterAdjustment(row.accountId||row.account_id);
-    }catch(e){alert(e.message||String(e))}
+    }catch(e){nmiToast(e.message||String(e),'error','Void Not Completed',10000)}
   };
 
   window.nmiRefundPayment=async function(ledgerId){
-    if(!isAdmin())return alert('Admin only.');
-    var row=(window.paymentLedgerData||[]).find(function(x){return str(x.id)===str(ledgerId)});if(!row)return alert('Payment ledger row not found.');
+    if(!isAdmin())return nmiToast('Only an administrator can refund an NMI payment.','error','Admin Required');
+    var row=(window.paymentLedgerData||[]).find(function(x){return str(x.id)===str(ledgerId)});if(!row)return nmiToast('The payment ledger row could not be found. Refresh the ledger and try again.','error','Payment Not Found');
     var remaining=Math.max(0,amount(row.amount)-amount(row.refundedAmount||row.refunded_amount));
     var requested=prompt('Refund amount (maximum '+usd(remaining)+'):',remaining.toFixed(2));if(requested===null)return;
-    var refund=amount(requested);if(refund<=0||refund>remaining+0.01)return alert('Enter a refund amount from $0.01 to '+usd(remaining)+'.');
+    var refund=amount(requested);if(refund<=0||refund>remaining+0.01)return nmiToast('Enter a refund amount from $0.01 to '+usd(remaining)+'.','error','Invalid Refund Amount');
     if(!confirm('Refund '+usd(refund)+' through NMI and add it back to the account balance?'))return;
     try{
+      nmiToast('The refund request is being sent to NMI. Do not click again.','info','Processing Refund',9000);
       var result=await invokeNmi({action:'refund',originalLedgerId:ledgerId,amount:refund,idempotencyKey:'refund-'+uuid(),metadata:{source:'Payment Ledger',accountNumber:typeof acctNo==='function'?acctNo(current()):''}});
-      alert('NMI refund approved. '+usd(result.amount)+' was added back to the account balance.');
+      nmiToast('NMI approved the refund. '+usd(result.amount)+' was added back to the account balance.','success','Refund Approved',8000);
       await refreshAfterAdjustment(row.accountId||row.account_id);
-    }catch(e){alert(e.message||String(e))}
+    }catch(e){nmiToast(e.message||String(e),'error','Refund Not Completed',10000)}
   };
 
   window.nmiLedgerActions=function(row){
-    if(!isAdmin()||str(row.gatewayProvider||row.gateway_provider).toUpperCase()!=='NMI'||str(row.paymentType||row.payment_type).toLowerCase()!=='payment'||!str(row.gatewayTransactionId||row.gateway_transaction_id))return '—';
+    var provider=str(row.gatewayProvider||row.gateway_provider).toUpperCase();
+    var type=str(row.paymentType||row.payment_type).toLowerCase();
+    var gatewayId=str(row.gatewayTransactionId||row.gateway_transaction_id);
+    if(!isAdmin()||provider!=='NMI'||type!=='payment')return '—';
+    if(!gatewayId)return '<span style="font-size:10px;font-weight:800;color:#b45309">Gateway link missing</span>';
     var remaining=Math.max(0,amount(row.amount)-amount(row.refundedAmount||row.refunded_amount));
     if(remaining<=0.009)return '<span class="nmiGatewayPill">Fully reversed</span>';
     return '<div class="nmiActionButtons"><button class="outline" onclick="nmiVoidPayment(\''+safeHtml(row.id)+'\')">Void</button><button class="danger" onclick="nmiRefundPayment(\''+safeHtml(row.id)+'\')">Refund</button></div>';
@@ -13789,6 +13829,16 @@ function exportContactIntelligenceCSV(){let calls=filteredContactCalls();let row
       return '<tr><td>'+safeHtml(r.paymentDate||str(r.createdAt||'').slice(0,10))+'</td><td><span class="ledgerPill '+cls+'">'+safeHtml(r.paymentType||'Payment')+'</span></td><td><b>'+usd(r.amount)+'</b></td><td>'+safeHtml(r.paymentMethod||'')+'</td><td>'+safeHtml(r.status||'')+'</td><td>'+gateway+'</td><td>'+usd(r.balanceBefore)+'</td><td>'+usd(r.balanceAfter)+'</td><td>'+safeHtml(r.receiptNumber||'')+'</td><td>'+safeHtml(r.createdByEmail||'')+'</td><td>'+safeHtml(r.notes||'')+'</td><td>'+window.nmiLedgerActions(r)+'</td></tr>';
     }).join('')||'<tr><td colspan="12"><div class="powerEmpty">No payment ledger entries yet.</div></td></tr>';
   };
+
+
+  // Keep the ledger balance preview synchronized with the latest database state.
+  var cpcmOriginalOpenPaymentLedger=window.openPaymentLedger;
+  if(typeof cpcmOriginalOpenPaymentLedger==='function'){
+    window.openPaymentLedger=async function(){
+      try{if(typeof loadAccounts==='function')await loadAccounts()}catch(e){}
+      return cpcmOriginalOpenPaymentLedger.apply(this,arguments);
+    };
+  }
 
   window.CPCM_NMI_PHASE1_BUILD=BUILD;
   window.dispatchEvent(new CustomEvent('cpcm:nmi-phase1-ready',{detail:{build:BUILD}}));
