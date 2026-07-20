@@ -1,5 +1,0 @@
-[functions.nmi-payments]
-verify_jwt = false
-
-[functions.nmi-webhook]
-verify_jwt = false
