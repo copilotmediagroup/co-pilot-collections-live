@@ -11,7 +11,7 @@
 <!-- DOCUMENT_BRANDING_TYPED_ESIGN_R4_2026_07_18: brand logo/name on documents + company Created By + DocuSign-style typed signature chooser -->
 
 <head>
-<!-- STABLE_SINGLE_FILE_QA_LOCK_2026_07_20_R8N17: LIVE NMI Employee/Admin Payment Approval Queue -->
+<!-- RINGCENTRAL_POWER_DIALER_PHASE1_2026_07_20_R8N18: LIVE RingCentral Power Dialer + preserved NMI approval queue -->
 <!-- LIVE_COMPLIANCE_GUARD_MARKER: compliance guard + call rules -->
 <!-- LIVE_REPORTING_CLEAN_PACKAGE_MARKER: clean live package + admin reports -->
 <!-- LIVE_REPORTING_CLEAN_PACKAGE_MARKER: clean live package + admin reports -->
@@ -3634,6 +3634,42 @@ button {
 @media(max-width:560px){.nmiAccountStrip,.nmiGrid,.nmiCardFields{grid-template-columns:1fr}.nmiCardFields>div:first-child{grid-column:auto}.nmiFooterActions button{width:100%}}
 </style>
 
+<style id="cpcmRingCentralDialerStylesR8N18">
+/* R8N18 RINGCENTRAL POWER DIALER */
+.dialerModalBox{max-width:1460px!important;border-radius:18px!important;overflow:hidden}
+.dialerSub{font-size:11px;color:#64748b;font-weight:750;margin-top:3px}
+.dialerBody{background:#f4f7fb;display:flex;flex-direction:column;gap:12px}
+.dialerHero{display:flex;align-items:center;justify-content:space-between;gap:14px;background:linear-gradient(135deg,#05225f,#0b45c6);color:#fff;border-radius:16px;padding:17px 19px;box-shadow:0 8px 24px rgba(5,34,95,.18)}
+.dialerHeroTitle{font-size:18px;font-weight:1000}.dialerHeroSub{font-size:12px;color:#dbeafe;margin-top:4px}
+.dialerProviderChip{border-radius:999px;padding:7px 11px;font-size:11px;font-weight:900;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);max-width:480px}
+.dialerProviderChip.connected{background:#dcfce7;color:#166534;border-color:#86efac}.dialerProviderChip.error{background:#fee2e2;color:#991b1b;border-color:#fecaca}
+.dialerAgentConsole{display:grid;grid-template-columns:1.1fr .7fr auto 1.5fr;gap:12px;align-items:end;background:#fff;border:1px solid #dbe3ef;border-radius:16px;padding:14px 16px;box-shadow:0 3px 14px rgba(15,23,42,.05)}
+.dialerAgentConsole label,.dialerFormGrid label{display:block;font-size:11px;font-weight:900;color:#475569;margin-bottom:5px}
+.dialerAgentConsole select,.dialerFormGrid input,.dialerFormGrid select{height:40px;border:1px solid #cbd5e1;border-radius:10px;padding:8px 10px;background:#fff;width:100%;font:inherit}
+.dialerStatusButtons{display:flex;gap:7px;flex-wrap:wrap}.dialerStatusButtons button{height:40px;padding:0 11px;font-size:11px}
+.dialerCurrentCall{min-height:40px;border:1px solid #dbe3ef;background:#f8fafc;border-radius:10px;padding:8px 10px;font-size:12px;color:#334155}.dialerCurrentCall small{color:#64748b}
+.dialerAdminGrid{display:grid;grid-template-columns:1.25fr .75fr;gap:12px}
+.dialerPanel{background:#fff;border:1px solid #dbe3ef;border-radius:16px;padding:15px 16px;box-shadow:0 3px 14px rgba(15,23,42,.05)}
+.dialerPanelHead{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:12px}.dialerPanelHead h3{margin:0;font-size:16px;color:#0f172a}.dialerPanelHead span{display:block;font-size:11px;color:#64748b;margin-top:4px}
+.dialerFormGrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}.dialerWide{grid-column:1/-1}
+.dialerEmployeeChecks{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;max-height:180px;overflow:auto;border:1px solid #e2e8f0;border-radius:12px;padding:8px;background:#f8fafc}
+.dialerEmployeeChecks label{display:flex;align-items:center;gap:8px;border:1px solid #e2e8f0;border-radius:10px;padding:8px;background:#fff;margin:0;cursor:pointer}.dialerEmployeeChecks input{width:auto;height:auto}.dialerEmployeeChecks b,.dialerEmployeeChecks small{display:block}.dialerEmployeeChecks small{font-size:10px;color:#64748b;margin-top:2px}
+.dialerPreview{margin-top:10px;border:1px solid #bfdbfe;background:#eff6ff;color:#1e3a8a;border-radius:12px;padding:10px 12px;font-size:12px;line-height:1.45}.dialerPreview span{color:#475569}
+.dialerActions{display:flex;justify-content:flex-end;gap:8px;flex-wrap:wrap;margin-top:11px}.dialerActions button{height:38px;padding:0 12px;font-size:11px}
+.dialerMappingTable{display:grid;gap:7px;margin-top:12px;max-height:210px;overflow:auto}.dialerMappingTable>div{border:1px solid #e2e8f0;border-radius:11px;padding:9px;background:#f8fafc}.dialerMappingTable b,.dialerMappingTable span,.dialerMappingTable small{display:block}.dialerMappingTable span{font-size:11px;color:#334155;margin-top:3px}.dialerMappingTable small{font-size:10px;color:#64748b;margin-top:2px}
+.dialerStats{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:8px;margin-bottom:12px}.dialerStats>div{border:1px solid #e2e8f0;border-radius:12px;background:#f8fafc;padding:10px}.dialerStats span{display:block;font-size:10px;color:#64748b;font-weight:900;text-transform:uppercase}.dialerStats b{display:block;font-size:18px;color:#0f172a;margin-top:4px}
+.dialerCampaignList{display:flex;flex-direction:column;gap:9px}.dialerCampaignCard{border:1px solid #dbe3ef;border-left:5px solid #64748b;border-radius:13px;padding:11px 12px;background:#fff}.dialerCampaignCard.running{border-left-color:#16a34a}.dialerCampaignCard.paused{border-left-color:#7c3aed}.dialerCampaignCard.completed{border-left-color:#2563eb}.dialerCampaignCard.stopped{border-left-color:#dc2626}
+.dialerCampaignTop{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}.dialerCampaignTop b{font-size:14px}.dialerCampaignTop small{display:block;font-size:10px;color:#64748b;margin-top:5px;word-break:break-word}.dialerCampaignActions{display:flex;gap:6px;flex-wrap:wrap}.dialerCampaignActions button{height:32px;padding:0 9px;font-size:10px}
+.dialerCampaignMetrics{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:7px;margin-top:10px}.dialerCampaignMetrics span{border:1px solid #e2e8f0;background:#f8fafc;border-radius:9px;padding:7px;font-size:10px;color:#64748b}.dialerCampaignMetrics b{display:block;color:#0f172a;font-size:13px;margin-top:3px}.dialerCampaignMeta{font-size:10px;color:#94a3b8;margin-top:7px}
+.dialerStatusPill{display:inline-flex;align-items:center;justify-content:center;border-radius:999px;padding:6px 9px;font-size:10px;font-weight:1000;text-transform:capitalize;background:#e2e8f0;color:#334155;margin-left:7px}.dialerStatusPill.available,.dialerStatusPill.running,.dialerStatusPill.connected{background:#dcfce7;color:#166534}.dialerStatusPill.dialing,.dialerStatusPill.ringing,.dialerStatusPill.scheduled{background:#dbeafe;color:#1d4ed8}.dialerStatusPill.wrap_up,.dialerStatusPill.paused{background:#ede9fe;color:#6d28d9}.dialerStatusPill.unavailable,.dialerStatusPill.stopped{background:#fee2e2;color:#991b1b}.dialerStatusPill.completed{background:#e0f2fe;color:#075985}.dialerAgentConsole .dialerStatusPill{margin:0;min-height:40px;border-radius:10px;width:100%}
+.dialerAgentList{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.dialerAgentCard{display:flex;align-items:center;justify-content:space-between;gap:8px;border:1px solid #e2e8f0;border-radius:12px;padding:9px 10px;background:#f8fafc}.dialerAgentCard b,.dialerAgentCard small{display:block}.dialerAgentCard b{font-size:11px}.dialerAgentCard small{font-size:10px;color:#64748b;margin-top:3px}
+.dialerEmpty{border:1px dashed #cbd5e1;border-radius:12px;background:#f8fafc;color:#64748b;padding:14px;font-size:12px;text-align:center}
+.dialerLiveBanner{grid-column:1/-1;display:flex;align-items:center;gap:12px;border-radius:15px;padding:12px 14px;background:#eff6ff;border:2px solid #3b82f6;box-shadow:0 5px 18px rgba(37,99,235,.14);position:sticky;top:0;z-index:8}.dialerLiveBanner.connected{background:#ecfdf5;border-color:#22c55e}.dialerLiveBanner.wrap_up{background:#fff7ed;border-color:#f59e0b}.dialerLivePulse{width:14px;height:14px;border-radius:999px;background:#3b82f6;box-shadow:0 0 0 0 rgba(59,130,246,.5);animation:dialerPulse 1.4s infinite}.dialerLiveBanner.connected .dialerLivePulse{background:#16a34a}.dialerLiveBanner.wrap_up .dialerLivePulse{background:#f59e0b;animation:none}.dialerLiveCopy{display:flex;flex-direction:column;min-width:0;flex:1}.dialerLiveCopy b{font-size:13px}.dialerLiveCopy span{font-size:11px;color:#475569;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.dialerLiveTimer{font-size:20px;font-weight:1000;font-variant-numeric:tabular-nums}.dialerWrapButton{background:#f59e0b;color:#fff}
+@keyframes dialerPulse{0%{box-shadow:0 0 0 0 rgba(59,130,246,.5)}70%{box-shadow:0 0 0 10px rgba(59,130,246,0)}100%{box-shadow:0 0 0 0 rgba(59,130,246,0)}}
+@media(max-width:1200px){.dialerAdminGrid{grid-template-columns:1fr}.dialerAgentConsole{grid-template-columns:1fr 1fr}.dialerFormGrid{grid-template-columns:repeat(2,minmax(0,1fr))}.dialerStats,.dialerCampaignMetrics{grid-template-columns:repeat(3,minmax(0,1fr))}.dialerAgentList{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:760px){.dialerAgentConsole,.dialerFormGrid,.dialerStats,.dialerCampaignMetrics,.dialerAgentList,.dialerEmployeeChecks{grid-template-columns:1fr}.dialerLiveBanner{flex-wrap:wrap}.dialerLiveTimer{margin-left:auto}}
+
+</style>
 </head>
 <body>
 <div id="loginScreen" class="loginScreen open">
@@ -12364,7 +12400,7 @@ function exportContactIntelligenceCSV(){let calls=filteredContactCalls();let row
   if(window.__cpcmSystemQaVersionLockLoaded) return;
   window.__cpcmSystemQaVersionLockLoaded = true;
   var BUILD_NAME = "Co Pilot Collections Manager — Stability QA / Version Lock";
-  var BUILD_VERSION = "STABLE_SINGLE_FILE_QA_LOCK_2026_07_20_R8N17";
+  var BUILD_VERSION = "RINGCENTRAL_POWER_DIALER_PHASE1_2026_07_20_R8N18";
   var EXPECTED_ENV = "LIVE";
   var EXPECTED_URL = "https://bwvufgzbkaymffwxuuzr.supabase.co";
   var EXPECTED_KEY_PREFIX = "sb_publishable_cvwkN3fOovsYvAvzXvrmRA";
@@ -13568,7 +13604,7 @@ function exportContactIntelligenceCSV(){let calls=filteredContactCalls();let row
 <script id="cpcmNmiPhase1Module">
 (function(){
   'use strict';
-  var BUILD='STABLE_SINGLE_FILE_QA_LOCK_2026_07_20_R8N17';
+  var BUILD='RINGCENTRAL_POWER_DIALER_PHASE1_2026_07_20_R8N18';
   var collectScriptPromise=null, collectReadyPromise=null, collectConfigured=false, paymentBusy=false, paymentContext=null, lastReceipt=null, collectGeneration=0;
   function byId(id){return document.getElementById(id)}
   function cfg(){return window.CO_PILOT_NMI_CONFIG||{}}
@@ -13890,7 +13926,7 @@ function exportContactIntelligenceCSV(){let calls=filteredContactCalls();let row
 <script id="cpcmNmiApprovalQueueR8N17">
 (function(){
   'use strict';
-  var BUILD='STABLE_SINGLE_FILE_QA_LOCK_2026_07_20_R8N17';
+  var BUILD='RINGCENTRAL_POWER_DIALER_PHASE1_2026_07_20_R8N18';
   var approvalContext=null, approvalActionBusy={};
   function el(id){return document.getElementById(id)}
   function s(v){return String(v==null?'':v)}
@@ -14026,5 +14062,246 @@ function exportContactIntelligenceCSV(){let calls=filteredContactCalls();let row
 })();
 </script>
 
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" crossorigin="anonymous"></script>
+<script id="cpcmRingCentralPowerDialerR8N18">
+(function(){
+  if(window.__cpcmRingCentralPowerDialerR8N18)return;
+  window.__cpcmRingCentralPowerDialerR8N18=true;
+  const BUILD='RINGCENTRAL_POWER_DIALER_PHASE1_2026_07_20_R8N18';
+  const ds={campaigns:[],campaignAccounts:[],agentStatuses:[],mappings:[],calls:[],activeCall:null,pendingDispositionCallId:'',realtimeClient:null,realtimeChannel:null,timer:null,timerStart:0,bootedFor:'',lastDispositionOpened:'',provider:null};
+  const de=id=>document.getElementById(id);
+  const dv=id=>String(de(id)?.value||'').trim();
+  const dn=v=>{let n=Number(String(v??'').replace(/[$,]/g,''));return Number.isFinite(n)?n:0};
+  const dh=v=>String(v??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
+  const dphone=v=>{let x=String(v||'').replace(/\D/g,'');if(x.length===11&&x[0]==='1')x=x.slice(1);return x.length===10?`(${x.slice(0,3)}) ${x.slice(3,6)}-${x.slice(6)}`:String(v||'')};
+  const ddate=v=>{if(!v)return '—';let d=new Date(v);return isNaN(d)?String(v):d.toLocaleString()};
+  const dcamel=row=>typeof toCamel==='function'?toCamel(row):row;
+  const dcurrentEmail=()=>String((typeof currentUser!=='undefined'&&currentUser?.email)||'').toLowerCase();
+  const disAdmin=()=>Boolean(typeof currentUser!=='undefined'&&currentUser?.isAdmin);
+
+  async function dinvoke(payload){
+    if(typeof ensureFreshToken==='function')await ensureFreshToken();
+    let res=await fetch(url()+'/functions/v1/ringcentral-dialer',{method:'POST',headers:{apikey:pubKey(),Authorization:'Bearer '+token(),'Content-Type':'application/json'},body:JSON.stringify(payload||{})});
+    let data=await res.json().catch(()=>({}));
+    if(!res.ok)throw new Error(data.error||data.message||'RingCentral dialer request failed.');
+    return data;
+  }
+
+  function installUi(){
+    if(de('powerDialerButton'))return;
+    const actions=document.querySelector('.topActions');
+    if(actions){
+      const button=document.createElement('button');
+      button.className='gray';button.id='powerDialerButton';button.innerHTML='Dialer <span id="dialerHeaderBadge" class="alertBadge hidden">0</span>';button.onclick=window.openPowerDialer;
+      const role=de('roleBadge');actions.insertBefore(button,role||actions.firstChild);
+      const old=[...actions.children].find(node=>node.tagName==='SPAN'&&/Available/i.test(node.textContent||''));
+      if(old)old.id='dialerHeaderAgentState';
+    }
+    const rail=document.querySelector('.navRail');
+    if(rail){
+      const button=document.createElement('button');button.className='navIcon green';button.title='RingCentral Power Dialer';button.innerHTML='<span class="navEmoji">📲</span>';button.onclick=window.openPowerDialer;
+      const spacer=rail.querySelector('.navSpacer');rail.insertBefore(button,spacer||null);
+    }
+    const center=document.querySelector('main.center');
+    if(center){
+      const banner=document.createElement('section');banner.id='dialerLiveBanner';banner.className='dialerLiveBanner hidden';banner.innerHTML='<div class="dialerLivePulse"></div><div class="dialerLiveCopy"><b id="dialerLiveTitle">RingCentral Power Dialer</b><span id="dialerLiveSub">Waiting for a call.</span></div><div id="dialerLiveTimer" class="dialerLiveTimer">00:00</div><button id="dialerWrapButton" class="dialerWrapButton hidden" onclick="openDialerDisposition()">Complete Disposition</button><button class="outline" onclick="openPowerDialer()">Open Dialer</button>';
+      center.insertBefore(banner,center.firstChild);
+    }
+    document.body.insertAdjacentHTML('beforeend',modalHtml());
+    try{if(typeof applyRoleUI==='function')applyRoleUI()}catch(e){}
+  }
+
+  function modalHtml(){return `
+  <div id="powerDialerModal" class="modal"><div class="modalbox dialerModalBox">
+    <div class="modalhead"><div><h2 style="margin:0">RingCentral Power Dialer</h2><div class="dialerSub">LIVE Phase 1 · one account per available employee · forced disposition before next call</div></div><button class="gray" onclick="closeModal('powerDialerModal')">Close</button></div>
+    <div class="modalbody dialerBody">
+      <section class="dialerHero">
+        <div><div class="dialerHeroTitle">Agent Console</div><div class="dialerHeroSub">Your RingCentral user and extension stay unique to your Co Pilot login.</div></div>
+        <div id="dialerProviderChip" class="dialerProviderChip">Provider status not checked</div>
+      </section>
+      <div class="dialerAgentConsole">
+        <div><label>Running Campaign</label><select id="dialerAgentCampaign"></select></div>
+        <div><label>My Dialer Status</label><div id="dialerMyStatus" class="dialerStatusPill unavailable">Unavailable</div></div>
+        <div class="dialerStatusButtons"><button class="green" onclick="setDialerAgentStatus('available')">Available</button><button class="gray" onclick="setDialerAgentStatus('unavailable')">Unavailable</button><button class="purple" onclick="setDialerAgentStatus('wrap_up')">Wrap-Up</button></div>
+        <div><label>Current Call</label><div id="dialerCurrentCall" class="dialerCurrentCall">No active dialer call.</div></div>
+      </div>
+
+      <section class="dialerAdminGrid adminOnly hidden">
+        <div class="dialerPanel">
+          <div class="dialerPanelHead"><div><h3>Create Campaign</h3><span>Uses phone numbers already stored on assigned accounts.</span></div><button class="outline" onclick="previewDialerCampaign()">Preview</button></div>
+          <div class="dialerFormGrid">
+            <div class="dialerWide"><label>Campaign Name</label><input id="dialerCampaignName" placeholder="Example: Monday Florida Portfolio"></div>
+            <div><label>Portfolio / Client</label><select id="dialerPortfolioFilter"><option value="">All Portfolios</option></select></div>
+            <div><label>Account Status</label><select id="dialerStatusFilter"><option value="">All Statuses</option></select></div>
+            <div><label>State</label><select id="dialerStateFilter"><option value="">All States</option></select></div>
+            <div><label>Last Called Before</label><input id="dialerLastCalledBefore" type="date"></div>
+            <div><label>Minimum Balance</label><input id="dialerMinBalance" type="number" step="0.01" min="0"></div>
+            <div><label>Maximum Balance</label><input id="dialerMaxBalance" type="number" step="0.01" min="0"></div>
+            <div><label>Maximum Campaign Attempts</label><input id="dialerMaxAttempts" type="number" min="1" max="20" value="2"></div>
+            <div><label>Schedule Start</label><input id="dialerScheduleStart" type="datetime-local"></div>
+            <div><label>Schedule End</label><input id="dialerScheduleEnd" type="datetime-local"></div>
+            <div class="dialerWide"><label>Participating Employees</label><div id="dialerEmployeeChecks" class="dialerEmployeeChecks"></div></div>
+          </div>
+          <div id="dialerPreview" class="dialerPreview">Select employees, then preview the campaign.</div>
+          <div class="dialerActions"><button class="green" onclick="createDialerCampaign()">Create Campaign From Uploaded Accounts</button></div>
+        </div>
+
+        <div class="dialerPanel">
+          <div class="dialerPanelHead"><div><h3>RingCentral User Mapping</h3><span>One Co Pilot employee = one RingCentral user, one private credential, and one extension.</span></div><button class="outline" onclick="checkDialerProvider()">Check Connections</button></div>
+          <div class="dialerFormGrid">
+            <div class="dialerWide"><label>Employee</label><select id="dialerMappingEmployee" onchange="loadDialerMappingForm()"></select></div>
+            <div><label>RingCentral Extension ID</label><input id="dialerExtensionId" placeholder="Numeric API extension ID"></div>
+            <div><label>Extension Number</label><input id="dialerExtensionNumber" placeholder="Example: 102"></div>
+            <div><label>Forwarding / Agent Phone</label><input id="dialerForwardPhone" placeholder="Phone RingOut calls first"></div>
+            <div><label>Caller ID (reference)</label><input id="dialerCallerId" placeholder="RingCentral outbound caller ID"></div>
+          </div>
+          <div class="dialerPreview">Private RingCentral user credentials are never entered here. Add each employee JWT to the <b>RC_USER_JWTS_JSON</b> LIVE Supabase Edge Function secret, keyed by the employee’s lowercase email.</div><div class="dialerActions"><button class="green" onclick="saveDialerMapping()">Save Employee Mapping</button><button class="purple" onclick="createRingCentralWebhook()">Create / Renew User Webhooks</button></div>
+          <div id="dialerMappingTable" class="dialerMappingTable"></div>
+        </div>
+      </section>
+
+      <section class="dialerPanel">
+        <div class="dialerPanelHead"><div><h3>Campaign Control</h3><span>Start, pause, resume, or stop campaigns. Employees cannot dial until a campaign is running.</span></div><button class="outline" onclick="loadDialerDashboard(true)">Refresh</button></div>
+        <div id="dialerStats" class="dialerStats"></div>
+        <div id="dialerCampaignList" class="dialerCampaignList"></div>
+      </section>
+
+      <section class="dialerPanel adminOnly hidden">
+        <div class="dialerPanelHead"><div><h3>Live Agent States</h3><span>Available, dialing, connected, and wrap-up update from the provider flow.</span></div></div>
+        <div id="dialerAgentList" class="dialerAgentList"></div>
+      </section>
+    </div>
+  </div></div>`}
+
+  async function approvedEmployees(){
+    try{if(typeof loadAppUsers==='function')await loadAppUsers()}catch(e){}
+    return (typeof appUsers!=='undefined'?appUsers:[]).filter(u=>{
+      let role=String(u.role||'employee').toLowerCase();let email=String(u.email||'').toLowerCase();
+      let approved=u.isApproved===true||u.is_approved===true||String(u.approvalStatus||u.approval_status||'').toLowerCase()==='approved';
+      let active=u.isActive!==false&&u.is_active!==false;
+      return role==='employee'&&approved&&active&&email&&email!=='afinch2678@gmail.com';
+    }).sort((a,b)=>String(a.email).localeCompare(String(b.email)));
+  }
+
+  async function populateDialerForm(){
+    const employees=await approvedEmployees();
+    let portfolios=[...new Set((typeof accounts!=='undefined'?accounts:[]).map(a=>String(a.portfolio||'').trim()).filter(Boolean))].sort();
+    let statuses=[...new Set((typeof accounts!=='undefined'?accounts:[]).map(a=>String(a.status||a.disposition||'').trim()).filter(Boolean))].sort();
+    let states=[...new Set((typeof accounts!=='undefined'?accounts:[]).map(a=>String(a.state||'').trim().toUpperCase()).filter(Boolean))].sort();
+    if(de('dialerPortfolioFilter'))de('dialerPortfolioFilter').innerHTML='<option value="">All Portfolios</option>'+portfolios.map(v=>`<option>${dh(v)}</option>`).join('');
+    if(de('dialerStatusFilter'))de('dialerStatusFilter').innerHTML='<option value="">All Statuses</option>'+statuses.map(v=>`<option>${dh(v)}</option>`).join('');
+    if(de('dialerStateFilter'))de('dialerStateFilter').innerHTML='<option value="">All States</option>'+states.map(v=>`<option>${dh(v)}</option>`).join('');
+    if(de('dialerEmployeeChecks'))de('dialerEmployeeChecks').innerHTML=employees.map(u=>`<label><input type="checkbox" value="${dh(String(u.email).toLowerCase())}"><span><b>${dh(u.fullName||u.full_name||u.email)}</b><small>${dh(u.email)}</small></span></label>`).join('')||'<div class="dialerEmpty">No approved employees are available. Approve staff first.</div>';
+    if(de('dialerMappingEmployee'))de('dialerMappingEmployee').innerHTML='<option value="">Choose employee</option>'+employees.map(u=>`<option value="${dh(String(u.email).toLowerCase())}">${dh(u.fullName||u.full_name||u.email)} · ${dh(u.email)}</option>`).join('');
+  }
+
+  function selectedCampaignEmployees(){return [...document.querySelectorAll('#dialerEmployeeChecks input:checked')].map(x=>String(x.value).toLowerCase())}
+  function accountHasPhone(a){try{return (typeof phones==='function'?phones(a):[]).some(Boolean)}catch(e){return [a.phone1,a.phone2,a.phone3,a.phone4,a.phone5,a.phone6,a.phone7,a.phone8,a.phone9,a.phone10].some(Boolean)}}
+  function candidateAccounts(){
+    let selected=new Set(selectedCampaignEmployees()),portfolio=dv('dialerPortfolioFilter'),status=dv('dialerStatusFilter'),state=dv('dialerStateFilter').toUpperCase(),before=dv('dialerLastCalledBefore');
+    let min=dv('dialerMinBalance')===''?null:dn(dv('dialerMinBalance')),max=dv('dialerMaxBalance')===''?null:dn(dv('dialerMaxBalance'));
+    return (typeof accounts!=='undefined'?accounts:[]).filter(a=>{
+      let assigned=String(a.assignedToEmail||a.assigned_to_email||'').toLowerCase();
+      let balance=typeof accountBalance==='function'?accountBalance(a):dn(a.currentBalance||a.current_balance);
+      let last=String(a.lastCalledAt||a.last_called_at||'').slice(0,10);
+      return selected.has(assigned)&&accountHasPhone(a)&&(!portfolio||a.portfolio===portfolio)&&(!status||String(a.status||a.disposition)===status)&&(!state||String(a.state||'').toUpperCase()===state)&&(min===null||balance>=min)&&(max===null||balance<=max)&&(!before||!last||last<=before);
+    });
+  }
+
+  window.previewDialerCampaign=function(){
+    let employees=selectedCampaignEmployees(),rows=candidateAccounts(),balance=rows.reduce((s,a)=>s+(typeof accountBalance==='function'?accountBalance(a):dn(a.currentBalance||a.current_balance)),0);
+    let assignedCounts={};rows.forEach(a=>{let e=String(a.assignedToEmail||a.assigned_to_email||'').toLowerCase();assignedCounts[e]=(assignedCounts[e]||0)+1});
+    de('dialerPreview').innerHTML=`<b>${rows.length.toLocaleString()} eligible assigned accounts</b> · ${typeof money==='function'?money(balance):'$'+balance.toFixed(2)} total balance<br><span>${employees.length?employees.map(e=>dh(e)+' ('+(assignedCounts[e]||0)+')').join(' · '):'Select at least one participating employee.'}</span>`;
+    return rows;
+  };
+
+  window.createDialerCampaign=async function(){
+    if(!disAdmin())return alert('Administrator access is required.');
+    let name=dv('dialerCampaignName'),employees=selectedCampaignEmployees(),rows=window.previewDialerCampaign();
+    if(!name)return alert('Enter a campaign name.');if(!employees.length)return alert('Select at least one participating employee.');if(!rows.length)return alert('No eligible assigned accounts match these filters.');
+    let start=dv('dialerScheduleStart'),end=dv('dialerScheduleEnd'),maxAttempts=Math.max(1,Math.min(20,dn(dv('dialerMaxAttempts'))||2));
+    let filters={portfolio:dv('dialerPortfolioFilter'),status:dv('dialerStatusFilter'),state:dv('dialerStateFilter'),lastCalledBefore:dv('dialerLastCalledBefore'),minBalance:dv('dialerMinBalance'),maxBalance:dv('dialerMaxBalance')};
+    if(!confirm(`Create “${name}” with ${rows.length.toLocaleString()} accounts?`))return;
+    try{
+      if(typeof setGlobalBusy==='function')setGlobalBusy(true,'Creating power dialer campaign','Saving filtered accounts and employee assignments...');
+      let saved=await dbFetch('/dialer_campaigns',{method:'POST',body:JSON.stringify([{name,status:start?'scheduled':'draft',filters,selected_employee_emails:employees,max_attempts:maxAttempts,schedule_start:start?new Date(start).toISOString():null,schedule_end:end?new Date(end).toISOString():null,created_by_email:dcurrentEmail(),updated_at:new Date().toISOString()}])});
+      let campaign=saved[0],payload=rows.map((a,i)=>({campaign_id:campaign.id,account_id:a.id,employee_email:String(a.assignedToEmail||a.assigned_to_email||'').toLowerCase(),status:'queued',sort_order:i+1}));
+      for(let i=0;i<payload.length;i+=400)await dbFetch('/dialer_campaign_accounts',{method:'POST',body:JSON.stringify(payload.slice(i,i+400))});
+      for(let email of employees)await dbFetch('/dialer_agent_status?on_conflict=employee_email',{method:'POST',headers:{Prefer:'resolution=merge-duplicates,return=representation'},body:JSON.stringify([{employee_email:email,status:'unavailable',campaign_id:campaign.id,last_seen_at:new Date().toISOString(),updated_at:new Date().toISOString()}])}).catch(()=>{});
+      de('dialerCampaignName').value='';alert(`Campaign created with ${rows.length.toLocaleString()} assigned accounts. Start it when your employees are ready.`);await window.loadDialerDashboard(true);
+    }catch(e){alert('Campaign could not be created:\n\n'+(e.message||e))}finally{if(typeof setGlobalBusy==='function')setGlobalBusy(false)}
+  };
+
+  async function fetchDashboardRows(){
+    let [campaigns,campaignAccounts,agents,mappings,calls]=await Promise.all([
+      dbFetch('/dialer_campaigns?select=*&order=created_at.desc&limit=200').catch(()=>[]),
+      dbFetch('/dialer_campaign_accounts?select=*&order=created_at.desc&limit=30000').catch(()=>[]),
+      dbFetch('/dialer_agent_status?select=*&order=employee_email.asc').catch(()=>[]),
+      dbFetch('/ringcentral_user_mappings?select=*&order=employee_email.asc').catch(()=>[]),
+      dbFetch('/dialer_calls?select=*&order=created_at.desc&limit=500').catch(()=>[])
+    ]);
+    ds.campaigns=(campaigns||[]).map(dcamel);ds.campaignAccounts=(campaignAccounts||[]).map(dcamel);ds.agentStatuses=(agents||[]).map(dcamel);ds.mappings=(mappings||[]).map(dcamel);ds.calls=(calls||[]).map(dcamel);
+  }
+
+  window.loadDialerDashboard=async function(checkProvider=false){
+    try{await fetchDashboardRows();renderDialerDashboard();if(checkProvider&&disAdmin())await window.checkDialerProvider()}catch(e){console.warn('Dialer dashboard load failed',e);let list=de('dialerCampaignList');if(list)list.innerHTML='<div class="dialerEmpty">Run the R8N18 dialer SQL migration, then reload. '+dh(e.message||e)+'</div>'}
+  };
+
+  function renderDialerDashboard(){
+    const email=dcurrentEmail(),mine=ds.agentStatuses.find(x=>String(x.employeeEmail||x.employee_email).toLowerCase()===email),status=String(mine?.status||'unavailable');
+    let statusEl=de('dialerMyStatus');if(statusEl){statusEl.textContent=status.replace('_',' ').replace(/\b\w/g,c=>c.toUpperCase());statusEl.className='dialerStatusPill '+status}
+    let header=de('dialerHeaderAgentState');if(header)header.innerHTML=`<span class="dot"></span> ${dh(status.replace('_',' '))}`;
+    let running=ds.campaigns.filter(c=>c.status==='running'&&(disAdmin()||(c.selectedEmployeeEmails||c.selected_employee_emails||[]).includes(email)));
+    let select=de('dialerAgentCampaign');if(select){let keep=mine?.campaignId||mine?.campaign_id||select.value;select.innerHTML='<option value="">Choose running campaign</option>'+running.map(c=>`<option value="${c.id}">${dh(c.name)}</option>`).join('');select.value=running.some(c=>c.id===keep)?keep:(running[0]?.id||'')}
+    let active=ds.calls.find(c=>String(c.employeeEmail||c.employee_email).toLowerCase()===email&&c.dispositionRequired!==false&&c.disposition_required!==false&&['initiated','ringing','answered','disconnected'].includes(c.status));
+    if(active){ds.activeCall=active;de('dialerCurrentCall').innerHTML=`<b>${dh(active.status)}</b> · ${dh(dphone(active.phoneNumber||active.phone_number))}<br><small>Started ${dh(ddate(active.startedAt||active.started_at))}</small>`}else de('dialerCurrentCall').textContent='No active dialer call.';
+    renderCampaignList();renderAgentList();renderMappings();renderStats();
+    let pending=ds.calls.filter(c=>c.dispositionRequired!==false&&c.disposition_required!==false&&c.status==='disconnected').length,badge=de('dialerHeaderBadge');if(badge){badge.textContent=String(pending);badge.classList.toggle('hidden',pending<1)}
+  }
+
+  function campaignCounts(id){let rows=ds.campaignAccounts.filter(r=>String(r.campaignId||r.campaign_id)===String(id)),o={total:rows.length,queued:0,active:0,completed:0,blocked:0,failed:0};rows.forEach(r=>{let s=r.status;if(s==='queued')o.queued++;else if(['dialing','ringing','connected','wrap_up'].includes(s))o.active++;else if(s==='completed')o.completed++;else if(['blocked','skipped'].includes(s))o.blocked++;else if(s==='failed')o.failed++});return o}
+  function renderStats(){let all=ds.campaignAccounts,activeCampaigns=ds.campaigns.filter(c=>c.status==='running').length,available=ds.agentStatuses.filter(a=>a.status==='available').length,connected=ds.agentStatuses.filter(a=>a.status==='connected').length,wrap=ds.agentStatuses.filter(a=>a.status==='wrap_up').length;de('dialerStats').innerHTML=[['Campaigns',ds.campaigns.length],['Running',activeCampaigns],['Queued',all.filter(x=>x.status==='queued').length],['Available Agents',available],['Connected',connected],['Wrap-Up',wrap]].map(x=>`<div><span>${x[0]}</span><b>${Number(x[1]).toLocaleString()}</b></div>`).join('')}
+  function renderCampaignList(){let list=de('dialerCampaignList');if(!list)return;list.innerHTML=ds.campaigns.map(c=>{let n=campaignCounts(c.id),emps=c.selectedEmployeeEmails||c.selected_employee_emails||[],can=disAdmin(),buttons='';if(can){if(['draft','scheduled','paused'].includes(c.status))buttons+=`<button class="green" onclick="controlDialerCampaign('${c.id}','${c.status==='paused'?'resume':'start'}')">${c.status==='paused'?'Resume':'Start'}</button>`;if(c.status==='running')buttons+=`<button class="purple" onclick="controlDialerCampaign('${c.id}','pause')">Pause</button>`;if(!['stopped','completed'].includes(c.status))buttons+=`<button class="red" onclick="controlDialerCampaign('${c.id}','stop')">Stop</button>`}return `<div class="dialerCampaignCard ${dh(c.status)}"><div class="dialerCampaignTop"><div><b>${dh(c.name)}</b><span class="dialerStatusPill ${dh(c.status)}">${dh(c.status)}</span><small>${dh(emps.join(' · '))}</small></div><div class="dialerCampaignActions">${buttons}</div></div><div class="dialerCampaignMetrics"><span>Total <b>${n.total}</b></span><span>Queued <b>${n.queued}</b></span><span>Active <b>${n.active}</b></span><span>Completed <b>${n.completed}</b></span><span>Blocked/Skipped <b>${n.blocked}</b></span><span>Failed <b>${n.failed}</b></span></div><div class="dialerCampaignMeta">Created ${dh(ddate(c.createdAt||c.created_at))}${c.scheduleStart||c.schedule_start?' · Scheduled '+dh(ddate(c.scheduleStart||c.schedule_start)):''}</div></div>`}).join('')||'<div class="dialerEmpty">No dialer campaigns have been created.</div>'}
+  function renderAgentList(){let list=de('dialerAgentList');if(!list)return;list.innerHTML=ds.agentStatuses.map(a=>{let email=a.employeeEmail||a.employee_email,mapping=ds.mappings.find(m=>String(m.employeeEmail||m.employee_email).toLowerCase()===String(email).toLowerCase());return `<div class="dialerAgentCard"><div><b>${dh(email)}</b><small>${mapping?'Extension '+dh(mapping.ringcentralExtensionNumber||mapping.ringcentral_extension_number||mapping.ringcentralExtensionId||mapping.ringcentral_extension_id):'RingCentral mapping missing'}</small></div><span class="dialerStatusPill ${dh(a.status)}">${dh(a.status)}</span></div>`}).join('')||'<div class="dialerEmpty">No employee dialer states yet.</div>'}
+  function renderMappings(){let box=de('dialerMappingTable');if(!box)return;box.innerHTML=ds.mappings.map(m=>{let email=String(m.employeeEmail||m.employee_email||'').toLowerCase(),state=ds.provider?.users?.find(u=>String(u.employeeEmail||'').toLowerCase()===email);return `<div><b>${dh(email)}</b><span>Ext ${dh(m.ringcentralExtensionNumber||m.ringcentral_extension_number||'—')} · API ID ${dh(m.ringcentralExtensionId||m.ringcentral_extension_id||'—')}</span><small>Agent phone ${dh(dphone(m.ringcentralForwardPhone||m.ringcentral_forward_phone||''))} · ${state?(state.connected?'Credential connected':'Credential error'):'Connection not checked'}</small></div>`}).join('')||'<div class="dialerEmpty">No RingCentral employee mappings saved.</div>'}
+
+  window.controlDialerCampaign=async function(id,command){try{await dinvoke({action:'campaign_control',campaignId:id,command});await window.loadDialerDashboard(true)}catch(e){alert(e.message||e)}};
+  window.setDialerAgentStatus=async function(status){let campaignId=dv('dialerAgentCampaign');if(status==='available'&&!campaignId)return alert('Choose a running campaign first.');try{await dinvoke({action:'set_agent_status',status,campaignId:campaignId||null});await window.loadDialerDashboard(false);if(status==='available')setTimeout(()=>window.dispatchDialerNext(),300)}catch(e){alert(e.message||e)}};
+  window.dispatchDialerNext=async function(){let campaignId=dv('dialerAgentCampaign');try{let r=await dinvoke({action:'dispatch_next',campaignId,employeeEmail:dcurrentEmail()});if(r.call){ds.activeCall=dcamel(r.call);showDialerBanner(ds.activeCall,'ringing');de('dialerCurrentCall').innerHTML=`Calling ${dh(dphone(r.call.phone_number||r.call.phoneNumber))}…`}else if(r.message){de('dialerCurrentCall').textContent=r.message}await window.loadDialerDashboard(false)}catch(e){de('dialerCurrentCall').textContent=e.message||String(e);console.warn(e)}};
+
+  window.loadDialerMappingForm=function(){let email=dv('dialerMappingEmployee'),m=ds.mappings.find(x=>String(x.employeeEmail||x.employee_email).toLowerCase()===email);de('dialerExtensionId').value=m?.ringcentralExtensionId||m?.ringcentral_extension_id||'';de('dialerExtensionNumber').value=m?.ringcentralExtensionNumber||m?.ringcentral_extension_number||'';de('dialerForwardPhone').value=m?.ringcentralForwardPhone||m?.ringcentral_forward_phone||'';de('dialerCallerId').value=m?.ringcentralCallerId||m?.ringcentral_caller_id||''};
+  window.saveDialerMapping=async function(){let employee=dv('dialerMappingEmployee');if(!employee)return alert('Choose an employee.');if(!dv('dialerExtensionId')||!dv('dialerForwardPhone'))return alert('Extension ID and forwarding/agent phone are required.');try{await dbFetch('/ringcentral_user_mappings?on_conflict=employee_email',{method:'POST',headers:{Prefer:'resolution=merge-duplicates,return=representation'},body:JSON.stringify([{employee_email:employee,ringcentral_extension_id:dv('dialerExtensionId'),ringcentral_extension_number:dv('dialerExtensionNumber')||null,ringcentral_forward_phone:dv('dialerForwardPhone'),ringcentral_caller_id:dv('dialerCallerId')||null,enabled:true,updated_by_email:dcurrentEmail(),created_by_email:dcurrentEmail(),updated_at:new Date().toISOString()}])});await window.loadDialerDashboard(true);alert('RingCentral employee mapping saved.')}catch(e){alert(e.message||e)}};
+  window.checkDialerProvider=async function(){try{let r=await dinvoke({action:'connection_status'});ds.provider=r;let chip=de('dialerProviderChip'),connected=Number(r.connectedCount||0),visible=Array.isArray(r.users)?r.users.length:Number(r.mappingCount||0);chip.textContent=r.providerConnected?`RingCentral connected · ${connected}/${visible} users`:`RingCentral ${connected}/${visible} users connected`;chip.className='dialerProviderChip '+(r.providerConnected?'connected':'error');renderMappings()}catch(e){let chip=de('dialerProviderChip');chip.textContent=e.message||e;chip.className='dialerProviderChip error'}};
+  window.createRingCentralWebhook=async function(){if(!confirm('Create or renew one RingCentral telephony-session webhook for each connected employee user?'))return;try{let r=await dinvoke({action:'create_webhook_subscription'}),failed=(r.results||[]).filter(x=>!x.success);alert(`RingCentral user webhooks created: ${r.subscriptionsCreated}/${r.totalMappings}`+(failed.length?'\n\nFailed: '+failed.map(x=>x.employeeEmail).join(', '):''));await window.checkDialerProvider()}catch(e){alert('Webhooks could not be created:\n\n'+(e.message||e))}};
+
+  window.openPowerDialer=async function(){installUi();de('powerDialerModal').classList.add('open');await populateDialerForm();await window.loadDialerDashboard(true)};
+
+  function showDialerBanner(call,state){let banner=de('dialerLiveBanner');if(!banner)return;banner.classList.remove('hidden','ringing','connected','wrap_up');banner.classList.add(state||call.status||'ringing');let phone=call.phoneNumber||call.phone_number||'',title=state==='connected'?'LIVE CONSUMER CONNECTED':state==='wrap_up'?'CALL ENDED — DISPOSITION REQUIRED':'RINGCENTRAL CALLING';de('dialerLiveTitle').textContent=title;de('dialerLiveSub').textContent=`${dphone(phone)} · ${call.employeeEmail||call.employee_email||dcurrentEmail()}`;de('dialerWrapButton').classList.toggle('hidden',state!=='wrap_up');let start=call.answeredAt||call.answered_at||call.startedAt||call.started_at||new Date().toISOString();startDialerTimer(start)}
+  function startDialerTimer(start){clearInterval(ds.timer);ds.timerStart=new Date(start).getTime()||Date.now();let tick=()=>{let sec=Math.max(0,Math.floor((Date.now()-ds.timerStart)/1000)),m=Math.floor(sec/60),s=sec%60;if(de('dialerLiveTimer'))de('dialerLiveTimer').textContent=String(m).padStart(2,'0')+':'+String(s).padStart(2,'0')};tick();ds.timer=setInterval(tick,1000)}
+  function hideDialerBanner(){clearInterval(ds.timer);de('dialerLiveBanner')?.classList.add('hidden')}
+
+  async function handleScreenPop(row){let pop=dcamel(row),callId=pop.callId||pop.call_id;if(callId&&callId===ds.lastScreenPop)return;ds.lastScreenPop=callId;let accountId=pop.accountId||pop.account_id;if(!(typeof accounts!=='undefined'?accounts:[]).some(a=>String(a.id)===String(accountId))){try{await loadAccounts()}catch(e){}}if((typeof accounts!=='undefined'?accounts:[]).some(a=>String(a.id)===String(accountId))){currentAccountId=accountId;try{render()}catch(e){}}
+    let call=ds.calls.find(c=>String(c.id)===String(callId));if(!call){let rows=await dbFetch('/dialer_calls?id=eq.'+encodeURIComponent(callId)+'&select=*').catch(()=>[]);call=rows[0]?dcamel(rows[0]):null}if(call){ds.activeCall=call;showDialerBanner(call,'connected')}
+    await dbFetch('/dialer_screen_pops?id=eq.'+encodeURIComponent(pop.id),{method:'PATCH',body:JSON.stringify({status:'delivered',delivered_at:new Date().toISOString(),updated_at:new Date().toISOString()})}).catch(()=>{});
+  }
+
+  async function handleCallUpdate(raw){let call=dcamel(raw);if(String(call.employeeEmail||call.employee_email).toLowerCase()!==dcurrentEmail())return;ds.activeCall=call;if(call.status==='answered'){showDialerBanner(call,'connected')}if(call.status==='disconnected'&&(call.dispositionRequired!==false&&call.disposition_required!==false)){let accountId=call.accountId||call.account_id;if(!(typeof accounts!=='undefined'?accounts:[]).some(a=>String(a.id)===String(accountId))){try{await loadAccounts()}catch(e){}}if((typeof accounts!=='undefined'?accounts:[]).some(a=>String(a.id)===String(accountId))){currentAccountId=accountId;try{render()}catch(e){}}showDialerBanner(call,'wrap_up');if(ds.lastDispositionOpened!==call.id){ds.lastDispositionOpened=call.id;setTimeout(()=>window.openDialerDisposition(),350)}}if(call.status==='completed'){hideDialerBanner();ds.activeCall=null}}
+
+  window.openDialerDisposition=function(){let call=ds.activeCall;if(!call)return alert('No dialer call is waiting for disposition.');let accountId=call.accountId||call.account_id,phone=call.phoneNumber||call.phone_number,duration=call.durationSeconds||call.duration_seconds||Math.max(0,Math.round((Date.now()-new Date(call.startedAt||call.started_at).getTime())/1000));currentAccountId=accountId;try{render()}catch(e){}ds.pendingDispositionCallId=call.id;openCallResultModal({accountId,phone,direction:'Outbound',durationSeconds:duration,defaultResult:call.answeredAt||call.answered_at?'Right Party Contact':'No Answer'});if(de('callResultNotes')&&!de('callResultNotes').value)de('callResultNotes').value='RingCentral power dialer call.'};
+
+  function wrapCallResultSave(){if(window.__cpcmDialerWrappedCallResult)return;let original=window.saveCallResult;if(typeof original!=='function')return;window.__cpcmDialerWrappedCallResult=true;window.saveCallResult=async function(){let pending=ds.pendingDispositionCallId,disposition=dv('callResultStatus')||'No Answer',notes=dv('callResultNotes'),duration=dn(dv('callDuration'));await original.apply(this,arguments);if(pending){try{await dinvoke({action:'complete_call',callId:pending,disposition,notes,durationSeconds:duration});ds.pendingDispositionCallId='';ds.lastDispositionOpened='';ds.activeCall=null;hideDialerBanner();await window.loadDialerDashboard(false);let mine=ds.agentStatuses.find(a=>String(a.employeeEmail||a.employee_email).toLowerCase()===dcurrentEmail());if(mine?.status==='available')setTimeout(()=>window.dispatchDialerNext(),500);else setTimeout(()=>window.setDialerAgentStatus('available'),500)}catch(e){alert('Call outcome saved, but dialer wrap-up could not complete:\n\n'+(e.message||e))}}}}
+
+  async function pollDialer(){if(!dcurrentEmail()||!token())return;try{let pops=await dbFetch('/dialer_screen_pops?employee_email=eq.'+encodeURIComponent(dcurrentEmail())+'&status=eq.pending&order=created_at.asc&limit=5');for(let p of pops||[])await handleScreenPop(p);let calls=await dbFetch('/dialer_calls?employee_email=eq.'+encodeURIComponent(dcurrentEmail())+'&disposition_required=eq.true&status=in.(initiated,ringing,answered,disconnected)&order=created_at.desc&limit=1');if(calls?.[0])await handleCallUpdate(calls[0])}catch(e){}}
+
+  function subscribeRealtime(){if(ds.realtimeChannel||!window.supabase||!dcurrentEmail()||!token())return;try{ds.realtimeClient=window.supabase.createClient(url(),pubKey(),{auth:{persistSession:false,autoRefreshToken:false},global:{headers:{Authorization:'Bearer '+token()}}});try{ds.realtimeClient.realtime.setAuth(token())}catch(e){}ds.realtimeChannel=ds.realtimeClient.channel('cpcm-dialer-'+dcurrentEmail()).on('postgres_changes',{event:'INSERT',schema:'public',table:'dialer_screen_pops',filter:'employee_email=eq.'+dcurrentEmail()},p=>handleScreenPop(p.new)).on('postgres_changes',{event:'UPDATE',schema:'public',table:'dialer_calls',filter:'employee_email=eq.'+dcurrentEmail()},p=>handleCallUpdate(p.new)).subscribe()}catch(e){console.warn('Dialer realtime unavailable; polling fallback remains active.',e)}}
+
+  async function sessionInit(){let email=dcurrentEmail();if(!email||!token()||ds.bootedFor===email)return;ds.bootedFor=email;wrapCallResultSave();subscribeRealtime();await pollDialer();try{await window.loadDialerDashboard(false)}catch(e){}}
+
+  function boot(){installUi();wrapCallResultSave();setInterval(()=>{sessionInit().catch(()=>{});pollDialer().catch(()=>{})},3000);setTimeout(()=>sessionInit().catch(()=>{}),800);window.CPCM_RINGCENTRAL_DIALER_BUILD=BUILD;window.dispatchEvent(new CustomEvent('cpcm:ringcentral-dialer-ready',{detail:{build:BUILD}}))}
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();
+})();
+
+</script>
 </body>
 </html>
