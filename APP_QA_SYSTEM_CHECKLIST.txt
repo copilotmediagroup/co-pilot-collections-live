@@ -137,3 +137,13 @@ LIVE NMI PHASE 1 R8N12
 [ ] NMI webhook rejects missing/invalid signatures
 [ ] External NMI refund/void not initiated in Co Pilot is marked for manual review, not silently applied
 [ ] No private key or full card/CVV appears in source, browser storage, database, logs, receipts, or GitHub
+
+
+R8N17 NMI APPROVAL QUEUE QA
+- Employee button says Submit for Admin Approval.
+- Employee submission does not create an NMI sale or reduce balance.
+- Admin Approvals badge increments.
+- Admin Approve & Process creates exactly one sale and one ledger entry.
+- Employee cannot call sale/approve/decline/refund/void actions.
+- Decline/cancel/expire removes temporary NMI vault reference.
+- Public key remains in public/nmi-config.js and private key remains only in Supabase Secrets.

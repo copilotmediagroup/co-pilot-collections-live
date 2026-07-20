@@ -11,7 +11,7 @@
 <!-- DOCUMENT_BRANDING_TYPED_ESIGN_R4_2026_07_18: brand logo/name on documents + company Created By + DocuSign-style typed signature chooser -->
 
 <head>
-<!-- STABLE_SINGLE_FILE_QA_LOCK_2026_07_20_R8N16: LIVE NMI Phase 1 Secure Card Payments -->
+<!-- STABLE_SINGLE_FILE_QA_LOCK_2026_07_20_R8N17: LIVE NMI Employee/Admin Payment Approval Queue -->
 <!-- LIVE_COMPLIANCE_GUARD_MARKER: compliance guard + call rules -->
 <!-- LIVE_REPORTING_CLEAN_PACKAGE_MARKER: clean live package + admin reports -->
 <!-- LIVE_REPORTING_CLEAN_PACKAGE_MARKER: clean live package + admin reports -->
@@ -3551,6 +3551,26 @@ button {
 @keyframes nmiToastIn{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
 @media(max-width:650px){.nmiToastStack{top:10px;right:10px;width:calc(100vw - 20px)}}
 
+
+/* NMI EMPLOYEE → ADMIN PAYMENT APPROVAL QUEUE — R8N17 */
+.nmiApprovalBox{width:min(1180px,96vw);max-height:92vh}
+.nmiApprovalHero{display:flex;justify-content:space-between;gap:16px;align-items:center;padding:14px 16px;border:1px solid #bfdbfe;background:#eff6ff;border-radius:12px;margin-bottom:12px}
+.nmiApprovalHero b{display:block;color:#0f3d78;font-size:14px}.nmiApprovalHero span{display:block;color:#475569;font-size:12px;margin-top:3px;font-weight:650}
+.nmiApprovalStats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-bottom:12px}
+.nmiApprovalStats>div{border:1px solid #dbe4ee;background:#fff;border-radius:11px;padding:11px 13px}.nmiApprovalStats span{display:block;color:#64748b;font-size:10px;font-weight:850;text-transform:uppercase;letter-spacing:.04em}.nmiApprovalStats b{display:block;color:#0f172a;font-size:20px;margin-top:3px}
+.nmiApprovalList{display:flex;flex-direction:column;gap:10px;margin-top:12px}
+.nmiApprovalCard{border:1px solid #dbe4ee;background:#fff;border-radius:13px;padding:14px;box-shadow:0 6px 18px rgba(15,23,42,.06)}
+.nmiApprovalCard.pending{border-left:5px solid #d97706}.nmiApprovalCard.processing{border-left:5px solid #2563eb}.nmiApprovalCard.approved{border-left:5px solid #16a34a}.nmiApprovalCard.declined,.nmiApprovalCard.expired,.nmiApprovalCard.cancelled,.nmiApprovalCard.gateway_declined,.nmiApprovalCard.failed{border-left:5px solid #dc2626}.nmiApprovalCard.needs_review{border-left:5px solid #7c3aed}
+.nmiApprovalTop{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}.nmiApprovalName{font-size:15px;font-weight:900;color:#0f172a}.nmiApprovalAccount{font-size:11px;color:#64748b;margin-top:2px;font-weight:700}
+.nmiApprovalAmount{text-align:right;font-size:20px;font-weight:950;color:#0f172a}.nmiApprovalStatus{display:inline-flex;margin-top:4px;padding:4px 8px;border-radius:999px;background:#f1f5f9;color:#334155;font-size:9px;font-weight:900;text-transform:uppercase;letter-spacing:.04em}
+.nmiApprovalGrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px;margin-top:12px}.nmiApprovalGrid>div{background:#f8fafc;border:1px solid #e2e8f0;border-radius:9px;padding:8px 10px}.nmiApprovalGrid span{display:block;color:#64748b;font-size:9px;font-weight:850;text-transform:uppercase}.nmiApprovalGrid b{display:block;color:#1e293b;font-size:11px;margin-top:3px;word-break:break-word}
+.nmiApprovalNotes{margin-top:10px;padding:9px 11px;border:1px solid #e2e8f0;background:#fafafa;border-radius:9px;color:#475569;font-size:11px;line-height:1.4}
+.nmiApprovalActions{display:flex;justify-content:flex-end;gap:8px;flex-wrap:wrap;margin-top:12px}.nmiApprovalActions button{min-width:120px}
+.nmiApprovalEmpty{border:1px dashed #cbd5e1;background:#f8fafc;border-radius:12px;padding:28px;text-align:center;color:#64748b;font-weight:750}
+.nmiEmployeeApprovalBanner{border:1px solid #fde68a;background:#fffbeb;color:#92400e;border-radius:10px;padding:10px 12px;margin:10px 0;font-size:11px;font-weight:750;line-height:1.4}
+@media(max-width:850px){.nmiApprovalGrid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:600px){.nmiApprovalStats,.nmiApprovalGrid{grid-template-columns:1fr}.nmiApprovalTop{flex-direction:column}.nmiApprovalAmount{text-align:left}.nmiApprovalHero{align-items:flex-start;flex-direction:column}}
+
 </style>
 
 <style id="dataCleanupDuplicateFinderStyles">
@@ -3682,6 +3702,7 @@ button {
       <button class="gray todayBtn" onclick="openTodayDashboard()">Today</button>
       <button class="gray" onclick="openPaymentTracker()">Pay Desk</button>
       <button class="gray" onclick="openPaymentsDashboard()">Ledger</button>
+      <button class="gray" id="nmiApprovalNavButton" onclick="openNmiApprovalQueue()">Approvals <span id="nmiApprovalBadge" class="alertBadge hidden">0</span></button>
       <button class="gray" onclick="runPromiseAutomation(true,true)">Broken</button>
       <button class="gray" onclick="openDailyWorkQueue()">Queue</button>
       <button class="gray" onclick="openPromiseDashboard()">Promises</button>
@@ -4388,7 +4409,7 @@ button {
 
 <div id="nmiPaymentModal" class="modal"><div class="modalbox nmiBox">
   <div class="modalhead">
-    <div><h2>Secure Card Payment</h2><div class="nmiModalSub">NMI hosted card fields • One-time credit/debit payment</div></div>
+    <div><h2 id="nmiPaymentModalTitle">Secure Card Payment</h2><div id="nmiPaymentModalSub" class="nmiModalSub">NMI hosted card fields • Administrator-controlled card processing</div></div>
     <button class="gray" onclick="closeModal('nmiPaymentModal')">Close</button>
   </div>
   <div class="modalbody">
@@ -4399,7 +4420,7 @@ button {
       <div><span>Current Balance</span><b id="nmiCurrentBalance">$0.00</b></div>
       <div><span>Balance After</span><b id="nmiBalanceAfter">$0.00</b></div>
     </div>
-    <div class="nmiSecurityNote"><b>Secure card entry:</b> Card number, expiration date, and CVV are entered inside NMI-hosted fields. Co Pilot does not store the full card number or CVV.</div>
+    <div id="nmiSecurityNote" class="nmiSecurityNote"><b>Secure card entry:</b> Card number, expiration date, and CVV are entered inside NMI-hosted fields. Co Pilot does not store the full card number or CVV.</div>
     <div class="nmiGrid">
       <div><label>Payment Amount</label><input id="nmiAmount" type="number" min="0.01" step="0.01" oninput="updateNmiPaymentPreview()" placeholder="0.00"></div>
       <div><label>Cardholder Name</label><input id="nmiCardholderName" autocomplete="cc-name"></div>
@@ -4417,7 +4438,7 @@ button {
       <div class="nmiWide nmiFieldTools"><span id="nmiFieldDiagnostic">NMI secure fields initialize when this screen opens.</span><button type="button" class="outline" onclick="reloadNmiSecureFields()">Reload Secure Fields</button></div>
       <div class="nmiWide"><label>Internal Notes</label><textarea id="nmiNotes" placeholder="Optional authorization or payment notes. Do not enter full card information."></textarea></div>
     </div>
-    <label class="nmiConsent"><input id="nmiAuthorization" type="checkbox"> I confirm the consumer authorized this one-time card charge for the amount shown.</label>
+    <label class="nmiConsent"><input id="nmiAuthorization" type="checkbox"> <span id="nmiConsentText">I confirm the consumer authorized this one-time card charge for the amount shown.</span></label>
     <div id="nmiPaymentStatus" class="nmiPaymentStatus">Ready for secure card entry.</div>
     <div id="nmiPaymentResult" class="nmiPaymentResult hidden"></div>
     <div class="nmiFooterActions">
@@ -4425,6 +4446,26 @@ button {
       <button class="outline" id="nmiReceiptButton" style="display:none" onclick="openNmiReceiptCenter()">Open Receipt Center</button>
       <button class="green" id="nmiPayButton" onclick="startNmiPayment()">Process Secure Payment</button>
     </div>
+  </div>
+</div></div>
+
+<div id="nmiApprovalModal" class="modal"><div class="modalbox nmiApprovalBox">
+  <div class="modalhead">
+    <div><h2 id="nmiApprovalTitle">Payment Approvals</h2><div id="nmiApprovalSub" class="nmiModalSub">Employee-submitted card requests waiting for administrator action.</div></div>
+    <button class="gray" onclick="closeModal('nmiApprovalModal')">Close</button>
+  </div>
+  <div class="modalbody">
+    <div class="nmiApprovalHero">
+      <div><b id="nmiApprovalHeroTitle">Administrator approval is required before a card is charged.</b><span id="nmiApprovalHeroText">Employees may securely capture payment information, but they cannot run a sale.</span></div>
+      <button class="outline" onclick="loadNmiApprovalQueue(true)">Refresh</button>
+    </div>
+    <div class="nmiApprovalStats">
+      <div><span>Pending</span><b id="nmiApprovalPendingStat">0</b></div>
+      <div><span>Approved</span><b id="nmiApprovalApprovedStat">0</b></div>
+      <div><span>Declined / Expired</span><b id="nmiApprovalClosedStat">0</b></div>
+    </div>
+    <div id="nmiApprovalQueueStatus" class="nmiPaymentStatus">Loading payment requests…</div>
+    <div id="nmiApprovalList" class="nmiApprovalList"></div>
   </div>
 </div></div>
 
@@ -12323,7 +12364,7 @@ function exportContactIntelligenceCSV(){let calls=filteredContactCalls();let row
   if(window.__cpcmSystemQaVersionLockLoaded) return;
   window.__cpcmSystemQaVersionLockLoaded = true;
   var BUILD_NAME = "Co Pilot Collections Manager — Stability QA / Version Lock";
-  var BUILD_VERSION = "STABLE_SINGLE_FILE_QA_LOCK_2026_07_20_R8N16";
+  var BUILD_VERSION = "STABLE_SINGLE_FILE_QA_LOCK_2026_07_20_R8N17";
   var EXPECTED_ENV = "LIVE";
   var EXPECTED_URL = "https://bwvufgzbkaymffwxuuzr.supabase.co";
   var EXPECTED_KEY_PREFIX = "sb_publishable_cvwkN3fOovsYvAvzXvrmRA";
@@ -12378,7 +12419,7 @@ function exportContactIntelligenceCSV(){let calls=filteredContactCalls();let row
     checks.push(line('Build marker installed', !!window.__cpcmSystemQaVersionLockLoaded, BUILD_VERSION));
     checks.push(line('Client remittance module installed', !!window.CPCM_CLIENT_REMITTANCE_BUILD, window.CPCM_CLIENT_REMITTANCE_BUILD||'Missing R8 module'));
     checks.push(line('Dynamic call attempts + live statistics installed', !!window.CPCM_DYNAMIC_ACTIVITY_STATS_BUILD, window.CPCM_DYNAMIC_ACTIVITY_STATS_BUILD||'Missing R8N11 dynamic statistics module'));
-    checks.push(line('NMI Phase 1 secure payments installed', !!window.CPCM_NMI_PHASE1_BUILD&&!!document.getElementById('nmiPaymentModal'), window.CPCM_NMI_PHASE1_BUILD||'Missing NMI payment module'));
+    checks.push(line('NMI admin approval payment queue installed', !!window.CPCM_NMI_APPROVAL_QUEUE_BUILD&&!!document.getElementById('nmiApprovalModal')&&!!document.getElementById('nmiPaymentModal'), window.CPCM_NMI_APPROVAL_QUEUE_BUILD||'Missing NMI approval queue module'));
     checks.push(line('NMI private key excluded from browser', !String(document.documentElement.innerHTML).includes('NMI_PRIVATE_API_KEY='), 'Private API key must remain in Supabase Secrets only'));
     checks.push(line('Document PDF engine loaded', !!(window.html2canvas&&window.jspdf&&window.jspdf.jsPDF), 'Local html2canvas + jsPDF'));
     checks.push(line('DocuSign-style typed signature controls loaded', !!(window.downloadCurrentDocumentPDF&&window.clearDocumentSignature&&window.applyTypedDocumentSignature&&window.selectDocumentSignatureStyle), 'Document Builder PDF + typed signature chooser'));
@@ -13527,7 +13568,7 @@ function exportContactIntelligenceCSV(){let calls=filteredContactCalls();let row
 <script id="cpcmNmiPhase1Module">
 (function(){
   'use strict';
-  var BUILD='STABLE_SINGLE_FILE_QA_LOCK_2026_07_20_R8N16';
+  var BUILD='STABLE_SINGLE_FILE_QA_LOCK_2026_07_20_R8N17';
   var collectScriptPromise=null, collectReadyPromise=null, collectConfigured=false, paymentBusy=false, paymentContext=null, lastReceipt=null, collectGeneration=0;
   function byId(id){return document.getElementById(id)}
   function cfg(){return window.CO_PILOT_NMI_CONFIG||{}}
@@ -13842,6 +13883,146 @@ function exportContactIntelligenceCSV(){let calls=filteredContactCalls();let row
 
   window.CPCM_NMI_PHASE1_BUILD=BUILD;
   window.dispatchEvent(new CustomEvent('cpcm:nmi-phase1-ready',{detail:{build:BUILD}}));
+})();
+</script>
+
+
+<script id="cpcmNmiApprovalQueueR8N17">
+(function(){
+  'use strict';
+  var BUILD='STABLE_SINGLE_FILE_QA_LOCK_2026_07_20_R8N17';
+  var approvalContext=null, approvalActionBusy={};
+  function el(id){return document.getElementById(id)}
+  function s(v){return String(v==null?'':v)}
+  function num(v){var n=Number(s(v).replace(/[^0-9.-]/g,''));return isFinite(n)?Math.round(n*100)/100:0}
+  function cash(v){return num(v).toLocaleString('en-US',{style:'currency',currency:'USD'})}
+  function h(v){return typeof esc==='function'?esc(v):s(v).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
+  function actor(){return (typeof currentUser!=='undefined'&&currentUser)?currentUser:{}}
+  function admin(){var u=actor();return !!(u.isAdmin===true||s(u.role).toLowerCase()==='admin'||s(u.email).toLowerCase()==='afinch2678@gmail.com')}
+  function currentAccount(){return typeof getCurrent==='function'?getCurrent():null}
+  function val(id){return el(id)?el(id).value.trim():''}
+  function uid(){return (window.crypto&&crypto.randomUUID)?crypto.randomUUID():'cpcm-'+Date.now()+'-'+Math.random().toString(36).slice(2)}
+  function payStatus(message,type){var node=el('nmiPaymentStatus');if(!node)return;node.textContent=message;node.className='nmiPaymentStatus'+(type?' '+type:'')}
+  function toast(message,type,title,timeout){
+    if(typeof nmiToast==='function')return nmiToast(message,type,title,timeout);
+    var stack=el('nmiToastStack');if(!stack){stack=document.createElement('div');stack.id='nmiToastStack';stack.className='nmiToastStack';document.body.appendChild(stack)}
+    type=type||'info';var item=document.createElement('div');item.className='nmiToast '+type;item.innerHTML='<button class="nmiToastClose">×</button><div class="nmiToastTitle">'+h(title||'Notice')+'</div><div class="nmiToastMessage">'+h(message)+'</div>';item.querySelector('button').onclick=function(){item.remove()};stack.appendChild(item);setTimeout(function(){item.remove()},timeout||6500)
+  }
+  function setPayBusy(on){var b=el('nmiPayButton');if(!b)return;b.disabled=!!on;b.textContent=on?'Securing Payment Information…':(admin()?'Process Secure Payment':'Submit for Admin Approval');var reload=el('nmiPaymentModal')&&el('nmiPaymentModal').querySelector('.nmiFieldTools button');if(reload)reload.disabled=!!on}
+  async function invoke(body){
+    if(typeof ensureFreshToken==='function')await ensureFreshToken();
+    var config=window.CO_PILOT_NMI_CONFIG||{};var fn=s(config.edgeFunctionName||'nmi-payments');
+    var response=await fetch(url()+'/functions/v1/'+encodeURIComponent(fn),{method:'POST',headers:{'Content-Type':'application/json','apikey':pubKey(),'Authorization':'Bearer '+token()},body:JSON.stringify(body)});
+    var data={};try{data=await response.json()}catch(e){data={error:'The secure payment service returned an unreadable response.'}}
+    if(!response.ok||!data.success){var error=new Error(data.error||'The payment request could not be completed.');error.details=data;throw error}return data;
+  }
+  function applyRolePaymentUI(){
+    var isAdmin=admin();
+    if(el('nmiPaymentModalTitle'))el('nmiPaymentModalTitle').textContent=isAdmin?'Secure Card Payment':'Submit Card Payment for Approval';
+    if(el('nmiPaymentModalSub'))el('nmiPaymentModalSub').textContent=isAdmin?'Administrator processing • NMI hosted card fields':'Employee capture • Administrator approval required before any charge';
+    if(el('nmiConsentText'))el('nmiConsentText').textContent=isAdmin?'I confirm the consumer authorized this one-time card charge for the amount shown.':'I confirm the consumer authorized this exact amount and understands an administrator will review and process the card.';
+    if(el('nmiSecurityNote'))el('nmiSecurityNote').innerHTML=isAdmin?'<b>Secure card entry:</b> NMI-hosted fields protect the full card number and CVV. As an administrator, you may process the authorized charge.':'<b>Approval protection:</b> NMI securely stores a temporary payment reference. You cannot charge the card. An administrator must approve and process the exact authorized amount.';
+    setPayBusy(false);
+    if(!isAdmin&&el('nmiPaymentResult')){el('nmiPaymentResult').classList.remove('hidden');el('nmiPaymentResult').innerHTML='<div class="nmiEmployeeApprovalBanner"><b>Employee restriction:</b> Submitting this form creates an approval request only. It does not charge the card or change the account balance.</div>'}
+  }
+  var originalOpenNmiPayment=window.openNmiPayment;
+  if(typeof originalOpenNmiPayment==='function')window.openNmiPayment=async function(){var result=await originalOpenNmiPayment.apply(this,arguments);applyRolePaymentUI();return result};
+
+  window.startNmiPayment=async function(){
+    if(approvalContext)return;
+    var a=currentAccount();if(!a)return toast('Select an account before entering a card payment.','error','No Account Selected');
+    var amount=num(val('nmiAmount')), balance=typeof accountBalance==='function'?accountBalance(a):0;
+    if(amount<=0)return payStatus('Enter a payment amount greater than zero.','error');
+    if(amount>balance+0.01)return payStatus('Payment cannot exceed the current balance of '+cash(balance)+'.','error');
+    if(!val('nmiCardholderName'))return payStatus('Enter the cardholder name.','error');
+    if(!val('nmiZip'))return payStatus('Enter the billing ZIP code.','error');
+    if(!el('nmiAuthorization')||!el('nmiAuthorization').checked)return payStatus('Confirm the consumer authorized the exact amount shown.','error');
+    var frames=['ccnumber','ccexp','cvv'].every(function(id){var host=el(id),frame=host&&host.querySelector('iframe');return !!frame});
+    if(!frames)return payStatus('The NMI card fields are not ready. Click Reload Secure Fields and try again.','error');
+    approvalContext={
+      mode:admin()?'sale':'submit_for_approval',accountId:a.id,amount:amount,
+      idempotencyKey:(admin()?'sale-':'approval-')+uid(),
+      billing:{cardholderName:val('nmiCardholderName'),address1:val('nmiAddress1'),city:val('nmiCity'),state:val('nmiState'),zip:val('nmiZip'),email:val('nmiEmail'),phone:val('nmiPhone')},
+      metadata:{source:admin()?'Co Pilot LIVE Admin Payment':'Co Pilot LIVE Employee Approval Request',notes:val('nmiNotes'),billingEmail:val('nmiEmail'),billingPhone:val('nmiPhone'),accountNumber:typeof acctNo==='function'?acctNo(a):s(a.accountNumber),consumerName:typeof nameOf==='function'?nameOf(a):s(a.fullName)}
+    };
+    setPayBusy(true);payStatus(admin()?'Securing card information with NMI before processing…':'Securing a temporary NMI payment reference for administrator review…','processing');
+    try{CollectJS.startPaymentRequest()}catch(error){approvalContext=null;setPayBusy(false);payStatus(error.message||s(error),'error')}
+  };
+
+  window.cpcmNmiCollectCallback=async function(response){
+    var ctx=approvalContext;approvalContext=null;
+    if(!ctx){setPayBusy(false);return payStatus('Payment context expired. Reopen the payment screen and try again.','error')}
+    var paymentToken=response&&response.token;if(!paymentToken){setPayBusy(false);return payStatus('NMI did not return a secure payment token. Check the card fields and try again.','error')}
+    var masked=s(response&&response.card&&response.card.number),digits=masked.replace(/\D/g,''),card={brand:s(response&&response.card&&response.card.type),last4:digits.slice(-4)};
+    try{
+      if(ctx.mode==='submit_for_approval'){
+        payStatus('Creating the administrator approval request. The card is not being charged.','processing');
+        var request=await invoke({action:'submit_for_approval',accountId:ctx.accountId,amount:ctx.amount,paymentToken:paymentToken,idempotencyKey:ctx.idempotencyKey,billing:ctx.billing,metadata:ctx.metadata,cardMetadata:card,authorizationConfirmed:true});
+        payStatus('Submitted for administrator approval. No card charge has occurred.','success');
+        var box=el('nmiPaymentResult');if(box){box.classList.remove('hidden');box.innerHTML='<h4>Submitted for Admin Approval</h4><div class="nmiResultGrid"><div><span>Amount</span><b>'+h(cash(request.amount||ctx.amount))+'</b></div><div><span>Status</span><b>Waiting for Administrator</b></div><div><span>Card</span><b>'+h([request.cardBrand||card.brand,(request.cardLast4||card.last4)?'•••• '+(request.cardLast4||card.last4):''].filter(Boolean).join(' ')||'Securely vaulted by NMI')+'</b></div><div><span>Expires</span><b>'+h(formatApprovalDate(request.expiresAt))+'</b></div></div><div class="nmiEmployeeApprovalBanner">The account balance has not changed. An administrator will receive this request in Payment Approvals.</div>'}
+        toast(cash(request.amount||ctx.amount)+' was submitted for administrator approval. The card was not charged.','success','Approval Request Submitted',8000);
+        try{if(window.CollectJS&&CollectJS.clearInputs)CollectJS.clearInputs()}catch(e){}
+        refreshNmiApprovalBadge();
+      }else{
+        payStatus('NMI is processing the administrator-approved card charge. Do not retry.','processing');
+        var result=await invoke({action:'sale',accountId:ctx.accountId,amount:ctx.amount,paymentToken:paymentToken,idempotencyKey:ctx.idempotencyKey,billing:ctx.billing,metadata:ctx.metadata,cardMetadata:card});
+        payStatus('Payment approved and posted to the account ledger.','success');
+        var resultBox=el('nmiPaymentResult');if(resultBox){resultBox.classList.remove('hidden');resultBox.innerHTML='<h4>Payment Approved</h4><div class="nmiResultGrid"><div><span>Amount</span><b>'+h(cash(result.amount||ctx.amount))+'</b></div><div><span>Receipt</span><b>'+h(result.receipt_number||result.receiptNumber||'Generated')+'</b></div><div><span>Balance After</span><b>'+h(cash(result.balance_after!=null?result.balance_after:result.balanceAfter))+'</b></div><div><span>NMI Transaction</span><b>'+h(result.transactionId||'')+'</b></div></div>'}
+        if(el('nmiReceiptButton'))el('nmiReceiptButton').style.display='inline-flex';
+        toast(cash(result.amount||ctx.amount)+' was approved and posted to the ledger.','success','Payment Approved',8000);
+        try{if(window.CollectJS&&CollectJS.clearInputs)CollectJS.clearInputs()}catch(e){}
+        await refreshPaymentAccount(ctx.accountId,'nmi-admin-sale');
+      }
+    }catch(error){var d=error.details||{};if(d.gatewayApproved||d.needsReview){payStatus((error.message||s(error))+' Transaction: '+s(d.transactionId)+' — DO NOT RETRY.','error');toast('NMI may have approved this transaction. Do not retry. Review transaction '+s(d.transactionId||'')+'.','error','Manual Review Required',12000)}else{payStatus(error.message||s(error),'error');toast(error.message||s(error),'error','Payment Request Not Completed',9000)}}finally{setPayBusy(false)}
+  };
+
+  async function refreshPaymentAccount(accountId,source){
+    try{if(typeof loadAccounts==='function')await loadAccounts()}catch(e){}
+    if(typeof currentAccountId!=='undefined'&&accountId)currentAccountId=accountId;
+    try{if(typeof loadPaymentLedgerForCurrent==='function')await loadPaymentLedgerForCurrent()}catch(e){}
+    try{if(typeof renderPaymentPlanSummary==='function')await renderPaymentPlanSummary(accountId)}catch(e){}
+    try{if(typeof loadHistory==='function')await loadHistory(accountId)}catch(e){}
+    try{if(typeof render==='function')render()}catch(e){}
+    try{if(typeof cpcmQueueDynamicStatsRefresh==='function')cpcmQueueDynamicStatsRefresh(source||'nmi-approval',100)}catch(e){}
+  }
+  function formatApprovalDate(value){if(!value)return '—';var d=new Date(value);return isNaN(d.getTime())?s(value):d.toLocaleString()}
+  function statusClass(value){return s(value).toLowerCase().replace(/[^a-z_]/g,'_')}
+  function approvalLabel(value){var x=s(value).toLowerCase();return {pending:'Waiting for Admin',processing:'Processing',approved:'Approved',declined:'Declined by Admin',cancelled:'Cancelled',expired:'Expired',gateway_declined:'Gateway Declined',failed:'Failed',needs_review:'Needs Review',vaulting:'Securing Card'}[x]||s(value||'Unknown')}
+  function setQueueStatus(message,type){var node=el('nmiApprovalQueueStatus');if(!node)return;node.textContent=message;node.className='nmiPaymentStatus'+(type?' '+type:'')}
+
+  window.openNmiApprovalQueue=async function(){
+    var modal=el('nmiApprovalModal');if(!modal)return toast('The Payment Approvals screen is unavailable.','error','Missing Approval Screen');
+    var isAdmin=admin();
+    if(el('nmiApprovalTitle'))el('nmiApprovalTitle').textContent=isAdmin?'Payment Approvals':'My Payment Requests';
+    if(el('nmiApprovalSub'))el('nmiApprovalSub').textContent=isAdmin?'Review employee-submitted card requests and decide whether to charge the card.':'Track payment information you submitted for administrator review.';
+    if(el('nmiApprovalHeroTitle'))el('nmiApprovalHeroTitle').textContent=isAdmin?'Only an administrator can process a submitted card.':'Your submitted card information cannot be charged by an employee.';
+    if(el('nmiApprovalHeroText'))el('nmiApprovalHeroText').textContent=isAdmin?'Approving processes the exact employee-entered amount. Declining removes the temporary NMI vault record.':'An administrator must approve the exact amount before NMI processes a sale.';
+    modal.classList.add('open');await window.loadNmiApprovalQueue(true);
+  };
+  window.loadNmiApprovalQueue=async function(showLoading){
+    if(showLoading)setQueueStatus('Loading secure payment requests…','processing');
+    try{var data=await invoke({action:'list_approval_requests'});renderApprovalRequests(data.requests||[]);setQueueStatus((data.requests||[]).length?'Payment requests are current.':'No payment requests were found.','');refreshNmiApprovalBadgeFromData(data)}catch(error){setQueueStatus(error.message||s(error),'error');if(el('nmiApprovalList'))el('nmiApprovalList').innerHTML='<div class="nmiApprovalEmpty">Unable to load payment requests.</div>'}
+  };
+  function refreshNmiApprovalBadgeFromData(data){var count=Number(data.pendingCount||0),badge=el('nmiApprovalBadge'),button=el('nmiApprovalNavButton');if(badge){badge.textContent=count>99?'99+':s(count);badge.classList.toggle('hidden',count<1)}if(button)button.childNodes[0].nodeValue=admin()?'Approvals ':'My Payments '}
+  window.refreshNmiApprovalBadge=async function(){if(!s(actor().email))return;try{var data=await invoke({action:'approval_count'});refreshNmiApprovalBadgeFromData(data)}catch(e){}}
+  function renderApprovalRequests(rows){
+    var list=el('nmiApprovalList');if(!list)return;var pending=0,approved=0,closed=0;
+    rows.forEach(function(r){var st=s(r.status).toLowerCase();if(st==='pending'||st==='processing'||st==='vaulting')pending++;else if(st==='approved')approved++;else closed++});
+    if(el('nmiApprovalPendingStat'))el('nmiApprovalPendingStat').textContent=pending;if(el('nmiApprovalApprovedStat'))el('nmiApprovalApprovedStat').textContent=approved;if(el('nmiApprovalClosedStat'))el('nmiApprovalClosedStat').textContent=closed;
+    list.innerHTML=rows.map(function(r){
+      var st=s(r.status).toLowerCase(),canApprove=admin()&&st==='pending',canCancel=!admin()&&st==='pending';
+      var actions='';if(canApprove)actions='<div class="nmiApprovalActions"><button class="danger" onclick="declineNmiApproval(\''+h(r.id)+'\')">Decline Request</button><button class="green" onclick="approveNmiApproval(\''+h(r.id)+'\')">Approve & Process</button></div>';else if(canCancel)actions='<div class="nmiApprovalActions"><button class="danger" onclick="cancelNmiApproval(\''+h(r.id)+'\')">Cancel Request</button></div>';
+      return '<div class="nmiApprovalCard '+statusClass(st)+'"><div class="nmiApprovalTop"><div><div class="nmiApprovalName">'+h(r.consumerName||'Consumer')+'</div><div class="nmiApprovalAccount">Account '+h(r.accountNumber||'—')+'</div><span class="nmiApprovalStatus">'+h(approvalLabel(st))+'</span></div><div class="nmiApprovalAmount">'+h(cash(r.amount))+'</div></div><div class="nmiApprovalGrid"><div><span>Submitted By</span><b>'+h(r.requestedByEmail||'—')+'</b></div><div><span>Submitted</span><b>'+h(formatApprovalDate(r.createdAt))+'</b></div><div><span>Card</span><b>'+h([r.cardBrand,r.cardLast4?'•••• '+r.cardLast4:''].filter(Boolean).join(' ')||'NMI secure reference')+'</b></div><div><span>Expires</span><b>'+h(formatApprovalDate(r.expiresAt))+'</b></div><div><span>Reviewed By</span><b>'+h(r.reviewedByEmail||'—')+'</b></div><div><span>Reviewed</span><b>'+h(formatApprovalDate(r.reviewedAt))+'</b></div><div><span>NMI Transaction</span><b>'+h(r.gatewayTransactionId||'—')+'</b></div><div><span>Balance at Request</span><b>'+h(cash(r.balanceAtRequest))+'</b></div></div>'+(r.authorizationNotes?'<div class="nmiApprovalNotes"><b>Authorization / Notes:</b> '+h(r.authorizationNotes)+'</div>':'')+(r.decisionNotes?'<div class="nmiApprovalNotes"><b>Decision:</b> '+h(r.decisionNotes)+'</div>':'')+actions+'</div>';
+    }).join('')||'<div class="nmiApprovalEmpty">No payment requests yet.</div>';
+  }
+  window.approveNmiApproval=async function(id){if(!admin())return toast('Only an administrator can approve and process a card.','error','Admin Required');if(approvalActionBusy[id])return;if(!confirm('Approve this exact payment request and process the card through NMI now?'))return;approvalActionBusy[id]=true;setQueueStatus('Processing the approved payment through NMI. Do not click again…','processing');try{var result=await invoke({action:'approve_request',requestId:id,idempotencyKey:'approve-'+id});toast(cash(result.amount)+' was approved, charged, and posted to the ledger.','success','Payment Approved',9000);await window.loadNmiApprovalQueue(false);await refreshPaymentAccount(result.accountId,'nmi-approved-request')}catch(error){var d=error.details||{};if(d.gatewayApproved||d.needsReview)toast('NMI may have approved this card. Do not retry. Review transaction '+s(d.transactionId||'')+'.','error','Manual Review Required',13000);else toast(error.message||s(error),'error','Approval Not Completed',10000);await window.loadNmiApprovalQueue(false)}finally{approvalActionBusy[id]=false;setQueueStatus('Payment requests are current.','')}};
+  window.declineNmiApproval=async function(id){if(!admin())return;var notes=prompt('Reason for declining this payment request:','');if(notes===null)return;if(!confirm('Decline this request and remove the temporary NMI card reference?'))return;try{await invoke({action:'decline_request',requestId:id,decisionNotes:notes,idempotencyKey:'decline-'+id});toast('The payment request was declined. No card charge occurred.','success','Request Declined',7000);await window.loadNmiApprovalQueue(false)}catch(error){toast(error.message||s(error),'error','Decline Not Completed',9000)}};
+  window.cancelNmiApproval=async function(id){if(admin())return;if(!confirm('Cancel this pending payment request? No card charge will occur.'))return;try{await invoke({action:'cancel_request',requestId:id,idempotencyKey:'cancel-'+id});toast('Your pending payment request was cancelled.','success','Request Cancelled',6500);await window.loadNmiApprovalQueue(false)}catch(error){toast(error.message||s(error),'error','Cancellation Not Completed',9000)}};
+
+  function initialize(){if(el('nmiApprovalNavButton'))el('nmiApprovalNavButton').childNodes[0].nodeValue=admin()?'Approvals ':'My Payments ';setTimeout(window.refreshNmiApprovalBadge,1200);setInterval(window.refreshNmiApprovalBadge,20000)}
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',initialize);else initialize();
+  window.CPCM_NMI_APPROVAL_QUEUE_BUILD=BUILD;
+  window.dispatchEvent(new CustomEvent('cpcm:nmi-approval-queue-ready',{detail:{build:BUILD}}));
 })();
 </script>
 
