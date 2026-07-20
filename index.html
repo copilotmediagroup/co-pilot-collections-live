@@ -11,7 +11,7 @@
 <!-- DOCUMENT_BRANDING_TYPED_ESIGN_R4_2026_07_18: brand logo/name on documents + company Created By + DocuSign-style typed signature chooser -->
 
 <head>
-<!-- STABLE_SINGLE_FILE_QA_LOCK_2026_07_20_R8N11: LIVE Dynamic Activity + Live Statistics -->
+<!-- STABLE_SINGLE_FILE_QA_LOCK_2026_07_20_R8N12: LIVE NMI Phase 1 Secure Card Payments -->
 <!-- LIVE_COMPLIANCE_GUARD_MARKER: compliance guard + call rules -->
 <!-- LIVE_REPORTING_CLEAN_PACKAGE_MARKER: clean live package + admin reports -->
 <!-- LIVE_REPORTING_CLEAN_PACKAGE_MARKER: clean live package + admin reports -->
@@ -3596,6 +3596,14 @@ button {
 /* QUICK ACTIONS TOP — CONTACT PANEL REMOVED — R8N9 */
 .right > .quickActions{margin-top:0!important;order:-10}
 </style>
+
+<style id="cpcmNmiPhase1Style">
+.nmiQuickAction{background:linear-gradient(90deg,#eefbf5,#f8fffc);border-color:#b7ead2!important}.nmiQuickAction .qaIcon{background:#0f9f6e!important;color:#fff!important}
+.nmiBox{width:min(980px,96vw)!important;max-width:980px!important}.nmiModalSub{font-size:11px;color:#64748b;font-weight:800;margin-top:3px}.nmiAccountStrip{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:12px}.nmiAccountStrip>div{border:1px solid #dbe5f1;background:#f8fbff;border-radius:12px;padding:11px}.nmiAccountStrip span{display:block;font-size:9px;font-weight:1000;letter-spacing:.06em;color:#64748b;text-transform:uppercase;margin-bottom:5px}.nmiAccountStrip b{font-size:14px;color:#0f172a;word-break:break-word}.nmiSecurityNote{border:1px solid #b7ead2;background:#ecfdf5;color:#065f46;border-radius:12px;padding:10px 12px;font-size:12px;margin-bottom:12px}.nmiGrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:11px}.nmiGrid label{font-size:10px;font-weight:950;color:#334155;text-transform:uppercase;letter-spacing:.03em}.nmiGrid input,.nmiGrid textarea{width:100%;box-sizing:border-box}.nmiWide{grid-column:1/-1}.nmiCardFields{display:grid;grid-template-columns:2fr 1fr 1fr;gap:11px;padding:12px;border:1px solid #cbd8e7;background:#f8fafc;border-radius:14px}.nmiHostedField{height:44px;border:1px solid #cbd5e1;border-radius:9px;background:#fff;overflow:hidden;box-shadow:inset 0 1px 2px rgba(15,23,42,.04)}.nmiHostedField iframe{width:100%!important;height:44px!important;border:0!important}.nmiConsent{display:flex;gap:9px;align-items:flex-start;margin-top:13px;padding:11px;border:1px solid #dbe5f1;background:#f8fafc;border-radius:12px;font-size:12px;font-weight:800;color:#334155}.nmiConsent input{margin-top:2px}.nmiPaymentStatus{margin-top:10px;border-radius:10px;padding:10px 12px;background:#eff6ff;border:1px solid #bfdbfe;color:#1e40af;font-size:12px;font-weight:850}.nmiPaymentStatus.processing{background:#fff7ed;border-color:#fed7aa;color:#9a3412}.nmiPaymentStatus.success{background:#ecfdf5;border-color:#a7f3d0;color:#065f46}.nmiPaymentStatus.error{background:#fef2f2;border-color:#fecaca;color:#991b1b}.nmiPaymentResult{margin-top:10px;border-radius:12px;border:1px solid #a7f3d0;background:#ecfdf5;padding:12px;color:#064e3b;font-size:12px}.nmiPaymentResult h4{margin:0 0 8px;font-size:15px}.nmiResultGrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.nmiResultGrid div{background:#fff;border:1px solid #d1fae5;border-radius:9px;padding:8px}.nmiResultGrid span{display:block;font-size:9px;text-transform:uppercase;color:#64748b;font-weight:900}.nmiResultGrid b{display:block;margin-top:4px;word-break:break-word}.nmiFooterActions{display:flex;gap:9px;justify-content:flex-end;flex-wrap:wrap;margin-top:13px}.nmiSetupWarning{border:1px solid #fdba74;background:#fff7ed;color:#9a3412;border-radius:12px;padding:11px;margin-bottom:12px;font-size:12px;font-weight:850}.nmiGatewayPill{display:inline-flex;align-items:center;border-radius:999px;padding:4px 8px;background:#dcfce7;color:#166534;font-size:10px;font-weight:950}.nmiActionButtons{display:flex;gap:5px;flex-wrap:wrap}.nmiActionButtons button{padding:6px 8px;font-size:10px}.nmiActionButtons .danger{background:#fee2e2;color:#991b1b;border:1px solid #fecaca}.hidden{display:none!important}
+@media(max-width:820px){.nmiAccountStrip{grid-template-columns:repeat(2,1fr)}.nmiGrid{grid-template-columns:1fr 1fr}.nmiCardFields{grid-template-columns:1fr 1fr}.nmiCardFields>div:first-child{grid-column:1/-1}.nmiResultGrid{grid-template-columns:1fr}}
+@media(max-width:560px){.nmiAccountStrip,.nmiGrid,.nmiCardFields{grid-template-columns:1fr}.nmiCardFields>div:first-child{grid-column:auto}.nmiFooterActions button{width:100%}}
+</style>
+
 </head>
 <body>
 <div id="loginScreen" class="loginScreen open">
@@ -3786,6 +3794,7 @@ button {
         <div class="panelTitle"><h3>Quick Actions</h3></div>
         <div class="qaItem" onclick="openPaymentTrackerForCurrent()"><span class="qaLeft"><span class="qaIcon">🧾</span>Record Payment Promise</span><span>›</span></div>
         <div class="qaItem" onclick="openPaymentPlan()"><span class="qaLeft"><span class="qaIcon">💳</span>Payment Plan Schedule</span><span>›</span></div>
+        <div class="qaItem nmiQuickAction" onclick="openNmiPayment()"><span class="qaLeft"><span class="qaIcon">🔒</span>Secure Card Payment (NMI)</span><span>›</span></div>
         <div class="qaItem" onclick="openPaymentLedger()"><span class="qaLeft"><span class="qaIcon">💵</span>Record Payment / Ledger</span><span>›</span></div>
         <div class="qaItem" onclick="openDocumentGenerator()"><span class="qaLeft"><span class="qaIcon">🧾</span>Create Debtor Letter / PDF</span><span>›</span></div>
         <div class="qaItem" onclick="openFollowUpModal('Callback')"><span class="qaLeft"><span class="qaIcon">📅</span>Schedule Callback / Follow-Up</span><span>›</span></div>
@@ -4366,6 +4375,48 @@ button {
 <div id="permissionsModal" class="modal"><div class="modalbox powerBox"><div class="modalhead"><h2>Role Permissions</h2><button class="gray" onclick="closeModal('permissionsModal')">Close</button></div><div class="modalbody"><div class="powerWarning">This stores role permissions for your CRM. Current hard rules still remain: admin controls imports/exports/assignments; employees work assigned accounts.</div><div class="powerTableWrap"><table class="powerTable"><thead><tr><th>Permission</th><th>Admin</th><th>Manager</th><th>Collector</th></tr></thead><tbody id="permissionsBody"></tbody></table></div><div style="text-align:right;margin-top:12px"><button class="green" onclick="savePermissions()">Save Permissions</button></div></div></div></div>
 
 
+
+<div id="nmiPaymentModal" class="modal"><div class="modalbox nmiBox">
+  <div class="modalhead">
+    <div><h2>Secure Card Payment</h2><div class="nmiModalSub">NMI hosted card fields • One-time credit/debit payment</div></div>
+    <button class="gray" onclick="closeModal('nmiPaymentModal')">Close</button>
+  </div>
+  <div class="modalbody">
+    <div id="nmiSetupWarning" class="nmiSetupWarning hidden"></div>
+    <div class="nmiAccountStrip">
+      <div><span>Consumer</span><b id="nmiConsumerName">—</b></div>
+      <div><span>Account</span><b id="nmiAccountNumber">—</b></div>
+      <div><span>Current Balance</span><b id="nmiCurrentBalance">$0.00</b></div>
+      <div><span>Balance After</span><b id="nmiBalanceAfter">$0.00</b></div>
+    </div>
+    <div class="nmiSecurityNote"><b>Secure card entry:</b> Card number, expiration date, and CVV are entered inside NMI-hosted fields. Co Pilot does not store the full card number or CVV.</div>
+    <div class="nmiGrid">
+      <div><label>Payment Amount</label><input id="nmiAmount" type="number" min="0.01" step="0.01" oninput="updateNmiPaymentPreview()" placeholder="0.00"></div>
+      <div><label>Cardholder Name</label><input id="nmiCardholderName" autocomplete="cc-name"></div>
+      <div class="nmiWide"><label>Billing Address</label><input id="nmiAddress1" autocomplete="billing street-address"></div>
+      <div><label>City</label><input id="nmiCity" autocomplete="billing address-level2"></div>
+      <div><label>State</label><input id="nmiState" maxlength="2" autocomplete="billing address-level1"></div>
+      <div><label>ZIP Code</label><input id="nmiZip" autocomplete="billing postal-code"></div>
+      <div><label>Email for Account Record</label><input id="nmiEmail" type="email" autocomplete="email"></div>
+      <div><label>Phone</label><input id="nmiPhone" autocomplete="tel"></div>
+      <div class="nmiWide nmiCardFields">
+        <div><label>Card Number</label><div id="nmiCcNumber" class="nmiHostedField"></div></div>
+        <div><label>Expiration</label><div id="nmiCcExp" class="nmiHostedField"></div></div>
+        <div><label>CVV</label><div id="nmiCvv" class="nmiHostedField"></div></div>
+      </div>
+      <div class="nmiWide"><label>Internal Notes</label><textarea id="nmiNotes" placeholder="Optional authorization or payment notes. Do not enter full card information."></textarea></div>
+    </div>
+    <label class="nmiConsent"><input id="nmiAuthorization" type="checkbox"> I confirm the consumer authorized this one-time card charge for the amount shown.</label>
+    <div id="nmiPaymentStatus" class="nmiPaymentStatus">Ready for secure card entry.</div>
+    <div id="nmiPaymentResult" class="nmiPaymentResult hidden"></div>
+    <div class="nmiFooterActions">
+      <button class="outline" onclick="openPaymentLedger()">Open Ledger</button>
+      <button class="outline" id="nmiReceiptButton" style="display:none" onclick="openNmiReceiptCenter()">Open Receipt Center</button>
+      <button class="green" id="nmiPayButton" onclick="startNmiPayment()">Process Secure Payment</button>
+    </div>
+  </div>
+</div></div>
+
 <div id="paymentLedgerModal" class="modal"><div class="modalbox ledgerBox">
   <div class="modalhead"><h2>Payment Ledger / Record Payment</h2><button class="gray" onclick="closeModal('paymentLedgerModal')">Close</button></div>
   <div class="modalbody">
@@ -4394,7 +4445,7 @@ button {
     </div>
     <div class="ledgerTableWrap">
       <table class="ledgerTable">
-        <thead><tr><th>Date</th><th>Type</th><th>Amount</th><th>Method</th><th>Status</th><th>Balance Before</th><th>Balance After</th><th>Receipt</th><th>Entered By</th><th>Notes</th></tr></thead>
+        <thead><tr><th>Date</th><th>Type</th><th>Amount</th><th>Method</th><th>Status</th><th>Gateway</th><th>Balance Before</th><th>Balance After</th><th>Receipt</th><th>Entered By</th><th>Notes</th><th>Actions</th></tr></thead>
         <tbody id="ledgerHistoryBody"></tbody>
       </table>
     </div>
@@ -4888,6 +4939,7 @@ button {
   };
 </script>
 <script src="/config.js"></script>
+<script src="/nmi-config.js"></script>
 <script>
 const ADMIN_EMAIL='afinch2678@gmail.com';
 const ADMIN_EMAILS=[ADMIN_EMAIL].map(e=>e.toLowerCase());
@@ -9197,6 +9249,7 @@ async function runQaHealthCheck(){
     ['todayDashboardModal','Today dashboard'],
     ['followUpModal','Follow-up modal'],
     ['paymentLedgerModal','Payment ledger'],
+    ['nmiPaymentModal','NMI secure card payment'],
     ['paymentPlanModal','Payment plan modal'],
     ['employeeAdminModal','Manage employees'],
     ['employeeMonitorModal','Employee monitor'],
@@ -12259,7 +12312,7 @@ function exportContactIntelligenceCSV(){let calls=filteredContactCalls();let row
   if(window.__cpcmSystemQaVersionLockLoaded) return;
   window.__cpcmSystemQaVersionLockLoaded = true;
   var BUILD_NAME = "Co Pilot Collections Manager — Stability QA / Version Lock";
-  var BUILD_VERSION = "STABLE_SINGLE_FILE_QA_LOCK_2026_07_20_R8N11";
+  var BUILD_VERSION = "STABLE_SINGLE_FILE_QA_LOCK_2026_07_20_R8N12";
   var EXPECTED_ENV = "LIVE";
   var EXPECTED_URL = "https://bwvufgzbkaymffwxuuzr.supabase.co";
   var EXPECTED_KEY_PREFIX = "sb_publishable_cvwkN3fOovsYvAvzXvrmRA";
@@ -12314,6 +12367,8 @@ function exportContactIntelligenceCSV(){let calls=filteredContactCalls();let row
     checks.push(line('Build marker installed', !!window.__cpcmSystemQaVersionLockLoaded, BUILD_VERSION));
     checks.push(line('Client remittance module installed', !!window.CPCM_CLIENT_REMITTANCE_BUILD, window.CPCM_CLIENT_REMITTANCE_BUILD||'Missing R8 module'));
     checks.push(line('Dynamic call attempts + live statistics installed', !!window.CPCM_DYNAMIC_ACTIVITY_STATS_BUILD, window.CPCM_DYNAMIC_ACTIVITY_STATS_BUILD||'Missing R8N11 dynamic statistics module'));
+    checks.push(line('NMI Phase 1 secure payments installed', !!window.CPCM_NMI_PHASE1_BUILD&&!!document.getElementById('nmiPaymentModal'), window.CPCM_NMI_PHASE1_BUILD||'Missing NMI payment module'));
+    checks.push(line('NMI private key excluded from browser', !String(document.documentElement.innerHTML).includes('NMI_PRIVATE_API_KEY='), 'Private API key must remain in Supabase Secrets only'));
     checks.push(line('Document PDF engine loaded', !!(window.html2canvas&&window.jspdf&&window.jspdf.jsPDF), 'Local html2canvas + jsPDF'));
     checks.push(line('DocuSign-style typed signature controls loaded', !!(window.downloadCurrentDocumentPDF&&window.clearDocumentSignature&&window.applyTypedDocumentSignature&&window.selectDocumentSignatureStyle), 'Document Builder PDF + typed signature chooser'));
     return checks;
@@ -12347,7 +12402,7 @@ function exportContactIntelligenceCSV(){let calls=filteredContactCalls();let row
   function ensurePage(){
     var p=document.getElementById('cpcmSystemQaPage'); if(p) return p;
     p=document.createElement('div'); p.id='cpcmSystemQaPage';
-    p.innerHTML='<div class="cpcmQaTop"><div><div class="cpcmQaTitle">System Check + Version Lock</div><div class="cpcmQaSub">'+esc(BUILD_NAME)+' • '+esc(BUILD_VERSION)+' • '+esc(EXPECTED_ENV)+'</div></div><div class="cpcmQaActions"><button class="cpcmQaBtn green" onclick="window.cpcmRunSystemCheck()">Run Check</button><button class="cpcmQaBtn white" onclick="window.cpcmCopySystemDiagnostics()">Copy Diagnostics</button><button class="cpcmQaBtn gray" onclick="window.cpcmCloseSystemCheck()">Back to App</button></div></div><div class="cpcmQaWrap"><div class="cpcmQaNote">This screen is a safe admin QA checklist. It does not change account data. Use it after every ZIP upload to verify environment, layout, admin detection, and core app sections before adding new features.</div><div id="cpcmQaMetrics" class="cpcmQaGrid"></div><div class="cpcmQaCard"><div class="cpcmQaCardHead"><div class="cpcmQaCardTitle">Automatic Checks</div><span class="cpcmQaPill info">Safe read-only</span></div><div class="cpcmQaCardBody" id="cpcmQaChecks"></div></div><div class="cpcmQaCard"><div class="cpcmQaCardHead"><div class="cpcmQaCardTitle">Manual Smoke Test Checklist</div><span class="cpcmQaPill warn">Click through after upload</span></div><div class="cpcmQaCardBody"><div class="cpcmQaManual"><div>1. Login works</div><div>2. Queue opens first 5 accounts</div><div>3. Notes save and stay after refresh</div><div>4. Employee can create payment plan</div><div>5. Admin can edit/delete payment plan</div><div>6. Compliance Guard opens</div><div>7. Reports full page opens and Back works</div><div>8. Chat opens without blocking screen</div><div>9. Pay Desk / Ledger open</div><div>10. Tickler opens</div><div>11. Scorecards opens</div><div>12. Receipt downloads as a PDF matching Preview</div><div>13. Electronic signature appears above Authorized Representative</div><div>14. No plain raw HTML layout</div><div>15. Clicking a phone number adds exactly one Call Attempt</div><div>16. Saving the outcome updates that same call instead of adding a second call</div><div>17. Calls, Monitor, Reports, and Scorecards refresh after activity</div></div></div></div><div class="cpcmQaCard"><div class="cpcmQaCardHead"><div class="cpcmQaCardTitle">Diagnostics</div><button class="cpcmQaBtn" onclick="window.cpcmCopySystemDiagnostics()">Copy</button></div><div class="cpcmQaCardBody"><pre id="cpcmQaDiag" class="cpcmQaCode"></pre></div></div></div>';
+    p.innerHTML='<div class="cpcmQaTop"><div><div class="cpcmQaTitle">System Check + Version Lock</div><div class="cpcmQaSub">'+esc(BUILD_NAME)+' • '+esc(BUILD_VERSION)+' • '+esc(EXPECTED_ENV)+'</div></div><div class="cpcmQaActions"><button class="cpcmQaBtn green" onclick="window.cpcmRunSystemCheck()">Run Check</button><button class="cpcmQaBtn white" onclick="window.cpcmCopySystemDiagnostics()">Copy Diagnostics</button><button class="cpcmQaBtn gray" onclick="window.cpcmCloseSystemCheck()">Back to App</button></div></div><div class="cpcmQaWrap"><div class="cpcmQaNote">This screen is a safe admin QA checklist. It does not change account data. Use it after every ZIP upload to verify environment, layout, admin detection, and core app sections before adding new features.</div><div id="cpcmQaMetrics" class="cpcmQaGrid"></div><div class="cpcmQaCard"><div class="cpcmQaCardHead"><div class="cpcmQaCardTitle">Automatic Checks</div><span class="cpcmQaPill info">Safe read-only</span></div><div class="cpcmQaCardBody" id="cpcmQaChecks"></div></div><div class="cpcmQaCard"><div class="cpcmQaCardHead"><div class="cpcmQaCardTitle">Manual Smoke Test Checklist</div><span class="cpcmQaPill warn">Click through after upload</span></div><div class="cpcmQaCardBody"><div class="cpcmQaManual"><div>1. Login works</div><div>2. Queue opens first 5 accounts</div><div>3. Notes save and stay after refresh</div><div>4. Employee can create payment plan</div><div>5. Admin can edit/delete payment plan</div><div>6. Compliance Guard opens</div><div>7. Reports full page opens and Back works</div><div>8. Chat opens without blocking screen</div><div>9. Pay Desk / Ledger open</div><div>10. Tickler opens</div><div>11. Scorecards opens</div><div>12. Receipt downloads as a PDF matching Preview</div><div>13. Electronic signature appears above Authorized Representative</div><div>14. No plain raw HTML layout</div><div>15. Clicking a phone number adds exactly one Call Attempt</div><div>16. Saving the outcome updates that same call instead of adding a second call</div><div>17. Calls, Monitor, Reports, and Scorecards refresh after activity</div><div>18. NMI secure card fields load after public key is pasted</div><div>19. Approved NMI test payment posts once to ledger and balance</div><div>20. Admin refund/void changes balance only after NMI approval</div></div></div></div><div class="cpcmQaCard"><div class="cpcmQaCardHead"><div class="cpcmQaCardTitle">Diagnostics</div><button class="cpcmQaBtn" onclick="window.cpcmCopySystemDiagnostics()">Copy</button></div><div class="cpcmQaCardBody"><pre id="cpcmQaDiag" class="cpcmQaCode"></pre></div></div></div>';
     document.body.appendChild(p); return p;
   }
   function addButton(){
@@ -13457,5 +13512,232 @@ function exportContactIntelligenceCSV(){let calls=filteredContactCalls();let row
 })();
 
 </script>
+
+<script id="cpcmNmiPhase1Module">
+(function(){
+  'use strict';
+  var BUILD='STABLE_SINGLE_FILE_QA_LOCK_2026_07_20_R8N12';
+  var collectPromise=null, collectConfigured=false, paymentBusy=false, paymentContext=null, lastReceipt=null;
+  function byId(id){return document.getElementById(id)}
+  function cfg(){return window.CO_PILOT_NMI_CONFIG||{}}
+  function str(v){return String(v==null?'':v)}
+  function amount(v){var n=Number(str(v).replace(/[^0-9.-]/g,''));return isFinite(n)?Math.round(n*100)/100:0}
+  function usd(v){return amount(v).toLocaleString('en-US',{style:'currency',currency:'USD'})}
+  function nmiKey(){return str(cfg().publicTokenizationKey).trim()}
+  function keyReady(){var key=nmiKey();return !!key&&!/PASTE_|YOUR_|REPLACE_/i.test(key)&&key.length>12}
+  function uuid(){return (window.crypto&&crypto.randomUUID)?crypto.randomUUID():'nmi-'+Date.now()+'-'+Math.random().toString(36).slice(2)}
+  function isAdmin(){return !!(window.currentUser&&(currentUser.isAdmin||str(currentUser.role).toLowerCase()==='admin'||str(currentUser.email).toLowerCase()==='afinch2678@gmail.com'))}
+  function status(text,type){var el=byId('nmiPaymentStatus');if(!el)return;el.textContent=text;el.className='nmiPaymentStatus'+(type?' '+type:'')}
+  function setBusy(on){paymentBusy=!!on;var btn=byId('nmiPayButton');if(btn){btn.disabled=!!on;btn.textContent=on?'Processing — Do Not Close':'Process Secure Payment'}}
+  function field(id){return byId(id)?byId(id).value.trim():''}
+  function current(){return typeof getCurrent==='function'?getCurrent():null}
+  function firstPhone(a){try{return typeof phones==='function'?(phones(a)[0]||''):(a.phone1||'')}catch(e){return a&&a.phone1||''}}
+  function setField(id,value){if(byId(id))byId(id).value=value==null?'':value}
+  function safeHtml(v){return typeof esc==='function'?esc(v):str(v).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
+
+  window.updateNmiPaymentPreview=function(){
+    var a=current(), bal=typeof accountBalance==='function'?accountBalance(a):0, pay=amount(field('nmiAmount'));
+    if(byId('nmiCurrentBalance'))byId('nmiCurrentBalance').textContent=usd(bal);
+    if(byId('nmiBalanceAfter'))byId('nmiBalanceAfter').textContent=usd(Math.max(0,bal-pay));
+  };
+
+  function configureCollect(){
+    if(!window.CollectJS||!byId('nmiCcNumber'))return false;
+    try{
+      CollectJS.configure({
+        variant:'inline',
+        styleSniffer:false,
+        customCss:{'background-color':'#ffffff','color':'#0f172a','font-size':'15px','font-family':'Arial, Helvetica, sans-serif','padding':'12px','height':'42px','line-height':'20px'},
+        invalidCss:{'color':'#b91c1c','background-color':'#fff7f7'},
+        validCss:{'color':'#0f172a','background-color':'#ffffff'},
+        placeholderCss:{'color':'#94a3b8'},
+        fields:{
+          ccnumber:{selector:'#nmiCcNumber',title:'Card Number',placeholder:'0000 0000 0000 0000'},
+          ccexp:{selector:'#nmiCcExp',title:'Expiration Date',placeholder:'MM / YY'},
+          cvv:{selector:'#nmiCvv',title:'CVV',placeholder:'CVV'}
+        },
+        timeoutDuration:15000,
+        timeoutCallback:function(){setBusy(false);status('NMI secure fields did not respond. Check the public tokenization key and internet connection.','error')},
+        fieldsAvailableCallback:function(){status('Secure card fields loaded. Enter payment information and confirm authorization.','')},
+        callback:window.cpcmNmiCollectCallback
+      });
+      collectConfigured=true;
+      return true;
+    }catch(e){status('Unable to configure NMI secure fields: '+(e.message||e),'error');return false}
+  }
+
+  function loadCollect(){
+    if(window.CollectJS){configureCollect();return Promise.resolve(true)}
+    if(collectPromise)return collectPromise;
+    if(!keyReady())return Promise.reject(new Error('Paste the NMI public tokenization key into public/nmi-config.js first.'));
+    collectPromise=new Promise(function(resolve,reject){
+      var prior=byId('cpcmNmiCollectScript');
+      if(prior)prior.remove();
+      var script=document.createElement('script');
+      script.id='cpcmNmiCollectScript';
+      script.src='https://secure.nmi.com/token/Collect.js';
+      script.setAttribute('data-tokenization-key',nmiKey());
+      script.setAttribute('data-variant','inline');
+      script.async=true;
+      script.onload=function(){setTimeout(function(){if(configureCollect())resolve(true);else reject(new Error('Collect.js loaded but could not configure the card fields.'))},50)};
+      script.onerror=function(){reject(new Error('NMI Collect.js could not be loaded.'))};
+      document.head.appendChild(script);
+    }).catch(function(e){collectPromise=null;throw e});
+    return collectPromise;
+  }
+
+  window.openNmiPayment=async function(){
+    var a=current();if(!a)return alert('No account selected.');
+    var modal=byId('nmiPaymentModal');if(!modal)return alert('NMI payment screen is unavailable.');
+    lastReceipt=null;paymentContext=null;setBusy(false);
+    if(byId('nmiPaymentResult')){byId('nmiPaymentResult').classList.add('hidden');byId('nmiPaymentResult').innerHTML=''}
+    if(byId('nmiReceiptButton'))byId('nmiReceiptButton').style.display='none';
+    if(byId('nmiAuthorization'))byId('nmiAuthorization').checked=false;
+    if(byId('nmiConsumerName'))byId('nmiConsumerName').textContent=typeof nameOf==='function'?nameOf(a):str(a.fullName||'Consumer');
+    if(byId('nmiAccountNumber'))byId('nmiAccountNumber').textContent=typeof acctNo==='function'?acctNo(a):str(a.accountNumber||'');
+    setField('nmiAmount','');setField('nmiCardholderName',typeof nameOf==='function'?nameOf(a):a.fullName||'');
+    setField('nmiAddress1',a.address||'');setField('nmiCity',a.city||'');setField('nmiState',a.state||'');setField('nmiZip',a.zip||'');
+    setField('nmiEmail',a.email||'');setField('nmiPhone',firstPhone(a));setField('nmiNotes','');
+    window.updateNmiPaymentPreview();
+    var warning=byId('nmiSetupWarning');
+    if(warning){warning.classList.toggle('hidden',keyReady());warning.textContent=keyReady()?'':'NMI is not configured yet. Paste only the public tokenization key into public/nmi-config.js, then deploy the Edge Functions and add the private key in Supabase Secrets.'}
+    modal.classList.add('open');
+    if(!keyReady()){status('NMI setup is incomplete. No payment can be submitted.','error');return}
+    status('Loading NMI secure card fields…','processing');
+    try{await loadCollect();if(window.CollectJS&&CollectJS.clearInputs)CollectJS.clearInputs()}catch(e){status(e.message||String(e),'error')}
+  };
+
+  window.startNmiPayment=async function(){
+    if(paymentBusy)return;
+    var a=current();if(!a)return alert('No account selected.');
+    if(!keyReady())return status('Paste the NMI public tokenization key into public/nmi-config.js first.','error');
+    var pay=amount(field('nmiAmount')), bal=typeof accountBalance==='function'?accountBalance(a):0;
+    if(pay<=0)return status('Enter a payment amount greater than zero.','error');
+    if(pay>bal+0.01)return status('Payment cannot exceed the current balance of '+usd(bal)+'.','error');
+    if(!field('nmiCardholderName'))return status('Enter the cardholder name.','error');
+    if(!field('nmiZip'))return status('Enter the billing ZIP code.','error');
+    if(!byId('nmiAuthorization').checked)return status('Confirm the consumer authorized this one-time charge.','error');
+    try{
+      await loadCollect();
+      paymentContext={
+        accountId:a.id,amount:pay,idempotencyKey:'sale-'+uuid(),
+        billing:{cardholderName:field('nmiCardholderName'),address1:field('nmiAddress1'),city:field('nmiCity'),state:field('nmiState'),zip:field('nmiZip'),email:field('nmiEmail'),phone:field('nmiPhone')},
+        metadata:{source:'Co Pilot LIVE NMI Phase 1',notes:field('nmiNotes'),billingEmail:field('nmiEmail'),billingPhone:field('nmiPhone'),accountNumber:typeof acctNo==='function'?acctNo(a):a.accountNumber||'',consumerName:typeof nameOf==='function'?nameOf(a):a.fullName||''}
+      };
+      setBusy(true);status('Securing card information with NMI… Do not close or press the button again.','processing');
+      CollectJS.startPaymentRequest();
+    }catch(e){setBusy(false);status(e.message||String(e),'error')}
+  };
+
+  async function invokeNmi(body){
+    if(typeof ensureFreshToken==='function')await ensureFreshToken();
+    var functionName=str(cfg().edgeFunctionName||'nmi-payments');
+    var response=await fetch(url()+'/functions/v1/'+encodeURIComponent(functionName),{
+      method:'POST',
+      headers:{'Content-Type':'application/json','apikey':pubKey(),'Authorization':'Bearer '+token()},
+      body:JSON.stringify(body)
+    });
+    var data={};try{data=await response.json()}catch(e){data={error:'The payment service returned an unreadable response.'}}
+    if(!response.ok||!data.success){var err=new Error(data.error||'The NMI request was not approved.');err.details=data;throw err}
+    return data;
+  }
+
+  window.cpcmNmiCollectCallback=async function(response){
+    if(!paymentContext){setBusy(false);return status('Payment context expired. Reopen the payment screen and try again.','error')}
+    var ctx=paymentContext;paymentContext=null;
+    var tokenized=response&&response.token;
+    if(!tokenized){setBusy(false);return status('NMI did not return a payment token. Check the card fields and try again.','error')}
+    try{
+      status('NMI is processing the card. Do not retry or close this screen.','processing');
+      var masked=str(response&&response.card&&response.card.number), digits=masked.replace(/\D/g,'');
+      var result=await invokeNmi({action:'sale',accountId:ctx.accountId,amount:ctx.amount,paymentToken:tokenized,idempotencyKey:ctx.idempotencyKey,billing:ctx.billing,metadata:ctx.metadata,cardMetadata:{brand:str(response&&response.card&&response.card.type),last4:digits.slice(-4)}});
+      lastReceipt=result.receipt_number||result.receiptNumber||'';
+      status('Payment approved and posted to the account ledger.','success');
+      var box=byId('nmiPaymentResult');
+      if(box){box.classList.remove('hidden');box.innerHTML='<h4>Payment Approved</h4><div class="nmiResultGrid"><div><span>Amount</span><b>'+safeHtml(usd(result.amount||ctx.amount))+'</b></div><div><span>Receipt</span><b>'+safeHtml(lastReceipt||'Generated')+'</b></div><div><span>Balance After</span><b>'+safeHtml(usd(result.balance_after!=null?result.balance_after:result.balanceAfter))+'</b></div><div><span>NMI Transaction</span><b>'+safeHtml(result.transactionId||result.gateway_transaction_id||'')+'</b></div><div><span>Authorization</span><b>'+safeHtml(result.authorizationCode||'—')+'</b></div><div><span>Card</span><b>'+safeHtml([result.card_brand||result.cardBrand||'',(result.card_last4||result.cardLast4)?'•••• '+(result.card_last4||result.cardLast4):''].filter(Boolean).join(' ')||'Masked by NMI')+'</b></div></div>'}
+      if(byId('nmiReceiptButton'))byId('nmiReceiptButton').style.display='inline-flex';
+      try{if(window.CollectJS&&CollectJS.clearInputs)CollectJS.clearInputs()}catch(e){}
+      var activeId=ctx.accountId;
+      if(typeof loadAccounts==='function')await loadAccounts();
+      if(typeof currentAccountId!=='undefined')currentAccountId=activeId;
+      if(typeof loadPaymentLedgerForCurrent==='function')await loadPaymentLedgerForCurrent();
+      if(typeof renderPaymentPlanSummary==='function')await renderPaymentPlanSummary(activeId).catch(function(){});
+      if(typeof loadHistory==='function')await loadHistory(activeId).catch(function(){});
+      if(typeof render==='function')render();
+      if(typeof cpcmQueueDynamicStatsRefresh==='function')cpcmQueueDynamicStatsRefresh('nmi-sale',100);
+    }catch(e){
+      var details=e.details||{};
+      if(details.gatewayApproved||details.needsReview){status((e.message||e)+' Transaction: '+str(details.transactionId||'')+' — DO NOT RETRY.','error')}
+      else status(e.message||String(e),'error');
+    }finally{setBusy(false)}
+  };
+
+  window.openNmiReceiptCenter=function(){
+    if(typeof closeModal==='function')closeModal('nmiPaymentModal');
+    if(typeof openReceiptsLettersPage==='function')return openReceiptsLettersPage('receipt');
+    if(typeof openDocumentGenerator==='function')return openDocumentGenerator();
+    alert('Receipt '+(lastReceipt||'')+' is saved in the Payment Ledger.');
+  };
+
+  async function refreshAfterAdjustment(accountId){
+    if(typeof loadAccounts==='function')await loadAccounts();
+    if(typeof currentAccountId!=='undefined')currentAccountId=accountId;
+    if(typeof loadPaymentLedgerForCurrent==='function')await loadPaymentLedgerForCurrent();
+    if(typeof renderPaymentPlanSummary==='function')await renderPaymentPlanSummary(accountId).catch(function(){});
+    if(typeof loadHistory==='function')await loadHistory(accountId).catch(function(){});
+    if(typeof render==='function')render();
+    if(typeof cpcmQueueDynamicStatsRefresh==='function')cpcmQueueDynamicStatsRefresh('nmi-adjustment',100);
+  }
+
+  window.nmiVoidPayment=async function(ledgerId){
+    if(!isAdmin())return alert('Admin only.');
+    var row=(window.paymentLedgerData||[]).find(function(x){return str(x.id)===str(ledgerId)});if(!row)return alert('Payment ledger row not found.');
+    if(!confirm('Void this NMI payment? A void is intended for an unsettled transaction and will add the amount back to the account balance only after NMI approves it.'))return;
+    try{
+      var result=await invokeNmi({action:'void',originalLedgerId:ledgerId,idempotencyKey:'void-'+uuid(),metadata:{source:'Payment Ledger',accountNumber:typeof acctNo==='function'?acctNo(current()):''}});
+      alert('NMI void approved. '+usd(result.amount)+' was added back to the account balance.');
+      await refreshAfterAdjustment(row.accountId||row.account_id);
+    }catch(e){alert(e.message||String(e))}
+  };
+
+  window.nmiRefundPayment=async function(ledgerId){
+    if(!isAdmin())return alert('Admin only.');
+    var row=(window.paymentLedgerData||[]).find(function(x){return str(x.id)===str(ledgerId)});if(!row)return alert('Payment ledger row not found.');
+    var remaining=Math.max(0,amount(row.amount)-amount(row.refundedAmount||row.refunded_amount));
+    var requested=prompt('Refund amount (maximum '+usd(remaining)+'):',remaining.toFixed(2));if(requested===null)return;
+    var refund=amount(requested);if(refund<=0||refund>remaining+0.01)return alert('Enter a refund amount from $0.01 to '+usd(remaining)+'.');
+    if(!confirm('Refund '+usd(refund)+' through NMI and add it back to the account balance?'))return;
+    try{
+      var result=await invokeNmi({action:'refund',originalLedgerId:ledgerId,amount:refund,idempotencyKey:'refund-'+uuid(),metadata:{source:'Payment Ledger',accountNumber:typeof acctNo==='function'?acctNo(current()):''}});
+      alert('NMI refund approved. '+usd(result.amount)+' was added back to the account balance.');
+      await refreshAfterAdjustment(row.accountId||row.account_id);
+    }catch(e){alert(e.message||String(e))}
+  };
+
+  window.nmiLedgerActions=function(row){
+    if(!isAdmin()||str(row.gatewayProvider||row.gateway_provider).toUpperCase()!=='NMI'||str(row.paymentType||row.payment_type).toLowerCase()!=='payment'||!str(row.gatewayTransactionId||row.gateway_transaction_id))return '—';
+    var remaining=Math.max(0,amount(row.amount)-amount(row.refundedAmount||row.refunded_amount));
+    if(remaining<=0.009)return '<span class="nmiGatewayPill">Fully reversed</span>';
+    return '<div class="nmiActionButtons"><button class="outline" onclick="nmiVoidPayment(\''+safeHtml(row.id)+'\')">Void</button><button class="danger" onclick="nmiRefundPayment(\''+safeHtml(row.id)+'\')">Refund</button></div>';
+  };
+
+  // Replace only the account-ledger renderer; the existing save and dashboard logic remains intact.
+  window.loadPaymentLedgerForCurrent=async function(){
+    var a=current();if(!a)return;
+    var rows=[];try{rows=(await dbFetch('/payments_ledger?account_id=eq.'+encodeURIComponent(a.id)+'&select=*&order=payment_date.desc,created_at.desc&limit=500')).map(toCamel)}catch(e){rows=[]}
+    window.paymentLedgerData=rows;
+    var body=byId('ledgerHistoryBody');if(!body)return;
+    body.innerHTML=rows.map(function(r){
+      var provider=str(r.gatewayProvider||r.gateway_provider), gateway=provider?'<span class="nmiGatewayPill">'+safeHtml(provider)+'</span><div style="font-size:9px;color:#64748b;margin-top:4px">'+safeHtml(r.gatewayStatus||r.gateway_status||'')+'</div>':'—';
+      var cls=(r.paymentType==='Payment'||r.paymentType==='Adjustment Credit')?'green':'red';
+      return '<tr><td>'+safeHtml(r.paymentDate||str(r.createdAt||'').slice(0,10))+'</td><td><span class="ledgerPill '+cls+'">'+safeHtml(r.paymentType||'Payment')+'</span></td><td><b>'+usd(r.amount)+'</b></td><td>'+safeHtml(r.paymentMethod||'')+'</td><td>'+safeHtml(r.status||'')+'</td><td>'+gateway+'</td><td>'+usd(r.balanceBefore)+'</td><td>'+usd(r.balanceAfter)+'</td><td>'+safeHtml(r.receiptNumber||'')+'</td><td>'+safeHtml(r.createdByEmail||'')+'</td><td>'+safeHtml(r.notes||'')+'</td><td>'+window.nmiLedgerActions(r)+'</td></tr>';
+    }).join('')||'<tr><td colspan="12"><div class="powerEmpty">No payment ledger entries yet.</div></td></tr>';
+  };
+
+  window.CPCM_NMI_PHASE1_BUILD=BUILD;
+  window.dispatchEvent(new CustomEvent('cpcm:nmi-phase1-ready',{detail:{build:BUILD}}));
+})();
+</script>
+
 </body>
 </html>

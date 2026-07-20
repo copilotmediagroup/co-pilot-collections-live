@@ -115,3 +115,25 @@ R8N11 DYNAMIC ACTIVITY + STATISTICS (LIVE)
 [ ] Call Intelligence, Reports, and Scorecards refresh after activity
 [ ] Account timeline shows Call Attempt and Call Result
 [ ] Second-browser activity appears on an open admin analytics screen within about 12 seconds
+
+
+LIVE NMI PHASE 1 R8N12
+[ ] Revoke the private NMI key that was previously exposed and create a replacement
+[ ] Run RUN_THIS_NMI_PHASE1_LIVE_R8N12.sql in LIVE Supabase
+[ ] Paste only the public tokenization key into public/nmi-config.js
+[ ] Deploy nmi-payments and nmi-webhook Edge Functions to project bwvufgzbkaymffwxuuzr
+[ ] Add NMI_PRIVATE_API_KEY in Supabase Edge Function Secrets
+[ ] Create the NMI webhook and add NMI_WEBHOOK_SIGNING_KEY in Supabase Secrets
+[ ] Secure Card Payment opens NMI-hosted card fields
+[ ] Approved payment creates exactly one ledger payment and reduces balance once
+[ ] Declined payment creates no completed ledger payment and does not reduce balance
+[ ] Double-clicking Process Payment cannot produce duplicate charges
+[ ] Existing payment plan receives the approved payment against oldest unpaid installments
+[ ] Account history, Payments Dashboard, Reports, Scorecards, remittance, and receipt data refresh
+[ ] Employee cannot process a payment on an account assigned to another employee
+[ ] Client Portal user cannot access staff-entered card processing
+[ ] Only admin sees and can use NMI Void and Refund controls
+[ ] Approved void/refund creates a reversal ledger row and adds amount back to account balance
+[ ] NMI webhook rejects missing/invalid signatures
+[ ] External NMI refund/void not initiated in Co Pilot is marked for manual review, not silently applied
+[ ] No private key or full card/CVV appears in source, browser storage, database, logs, receipts, or GitHub
