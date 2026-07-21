@@ -1,0 +1,19 @@
+CO PILOT COLLECTIONS LIVE — R8N19.8 CAMPAIGN START DIAL FIX
+
+Fixes the confirmed issue where a campaign could move from Draft to Completed without a Twilio call being created.
+
+Changes:
+- Start/Resume now performs the first dispatch_batch inside the same Edge Function request.
+- The selected campaign account is sent to Twilio before the campaign can complete.
+- The frontend displays whether Twilio received a call, the campaign is waiting for capacity, or no callable accounts remained.
+- Added Edge Function logs for campaign control, queue scan, account dialing, Twilio success/failure, and dispatch completion.
+- Uses test_phone_override first when present.
+
+INSTALL:
+1. Upload this package to the root of the LIVE GitHub repository.
+2. Preserve public/config.js / public/nmi-config.js if your deployed project has environment-specific values.
+3. Redeploy supabase/functions/voice-broadcast/index.ts.
+4. No SQL changes are required.
+
+BUILD BADGE:
+STABLE_SINGLE_FILE_QA_LOCK_2026_07_20_R8N19_8
