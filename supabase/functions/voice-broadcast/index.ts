@@ -301,21 +301,27 @@ async function dispatchBatch(admin: any, actor: any, input: any) {
       if (!supabaseUrl) throw new Error("SUPABASE_URL is unavailable.");
       const webhookBase = `${supabaseUrl}/functions/v1/voice-broadcast-webhook`;
       const { fromNumber } = twilioSecrets();
+      const liveMessage = firstText(campaign.live_message_text, "Please hold while we connect your call.");
+      const gatherUrl = `${webhookBase}?route=gather&callRowId=${encodeURIComponent(call.id)}`;
+      const dialCompleteUrl = `${webhookBase}?route=dial-complete&callRowId=${encodeURIComponent(call.id)}`;
+      const transferNumber = normalizePhone(campaign.transfer_number);
+      const initialTwiml = campaign.connect_mode === "auto_transfer"
+        ? `<Response><Pause length="2"/><Say voice="alice">${xmlEscape(liveMessage)}</Say><Dial answerOnBridge="true" timeout="25" callerId="${xmlEscape(fromNumber)}" action="${xmlEscape(dialCompleteUrl)}" method="POST"><Number>${xmlEscape(transferNumber)}</Number></Dial><Hangup/></Response>`
+        : `<Response><Pause length="2"/><Gather input="dtmf" numDigits="1" timeout="8" actionOnEmptyResult="true" action="${xmlEscape(gatherUrl)}" method="POST"><Say voice="alice">${xmlEscape(liveMessage)}</Say></Gather><Say voice="alice">We did not receive a response. Goodbye.</Say><Hangup/></Response>`;
       const params = new URLSearchParams();
       params.set("To", selectedPhone);
       params.set("From", fromNumber);
-      params.set("Url", `${webhookBase}?route=answer&callRowId=${encodeURIComponent(call.id)}`);
-      params.set("Method", "POST");
+      params.set("Twiml", initialTwiml);
       params.set("StatusCallback", `${webhookBase}?route=status&callRowId=${encodeURIComponent(call.id)}`);
       params.set("StatusCallbackMethod", "POST");
       for (const event of ["initiated", "ringing", "answered", "completed"]) params.append("StatusCallbackEvent", event);
       params.set("Timeout", "25");
-      // Do not use synchronous Twilio Answering Machine Detection here.
-      // AMD holds the call in silence before Twilio requests the answer webhook,
-      // and keypad noise can cause only part of the message to play.
-      // Press-1 campaigns must begin speaking immediately after answer.
+      params.set("MachineDetection", campaign.leave_voicemail ? "DetectMessageEnd" : "Enable");
+      params.set("MachineDetectionTimeout", campaign.leave_voicemail ? "45" : "20");
+      params.set("MachineDetectionSpeechThreshold", "2000");
+      params.set("MachineDetectionSpeechEndThreshold", "1500");
 
-      console.log("[voice-broadcast] dialing account", { campaignId, campaignAccountId: candidate.id, accountId: account.id, phoneNumber: selectedPhone });
+      console.log("[voice-broadcast] dialing account with inline TwiML", { campaignId, campaignAccountId: candidate.id, accountId: account.id, phoneNumber: selectedPhone, connectMode: campaign.connect_mode });
       const payload = await twilioRequest("/Calls.json", "POST", params);
       const providerSid = firstText(payload.sid);
       await admin.from("voice_broadcast_calls").update({

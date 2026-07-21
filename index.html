@@ -14072,7 +14072,7 @@ function exportContactIntelligenceCSV(){let calls=filteredContactCalls();let row
 <script id="cpcmVoiceBroadcastR8N19Script">
 (function(){
   'use strict';
-  var BUILD='STABLE_SINGLE_FILE_QA_LOCK_2026_07_21_R8N19_14';
+  var BUILD='STABLE_SINGLE_FILE_QA_LOCK_2026_07_21_R8N19_10';
   var state={tab:'campaigns',settings:null,campaigns:[],rows:[],calls:[],busy:false,pumping:false,poll:null,pump:null,selectedCampaignId:'',campaignDraft:{},campaignMode:'filters',selectedAccountIds:[],accountSearch:''};
   function el(id){return document.getElementById(id)}
   function s(v){return String(v==null?'':v)}
@@ -14193,81 +14193,24 @@ function exportContactIntelligenceCSV(){let calls=filteredContactCalls();let row
 
 
 <style>
-#cpcmLiveTransferTray{position:fixed;right:20px;bottom:72px;z-index:2147483000;width:min(410px,calc(100vw - 28px));display:none}.ltCard{background:#07111f;color:#fff;border:1px solid #2dd4bf;border-radius:16px;box-shadow:0 24px 70px rgba(0,0,0,.5);overflow:hidden}.ltHead{display:flex;justify-content:space-between;align-items:center;padding:12px 14px;background:linear-gradient(90deg,#0f766e,#0f172a);font-weight:950}.ltPulse{width:10px;height:10px;border-radius:50%;background:#5eead4;box-shadow:0 0 0 0 rgba(94,234,212,.65);animation:ltPulse 1.2s infinite}@keyframes ltPulse{70%{box-shadow:0 0 0 12px rgba(94,234,212,0)}100%{box-shadow:0 0 0 0 rgba(94,234,212,0)}}.ltBody{padding:15px}.ltName{font-size:21px;font-weight:950}.ltMeta{color:#cbd5e1;font-size:13px;line-height:1.55;margin-top:5px}.ltAuto{margin-top:10px;padding:9px 10px;border-radius:9px;background:#0f2f2c;color:#99f6e4;font-size:12px;font-weight:800}.ltActions{display:flex;gap:8px;margin-top:14px}.ltBtn{border:0;border-radius:10px;padding:11px 14px;font-weight:950;cursor:pointer}.ltOpen{background:#22c55e;color:#052e16;flex:1}.ltDismiss{background:#334155;color:#fff}
+#cpcmLiveTransferTray{position:fixed;right:20px;bottom:72px;z-index:2147483000;width:min(390px,calc(100vw - 28px));display:none}.ltCard{background:#07111f;color:#fff;border:1px solid #2dd4bf;border-radius:16px;box-shadow:0 24px 70px rgba(0,0,0,.5);overflow:hidden}.ltHead{display:flex;justify-content:space-between;align-items:center;padding:12px 14px;background:linear-gradient(90deg,#0f766e,#0f172a);font-weight:950}.ltPulse{width:10px;height:10px;border-radius:50%;background:#5eead4;box-shadow:0 0 0 0 rgba(94,234,212,.65);animation:ltPulse 1.2s infinite}@keyframes ltPulse{70%{box-shadow:0 0 0 12px rgba(94,234,212,0)}100%{box-shadow:0 0 0 0 rgba(94,234,212,0)}}.ltBody{padding:15px}.ltName{font-size:21px;font-weight:950}.ltMeta{color:#cbd5e1;font-size:13px;line-height:1.55;margin-top:5px}.ltActions{display:flex;gap:8px;margin-top:14px}.ltBtn{border:0;border-radius:10px;padding:11px 14px;font-weight:950;cursor:pointer}.ltOpen{background:#22c55e;color:#052e16;flex:1}.ltDismiss{background:#334155;color:#fff}.ltClaimed{padding:14px;color:#cbd5e1;text-align:center}
 </style>
 <div id="cpcmLiveTransferTray"></div>
 <script>
 (function(){
-  var active=null,busy=false,lastAutoOpenedId='',dismissed={},originalTitle=document.title;
+  var active=null,busy=false,lastSeen='';
   function escx(v){return String(v==null?'':v).replace(/[&<>"']/g,function(c){return({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]})}
   function valx(o){return o===undefined||o===null?'':String(o)}
-  function allAccounts(){try{return Array.isArray(accounts)?accounts:[]}catch(e){return []}}
-  function acct(id){return allAccounts().find(function(a){return String(a.id)===String(id)})||null}
-  function rowName(row,a){return row.consumer_name||(a&&(a.fullName||a.full_name||[a.firstName||a.first_name,a.lastName||a.last_name].filter(Boolean).join(' ')))||'Account'}
-  function rowAccount(row,a){return row.account_number||(a&&(a.accountNumber||a.account_number||a.clientAccountNumber||a.client_account_number))||''}
-  function rowBalance(row,a){var n=Number(row.balance!=null?row.balance:(a&&(a.currentBalance||a.current_balance||a.originalBalance||a.original_balance))||0);return n.toLocaleString('en-US',{style:'currency',currency:'USD'})}
-  function fp(v){var d=valx(v).replace(/\D/g,'');if(d.length===11&&d[0]==='1')d=d.slice(1);return d.length===10?'('+d.slice(0,3)+') '+d.slice(3,6)+'-'+d.slice(6):v||'Number unavailable'}
-  function loggedIn(){try{return typeof token==='function'&&!!token()}catch(e){return false}}
-  function clearAccountFilters(){
-    ['search','globalSearch'].forEach(function(id){var e=document.getElementById(id);if(e){e.value='';e.dispatchEvent(new Event('input',{bubbles:true}))}});
-    ['statusFilter','portfolioFilter'].forEach(function(id){var e=document.getElementById(id);if(e)e.value=''});
-  }
-  function openExactAccount(accountId){
-    if(!accountId)return false;
-    var a=acct(accountId);if(!a)return false;
-    clearAccountFilters();
-    try{if(typeof window.closeVoiceBroadcast==='function')window.closeVoiceBroadcast()}catch(e){}
-    try{if(typeof setCurrent==='function'){setCurrent(accountId);return true}}catch(e){console.warn('setCurrent failed',e)}
-    try{currentAccountId=accountId}catch(e){} window.currentAccountId=accountId;
-    try{if(typeof render==='function'){render();return true}}catch(e){console.warn('render failed',e)}
-    return false;
-  }
-  async function loadExactAccount(row){
-    if(!row||!row.account_id||acct(row.account_id)||typeof dbFetch!=='function')return;
-    var found=await dbFetch('/accounts?id=eq.'+encodeURIComponent(row.account_id)+'&select=*&limit=1');
-    if(found&&found[0]){
-      var converted=(typeof toCamel==='function')?toCamel(found[0]):found[0];
-      try{if(Array.isArray(accounts)&&!accounts.some(function(a){return String(a.id)===String(converted.id)}))accounts.push(converted)}catch(e){}
-    }
-  }
-  async function ensureAccountAndOpen(row){
-    if(!row||!row.account_id||lastAutoOpenedId===row.id)return;
-    try{await loadExactAccount(row)}catch(e){console.warn('Transferred account load failed',e)}
-    if(openExactAccount(row.account_id))lastAutoOpenedId=row.id;
-  }
-  function draw(){
-    var tray=document.getElementById('cpcmLiveTransferTray');if(!tray)return;
-    if(!active){tray.style.display='none';tray.innerHTML='';document.title=originalTitle;return}
-    var a=acct(active.account_id),phone=active.called_number||active.phone_number;
-    document.title='INCOMING: '+fp(phone)+' — '+originalTitle;
-    tray.style.display='block';
-    tray.innerHTML='<div class="ltCard"><div class="ltHead"><span style="display:flex;align-items:center;gap:9px"><span class="ltPulse"></span> INCOMING ACCOUNT</span><span>'+escx(fp(phone))+'</span></div><div class="ltBody"><div class="ltName">'+escx(rowName(active,a))+'</div><div class="ltMeta"><b>Called number:</b> '+escx(fp(phone))+'<br><b>Account:</b> '+escx(rowAccount(active,a)||'—')+'<br><b>Balance:</b> '+escx(rowBalance(active,a))+'</div><div class="ltAuto">The matching Co Pilot account is opening now. Answer the RingCentral call, then claim it.</div><div class="ltActions"><button class="ltBtn ltOpen" onclick="window.cpcmOpenLiveTransferAccount()">Open Account</button><button class="ltBtn ltOpen" onclick="window.cpcmClaimLiveTransfer()">Claim Call</button><button class="ltBtn ltDismiss" onclick="window.cpcmDismissLiveTransfer()">Hide</button></div></div></div>';
-  }
-  async function poll(){
-    if(busy||!loggedIn()||typeof dbFetch!=='function')return;
-    busy=true;
-    try{
-      var rows=await dbFetch('/voice_broadcast_live_transfers?status=in.(waiting,connected)&expires_at=gt.'+encodeURIComponent(new Date().toISOString())+'&select=*&order=created_at.desc&limit=20');
-      var row=(rows||[]).find(function(r){return !dismissed[r.id]})||null;
-      active=row;
-      draw();
-      if(row)await ensureAccountAndOpen(row);
-    }catch(e){console.error('LIVE TRANSFER POPUP FAILED:',e)}finally{busy=false}
-  }
-  window.cpcmDismissLiveTransfer=function(){if(active)dismissed[active.id]=true;active=null;draw()};
-  window.cpcmOpenLiveTransferAccount=function(){if(active){ensureAccountAndOpen(active);draw()}};
-  window.cpcmClaimLiveTransfer=async function(){
-    if(!active||busy)return;busy=true;
-    try{
-      var email='';try{email=String(currentUser&&currentUser.email||'').toLowerCase()}catch(e){}
-      var rows=await dbFetch('/voice_broadcast_live_transfers?id=eq.'+encodeURIComponent(active.id)+'&status=in.(waiting,connected)',{method:'PATCH',headers:{Prefer:'return=representation'},body:JSON.stringify({status:'claimed',claimed_by_email:email,claimed_at:new Date().toISOString(),updated_at:new Date().toISOString()})});
-      if(!rows||!rows.length)throw new Error('Another collector already claimed this call.');
-      await ensureAccountAndOpen(active);active=null;draw();
-    }catch(e){alert(e.message||String(e));active=null;draw()}finally{busy=false;setTimeout(poll,250)}
-  };
-  window.cpcmTestLiveTransferPopup=function(row){active=row;draw();ensureAccountAndOpen(row)};
-  setInterval(poll,750);setTimeout(poll,300);
-  window.addEventListener('focus',poll);document.addEventListener('visibilitychange',function(){if(!document.hidden)poll()});
+  function acct(id){return (typeof accounts!=='undefined'?accounts:[]).find(function(a){return a.id===id})||null}
+  function nm(a){return a?(a.fullName||a.full_name||[a.firstName||a.first_name,a.lastName||a.last_name].filter(Boolean).join(' ')||'Account'):'Account'}
+  function an(a){return a?(a.accountNumber||a.account_number||a.clientAccountNumber||a.client_account_number||''):''}
+  function bal(a){var n=Number(a&&(a.currentBalance||a.current_balance||a.originalBalance||a.original_balance)||0);return n.toLocaleString('en-US',{style:'currency',currency:'USD'})}
+  function fp(v){var d=valx(v).replace(/\D/g,'');if(d.length===11&&d[0]==='1')d=d.slice(1);return d.length===10?'('+d.slice(0,3)+') '+d.slice(3,6)+'-'+d.slice(6):v||''}
+  async function poll(){if(busy||typeof currentUser==='undefined'||!currentUser.email||typeof dbFetch!=='function')return;busy=true;try{var rows=await dbFetch('/voice_broadcast_live_transfers?status=eq.waiting&expires_at=gt.'+encodeURIComponent(new Date().toISOString())+'&select=*&order=created_at.asc&limit=1');var row=rows&&rows[0];if(row){active=row;draw()}else{active=null;draw()}}catch(e){}finally{busy=false}}
+  function draw(){var tray=document.getElementById('cpcmLiveTransferTray');if(!tray)return;if(!active){tray.style.display='none';tray.innerHTML='';return}var a=acct(active.account_id);tray.style.display='block';tray.innerHTML='<div class="ltCard"><div class="ltHead"><span style="display:flex;align-items:center;gap:9px"><span class="ltPulse"></span> LIVE TRANSFER INCOMING</span><span>'+escx(fp(active.phone_number))+'</span></div><div class="ltBody"><div class="ltName">'+escx(nm(a))+'</div><div class="ltMeta">Account: '+escx(an(a)||'—')+'<br>Balance: '+escx(bal(a))+'<br>The collector who answered the RingCentral call should claim this account.</div><div class="ltActions"><button class="ltBtn ltOpen" onclick="window.cpcmClaimLiveTransfer()">Claim & Open Account</button><button class="ltBtn ltDismiss" onclick="window.cpcmDismissLiveTransfer()">Hide</button></div></div></div>'}
+  window.cpcmDismissLiveTransfer=function(){var tray=document.getElementById('cpcmLiveTransferTray');if(tray)tray.style.display='none'};
+  window.cpcmClaimLiveTransfer=async function(){if(!active||busy)return;busy=true;try{var email=String(currentUser.email||'').toLowerCase();var rows=await dbFetch('/voice_broadcast_live_transfers?id=eq.'+encodeURIComponent(active.id)+'&status=eq.waiting',{method:'PATCH',headers:{Prefer:'return=representation'},body:JSON.stringify({status:'claimed',claimed_by_email:email,claimed_at:new Date().toISOString(),updated_at:new Date().toISOString()})});if(!rows||!rows.length)throw new Error('Another collector already claimed this account.');var id=active.account_id;active=null;draw();try{if(typeof window.closeVoiceBroadcast==='function')window.closeVoiceBroadcast()}catch(e){}window.currentAccountId=id;try{currentAccountId=id}catch(e){}if(typeof window.render==='function')window.render();else if(typeof render==='function')render();}catch(e){alert(e.message||String(e));active=null;draw()}finally{busy=false;setTimeout(poll,300)}};
+  setInterval(poll,2000);setTimeout(poll,1500);
 })();
 </script>
 </body>
