@@ -1,0 +1,30 @@
+CO PILOT COLLECTIONS LIVE — R8N19.6
+ADMIN TEST OVERRIDE NUMBER
+
+WHAT THIS BUILD ADDS
+- Admin-only Test Override Number inside Update Contact Info.
+- Accepts a controlled test phone without changing Phone 1 or Phone 2.
+- Normalizes US 10-digit numbers to +1 E.164 format.
+- Voice Broadcast campaign creation prioritizes the test override.
+- The voice-broadcast Edge Function re-checks and prioritizes the override when each call launches, including campaigns created before the override was saved.
+- The transferred call remains tied to the original account ID, so Claim & Open Account opens the exact test account.
+- Clear Test Override button for returning the account to its real phone numbers.
+
+INSTALL
+1. Upload the package contents to the LIVE GitHub repository root.
+2. Preserve public/nmi-config.js.
+3. Run SQL_TO_RUN_IN_SUPABASE/R8N19_6_ADMIN_TEST_OVERRIDE_NUMBER.sql in LIVE Supabase.
+4. Redeploy supabase/functions/voice-broadcast/index.ts.
+5. The voice-broadcast-webhook from R8N19.5 remains valid and does not need changes.
+
+TEST
+1. Open any saved account as admin.
+2. Quick Actions > Update Contact Info.
+3. Enter your phone in Admin Test Override Number and save.
+4. Create a one-account broadcast containing that account.
+5. Start the campaign, answer, press 1, then answer the RingCentral queue.
+6. In the collector browser, click Claim & Open Account.
+7. Clear the override before using the account in a live campaign.
+
+BUILD BADGE
+STABLE_SINGLE_FILE_QA_LOCK_2026_07_20_R8N19_6

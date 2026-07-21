@@ -3920,6 +3920,12 @@ button {
       <div><label>Email</label><input id="contactEmail"></div>
       <div><label>Phone 1</label><input id="contactPhone1"></div>
       <div><label>Phone 2</label><input id="contactPhone2"></div>
+      <div id="contactTestOverrideWrap" style="display:none;grid-column:1/-1;border:1px solid #bfdbfe;background:#eff6ff;border-radius:12px;padding:12px">
+        <label style="color:#1d4ed8">Admin Test Override Number</label>
+        <input id="contactTestOverride" inputmode="tel" autocomplete="off" placeholder="Use your own number for a full broadcast test">
+        <div class="muted" style="margin-top:6px">When present, voice-broadcast campaigns call this test number while keeping the account tied to the original consumer record. Clear it before using the account in a live campaign.</div>
+        <button type="button" class="gray" style="margin-top:9px" onclick="clearContactTestOverride()">Clear Test Override</button>
+      </div>
       <div><label>Address</label><input id="contactAddress"></div>
       <div><label>City</label><input id="contactCity"></div>
       <div><label>State</label><input id="contactState"></div>
@@ -8899,18 +8905,37 @@ function openContactUpdate(){
  document.getElementById('contactEmail').value=a.email||'';
  document.getElementById('contactPhone1').value=a.phone1||'';
  document.getElementById('contactPhone2').value=a.phone2||'';
+ let testWrap=document.getElementById('contactTestOverrideWrap');
+ if(testWrap)testWrap.style.display=currentUser&&currentUser.isAdmin?'block':'none';
+ let testInput=document.getElementById('contactTestOverride');
+ if(testInput)testInput.value=a.testPhoneOverride||a.test_phone_override||'';
  document.getElementById('contactAddress').value=a.address||'';
  document.getElementById('contactCity').value=a.city||'';
  document.getElementById('contactState').value=a.state||'';
  document.getElementById('contactZip').value=a.zip||'';
  document.getElementById('contactModal').classList.add('open');
 }
+function normalizeAccountTestPhone(value){
+ let digits=String(value||'').replace(/\D/g,'');
+ if(!digits)return '';
+ if(digits.length===10)return '+1'+digits;
+ if(digits.length===11&&digits.startsWith('1'))return '+'+digits;
+ if(digits.length>=8&&digits.length<=15)return '+'+digits;
+ return '';
+}
+function clearContactTestOverride(){let input=document.getElementById('contactTestOverride');if(input)input.value=''}
 async function saveContactUpdate(){
  let a=getCurrent();if(!a)return;
  let body={email:document.getElementById('contactEmail').value.trim(),phone1:document.getElementById('contactPhone1').value.trim(),phone2:document.getElementById('contactPhone2').value.trim(),address:document.getElementById('contactAddress').value.trim(),city:document.getElementById('contactCity').value.trim(),state:document.getElementById('contactState').value.trim(),zip:document.getElementById('contactZip').value.trim(),updatedAt:new Date().toISOString()};
  let db={};Object.entries(body).forEach(([k,v])=>{if(reverse[k])db[reverse[k]]=v});
+ if(currentUser&&currentUser.isAdmin){
+   let raw=document.getElementById('contactTestOverride')?.value||'';
+   let normalized=normalizeAccountTestPhone(raw);
+   if(raw.trim()&&!normalized)return alert('Enter a valid test phone number with 10 to 15 digits.');
+   db.test_phone_override=normalized||null;
+ }
  let updated=(await dbFetch(`/accounts?id=eq.${a.id}`,{method:'PATCH',body:JSON.stringify(db)}))[0];
- await insertActivity(a.id,'Contact Updated','Contact info updated');
+ await insertActivity(a.id,'Contact Updated','Contact info updated'+(db.test_phone_override?' with an admin test broadcast override.':db.test_phone_override===null?' and the test broadcast override cleared.':''));
  let i=accounts.findIndex(x=>x.id===a.id);if(i>=0)accounts[i]=toCamel(updated);
  closeModal('contactModal');render();
 }
@@ -14047,7 +14072,7 @@ function exportContactIntelligenceCSV(){let calls=filteredContactCalls();let row
 <script id="cpcmVoiceBroadcastR8N19Script">
 (function(){
   'use strict';
-  var BUILD='STABLE_SINGLE_FILE_QA_LOCK_2026_07_20_R8N19_5';
+  var BUILD='STABLE_SINGLE_FILE_QA_LOCK_2026_07_20_R8N19_6';
   var state={tab:'campaigns',settings:null,campaigns:[],rows:[],calls:[],busy:false,pumping:false,poll:null,pump:null,selectedCampaignId:''};
   function el(id){return document.getElementById(id)}
   function s(v){return String(v==null?'':v)}
@@ -14064,7 +14089,7 @@ function exportContactIntelligenceCSV(){let calls=filteredContactCalls();let row
   function fmtPhone(v){var d=s(v).replace(/\D/g,'');return d.length===11&&d[0]==='1'?'('+d.slice(1,4)+') '+d.slice(4,7)+'-'+d.slice(7):d.length===10?'('+d.slice(0,3)+') '+d.slice(3,6)+'-'+d.slice(6):s(v||'—')}
   function fmtDate(v){if(!v)return '—';var d=new Date(v);return isNaN(d.getTime())?s(v):d.toLocaleString()}
   function cash(v){return Number(v||0).toLocaleString('en-US',{style:'currency',currency:'USD'})}
-  function firstPhone(a){for(var i=1;i<=10;i++){var p=phone(a&&a['phone'+i]);if(p)return {phone:p,slot:'phone'+i}}return null}
+  function firstPhone(a){var test=phone(a&&(a.testPhoneOverride||a.test_phone_override));if(test)return {phone:test,slot:'test_phone_override'};for(var i=1;i<=10;i++){var p=phone(a&&a['phone'+i]);if(p)return {phone:p,slot:'phone'+i}}return null}
   function accountName(id){var a=((typeof accounts!=='undefined'&&accounts)||[]).find(function(x){return x.id===id});return a?(a.fullName||a.full_name||a.name||a.consumerName||a.accountNumber||a.account_number||id):id}
   function accountNumber(id){var a=((typeof accounts!=='undefined'&&accounts)||[]).find(function(x){return x.id===id});return a?s(a.accountNumber||a.account_number||'—'):'—'}
   function notice(message,type){var n=el('vbcNotice');if(!n)return;n.textContent=message;n.className='vbcNotice'+(type?' '+type:'')}
