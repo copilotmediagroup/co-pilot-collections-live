@@ -13568,7 +13568,7 @@ function exportContactIntelligenceCSV(){let calls=filteredContactCalls();let row
 <script id="cpcmNmiPhase1Module">
 (function(){
   'use strict';
-  var BUILD='STABLE_SINGLE_FILE_QA_LOCK_2026_07_20_R8N19';
+  var BUILD='STABLE_SINGLE_FILE_QA_LOCK_2026_07_20_R8N19_2';
   var collectScriptPromise=null, collectReadyPromise=null, collectConfigured=false, paymentBusy=false, paymentContext=null, lastReceipt=null, collectGeneration=0;
   function byId(id){return document.getElementById(id)}
   function cfg(){return window.CO_PILOT_NMI_CONFIG||{}}
@@ -14068,8 +14068,8 @@ function exportContactIntelligenceCSV(){let calls=filteredContactCalls();let row
   async function invoke(body){
     if(typeof ensureFreshToken==='function')await ensureFreshToken();
     var response=await fetch(url()+'/functions/v1/voice-broadcast',{method:'POST',headers:{'Content-Type':'application/json','apikey':pubKey(),'Authorization':'Bearer '+token()},body:JSON.stringify(body)});
-    var data={};try{data=await response.json()}catch(e){data={error:'The voice broadcast service returned an unreadable response.'}}
-    if(!response.ok||data.success===false&&!data.idle){var error=new Error(data.error||data.message||'Voice broadcast request failed.');error.details=data;throw error}return data;
+    var raw=await response.text(),data={};try{data=raw?JSON.parse(raw):{}}catch(e){data={error:raw||'The voice broadcast service returned an unreadable response.'}}
+    if(!response.ok||data.success===false&&!data.idle){var error=new Error(data.error||data.message||raw||('Voice broadcast request failed with HTTP '+response.status+'.'));error.details=data;error.status=response.status;throw error}return data;
   }
   function pageHtml(){return `<div id="cpcmVoiceBroadcastPage"><div class="vbcTop"><div><div class="vbcTitle">Voice Broadcast & Live Transfer</div><div class="vbcSub">Uploaded account numbers → human answer → RingCentral group line → first collector answers • ${h(BUILD)}</div></div><div class="vbcTopActions"><button class="vbcBtn white" onclick="window.cpcmBroadcastRefreshAll()">Refresh</button><button class="vbcBtn gray" onclick="window.closeVoiceBroadcast()">Back to Accounts</button></div></div><div class="vbcBody"><div id="vbcNotice" class="vbcNotice">Loading voice broadcast…</div><div class="vbcTabs"><button id="vbcTabCampaigns" class="vbcBtn vbcTab" onclick="window.cpcmBroadcastTab('campaigns')">Campaigns</button><button id="vbcTabSettings" class="vbcBtn vbcTab" onclick="window.cpcmBroadcastTab('settings')">Message & Queue</button><button id="vbcTabLive" class="vbcBtn vbcTab" onclick="window.cpcmBroadcastTab('live')">Live Results</button><button id="vbcTabSetup" class="vbcBtn vbcTab" onclick="window.cpcmBroadcastTab('setup')">Setup</button></div><section id="vbcPanelCampaigns" class="vbcPanel"></section><section id="vbcPanelSettings" class="vbcPanel"></section><section id="vbcPanelLive" class="vbcPanel"></section><section id="vbcPanelSetup" class="vbcPanel"></section></div><div id="vbcPump" class="vbcPump">Broadcast engine running while this page is open</div></div>`}
   function ensurePage(){if(!el('cpcmVoiceBroadcastPage'))document.body.insertAdjacentHTML('beforeend',pageHtml());ensureNav()}

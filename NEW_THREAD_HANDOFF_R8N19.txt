@@ -1,0 +1,95 @@
+CO PILOT COLLECTIONS MANAGER — NEW THREAD HANDOFF
+CURRENT BASELINE: R8N19 LIVE
+BUILD MARKER: STABLE_SINGLE_FILE_QA_LOCK_2026_07_20_R8N19
+
+THIS PACKAGE
+============
+This is the consolidated LIVE Co Pilot Collections Manager R8N19 package.
+Use it only with:
+- GitHub repo: co-pilot-collections-live
+- LIVE Supabase: https://bwvufgzbkaymffwxuuzr.supabase.co
+- LIVE administrator: afinch2678@gmail.com
+
+Never mix it with the DEMO repository or DEMO Supabase project.
+Preserve the existing LIVE public/nmi-config.js file in GitHub.
+
+R8N17/R8N18 PAYMENT BASELINE
+============================
+The NMI employee-to-admin payment approval queue remains intact.
+R8N19 does not change or replace the existing NMI payment functions, webhook, ledger, receipt, remittance, or approval workflow.
+
+DIALER DIRECTION CORRECTION
+===========================
+R8N18 attempted a per-employee RingCentral power dialer and required individual RingCentral JWT credentials.
+That did not match the user's intended TMax-style workflow.
+
+R8N19 replaces the visible dialer with:
+Uploaded accounts → Twilio voice broadcast → human answer/Press 1 → RingCentral group number → first collector answers.
+
+R8N19 does not use employee RingCentral credentials, extensions, or employee forwarding numbers.
+The old R8N18 database tables may still exist if its SQL was run, but the R8N19 frontend and functions do not use them.
+
+R8N19 PROVIDER ARCHITECTURE
+===========================
+Twilio Programmable Voice:
+- Initiates outbound calls from uploaded Co Pilot account phone numbers.
+- Performs human/machine detection.
+- Plays text-to-speech messages.
+- Optionally gathers Press 1.
+- Transfers qualified live calls to one RingCentral queue number.
+- Sends signed webhooks for call and transfer outcomes.
+
+RingCentral:
+- Receives one transferred call at the public call-queue/group number.
+- Rings queue members according to RingCentral queue settings.
+- First collector to answer gets the call.
+
+Required LIVE Supabase secrets:
+- TWILIO_ACCOUNT_SID
+- TWILIO_AUTH_TOKEN
+- TWILIO_FROM_NUMBER
+
+New Edge Functions:
+- voice-broadcast
+- voice-broadcast-webhook
+
+New incremental SQL:
+- SQL_TO_RUN_IN_SUPABASE/R8N19_SIMPLE_VOICE_BROADCAST.sql
+
+New tables:
+- voice_broadcast_settings
+- voice_broadcast_campaigns
+- voice_broadcast_campaign_accounts
+- voice_broadcast_calls
+
+FRONTEND FEATURES
+=================
+Admin-only Broadcast button and page with:
+- Campaign creation from already uploaded accounts
+- Filters for portfolio, state, status, assigned employee, and balance
+- RingCentral group/queue phone number
+- Press 1 or automatic live-human transfer mode
+- Live-person and voicemail scripts
+- Calls-per-minute and simultaneous-call controls
+- Start, Pause, Resume, Stop
+- Live campaign metrics and call results
+- Twilio connection test
+- No separate dialer-list upload
+- No employee RingCentral credentials
+
+OPERATING LIMITATION
+====================
+The R8N19 campaign pump runs while the admin Broadcast page is open. Closing the page stops launching new calls. Active calls can complete. A future release may replace this with a server-side scheduler/worker after the simple workflow is proven.
+
+DEVELOPMENT RULES
+=================
+- Start only from this R8N19 LIVE package.
+- Preserve strict LIVE/DEMO isolation.
+- Preserve NMI and public/nmi-config.js.
+- Do not restore the R8N18 employee-JWT power dialer.
+- Do not expose Twilio secrets in frontend files.
+- Keep Twilio webhook signature validation.
+- Build incrementally and test with controlled numbers.
+- Add a visible version marker to every release.
+- Run Vite production build and executable inline-script syntax checks.
+- Keep future handoff ZIPs under 20 source files when possible.

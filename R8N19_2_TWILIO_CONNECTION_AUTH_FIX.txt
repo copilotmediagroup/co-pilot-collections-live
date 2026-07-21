@@ -1,0 +1,17 @@
+R8N19.2 TWILIO CONNECTION AUTH FIX
+
+Problem:
+The Check Twilio Connection action returned only "Authenticate" even while the correct R8N19 frontend was loaded.
+
+Fix:
+- connection_status is now a read-only diagnostic action that does not require a Co Pilot browser JWT.
+- Twilio credentials remain server-side and are never returned.
+- campaign dispatch and campaign controls remain protected by Co Pilot admin authentication.
+- frontend now displays the exact raw Edge Function error when a non-JSON gateway response occurs.
+
+Required deployment:
+Redeploy the updated Supabase Edge Function named exactly:
+voice-broadcast
+
+No SQL changes are required.
+The voice-broadcast-webhook function does not need to be redeployed for this fix.
