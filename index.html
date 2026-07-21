@@ -12197,7 +12197,9 @@ function exportContactIntelligenceCSV(){let calls=filteredContactCalls();let row
   }
   function renderDocMetrics(rows){let box=dEl('docMetrics'); if(!box)return; let receipts=rows.filter(r=>/receipt/i.test(r.actionType||r.actionText||'')).length, letters=rows.filter(r=>/letter|settlement/i.test(r.actionType||r.actionText||'')).length, plans=rows.filter(r=>/agreement|plan/i.test(r.actionType||r.actionText||'')).length, comms=rows.filter(r=>/mail|printed|certified|communication/i.test(r.actionType||r.actionText||'')).length; box.innerHTML=[['Receipts',receipts],['Letters',letters],['Plan Agreements',plans],['Comms Docs',comms]].map(x=>'<div class="docMetric"><div class="docMetricLabel">'+dEsc(x[0])+'</div><div class="docMetricValue">'+dEsc(x[1])+'</div></div>').join('')}
   window.exportDocumentHistoryCSV=function(){let rows=window.__docHistoryRows||[]; let csv=[['Date','Type','Summary','Created By'].map(dCsvCell).join(',')].concat(rows.map(r=>[r.createdAt,r.actionType,r.actionText,r.createdByEmail].map(dCsvCell).join(','))).join('\n'); dDownload('co-pilot-document-history.csv',csv)};
-  window.printCurrentDocument=function(){let p=dEl('docPreview'); if(!p)return; let w=window.open('','_blank','width=900,height=1100'); let css='body{font-family:Arial,Helvetica,sans-serif;color:#0f172a;padding:30px;line-height:1.45}h1{font-size:24px}h2{font-size:18px;margin:20px 0 8px;border-left:4px solid #1457ff;padding-left:9px}table{width:100%;border-collapse:collapse;margin:12px 0;font-size:13px}th,td{border:1px solid #dbe3ef;padding:8px;text-align:left}th{background:#f4f7fc}.muted{color:#64748b}.docBrandHeader{display:flex;justify-content:space-between;align-items:flex-start;gap:22px;padding:2px 0 14px;border-top:5px solid #0b45c6;border-bottom:1px solid #dbe3ef;margin-bottom:16px}.docBrandIdentity{display:flex;align-items:center;gap:13px}.docBrandLogo{width:58px;height:58px;border:1px solid #dbe3ef;border-radius:13px;display:grid;place-items:center;overflow:hidden}.docBrandLogo img{width:100%;height:100%;object-fit:contain;padding:5px;box-sizing:border-box}.docBrandLogoFallback{width:100%;height:100%;display:grid;place-items:center;background:#0b45c6;color:#fff;font-size:27px;font-weight:900}.docBrandName{font-size:18px;font-weight:900}.docBrandSub,.docMetaDate{font-size:11px;color:#64748b;margin-top:4px}.docHeaderMeta{text-align:right}.docTypeBadge{display:inline-block;border-radius:999px;background:#e8f0ff;color:#0b45c6;border:1px solid #c7d7ff;padding:4px 9px;font-size:9px;font-weight:900;text-transform:uppercase;margin-bottom:5px}.docDocumentTitle{font-size:21px;font-weight:900;color:#0f172a;line-height:1.12;margin-bottom:8px}.docMetaNumber{font-size:14px;font-weight:900}.docSignatureBlock{width:340px;margin-top:30px}.docSignatureImageBox{height:70px;display:flex;align-items:flex-end;padding-left:4px}.docSignatureImage{display:block;max-width:305px;max-height:66px;object-fit:contain;object-position:left bottom}.docSignatureBlank{height:66px}.docSignatureRule{border-top:1px solid #0f172a}.docSignatureName{font-size:12px;font-weight:900;margin-top:5px}.docSignatureRole{font-size:10px;color:#475569;margin-top:2px}.docSignatureMeta{font-size:9px;color:#64748b;margin-top:3px}.docWatermark{border-top:1px solid #edf2f8;padding-top:10px;font-size:10px;color:#94a3b8;text-align:right;margin-top:22px}'; let html='<!doctype html><html><head><title>'+dEsc(documentBrandName())+' Document</title><style>'+css+'</style></head><body>'+p.innerHTML+'</body></html>'; if(w){w.document.write(html);w.document.close();setTimeout(()=>{w.focus();w.print()},300)}else{window.print()}};
+  window.printCurrentDocument=function(){let p=dEl('docPreview'); if(!p)return; let w=window.open('','_blank','width=900,height=1100'); let css='body{font-family:Arial,Helvetica,sans-serif;color:#0f172a;padding:30px;line-height:1.45}h1{font-size:24px}h2{font-size:18px;margin:20px 0 8px;border-left:4px solid #1457ff;padding-left:9px}table{width:100%;border-collapse:collapse;margin:12px 0;font-size:13px}th,td{border:1px solid #dbe3ef;padding:8px;text-align:left}th{background:#f4f7fc}.muted{color:#64748b}.docBrandHeader{display:flex;justify-content:space-between;align-items:flex-start;gap:22px;padding:2px 0 14px;border-top:5px solid #0b45c6;border-bottom:1px solid #dbe3ef;margin-bottom:16px}.docBrandIdentity{display:flex;align-items:center;gap:13px}.docBrandLogo{width:58px;height:58px;border:1px solid #dbe3ef;border-radius:13px;display:grid;place-items:center;overflow:hidden}.docBrandLogo img{width:100%;height:100%;object-fit:contain;padding:5px;box-sizing:border-box}.docBrandLogoFallback{width:100%;height:100%;display:grid;place-items:center;background:#0b45c6;color:#fff;font-size:27px;font-weight:900}.docBrandName{font-size:18px;font-weight:900}.docBrandSub,.docMetaDate{font-size:11px;color:#64748b;margin-top:4px}.docHeaderMeta{text-align:right}.docTypeBadge{display:inline-block;border-radius:999px;background:#e8f0ff;color:#0b45c6;border:1px solid #c7d7ff;padding:4px 9px;font-size:9px;font-weight:900;text-transform:uppercase;margin-bottom:5px}.docDocumentTitle{font-size:21px;font-weight:900;color:#0f172a;line-height:1.12;margin-bottom:8px}.docMetaNumber{font-size:14px;font-weight:900}.docSignatureBlock{width:340px;margin-top:30px}.docSignatureImageBox{height:70px;display:flex;align-items:flex-end;padding-left:4px}.docSignatureImage{display:block;max-width:305px;max-height:66px;object-fit:contain;object-position:left bottom}.docSignatureBlank{height:66px}.docSignatureRule{border-top:1px solid #0f172a}.docSignatureName{font-size:12px;font-weight:900;margin-top:5px}.docSignatureRole{font-size:10px;color:#475569;margin-top:2px}.docSignatureMeta{font-size:9px;color:#64748b;margin-top:3px}.docWatermark{border-top:1px solid #edf2f8;padding-top:10px;font-size:10px;color:#94a3b8;text-align:right;margin-top:22px}'; let html='<!doctype html><html><head><title>'+dEsc(documentBrandName())+' Document</title><style>'+css+'</style></head><body>'+p.innerHTML+'
+<script src="./screen-pop.js?v=R8N19_16" defer></script>
+</body></html>'; if(w){w.document.write(html);w.document.close();setTimeout(()=>{w.focus();w.print()},300)}else{window.print()}};
   function safePdfFilePart(v){return String(v||'document').trim().replace(/[^a-z0-9_-]+/gi,'-').replace(/^-+|-+$/g,'').slice(0,80)||'document'}
   window.downloadCurrentDocumentPDF=async function(trigger){let p=dEl('docPreview');if(!p)return alert('Generate a document first.');if(!window.html2canvas||!window.jspdf||!window.jspdf.jsPDF)return alert('The built-in PDF engine could not initialize. Reload the app once and try again.');let buttons=[...document.querySelectorAll('.docPdfDownloadBtn')],labels=buttons.map(b=>b.textContent);buttons.forEach(b=>{b.classList.add('isBusy');b.textContent='Building PDF...'});let stage=null;try{await refreshCurrentDocumentPreview();await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)));stage=document.createElement('div');stage.setAttribute('aria-hidden','true');stage.style.cssText='position:fixed;left:-12000px;top:0;width:816px;background:#fff;padding:0;z-index:-1;';let clone=p.cloneNode(true);clone.removeAttribute('id');clone.style.cssText='width:816px;min-height:0;background:#fff;border:0;border-radius:0;box-shadow:none;padding:34px 38px;box-sizing:border-box;line-height:1.45;';stage.appendChild(clone);document.body.appendChild(stage);if(document.fonts&&document.fonts.ready)await document.fonts.ready;let canvas=await window.html2canvas(clone,{scale:2,backgroundColor:'#ffffff',logging:false,useCORS:true,imageTimeout:0,windowWidth:900,scrollX:0,scrollY:0});let PDF=window.jspdf.jsPDF,pdf=new PDF({orientation:'portrait',unit:'pt',format:'letter',compress:true}),pageW=pdf.internal.pageSize.getWidth(),pageH=pdf.internal.pageSize.getHeight(),margin=24,drawW=pageW-margin*2,drawH=pageH-margin*2,pxPerPt=canvas.width/drawW,slicePx=Math.floor(drawH*pxPerPt),y=0,page=0;while(y<canvas.height){let h=Math.min(slicePx,canvas.height-y),part=document.createElement('canvas');part.width=canvas.width;part.height=h;let ctx=part.getContext('2d');ctx.fillStyle='#fff';ctx.fillRect(0,0,part.width,part.height);ctx.drawImage(canvas,0,y,canvas.width,h,0,0,canvas.width,h);if(page++)pdf.addPage();let img=part.toDataURL('image/jpeg',0.96),renderH=h/pxPerPt;pdf.addImage(img,'JPEG',margin,margin,drawW,renderH,undefined,'FAST');y+=h}let a=dCurrent(),kind=window.__docTemplateKind||'document',title=kind==='receipt'?'Payment-Receipt':kind==='settlement'?'Settlement-Letter':kind==='plan'?'Payment-Plan-Agreement':'Document',filename=safePdfFilePart(title)+'-'+safePdfFilePart(dName(a))+'-'+safePdfFilePart(dVal('docNumber'))+'.pdf';pdf.save(filename);if(a)await dActivity(a.id,'Document PDF Downloaded','Downloaded '+title.replace(/-/g,' ')+' • Document # '+(dVal('docNumber')||'—'));if(a)await loadDocumentHistory(a.id)}catch(e){console.error('PDF download failed',e);alert('The PDF could not be created. Try Print / Save PDF as a fallback. '+(e&&e.message?e.message:''))}finally{if(stage&&stage.parentNode)stage.parentNode.removeChild(stage);buttons.forEach((b,i)=>{b.classList.remove('isBusy');b.textContent=labels[i]||'Download PDF'})}};
   window.refreshReceiptsLettersPage=async function(){let a=dCurrent(); if(!a)return; await hydrateDocInputs(window.__docTemplateKind||'receipt'); await loadDocumentHistory(a.id);};
@@ -14192,105 +14194,5 @@ function exportContactIntelligenceCSV(){let calls=filteredContactCalls();let row
 </script>
 
 
-<style>
-#cpcmLiveTransferStatus{position:fixed;right:14px;top:14px;z-index:2147482998;padding:7px 10px;border-radius:999px;background:#14532d;color:#dcfce7;font:800 11px Arial,sans-serif;box-shadow:0 8px 24px rgba(0,0,0,.18)}
-#cpcmLiveTransferStatus.error{background:#991b1b;color:#fee2e2}
-#cpcmLiveTransferTray{position:fixed;right:20px;bottom:72px;z-index:2147483000;width:min(430px,calc(100vw - 28px));display:none}.ltCard{background:#07111f;color:#fff;border:2px solid #2dd4bf;border-radius:16px;box-shadow:0 24px 70px rgba(0,0,0,.55);overflow:hidden}.ltHead{display:flex;justify-content:space-between;align-items:center;padding:13px 14px;background:linear-gradient(90deg,#0f766e,#0f172a);font-weight:950}.ltPulse{width:10px;height:10px;border-radius:50%;background:#5eead4;box-shadow:0 0 0 0 rgba(94,234,212,.65);animation:ltPulse 1.2s infinite}@keyframes ltPulse{70%{box-shadow:0 0 0 12px rgba(94,234,212,0)}100%{box-shadow:0 0 0 0 rgba(94,234,212,0)}}.ltBody{padding:16px}.ltName{font-size:22px;font-weight:950}.ltPhone{font-size:24px;font-weight:1000;color:#5eead4;margin:9px 0}.ltMeta{color:#cbd5e1;font-size:14px;line-height:1.65}.ltAuto{margin-top:11px;padding:10px;border-radius:9px;background:#0f2f2c;color:#99f6e4;font-size:12px;font-weight:800}.ltActions{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}.ltBtn{border:0;border-radius:10px;padding:11px 14px;font-weight:950;cursor:pointer}.ltOpen{background:#22c55e;color:#052e16;flex:1}.ltClaim{background:#f59e0b;color:#451a03;flex:1}.ltDismiss{background:#334155;color:#fff}
-</style>
-<div id="cpcmLiveTransferStatus">SCREEN POP ONLINE</div>
-<div id="cpcmLiveTransferTray"></div>
-<script>
-(function(){
-  var BUILD='STABLE_SINGLE_FILE_QA_LOCK_2026_07_21_R8N19_15';
-  var active=null,busy=false,dismissed={},lastOpened='',originalTitle=document.title;
-  function E(v){return String(v==null?'':v).replace(/[&<>"']/g,function(c){return({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]})}
-  function S(v){return v==null?'':String(v)}
-  function status(text,error){var e=document.getElementById('cpcmLiveTransferStatus');if(!e)return;e.textContent=text;e.classList.toggle('error',!!error)}
-  function fmt(v){var d=S(v).replace(/\D/g,'');if(d.length===11&&d[0]==='1')d=d.slice(1);return d.length===10?'('+d.slice(0,3)+') '+d.slice(3,6)+'-'+d.slice(6):S(v)||'Number unavailable'}
-  function list(){try{return Array.isArray(accounts)?accounts:[]}catch(e){return[]}}
-  function findAccount(id){return list().find(function(a){return String(a.id)===String(id)})||null}
-  function name(row,a){return row.consumer_name||(a&&(a.fullName||a.full_name||[a.firstName||a.first_name,a.lastName||a.last_name].filter(Boolean).join(' ')))||'Unknown consumer'}
-  function number(row,a){return row.account_number||(a&&(a.accountNumber||a.account_number||a.clientAccountNumber||a.client_account_number))||'—'}
-  function balance(row,a){var n=Number(row.balance!=null?row.balance:(a&&(a.currentBalance||a.current_balance||a.originalBalance||a.original_balance))||0);return n.toLocaleString('en-US',{style:'currency',currency:'USD'})}
-  async function directFetch(path,opt){
-    opt=opt||{};
-    var base=(typeof url==='function'?url():S(window.CO_PILOT_SUPABASE_CONFIG&&window.CO_PILOT_SUPABASE_CONFIG.url)).replace(/\/$/,'');
-    var key=typeof pubKey==='function'?pubKey():S(window.CO_PILOT_SUPABASE_CONFIG&&window.CO_PILOT_SUPABASE_CONFIG.publishableKey);
-    var access=typeof token==='function'?token():localStorage.getItem('coPilotSupabaseAccessToken')||'';
-    if(!base||!key||!access)throw new Error('Co Pilot login session is unavailable. Log out and back in once.');
-    var r=await fetch(base+'/rest/v1'+path,{method:opt.method||'GET',headers:Object.assign({apikey:key,Authorization:'Bearer '+access,'Content-Type':'application/json',Prefer:'return=representation'},opt.headers||{}),body:opt.body});
-    var t=await r.text(),d;try{d=t?JSON.parse(t):null}catch(e){d=t}
-    if(!r.ok)throw new Error((d&&d.message)||S(d)||('HTTP '+r.status));
-    return d;
-  }
-  async function fetchRows(path,opt){
-    if(typeof dbFetch==='function')return dbFetch(path,opt||{});
-    return directFetch(path,opt||{});
-  }
-  async function loadAccount(row){
-    if(!row||!row.account_id)return null;
-    var a=findAccount(row.account_id);if(a)return a;
-    var rows=await fetchRows('/accounts?id=eq.'+encodeURIComponent(row.account_id)+'&select=*&limit=1');
-    if(rows&&rows[0]){
-      a=typeof toCamel==='function'?toCamel(rows[0]):rows[0];
-      try{if(Array.isArray(accounts)&&!findAccount(a.id))accounts.push(a)}catch(e){}
-      return a;
-    }
-    return null;
-  }
-  function forceOpen(a,row){
-    if(!a)return false;
-    try{if(typeof window.closeVoiceBroadcast==='function')window.closeVoiceBroadcast()}catch(e){}
-    try{currentAccountId=a.id}catch(e){} window.currentAccountId=a.id;
-    try{
-      var search=document.getElementById('search');
-      if(search){search.value=number(row,a)!=='—'?number(row,a):fmt(row.called_number||row.phone_number);search.dispatchEvent(new Event('input',{bubbles:true}))}
-    }catch(e){}
-    try{if(typeof setCurrent==='function')setCurrent(a.id)}catch(e){}
-    /* Bypass employee queue filters so the transferred account still opens. */
-    try{if(typeof renderCurrent==='function')renderCurrent(a,[a])}catch(e){}
-    try{if(typeof renderDispos==='function')renderDispos(a)}catch(e){}
-    try{if(typeof scheduleHistoryLoad==='function')scheduleHistoryLoad(a.id)}catch(e){}
-    lastOpened=row.id;
-    return true;
-  }
-  async function openActive(){if(!active)return false;var a=await loadAccount(active);return forceOpen(a,active)}
-  function draw(){
-    var tray=document.getElementById('cpcmLiveTransferTray');if(!tray)return;
-    if(!active){tray.style.display='none';tray.innerHTML='';document.title=originalTitle;return}
-    var a=findAccount(active.account_id),phone=active.called_number||active.phone_number;
-    document.title='INCOMING '+fmt(phone)+' — '+originalTitle;
-    tray.style.display='block';
-    tray.innerHTML='<div class="ltCard"><div class="ltHead"><span style="display:flex;align-items:center;gap:9px"><span class="ltPulse"></span> INCOMING ACCOUNT</span><span>'+E(active.status||'')+'</span></div><div class="ltBody"><div class="ltName">'+E(name(active,a))+'</div><div class="ltPhone">'+E(fmt(phone))+'</div><div class="ltMeta"><b>Account:</b> '+E(number(active,a))+'<br><b>Balance:</b> '+E(balance(active,a))+'<br><b>Account ID:</b> '+E(active.account_id||'—')+'</div><div class="ltAuto">This is the exact account connected to the RingCentral call.</div><div class="ltActions"><button class="ltBtn ltOpen" onclick="window.cpcmOpenLiveTransferAccount()">Open Account</button><button class="ltBtn ltClaim" onclick="window.cpcmClaimLiveTransfer()">Claim Call</button><button class="ltBtn ltDismiss" onclick="window.cpcmDismissLiveTransfer()">Hide</button></div></div></div>';
-  }
-  async function poll(){
-    if(busy)return;busy=true;
-    try{
-      var path='/voice_broadcast_live_transfers?status=in.(waiting,connected)&expires_at=gt.'+encodeURIComponent(new Date().toISOString())+'&select=id,call_id,account_id,called_number,phone_number,consumer_name,account_number,balance,status,expires_at,created_at&order=created_at.desc&limit=20';
-      var rows=await fetchRows(path);
-      status('SCREEN POP ONLINE',false);
-      var row=(rows||[]).find(function(r){return !dismissed[r.id]})||null;
-      active=row;draw();
-      if(row&&lastOpened!==row.id){try{await openActive()}catch(e){console.error('Account auto-open failed',e)}}
-    }catch(e){console.error('SCREEN POP READ FAILED',e);status('SCREEN POP ERROR — CLICK',true);var st=document.getElementById('cpcmLiveTransferStatus');if(st)st.onclick=function(){alert('Screen pop error: '+(e.message||String(e)))} }
-    finally{busy=false}
-  }
-  window.cpcmDismissLiveTransfer=function(){if(active)dismissed[active.id]=true;active=null;draw()};
-  window.cpcmOpenLiveTransferAccount=function(){openActive().catch(function(e){alert(e.message||String(e))})};
-  window.cpcmClaimLiveTransfer=async function(){
-    if(!active||busy)return;busy=true;
-    try{
-      var email='';try{email=S(currentUser&&currentUser.email).toLowerCase()}catch(e){}
-      var rows=await fetchRows('/voice_broadcast_live_transfers?id=eq.'+encodeURIComponent(active.id)+'&status=in.(waiting,connected)',{method:'PATCH',body:JSON.stringify({status:'claimed',claimed_by_email:email,claimed_at:new Date().toISOString(),updated_at:new Date().toISOString()})});
-      if(!rows||!rows.length)throw new Error('Another collector already claimed this call.');
-      await openActive();active=null;draw();
-    }catch(e){alert(e.message||String(e));active=null;draw()}finally{busy=false;setTimeout(poll,200)}
-  };
-  window.cpcmTestLiveTransferPopup=function(row){active=row;draw();openActive()};
-  setInterval(poll,700);setTimeout(poll,250);
-  window.addEventListener('focus',poll);document.addEventListener('visibilitychange',function(){if(!document.hidden)poll()});
-  window.CPCM_LIVE_TRANSFER_BUILD=BUILD;
-})();
-</script>
 </body>
 </html>
