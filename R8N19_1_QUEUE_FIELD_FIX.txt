@@ -1,0 +1,15 @@
+CO PILOT COLLECTIONS MANAGER — R8N19.1
+QUEUE NUMBER FIELD PERSISTENCE FIX
+
+Problem fixed:
+The Broadcast page polled Supabase every four seconds and rebuilt the Message & Queue form while the administrator was typing. This erased the RingCentral queue number before Save could be clicked.
+
+Fix:
+- Campaign and Message & Queue forms are not rebuilt while an input inside that form is active.
+- Live campaign and call data continue refreshing.
+- Telephone inputs use telephone input mode.
+- The valid RingCentral queue number (323) 284-2154 can be entered as +13232842154.
+
+No SQL changes.
+No Edge Function changes.
+No secret changes.
