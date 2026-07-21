@@ -3,9 +3,3 @@ verify_jwt = false
 
 [functions.nmi-webhook]
 verify_jwt = false
-
-[functions.voice-broadcast]
-verify_jwt = false
-
-[functions.voice-broadcast-webhook]
-verify_jwt = false
