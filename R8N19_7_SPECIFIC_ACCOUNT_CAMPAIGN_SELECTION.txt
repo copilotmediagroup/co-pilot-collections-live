@@ -1,0 +1,20 @@
+R8N19.7 — Specific Account Campaign Selection
+
+Adds two campaign targeting modes:
+1. Portfolio & Account Filters
+2. Select Specific Accounts Only
+
+Specific Account mode includes:
+- Search by consumer name
+- Search by account number
+- Search by phone number
+- Search by portfolio, status, or state
+- Multi-account checkboxes
+- Selected account count
+- Test override number visibility
+- Campaign filters record the exact selected account IDs
+- Safety confirmation for larger selected groups
+
+No SQL changes.
+No Edge Function changes.
+Existing R8N19.5 live-transfer screen pop and R8N19.6 admin test override remain included.
