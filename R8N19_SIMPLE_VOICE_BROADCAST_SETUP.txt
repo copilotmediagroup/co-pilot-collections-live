@@ -1,0 +1,178 @@
+CO PILOT COLLECTIONS MANAGER — R8N19 LIVE
+SIMPLE VOICE BROADCAST + RINGCENTRAL GROUP TRANSFER SETUP
+
+WHAT CHANGED
+============
+R8N19 replaces the per-employee RingCentral power dialer frontend with the simpler TMax-style flow:
+
+Uploaded Co Pilot accounts
+→ Twilio calls the account phone numbers
+→ Twilio detects human vs machine
+→ Human presses 1, or is automatically transferred if Auto Transfer is selected
+→ One RingCentral call-queue/group number rings
+→ The first available collector to answer receives the call
+
+NO EMPLOYEE RINGCENTRAL CREDENTIALS ARE USED.
+R8N19 does not use:
+- RC_APP_CLIENT_ID
+- RC_APP_CLIENT_SECRET
+- RC_USER_JWTS_JSON
+- RC_WEBHOOK_VALIDATION_TOKEN
+- RingCentral employee extension mappings
+- Employee forwarding numbers inside Co Pilot
+
+If those old R8N18 secrets already exist, they can remain temporarily, but R8N19 never reads them. You may delete them after R8N19 is working.
+
+REQUIRED APPS
+=============
+1. Co Pilot Collections Manager LIVE
+2. Twilio Programmable Voice account
+3. One Twilio voice-capable outbound phone number
+4. Your existing RingCentral call queue/group with a public phone number
+
+SUPABASE SECRETS — ONLY THREE
+=============================
+In LIVE Supabase:
+Project Settings → Edge Functions → Secrets
+
+Add these exact names:
+
+TWILIO_ACCOUNT_SID
+Value: Your Twilio Account SID, normally beginning with AC.
+
+TWILIO_AUTH_TOKEN
+Value: Your Twilio Auth Token.
+
+TWILIO_FROM_NUMBER
+Value: Your Twilio voice phone number in E.164 format, such as +13322590894.
+
+Do not put these values in GitHub, Bolt, index.html, public/config.js, or chat messages.
+
+DATABASE
+========
+Open LIVE Supabase → SQL Editor.
+Run once:
+
+SQL_TO_RUN_IN_SUPABASE/R8N19_SIMPLE_VOICE_BROADCAST.sql
+
+Do not rerun the combined R8N17 reference migration.
+If R8N18 SQL was already run, leave those old tables alone for now. R8N19 uses separate voice_broadcast_* tables.
+
+EDGE FUNCTIONS
+==============
+Create/deploy these exact function names:
+
+1. voice-broadcast
+Paste:
+supabase/functions/voice-broadcast/index.ts
+
+2. voice-broadcast-webhook
+Paste:
+supabase/functions/voice-broadcast-webhook/index.ts
+
+Both are listed with verify_jwt = false in supabase/config.toml.
+- voice-broadcast validates the logged-in Co Pilot administrator internally.
+- voice-broadcast-webhook validates Twilio's X-Twilio-Signature internally.
+
+FRONTEND
+========
+Upload this package to the root of co-pilot-collections-live.
+Preserve the existing LIVE file:
+
+public/nmi-config.js
+
+Do not replace that NMI public-token file with a placeholder.
+Commit and publish through GitHub/Bolt/Netlify as usual.
+Hard refresh the browser after deployment:
+Mac: Command + Shift + R
+Windows: Ctrl + Shift + R
+
+The bottom-right build marker should read:
+STABLE_SINGLE_FILE_QA_LOCK_2026_07_20_R8N19 • LIVE
+
+RINGCENTRAL GROUP NUMBER
+========================
+In RingCentral, create or use a Call Queue / group with all six collectors.
+Give that queue a public phone number.
+Set the queue to ring the members in the pattern you want, such as simultaneous ringing.
+
+In Co Pilot:
+Broadcast → Message & Queue
+
+Enter the public RingCentral queue number and save defaults.
+No RingCentral API credentials are entered into Co Pilot for this R8N19 flow.
+
+CONNECTION MODES
+================
+Press 1, then transfer:
+- Live person hears your approved message.
+- They press 1.
+- RingCentral group line rings.
+- First collector answers.
+
+Auto-transfer detected humans:
+- Twilio detects a human answer.
+- The message plays.
+- RingCentral group line rings automatically.
+
+Press 1 is the safer starting mode because it reduces accidental transfers caused by machine-detection errors.
+
+HOW CAMPAIGNS RUN
+=================
+The Broadcast page pulls phone numbers directly from accounts already uploaded into Co Pilot.
+There is no separate phone-list upload.
+
+The administrator chooses filters, message, RingCentral queue number, calls per minute, and simultaneous calls.
+The server runs Compliance Guard before each call.
+
+IMPORTANT: Keep the Broadcast page open while a campaign is running. R8N19 intentionally uses the open admin page as the simple campaign pump. Closing the page pauses new outbound launches, although calls already in progress can finish.
+
+FIRST CONTROLLED TEST
+=====================
+Use only numbers you control.
+
+1. Make sure the R8N19 SQL was run.
+2. Add the three Twilio secrets.
+3. Deploy both Edge Functions.
+4. Publish the R8N19 frontend.
+5. Open Broadcast → Setup → Check Twilio Connection.
+6. Open Message & Queue.
+7. Enter your RingCentral group phone number.
+8. Select Press 1 mode.
+9. Save a short neutral test message.
+10. Create one test Co Pilot account with a second phone number you control.
+11. Create a campaign filtered to that one account.
+12. Use 1 call per minute and 1 simultaneous call.
+13. Start the campaign and keep the Broadcast page open.
+14. Answer the test-consumer phone and press 1.
+15. Confirm the RingCentral group line rings.
+16. Answer with one collector phone.
+17. Confirm Live Results shows Transferred to Agent Queue.
+
+If Check Twilio Connection fails:
+- Verify TWILIO_ACCOUNT_SID.
+- Verify TWILIO_AUTH_TOKEN.
+- Verify TWILIO_FROM_NUMBER belongs to that Twilio account and is voice capable.
+- Redeploy voice-broadcast after saving secrets.
+
+If the consumer phone does not ring:
+- Review voice-broadcast Edge Function logs.
+- Confirm the campaign is Running.
+- Keep the Broadcast page open.
+- Confirm the account has a valid phone and is not blocked by Compliance Guard.
+- Confirm the Twilio account can call the destination country/region.
+
+If the consumer answers but RingCentral does not ring:
+- Confirm the queue number is a public E.164 number.
+- Confirm the consumer pressed 1 when using Press 1 mode.
+- Review voice-broadcast-webhook logs.
+- Confirm the RingCentral queue accepts outside calls and has available members.
+
+SECURITY AND OPERATING RULES
+============================
+- Never expose the Twilio Auth Token in frontend code.
+- Do not disable Twilio webhook-signature validation.
+- Start at 1 simultaneous call.
+- Increase pacing only after agent coverage and call-result behavior are proven.
+- Review message wording, consent/permission, DNC, state calling rules, time zones, frequency, and abandonment safeguards before production broadcasting.
+- Do not use real consumer accounts for the first test.

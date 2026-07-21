@@ -84,7 +84,7 @@ Deno.serve(async (req: Request) => {
         const { data: tx } = await admin.from("nmi_transactions").select("*").eq("gateway_transaction_id", gatewayTransactionId).order("created_at", { ascending: false }).limit(1).maybeSingle();
         if (tx && !tx.ledger_id && ["gateway_approved", "gateway_approved_needs_reconciliation", "processing", "pending"].includes(tx.status)) {
           if (tx.action === "sale") {
-            const { error } = await admin.rpc("cpcm_nmi_finalize_sale", {
+            const { data: finalized, error } = await admin.rpc("cpcm_nmi_finalize_sale", {
               p_nmi_transaction_id: tx.id,
               p_gateway_transaction_id: gatewayTransactionId,
               p_gateway_status: firstText(body.condition, body.status, "Webhook approved"),
@@ -96,6 +96,16 @@ Deno.serve(async (req: Request) => {
               p_card_last4: firstText(body.card_last4, body.cc_last_four),
             });
             if (error) throw error;
+            if (tx.approval_request_id) {
+              await admin.from("payment_approval_requests").update({
+                status: "approved",
+                nmi_transaction_id: tx.id,
+                ledger_id: finalized?.ledger_id || tx.ledger_id || null,
+                gateway_transaction_id: gatewayTransactionId,
+                decision_notes: "Reconciled from verified NMI webhook.",
+                updated_at: new Date().toISOString(),
+              }).eq("id", tx.approval_request_id);
+            }
             processingStatus = "sale_reconciled";
           } else if (tx.action === "refund" || tx.action === "void") {
             const { error } = await admin.rpc("cpcm_nmi_apply_adjustment", {
