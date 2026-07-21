@@ -1,0 +1,22 @@
+CO PILOT COLLECTIONS LIVE R8N19.3
+MANUAL TEST CALL + TEST TRANSFER
+
+Adds a Manual Test Center under Broadcast > Message & Queue.
+
+Test Call:
+- Enter a phone number you control.
+- Twilio calls it and plays the current live-person message.
+- No RingCentral transfer occurs.
+
+Test Transfer:
+- Twilio calls the manual test number.
+- After it is answered, the current message plays.
+- Twilio then dials the saved RingCentral queue number.
+- Whoever answers the RingCentral queue first receives the test call.
+
+Deployment:
+1. Upload the package contents to the GitHub repository root.
+2. Preserve public/nmi-config.js if your live repo has that file.
+3. Replace and redeploy only supabase/functions/voice-broadcast/index.ts.
+4. No SQL changes are required.
+5. voice-broadcast-webhook does not need to be redeployed.
