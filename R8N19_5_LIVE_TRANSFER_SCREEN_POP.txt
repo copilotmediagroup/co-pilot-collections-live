@@ -1,0 +1,6 @@
+R8N19.5
+- Adds a 2-second pause before broadcast speech so the first sentence is heard.
+- Creates a live transfer event when a human is being transferred to RingCentral.
+- Shows all logged-in collectors an incoming account popup.
+- First collector to click Claim & Open Account owns the popup and opens the exact account.
+- Requires running SQL_TO_RUN_IN_SUPABASE/R8N19_5_LIVE_TRANSFER_SCREEN_POP.sql and redeploying voice-broadcast-webhook.
