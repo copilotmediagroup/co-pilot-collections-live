@@ -1,0 +1,15 @@
+CO PILOT COLLECTIONS LIVE — R8N19.4
+MANUAL TEST CENTER FIX
+
+Fixes:
+- Adds the missing browser normalizePhone helper.
+- Removes "normalizePhone is not defined".
+- Adds Test Call, Test Transfer, Test Queue, and Replay Last Test.
+- Adds local recent test history.
+- Normalizes manual numbers to E.164 before testing.
+
+Deployment:
+1. Upload this ZIP contents to the root of co-pilot-collections-live.
+2. Preserve public/nmi-config.js if your repo contains it.
+3. Replace and redeploy supabase/functions/voice-broadcast/index.ts.
+4. No SQL changes and no secret changes are required.
