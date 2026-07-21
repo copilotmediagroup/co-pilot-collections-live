@@ -1,0 +1,24 @@
+CO PILOT COLLECTIONS LIVE — R8N19.10 MINIMAL PATCH
+
+This package contains only 3 files total and is safe for GitHub's web uploader.
+
+Upload these files to the matching paths in your LIVE repository:
+
+1. index.html
+   Destination: repository root/index.html
+
+2. supabase/functions/voice-broadcast/index.ts
+   Destination: supabase/functions/voice-broadcast/index.ts
+
+3. UPLOAD_INSTRUCTIONS.txt
+   Optional reference file. You do not need to upload this file.
+
+After committing to GitHub:
+- Publish/redeploy the frontend through Bolt.
+- Redeploy the Supabase Edge Function named voice-broadcast using the included index.ts.
+
+No SQL changes are required.
+Do not upload node_modules, dist, package-lock.json, or other project files from the earlier full archive.
+
+Expected badge:
+STABLE_SINGLE_FILE_QA_LOCK_2026_07_21_R8N19_10
