@@ -1,19 +1,15 @@
-CO PILOT COLLECTIONS LIVE — R8N19.12 MINIMAL PATCH
+CO PILOT COLLECTIONS LIVE — R8N19.13
+ACCOUNT AUTO-OPEN + IMMEDIATE AUDIO FIX
 
-FILES TO REPLACE
-1. /index.html
-2. /supabase/functions/voice-broadcast-webhook/index.ts
+1. Upload index.html to the repository root.
+2. Upload supabase/functions/voice-broadcast/index.ts and deploy voice-broadcast.
+3. Upload supabase/functions/voice-broadcast-webhook/index.ts and deploy voice-broadcast-webhook.
+4. Run supabase/migrations/20260721_r8n19_13_live_transfer_access.sql once in Supabase SQL Editor.
+5. Keep Verify JWT OFF for voice-broadcast-webhook.
+6. Publish/redeploy the frontend.
 
-AFTER UPLOAD
-- Publish the GitHub/Bolt frontend update.
-- Redeploy the Supabase Edge Function named: voice-broadcast-webhook
-- Keep Verify JWT OFF for voice-broadcast-webhook.
-
-WHAT THIS FIXES
-- Live-transfer popup now remains visible when transfer status changes from waiting to connected.
-- Claim & Open Account now works from waiting or connected status.
-- Opening message pause reduced from 2 seconds to 1 second.
-- No SQL changes are required.
-
-EXPECTED BUILD BADGE
-STABLE_SINGLE_FILE_QA_LOCK_2026_07_21_R8N19_12
+BEHAVIOR:
+- Twilio no longer waits on synchronous answering-machine detection, so the message starts immediately.
+- As soon as the customer presses 1 and RingCentral begins ringing, the exact linked account automatically opens in Co Pilot.
+- An incoming-transfer popup remains visible until a collector claims or hides it.
+- Polling checks every second and supports both waiting and connected states.
