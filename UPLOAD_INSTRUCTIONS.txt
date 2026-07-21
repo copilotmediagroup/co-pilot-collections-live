@@ -1,41 +1,19 @@
-CO PILOT COLLECTIONS LIVE — R8N19.11
-TWILIO SILENCE / APPLICATION ERROR FIX
+CO PILOT COLLECTIONS LIVE — R8N19.12 MINIMAL PATCH
 
-FILES IN THIS PATCH: 4
+FILES TO REPLACE
+1. /index.html
+2. /supabase/functions/voice-broadcast-webhook/index.ts
 
-1) Upload:
-   supabase/functions/voice-broadcast/index.ts
+AFTER UPLOAD
+- Publish the GitHub/Bolt frontend update.
+- Redeploy the Supabase Edge Function named: voice-broadcast-webhook
+- Keep Verify JWT OFF for voice-broadcast-webhook.
 
-2) Upload:
-   supabase/functions/voice-broadcast-webhook/index.ts
+WHAT THIS FIXES
+- Live-transfer popup now remains visible when transfer status changes from waiting to connected.
+- Claim & Open Account now works from waiting or connected status.
+- Opening message pause reduced from 2 seconds to 1 second.
+- No SQL changes are required.
 
-3) Upload:
-   supabase/config.toml
-
-4) Redeploy BOTH Supabase Edge Functions:
-   - voice-broadcast
-   - voice-broadcast-webhook
-
-IMPORTANT SUPABASE SETTING
-The public Twilio webhook must NOT require a Supabase JWT.
-Confirm voice-broadcast-webhook has Verify JWT disabled.
-The included config.toml contains:
-
-[functions.voice-broadcast-webhook]
-verify_jwt = false
-
-WHY THIS FIX WORKS
-- The first greeting is now supplied directly to Twilio as inline TwiML.
-- The call no longer depends on the webhook successfully loading before the greeting plays.
-- A 2-second pause is included before speech.
-- Press 1 and transfer callbacks still use voice-broadcast-webhook.
-
-TEST
-Create a NEW one-account campaign and start it.
-Expected flow:
-1. Phone rings.
-2. Two-second pause.
-3. Full message plays from the beginning.
-4. Press 1.
-5. RingCentral queue rings.
-6. Live-transfer screen pop appears.
+EXPECTED BUILD BADGE
+STABLE_SINGLE_FILE_QA_LOCK_2026_07_21_R8N19_12
