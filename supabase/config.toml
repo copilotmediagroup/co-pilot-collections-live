@@ -4,8 +4,8 @@ verify_jwt = false
 [functions.nmi-webhook]
 verify_jwt = false
 
-[functions.ringcentral-dialer]
+[functions.voice-broadcast]
 verify_jwt = false
 
-[functions.ringcentral-webhook]
+[functions.voice-broadcast-webhook]
 verify_jwt = false
