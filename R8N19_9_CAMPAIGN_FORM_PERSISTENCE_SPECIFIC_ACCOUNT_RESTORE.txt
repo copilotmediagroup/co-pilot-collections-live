@@ -1,0 +1,10 @@
+CO PILOT COLLECTIONS LIVE R8N19.9
+
+Fixes:
+- Campaign name and all campaign form fields persist during 4-second refreshes.
+- Restores Specific Accounts Only mode.
+- Search and select one or multiple exact accounts.
+- Selected account IDs are stored in campaign filters and only those accounts are queued.
+- Preserves R8N19.8 campaign start dialing fix.
+
+No SQL changes. Redeploy voice-broadcast from R8N19.8 remains required.
