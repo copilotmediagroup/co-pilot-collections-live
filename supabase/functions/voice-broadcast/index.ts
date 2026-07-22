@@ -127,18 +127,6 @@ function phoneCandidates(account: any) {
   return rows.filter((row, index, list) => list.findIndex((other) => other.phone === row.phone) === index);
 }
 
-async function recentPhoneAttempt(admin: any, normalizedPhone: string) {
-  const since = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
-  const { data, error } = await admin.from("voice_broadcast_calls")
-    .select("id,started_at,campaign_id,account_id,status,phone_number,normalized_phone")
-    .gte("started_at", since)
-    .or(`normalized_phone.eq.${normalizedPhone},phone_number.eq.${normalizedPhone}`)
-    .order("started_at", { ascending: false })
-    .limit(1);
-  if (error) throw error;
-  return data?.[0] || null;
-}
-
 async function complianceSnapshot(admin: any, account: any) {
   const reasons: string[] = [];
   const status = String(account.status || account.disposition || "").toLowerCase();
@@ -265,30 +253,8 @@ async function dispatchBatch(admin: any, actor: any, input: any) {
     const compliance = await complianceSnapshot(admin, account);
     const phones = phoneCandidates(account);
     const testOverride = normalizePhone(account.test_phone_override);
-    const selectedPhone = testOverride || normalizePhone(candidate.normalized_phone) || normalizePhone(candidate.phone_number) || phones[0]?.phone || "";
+    const selectedPhone = testOverride || normalizePhone(candidate.phone_number) || phones[0]?.phone || "";
     const selectedSlot = testOverride ? "test_phone_override" : (candidate.phone_slot || phones.find((row) => row.phone === selectedPhone)?.slot || phones[0]?.slot || "");
-
-    // Mandatory global rolling 24-hour suppression. This is checked immediately
-    // before every Twilio request, so a second campaign or restarted campaign
-    // cannot redial the same normalized number inside the hold window.
-    if (selectedPhone && selectedSlot !== "test_phone_override") {
-      const recent = await recentPhoneAttempt(admin, selectedPhone);
-      if (recent) {
-        const eligibleAt = new Date(new Date(recent.started_at).getTime() + 24 * 60 * 60 * 1000).toISOString();
-        await admin.from("voice_broadcast_campaign_accounts").update({
-          status: "24_hour_hold",
-          normalized_phone: selectedPhone,
-          phone_number: selectedPhone,
-          eligible_at: eligibleAt,
-          last_result: "Called within prior 24 hours",
-          last_error: `Last attempted ${recent.started_at}. Eligible again ${eligibleAt}.`,
-          updated_at: new Date().toISOString(),
-        }).eq("id", candidate.id);
-        await insertActivity(admin, account.id, "Broadcast 24-Hour Hold", `Voice broadcast skipped ${selectedPhone}; eligible again ${eligibleAt}.`, actor.email, selectedPhone);
-        blocked.push({ id: candidate.id, reason: `24-hour hold until ${eligibleAt}` });
-        continue;
-      }
-    }
     const campaignFilters = campaign.filters && typeof campaign.filters === "object" ? campaign.filters : {};
     const isSpecificAccountTest = campaignFilters.mode === "specific_accounts" && selectedSlot === "test_phone_override";
     const effectiveCompliance = isSpecificAccountTest
@@ -312,7 +278,6 @@ async function dispatchBatch(admin: any, actor: any, input: any) {
     const { data: claimed } = await admin.from("voice_broadcast_campaign_accounts").update({
       status: "initiating",
       phone_number: selectedPhone,
-      normalized_phone: selectedPhone,
       phone_slot: selectedSlot,
       last_attempt_at: now,
       compliance_snapshot: effectiveCompliance,
@@ -326,7 +291,6 @@ async function dispatchBatch(admin: any, actor: any, input: any) {
       campaign_account_id: candidate.id,
       account_id: account.id,
       phone_number: selectedPhone,
-      normalized_phone: selectedPhone,
       status: "initiated",
       started_at: now,
     }).select("*").single();
@@ -337,21 +301,27 @@ async function dispatchBatch(admin: any, actor: any, input: any) {
       if (!supabaseUrl) throw new Error("SUPABASE_URL is unavailable.");
       const webhookBase = `${supabaseUrl}/functions/v1/voice-broadcast-webhook`;
       const { fromNumber } = twilioSecrets();
+      const liveMessage = firstText(campaign.live_message_text, "Please hold while we connect your call.");
+      const gatherUrl = `${webhookBase}?route=gather&callRowId=${encodeURIComponent(call.id)}`;
+      const dialCompleteUrl = `${webhookBase}?route=dial-complete&callRowId=${encodeURIComponent(call.id)}`;
+      const transferNumber = normalizePhone(campaign.transfer_number);
+      const initialTwiml = campaign.connect_mode === "auto_transfer"
+        ? `<Response><Pause length="2"/><Say voice="alice">${xmlEscape(liveMessage)}</Say><Dial answerOnBridge="true" timeout="25" callerId="${xmlEscape(fromNumber)}" action="${xmlEscape(dialCompleteUrl)}" method="POST"><Number>${xmlEscape(transferNumber)}</Number></Dial><Hangup/></Response>`
+        : `<Response><Pause length="2"/><Gather input="dtmf" numDigits="1" timeout="8" actionOnEmptyResult="true" action="${xmlEscape(gatherUrl)}" method="POST"><Say voice="alice">${xmlEscape(liveMessage)}</Say></Gather><Say voice="alice">We did not receive a response. Goodbye.</Say><Hangup/></Response>`;
       const params = new URLSearchParams();
       params.set("To", selectedPhone);
       params.set("From", fromNumber);
-      params.set("Url", `${webhookBase}?route=answer&callRowId=${encodeURIComponent(call.id)}`);
-      params.set("Method", "POST");
+      params.set("Twiml", initialTwiml);
       params.set("StatusCallback", `${webhookBase}?route=status&callRowId=${encodeURIComponent(call.id)}`);
       params.set("StatusCallbackMethod", "POST");
       for (const event of ["initiated", "ringing", "answered", "completed"]) params.append("StatusCallbackEvent", event);
       params.set("Timeout", "25");
-      // Do not use synchronous Twilio Answering Machine Detection here.
-      // AMD holds the call in silence before Twilio requests the answer webhook,
-      // and keypad noise can cause only part of the message to play.
-      // Press-1 campaigns must begin speaking immediately after answer.
+      params.set("MachineDetection", campaign.leave_voicemail ? "DetectMessageEnd" : "Enable");
+      params.set("MachineDetectionTimeout", campaign.leave_voicemail ? "45" : "20");
+      params.set("MachineDetectionSpeechThreshold", "2000");
+      params.set("MachineDetectionSpeechEndThreshold", "1500");
 
-      console.log("[voice-broadcast] dialing account", { campaignId, campaignAccountId: candidate.id, accountId: account.id, phoneNumber: selectedPhone });
+      console.log("[voice-broadcast] dialing account with inline TwiML", { campaignId, campaignAccountId: candidate.id, accountId: account.id, phoneNumber: selectedPhone, connectMode: campaign.connect_mode });
       const payload = await twilioRequest("/Calls.json", "POST", params);
       const providerSid = firstText(payload.sid);
       await admin.from("voice_broadcast_calls").update({

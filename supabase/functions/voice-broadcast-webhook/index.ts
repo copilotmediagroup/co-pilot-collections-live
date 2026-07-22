@@ -82,41 +82,13 @@ async function expectedTwilioSignature(url: string, params: URLSearchParams, aut
 async function verifyTwilioRequest(req: Request, params: URLSearchParams) {
   const authToken = Deno.env.get("TWILIO_AUTH_TOKEN")?.trim() || "";
   if (!authToken) throw new Error("TWILIO_AUTH_TOKEN is not configured.");
-
-  const sent =
-    req.headers.get("X-Twilio-Signature") ||
-    req.headers.get("x-twilio-signature") ||
-    "";
-
-  if (!sent) {
-    console.error("Twilio webhook rejected: missing X-Twilio-Signature header.");
-    return false;
-  }
-
-  /*
-   * Twilio signs the exact public callback URL, including the query string.
-   * Supabase may expose a different internal request URL at runtime, so build
-   * the canonical public URL from SUPABASE_URL and this function's fixed slug.
-   */
-  const supabaseUrl = Deno.env.get("SUPABASE_URL")?.trim().replace(/\/$/, "") || "";
-  if (!supabaseUrl) throw new Error("SUPABASE_URL is unavailable.");
-
+  const sent = req.headers.get("X-Twilio-Signature") || req.headers.get("x-twilio-signature") || "";
+  if (!sent) return false;
+  const overrideBase = Deno.env.get("TWILIO_WEBHOOK_BASE_URL")?.trim().replace(/\/$/, "") || "";
   const requestUrl = new URL(req.url);
-  const configuredBase = Deno.env.get("TWILIO_WEBHOOK_BASE_URL")?.trim().replace(/\/$/, "") || "";
-  const publicBase = configuredBase || `${supabaseUrl}/functions/v1/voice-broadcast-webhook`;
-  const signedUrl = `${publicBase}${requestUrl.search}`;
-
+  const signedUrl = overrideBase ? `${overrideBase}${requestUrl.pathname}${requestUrl.search}` : req.url;
   const expected = await expectedTwilioSignature(signedUrl, params, authToken);
-  const valid = safeEqual(sent, expected);
-
-  if (!valid) {
-    console.error("Twilio webhook rejected: signature mismatch.", {
-      signedUrl,
-      hasSignature: Boolean(sent),
-    });
-  }
-
-  return valid;
+  return safeEqual(sent, expected);
 }
 
 async function insertActivity(admin: any, accountId: string, type: string, text: string, email: string, phone = "") {
@@ -255,15 +227,10 @@ async function context(admin: any, callRowId: string) {
 }
 
 function webhookUrl(req: Request, route: string, callRowId: string) {
-  const supabaseUrl = Deno.env.get("SUPABASE_URL")?.trim().replace(/\/$/, "") || "";
-  if (!supabaseUrl) throw new Error("SUPABASE_URL is unavailable.");
-
-  const configuredBase = Deno.env.get("TWILIO_WEBHOOK_BASE_URL")?.trim().replace(/\/$/, "") || "";
-  const publicBase = configuredBase || `${supabaseUrl}/functions/v1/voice-broadcast-webhook`;
-  const url = new URL(publicBase);
-  url.searchParams.set("route", route);
-  url.searchParams.set("callRowId", callRowId);
-  return url.toString();
+  const current = new URL(req.url);
+  const overrideBase = Deno.env.get("TWILIO_WEBHOOK_BASE_URL")?.trim().replace(/\/$/, "") || "";
+  const base = overrideBase || `${current.protocol}//${current.host}`;
+  return `${base}${current.pathname}?route=${encodeURIComponent(route)}&callRowId=${encodeURIComponent(callRowId)}`;
 }
 
 function dialQueueTwiml(req: Request, campaign: any, callRow: any) {
@@ -275,65 +242,19 @@ function dialQueueTwiml(req: Request, campaign: any, callRow: any) {
 
 
 async function createLiveTransfer(admin: any, callRow: any, campaign: any) {
-  if (!callRow?.account_id || !callRow?.id) {
-    console.error("LIVE_TRANSFER_SKIPPED", { callId: callRow?.id, accountId: callRow?.account_id });
-    return null;
-  }
-
-  const { data: account, error: accountError } = await admin
-    .from("accounts")
-    .select("*")
-    .eq("id", callRow.account_id)
-    .maybeSingle();
-
-  if (accountError) console.error("LIVE_TRANSFER_ACCOUNT_LOOKUP_FAILED", accountError);
-
-  const raw = account?.raw_data || account?.rawData || {};
-  const first = account?.first_name || account?.firstName || raw?.first_name || raw?.firstName || "";
-  const last = account?.last_name || account?.lastName || raw?.last_name || raw?.lastName || "";
-  const consumerName = account?.full_name || account?.fullName || [first, last].filter(Boolean).join(" ") || "Account";
-  const accountNumber = account?.account_number || account?.accountNumber || account?.client_account_number || account?.clientAccountNumber || raw?.account_number || raw?.accountNumber || "";
-  const balance = Number(account?.current_balance ?? account?.currentBalance ?? account?.principal ?? account?.original_balance ?? account?.originalBalance ?? 0) || 0;
+  if (!callRow?.account_id || !callRow?.id) return;
   const now = new Date();
-
-  const payload = {
+  await admin.from("voice_broadcast_live_transfers").upsert({
     call_id: callRow.id,
     campaign_id: callRow.campaign_id,
     account_id: callRow.account_id,
     phone_number: callRow.phone_number || null,
-    called_number: callRow.phone_number || null,
-    consumer_name: consumerName,
-    account_number: String(accountNumber || ""),
-    balance,
     status: "waiting",
     claimed_by_email: null,
     claimed_at: null,
-    expires_at: new Date(now.getTime() + 10 * 60 * 1000).toISOString(),
+    expires_at: new Date(now.getTime() + 5 * 60 * 1000).toISOString(),
     updated_at: now.toISOString(),
-  };
-
-  const { data, error } = await admin
-    .from("voice_broadcast_live_transfers")
-    .upsert(payload, { onConflict: "call_id" })
-    .select("*")
-    .single();
-
-  if (error) {
-    console.error("LIVE_TRANSFER_CREATE_FAILED", { error, payload });
-    throw new Error(`Live transfer screen-pop row failed: ${error.message}`);
-  }
-
-  console.log("LIVE_TRANSFER_CREATED", { id: data?.id, callId: callRow.id, accountId: callRow.account_id, phone: callRow.phone_number });
-  return data;
-}
-
-
-function campaignMessageTwiml(campaign: any, fallback: string) {
-  const audioUrl = firstText(campaign.live_audio_url);
-  if (campaign.message_type === "recorded" && audioUrl && /^https:\/\//i.test(audioUrl)) {
-    return `<Play>${xmlEscape(audioUrl)}</Play>`;
-  }
-  return `<Say voice="alice">${xmlEscape(firstText(campaign.live_message_text, fallback))}</Say>`;
+  }, { onConflict: "call_id" });
 }
 
 async function handleAnswer(req: Request, params: URLSearchParams, admin: any, callRow: any, campaign: any) {
@@ -363,23 +284,23 @@ async function handleAnswer(req: Request, params: URLSearchParams, admin: any, c
   if (machineLike) {
     if (campaign.leave_voicemail && firstText(campaign.voicemail_message_text)) {
       await finalizeOutcome(admin, { ...callRow, answered_by: answeredBy }, campaign, "Left Voicemail");
-      return xml(`<Pause length="1"/><Say voice="alice">${xmlEscape(campaign.voicemail_message_text)}</Say><Hangup/>`);
+      return xml(`<Pause length="2"/><Say voice="alice">${xmlEscape(campaign.voicemail_message_text)}</Say><Hangup/>`);
     }
     await finalizeOutcome(admin, { ...callRow, answered_by: answeredBy }, campaign, "Machine Answer");
     return xml("<Hangup/>");
   }
 
-  const messageTwiml = campaignMessageTwiml(campaign, "Please hold while we connect your call.");
+  const message = firstText(campaign.live_message_text, "Please hold while we connect your call.");
   if (campaign.connect_mode === "auto_transfer") {
     await admin.from("voice_broadcast_calls").update({ status: "transferring", transferred_at: now, updated_at: now }).eq("id", callRow.id);
     await admin.from("voice_broadcast_campaign_accounts").update({ status: "transferring", updated_at: now }).eq("id", callRow.campaign_account_id);
     await createLiveTransfer(admin, callRow, campaign);
-    return xml(`<Pause length="1"/>${messageTwiml}${dialQueueTwiml(req, campaign, callRow)}`);
+    return xml(`<Pause length="2"/><Say voice="alice">${xmlEscape(message)}</Say>${dialQueueTwiml(req, campaign, callRow)}`);
   }
 
   const gatherAction = webhookUrl(req, "gather", callRow.id);
   await admin.from("voice_broadcast_calls").update({ status: "gathering", updated_at: now }).eq("id", callRow.id);
-  return xml(`<Pause length="1"/><Gather input="dtmf" numDigits="1" timeout="8" actionOnEmptyResult="true" action="${xmlEscape(gatherAction)}" method="POST">${messageTwiml}</Gather><Say voice="alice">We did not receive a response. Goodbye.</Say><Hangup/>`);
+  return xml(`<Pause length="2"/><Gather input="dtmf" numDigits="1" timeout="8" actionOnEmptyResult="true" action="${xmlEscape(gatherAction)}" method="POST"><Say voice="alice">${xmlEscape(message)}</Say></Gather><Say voice="alice">We did not receive a response. Goodbye.</Say><Hangup/>`);
 }
 
 async function handleGather(req: Request, params: URLSearchParams, admin: any, callRow: any, campaign: any) {
