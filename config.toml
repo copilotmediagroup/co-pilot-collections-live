@@ -9,3 +9,6 @@ verify_jwt = false
 
 [functions.voice-broadcast-webhook]
 verify_jwt = false
+
+[functions.dialer-gateway]
+verify_jwt = false
