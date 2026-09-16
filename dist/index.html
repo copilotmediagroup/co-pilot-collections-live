@@ -5,12 +5,13 @@
 <!-- PAYMENT_PROMISE_PLAN_SAVE_FIX_MARKER: payment promise, payment plan, and notes save repair -->
 <!-- LIVE_CALL_INTELLIGENCE_MARKER: call logging + contact intelligence -->
 <!-- LIVE_PROMISE_AUTOMATION_ALERTS_MARKER: promise automation + collector alerts -->
+<!-- LIVE_DEMO_ONE_CLICK_LOGIN_EXCLUSION_R8N2: no demo credentials, buttons, or public-demo restrictions -->
 <html>
 <!-- STAFF_APPROVAL_ACTIONS_R6_2026_07_18: secure admin RPC + compact professional staff controls -->
 <!-- DOCUMENT_BRANDING_TYPED_ESIGN_R4_2026_07_18: brand logo/name on documents + company Created By + DocuSign-style typed signature chooser -->
 
 <head>
-<!-- STABLE_SINGLE_FILE_QA_LOCK_2026_07_18_R8: Client Remittance + Agency Fee Accounting -->
+<!-- LIVE_SOURCE_OF_TRUTH_MESSENGER_CLEANUP_R8N20_1: LIVE Voice Broadcast Queue Field Persistence Fix -->
 <!-- LIVE_COMPLIANCE_GUARD_MARKER: compliance guard + call rules -->
 <!-- LIVE_REPORTING_CLEAN_PACKAGE_MARKER: clean live package + admin reports -->
 <!-- LIVE_REPORTING_CLEAN_PACKAGE_MARKER: clean live package + admin reports -->
@@ -99,7 +100,7 @@ header.topbar{height:66px;background:linear-gradient(90deg,#05225f,#07379a,#0b45
 .dispoPanel{grid-column:1/-1}.dispoGrid{grid-template-columns:repeat(8,1fr);gap:8px}.dispo{height:44px;font-size:12px;border-radius:10px;padding:0 8px}
 .notePanel{grid-column:1/2}.notePanel textarea{height:90px;background:#fffdf3;border-color:#f3d38a}.centerActivity{grid-column:2/3}.timeline{max-height:160px;overflow:auto}
 .mappedPanel{display:none}
-.right{padding:16px 14px 84px;background:#f8fbff;overflow:auto}.right .panel{border-radius:14px}.softphone{padding:14px}.ready{border-radius:10px}.dialer{grid-template-columns:1fr;gap:10px}.keys{grid-template-columns:repeat(3,1fr)}.key{height:46px;background:#fff;color:#0f172a;border:1px solid var(--line);border-radius:9px}.callBox{border:0;padding:0}.callBox button{width:100%;justify-content:center;border-radius:8px}.quickActions{padding:14px;margin-top:12px}.qaItem{height:42px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #e5edf7;font-weight:800;font-size:13px}.qaItem:last-child{border-bottom:0}.qaIcon{width:26px;height:26px;border-radius:8px;background:#e0ecff;color:#1457ff;display:grid;place-items:center;margin-right:8px}.qaLeft{display:flex;align-items:center}
+.right{padding:16px 14px 84px;background:#f8fbff;overflow:auto}.right .panel{border-radius:14px}.softphone{padding:14px}.ready{border-radius:10px}.dialer{grid-template-columns:1fr;gap:10px}.keys{grid-template-columns:repeat(3,1fr)}.key{height:46px;background:#fff;color:#0f172a;border:1px solid var(--line);border-radius:9px}.callBox{border:0;padding:0}.callBox button{width:100%;justify-content:center;border-radius:8px}.quickActions{padding:14px;margin-top:0}.qaItem{height:42px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #e5edf7;font-weight:800;font-size:13px}.qaItem:last-child{border-bottom:0}.qaIcon{width:26px;height:26px;border-radius:8px;background:#e0ecff;color:#1457ff;display:grid;place-items:center;margin-right:8px}.qaLeft{display:flex;align-items:center}
 .bottom{height:70px;background:white;border-top:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:12px 18px;box-shadow:0 -4px 18px rgba(15,23,42,.06);z-index:6}.rightBtns{gap:14px}.big,.primaryBig{min-width:165px;height:48px;justify-content:center;border-radius:10px}.primaryBig{background:#1457ff}
 .importProgressBox{z-index:99999}
 @media(max-width:1400px){.main{grid-template-columns:50px 300px 1fr 260px}.summaryGrid{grid-template-columns:repeat(3,1fr)}.allFieldsGrid{grid-template-columns:repeat(3,1fr)}.allFieldCard:nth-child(4n){border-right:1px solid #e5edf7}.allFieldCard:nth-child(3n){border-right:0}.phoneGrid{grid-template-columns:repeat(3,1fr)}.dispoGrid{grid-template-columns:repeat(4,1fr)}}
@@ -3540,6 +3541,36 @@ button {
 .planProHeader .planProActions{display:flex!important;gap:10px!important;align-items:center!important;justify-content:flex-end!important;flex-wrap:wrap!important}
 .planProHeader .planProActions .red{background:#dc2626!important;color:#fff!important}
 .planProHeader .planProActions .outline{background:#fff!important;color:#1d4ed8!important;border:1px solid #bfdbfe!important}
+
+/* NMI ADMIN ACTIONS + POLISHED TOASTS — R8N16 */
+.nmiToastStack{position:fixed;top:18px;right:18px;z-index:2147483647;display:flex;flex-direction:column;gap:10px;width:min(390px,calc(100vw - 36px));pointer-events:none}
+.nmiToast{pointer-events:auto;background:#fff;border:1px solid #dbe4ee;border-left:5px solid #2563eb;border-radius:12px;box-shadow:0 18px 50px rgba(15,23,42,.22);padding:13px 42px 13px 14px;position:relative;animation:nmiToastIn .2s ease-out}
+.nmiToast.success{border-left-color:#16a34a}.nmiToast.error{border-left-color:#dc2626}.nmiToast.warning{border-left-color:#d97706}.nmiToast.info{border-left-color:#2563eb}
+.nmiToastTitle{font-size:13px;font-weight:900;color:#0f172a;margin-bottom:3px}.nmiToastMessage{font-size:12px;line-height:1.45;color:#475569;font-weight:650}
+.nmiToastClose{position:absolute;right:10px;top:9px;border:0;background:transparent;color:#64748b;font-size:20px;line-height:1;cursor:pointer;padding:2px 5px}
+@keyframes nmiToastIn{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
+@media(max-width:650px){.nmiToastStack{top:10px;right:10px;width:calc(100vw - 20px)}}
+
+
+/* NMI EMPLOYEE → ADMIN PAYMENT APPROVAL QUEUE — R8N17 */
+.nmiApprovalBox{width:min(1180px,96vw);max-height:92vh}
+.nmiApprovalHero{display:flex;justify-content:space-between;gap:16px;align-items:center;padding:14px 16px;border:1px solid #bfdbfe;background:#eff6ff;border-radius:12px;margin-bottom:12px}
+.nmiApprovalHero b{display:block;color:#0f3d78;font-size:14px}.nmiApprovalHero span{display:block;color:#475569;font-size:12px;margin-top:3px;font-weight:650}
+.nmiApprovalStats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-bottom:12px}
+.nmiApprovalStats>div{border:1px solid #dbe4ee;background:#fff;border-radius:11px;padding:11px 13px}.nmiApprovalStats span{display:block;color:#64748b;font-size:10px;font-weight:850;text-transform:uppercase;letter-spacing:.04em}.nmiApprovalStats b{display:block;color:#0f172a;font-size:20px;margin-top:3px}
+.nmiApprovalList{display:flex;flex-direction:column;gap:10px;margin-top:12px}
+.nmiApprovalCard{border:1px solid #dbe4ee;background:#fff;border-radius:13px;padding:14px;box-shadow:0 6px 18px rgba(15,23,42,.06)}
+.nmiApprovalCard.pending{border-left:5px solid #d97706}.nmiApprovalCard.processing{border-left:5px solid #2563eb}.nmiApprovalCard.approved{border-left:5px solid #16a34a}.nmiApprovalCard.declined,.nmiApprovalCard.expired,.nmiApprovalCard.cancelled,.nmiApprovalCard.gateway_declined,.nmiApprovalCard.failed{border-left:5px solid #dc2626}.nmiApprovalCard.needs_review{border-left:5px solid #7c3aed}
+.nmiApprovalTop{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}.nmiApprovalName{font-size:15px;font-weight:900;color:#0f172a}.nmiApprovalAccount{font-size:11px;color:#64748b;margin-top:2px;font-weight:700}
+.nmiApprovalAmount{text-align:right;font-size:20px;font-weight:950;color:#0f172a}.nmiApprovalStatus{display:inline-flex;margin-top:4px;padding:4px 8px;border-radius:999px;background:#f1f5f9;color:#334155;font-size:9px;font-weight:900;text-transform:uppercase;letter-spacing:.04em}
+.nmiApprovalGrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px;margin-top:12px}.nmiApprovalGrid>div{background:#f8fafc;border:1px solid #e2e8f0;border-radius:9px;padding:8px 10px}.nmiApprovalGrid span{display:block;color:#64748b;font-size:9px;font-weight:850;text-transform:uppercase}.nmiApprovalGrid b{display:block;color:#1e293b;font-size:11px;margin-top:3px;word-break:break-word}
+.nmiApprovalNotes{margin-top:10px;padding:9px 11px;border:1px solid #e2e8f0;background:#fafafa;border-radius:9px;color:#475569;font-size:11px;line-height:1.4}
+.nmiApprovalActions{display:flex;justify-content:flex-end;gap:8px;flex-wrap:wrap;margin-top:12px}.nmiApprovalActions button{min-width:120px}
+.nmiApprovalEmpty{border:1px dashed #cbd5e1;background:#f8fafc;border-radius:12px;padding:28px;text-align:center;color:#64748b;font-weight:750}
+.nmiEmployeeApprovalBanner{border:1px solid #fde68a;background:#fffbeb;color:#92400e;border-radius:10px;padding:10px 12px;margin:10px 0;font-size:11px;font-weight:750;line-height:1.4}
+@media(max-width:850px){.nmiApprovalGrid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:600px){.nmiApprovalStats,.nmiApprovalGrid{grid-template-columns:1fr}.nmiApprovalTop{flex-direction:column}.nmiApprovalAmount{text-align:left}.nmiApprovalHero{align-items:flex-start;flex-direction:column}}
+
 </style>
 
 <style id="dataCleanupDuplicateFinderStyles">
@@ -3591,6 +3622,18 @@ button {
     }
   })();
   </script>
+<style>
+/* QUICK ACTIONS TOP — CONTACT PANEL REMOVED — R8N9 */
+.right > .quickActions{margin-top:0!important;order:-10}
+</style>
+
+<style id="cpcmNmiPhase1Style">
+.nmiQuickAction{background:linear-gradient(90deg,#eefbf5,#f8fffc);border-color:#b7ead2!important}.nmiQuickAction .qaIcon{background:#0f9f6e!important;color:#fff!important}
+.nmiBox{width:min(980px,96vw)!important;max-width:980px!important}.nmiModalSub{font-size:11px;color:#64748b;font-weight:800;margin-top:3px}.nmiAccountStrip{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:12px}.nmiAccountStrip>div{border:1px solid #dbe5f1;background:#f8fbff;border-radius:12px;padding:11px}.nmiAccountStrip span{display:block;font-size:9px;font-weight:1000;letter-spacing:.06em;color:#64748b;text-transform:uppercase;margin-bottom:5px}.nmiAccountStrip b{font-size:14px;color:#0f172a;word-break:break-word}.nmiSecurityNote{border:1px solid #b7ead2;background:#ecfdf5;color:#065f46;border-radius:12px;padding:10px 12px;font-size:12px;margin-bottom:12px}.nmiGrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:11px}.nmiGrid label{font-size:10px;font-weight:950;color:#334155;text-transform:uppercase;letter-spacing:.03em}.nmiGrid input,.nmiGrid textarea{width:100%;box-sizing:border-box}.nmiWide{grid-column:1/-1}.nmiCardFields{display:grid;grid-template-columns:2fr 1fr 1fr;gap:11px;padding:12px;border:1px solid #cbd8e7;background:#f8fafc;border-radius:14px}.nmiHostedField{height:44px;border:1px solid #cbd5e1;border-radius:9px;background:#fff;overflow:hidden;box-shadow:inset 0 1px 2px rgba(15,23,42,.04);position:relative;isolation:isolate;cursor:text}.nmiHostedField iframe{display:block!important;position:absolute!important;inset:0!important;width:100%!important;height:44px!important;border:0!important;z-index:5!important;pointer-events:auto!important;background:#fff!important}.nmiFieldTools{display:flex;gap:9px;align-items:center;justify-content:flex-end;flex-wrap:wrap;margin-top:-2px}.nmiFieldTools span{font-size:10px;color:#64748b;font-weight:800}.nmiFieldTools button{padding:7px 10px;font-size:10px}.nmiConsent{display:flex;gap:9px;align-items:flex-start;margin-top:13px;padding:11px;border:1px solid #dbe5f1;background:#f8fafc;border-radius:12px;font-size:12px;font-weight:800;color:#334155}.nmiConsent input{margin-top:2px}.nmiPaymentStatus{margin-top:10px;border-radius:10px;padding:10px 12px;background:#eff6ff;border:1px solid #bfdbfe;color:#1e40af;font-size:12px;font-weight:850}.nmiPaymentStatus.processing{background:#fff7ed;border-color:#fed7aa;color:#9a3412}.nmiPaymentStatus.success{background:#ecfdf5;border-color:#a7f3d0;color:#065f46}.nmiPaymentStatus.error{background:#fef2f2;border-color:#fecaca;color:#991b1b}.nmiPaymentResult{margin-top:10px;border-radius:12px;border:1px solid #a7f3d0;background:#ecfdf5;padding:12px;color:#064e3b;font-size:12px}.nmiPaymentResult h4{margin:0 0 8px;font-size:15px}.nmiResultGrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.nmiResultGrid div{background:#fff;border:1px solid #d1fae5;border-radius:9px;padding:8px}.nmiResultGrid span{display:block;font-size:9px;text-transform:uppercase;color:#64748b;font-weight:900}.nmiResultGrid b{display:block;margin-top:4px;word-break:break-word}.nmiFooterActions{display:flex;gap:9px;justify-content:flex-end;flex-wrap:wrap;margin-top:13px}.nmiSetupWarning{border:1px solid #fdba74;background:#fff7ed;color:#9a3412;border-radius:12px;padding:11px;margin-bottom:12px;font-size:12px;font-weight:850}.nmiGatewayPill{display:inline-flex;align-items:center;border-radius:999px;padding:4px 8px;background:#dcfce7;color:#166534;font-size:10px;font-weight:950}.nmiActionButtons{display:flex;gap:5px;flex-wrap:wrap}.nmiActionButtons button{padding:6px 8px;font-size:10px}.nmiActionButtons .danger{background:#fee2e2;color:#991b1b;border:1px solid #fecaca}.hidden{display:none!important}
+@media(max-width:820px){.nmiAccountStrip{grid-template-columns:repeat(2,1fr)}.nmiGrid{grid-template-columns:1fr 1fr}.nmiCardFields{grid-template-columns:1fr 1fr}.nmiCardFields>div:first-child{grid-column:1/-1}.nmiResultGrid{grid-template-columns:1fr}}
+@media(max-width:560px){.nmiAccountStrip,.nmiGrid,.nmiCardFields{grid-template-columns:1fr}.nmiCardFields>div:first-child{grid-column:auto}.nmiFooterActions button{width:100%}}
+</style>
+
 </head>
 <body>
 <div id="loginScreen" class="loginScreen open">
@@ -3659,6 +3702,7 @@ button {
       <button class="gray todayBtn" onclick="openTodayDashboard()">Today</button>
       <button class="gray" onclick="openPaymentTracker()">Pay Desk</button>
       <button class="gray" onclick="openPaymentsDashboard()">Ledger</button>
+      <button class="gray" id="nmiApprovalNavButton" onclick="openNmiApprovalQueue()">Approvals <span id="nmiApprovalBadge" class="alertBadge hidden">0</span></button>
       <button class="gray" onclick="runPromiseAutomation(true,true)">Broken</button>
       <button class="gray" onclick="openDailyWorkQueue()">Queue</button>
       <button class="gray" onclick="openPromiseDashboard()">Promises</button>
@@ -3776,15 +3820,12 @@ button {
     </main>
 
     <aside class="right">
-      <section class="panel softphone">
-        <div class="softTop"><b>Softphone</b><span class="connected">● Connected</span></div>
-        <div class="ready"><b>Ready to call</b><br><span id="lastDialed">Click a number to dial</span></div>
-        <div class="dialer"><div class="keys"><button class="key">1</button><button class="key">2<br><small>ABC</small></button><button class="key">3<br><small>DEF</small></button><button class="key">4<br><small>GHI</small></button><button class="key">5<br><small>JKL</small></button><button class="key">6<br><small>MNO</small></button><button class="key">7<br><small>PQRS</small></button><button class="key">8<br><small>TUV</small></button><button class="key">9<br><small>WXYZ</small></button><button class="key">*</button><button class="key">0</button><button class="key">#</button></div><div class="callBox"><div>No active call</div><div class="callNumber" id="callNumber">—</div><button class="green" onclick="callPrimary()">Call</button><br><br><button class="red" onclick="endCall()">End Call</button></div></div>
-      </section>
-      <section class="panel quickActions">
+<section class="panel quickActions">
+        <span id="callNumber" hidden>—</span><span id="lastDialed" hidden></span>
         <div class="panelTitle"><h3>Quick Actions</h3></div>
         <div class="qaItem" onclick="openPaymentTrackerForCurrent()"><span class="qaLeft"><span class="qaIcon">🧾</span>Record Payment Promise</span><span>›</span></div>
         <div class="qaItem" onclick="openPaymentPlan()"><span class="qaLeft"><span class="qaIcon">💳</span>Payment Plan Schedule</span><span>›</span></div>
+        <div class="qaItem nmiQuickAction" onclick="openNmiPayment()"><span class="qaLeft"><span class="qaIcon">🔒</span>Secure Card Payment (NMI)</span><span>›</span></div>
         <div class="qaItem" onclick="openPaymentLedger()"><span class="qaLeft"><span class="qaIcon">💵</span>Record Payment / Ledger</span><span>›</span></div>
         <div class="qaItem" onclick="openDocumentGenerator()"><span class="qaLeft"><span class="qaIcon">🧾</span>Create Debtor Letter / PDF</span><span>›</span></div>
         <div class="qaItem" onclick="openFollowUpModal('Callback')"><span class="qaLeft"><span class="qaIcon">📅</span>Schedule Callback / Follow-Up</span><span>›</span></div>
@@ -3879,6 +3920,12 @@ button {
       <div><label>Email</label><input id="contactEmail"></div>
       <div><label>Phone 1</label><input id="contactPhone1"></div>
       <div><label>Phone 2</label><input id="contactPhone2"></div>
+      <div id="contactTestOverrideWrap" style="display:none;grid-column:1/-1;border:1px solid #bfdbfe;background:#eff6ff;border-radius:12px;padding:12px">
+        <label style="color:#1d4ed8">Admin Test Override Number</label>
+        <input id="contactTestOverride" inputmode="tel" autocomplete="off" placeholder="Use your own number for a full broadcast test">
+        <div class="muted" style="margin-top:6px">When present, voice-broadcast campaigns call this test number while keeping the account tied to the original consumer record. Clear it before using the account in a live campaign.</div>
+        <button type="button" class="gray" style="margin-top:9px" onclick="clearContactTestOverride()">Clear Test Override</button>
+      </div>
       <div><label>Address</label><input id="contactAddress"></div>
       <div><label>City</label><input id="contactCity"></div>
       <div><label>State</label><input id="contactState"></div>
@@ -4365,6 +4412,69 @@ button {
 <div id="permissionsModal" class="modal"><div class="modalbox powerBox"><div class="modalhead"><h2>Role Permissions</h2><button class="gray" onclick="closeModal('permissionsModal')">Close</button></div><div class="modalbody"><div class="powerWarning">This stores role permissions for your CRM. Current hard rules still remain: admin controls imports/exports/assignments; employees work assigned accounts.</div><div class="powerTableWrap"><table class="powerTable"><thead><tr><th>Permission</th><th>Admin</th><th>Manager</th><th>Collector</th></tr></thead><tbody id="permissionsBody"></tbody></table></div><div style="text-align:right;margin-top:12px"><button class="green" onclick="savePermissions()">Save Permissions</button></div></div></div></div>
 
 
+
+<div id="nmiPaymentModal" class="modal"><div class="modalbox nmiBox">
+  <div class="modalhead">
+    <div><h2 id="nmiPaymentModalTitle">Secure Card Payment</h2><div id="nmiPaymentModalSub" class="nmiModalSub">NMI hosted card fields • Administrator-controlled card processing</div></div>
+    <button class="gray" onclick="closeModal('nmiPaymentModal')">Close</button>
+  </div>
+  <div class="modalbody">
+    <div id="nmiSetupWarning" class="nmiSetupWarning hidden"></div>
+    <div class="nmiAccountStrip">
+      <div><span>Consumer</span><b id="nmiConsumerName">—</b></div>
+      <div><span>Account</span><b id="nmiAccountNumber">—</b></div>
+      <div><span>Current Balance</span><b id="nmiCurrentBalance">$0.00</b></div>
+      <div><span>Balance After</span><b id="nmiBalanceAfter">$0.00</b></div>
+    </div>
+    <div id="nmiSecurityNote" class="nmiSecurityNote"><b>Secure card entry:</b> Card number, expiration date, and CVV are entered inside NMI-hosted fields. Co Pilot does not store the full card number or CVV.</div>
+    <div class="nmiGrid">
+      <div><label>Payment Amount</label><input id="nmiAmount" type="number" min="0.01" step="0.01" oninput="updateNmiPaymentPreview()" placeholder="0.00"></div>
+      <div><label>Cardholder Name</label><input id="nmiCardholderName" autocomplete="cc-name"></div>
+      <div class="nmiWide"><label>Billing Address</label><input id="nmiAddress1" autocomplete="billing street-address"></div>
+      <div><label>City</label><input id="nmiCity" autocomplete="billing address-level2"></div>
+      <div><label>State</label><input id="nmiState" maxlength="2" autocomplete="billing address-level1"></div>
+      <div><label>ZIP Code</label><input id="nmiZip" autocomplete="billing postal-code"></div>
+      <div><label>Email for Account Record</label><input id="nmiEmail" type="email" autocomplete="email"></div>
+      <div><label>Phone</label><input id="nmiPhone" autocomplete="tel"></div>
+      <div class="nmiWide nmiCardFields">
+        <div><label>Card Number</label><div id="ccnumber" class="nmiHostedField" aria-label="Secure card number field"></div></div>
+        <div><label>Expiration</label><div id="ccexp" class="nmiHostedField" aria-label="Secure expiration field"></div></div>
+        <div><label>CVV</label><div id="cvv" class="nmiHostedField" aria-label="Secure CVV field"></div></div>
+      </div>
+      <div class="nmiWide nmiFieldTools"><span id="nmiFieldDiagnostic">NMI secure fields initialize when this screen opens.</span><button type="button" class="outline" onclick="reloadNmiSecureFields()">Reload Secure Fields</button></div>
+      <div class="nmiWide"><label>Internal Notes</label><textarea id="nmiNotes" placeholder="Optional authorization or payment notes. Do not enter full card information."></textarea></div>
+    </div>
+    <label class="nmiConsent"><input id="nmiAuthorization" type="checkbox"> <span id="nmiConsentText">I confirm the consumer authorized this one-time card charge for the amount shown.</span></label>
+    <div id="nmiPaymentStatus" class="nmiPaymentStatus">Ready for secure card entry.</div>
+    <div id="nmiPaymentResult" class="nmiPaymentResult hidden"></div>
+    <div class="nmiFooterActions">
+      <button class="outline" onclick="openPaymentLedger()">Open Ledger</button>
+      <button class="outline" id="nmiReceiptButton" style="display:none" onclick="openNmiReceiptCenter()">Open Receipt Center</button>
+      <button class="green" id="nmiPayButton" onclick="startNmiPayment()">Process Secure Payment</button>
+    </div>
+  </div>
+</div></div>
+
+<div id="nmiApprovalModal" class="modal"><div class="modalbox nmiApprovalBox">
+  <div class="modalhead">
+    <div><h2 id="nmiApprovalTitle">Payment Approvals</h2><div id="nmiApprovalSub" class="nmiModalSub">Employee-submitted card requests waiting for administrator action.</div></div>
+    <button class="gray" onclick="closeModal('nmiApprovalModal')">Close</button>
+  </div>
+  <div class="modalbody">
+    <div class="nmiApprovalHero">
+      <div><b id="nmiApprovalHeroTitle">Administrator approval is required before a card is charged.</b><span id="nmiApprovalHeroText">Employees may securely capture payment information, but they cannot run a sale.</span></div>
+      <button class="outline" onclick="loadNmiApprovalQueue(true)">Refresh</button>
+    </div>
+    <div class="nmiApprovalStats">
+      <div><span>Pending</span><b id="nmiApprovalPendingStat">0</b></div>
+      <div><span>Approved</span><b id="nmiApprovalApprovedStat">0</b></div>
+      <div><span>Declined / Expired</span><b id="nmiApprovalClosedStat">0</b></div>
+    </div>
+    <div id="nmiApprovalQueueStatus" class="nmiPaymentStatus">Loading payment requests…</div>
+    <div id="nmiApprovalList" class="nmiApprovalList"></div>
+  </div>
+</div></div>
+
 <div id="paymentLedgerModal" class="modal"><div class="modalbox ledgerBox">
   <div class="modalhead"><h2>Payment Ledger / Record Payment</h2><button class="gray" onclick="closeModal('paymentLedgerModal')">Close</button></div>
   <div class="modalbody">
@@ -4393,7 +4503,7 @@ button {
     </div>
     <div class="ledgerTableWrap">
       <table class="ledgerTable">
-        <thead><tr><th>Date</th><th>Type</th><th>Amount</th><th>Method</th><th>Status</th><th>Balance Before</th><th>Balance After</th><th>Receipt</th><th>Entered By</th><th>Notes</th></tr></thead>
+        <thead><tr><th>Date</th><th>Type</th><th>Amount</th><th>Method</th><th>Status</th><th>Gateway</th><th>Balance Before</th><th>Balance After</th><th>Receipt</th><th>Entered By</th><th>Notes</th><th>Actions</th></tr></thead>
         <tbody id="ledgerHistoryBody"></tbody>
       </table>
     </div>
@@ -4597,7 +4707,6 @@ button {
             <div class="chatActiveSub" id="chatActiveStatus">Choose an employee or admin from the left.</div>
           </div>
         </div>
-        <button class="chatAttachAccount" onclick="attachCurrentAccountToChat()">Attach Current Account</button>
       </div>
       <div id="chatMessages" class="chatMessages">
         <div class="chatEmpty">Pick a person to start a direct chat.</div>
@@ -4887,6 +4996,7 @@ button {
   };
 </script>
 <script src="/config.js"></script>
+<script src="/nmi-config.js"></script>
 <script>
 const ADMIN_EMAIL='afinch2678@gmail.com';
 const ADMIN_EMAILS=[ADMIN_EMAIL].map(e=>e.toLowerCase());
@@ -5491,10 +5601,15 @@ function isUserApproved(profile){
 }
 async function loadAppUsers(){
  try{
-   let rows=await dbFetch('/app_users?select=*&order=email.asc');
+   let rows=[];
+   try{
+     rows=await dbFetch('/rpc/cpcm_staff_directory',{method:'POST',body:'{}'});
+   }catch(rpcErr){
+     rows=await dbFetch('/app_users?select=*&order=email.asc');
+   }
    appUsers=(rows||[]).map(toCamel);
  }catch(err){
-   console.warn('Could not load app users. Run updated SQL.',err);
+   console.warn('Could not load staff directory. Run RUN_THIS_MESSENGER_STAFF_NAMES_SQL.sql.',err);
    appUsers=[];
  }
  return appUsers;
@@ -5505,6 +5620,12 @@ function snakeToCamel(k){return String(k).replace(/_([a-z])/g,(_,c)=>c.toUpperCa
 function toRow(a){let r={};Object.entries(map).forEach(([k,v])=>{if(a[k]!==undefined)r[v]=numKey(k)?num(a[k]):a[k]});r.full_name=r.full_name||[r.first_name,r.middle_name,r.last_name].filter(Boolean).join(' ');r.account_number=r.account_number||r.client_account_number||r.source_account_id||'';r.portfolio=r.portfolio||r.issuer_name||r.account_description||r.original_creditor||'Imported Portfolio';r.original_creditor=r.original_creditor||r.issuer_name||r.account_description||r.portfolio;r.status=r.status||'New';r.updated_at=new Date().toISOString();r.created_by_email=currentUser.email;return r}
 function numKey(k){return ['originalBalance','principal','currentBalance','lastPaymentAmount','origPrincipalBalance','origOriginalLoanAmount','origChargeOffBalance','origPrincipalLoanAmount','origInterestAmount','origReturnFee'].includes(k)}function num(v){if(v===''||v==null)return null;let n=Number(String(v).replace(/[$,]/g,''));return Number.isFinite(n)?n:null}
 async function loadAccounts(){
+ if(!token()){
+   accounts=[];
+   currentAccountId='';
+   render();
+   return;
+ }
  try{
    setGlobalBusy(true,'Loading accounts','Refreshing queue and dashboards...');
    accounts=(await dbFetch('/accounts?select=*&order=created_at.asc&limit=20000')).map(toCamel);
@@ -5516,7 +5637,15 @@ async function loadAccounts(){
    if(typeof refreshCollectorAlertBadge==='function')refreshCollectorAlertBadge().catch(()=>{});
    render();
  }catch(e){
-   alert('Could not load accounts:\n\n'+friendlyError(e.message||String(e)));
+   let loadMessage=String(e?.message||e||'');
+   if(/not logged in|no refresh token|session expired|login session expired/i.test(loadMessage)){
+     console.info('Account loading skipped because no authenticated session is active.');
+     accounts=[];
+     currentAccountId='';
+     render();
+     return;
+   }
+   alert('Could not load accounts:\n\n'+friendlyError(loadMessage));
    accounts=[];
    currentAccountId='';
    render();
@@ -5747,7 +5876,7 @@ function displayVal(k,v,a){
  if(typeof v==='object')return '';
  let val=String(v);
  let phone=normPhone(val);
- if(phone.length>=10 && phone.length<=11 && /phone/i.test(k))return `<a href="tel:${phone}" onclick="recordDial('${a.id}','${phone}')">${fmtPhone(phone)}</a>`;
+ if(phone.length>=10 && phone.length<=11 && /phone/i.test(k))return `<a href="tel:${phone}" onclick="event.preventDefault(); return dialPhone('${a.id}','${phone}')">${fmtPhone(phone)}</a>`;
  return esc(val);
 }
 function mappedEntries(a){
@@ -5978,12 +6107,13 @@ function renderCurrent(a,q){
  renderPhones(a);
  renderDispos(a);
 }
+
 function renderPhones(a){
  let ps=phones(a).map(p=>normPhone(p)).filter(p=>p.length>=10);
  let seen=new Set();
  ps=ps.filter(p=>{let key=p.slice(-10); if(seen.has(key))return false; seen.add(key); return true;}).slice(0,6);
  let blocked=phoneIsBlocked(a);
- document.getElementById('phoneGrid').innerHTML=ps.map((p,i)=>`<a class="phoneChip ${blocked?'blocked':''}" href="tel:${normPhone(p)}" data-ringcentral-extension-number="${normPhone(p)}" onclick="event.preventDefault(); return dialPhone('${a.id}','${normPhone(p)}')"><div class="phoneIcon">☎</div><div><div class="phoneNum">${fmtPhone(p)}</div><div class="phoneType">${i===0?'Primary':i===1?'Mobile':'Alternate'}</div>${blocked?'<div class="callBlockedNote">Compliance review required</div>':''}</div></a>`).join('')||'<div class="muted">No phone numbers on this account.</div>'
+ document.getElementById('phoneGrid').innerHTML=ps.map((p,i)=>`<a class="phoneChip ${blocked?'blocked':''}" href="tel:${normPhone(p)}" data-ringcentral-extension-number="${normPhone(p)}" onclick="event.preventDefault(); return dialPhone('${a.id}','${normPhone(p)}')"><div class="phoneIcon">☎</div><div><div class="phoneNum">${fmtPhone(p)}</div><div class="phoneType">${i===0?'Primary':i===1?'Mobile':'Alternate'}</div>${blocked?'<div class="callBlockedNote">Compliance review required</div>':''}</div></a>`).join('')||'<div class="muted">No phone numbers on this account.</div>';
 }
 function renderDispos(a){document.getElementById('selectedDisposition').textContent=currentDisposition||a?.disposition||'Select one';document.getElementById('dispoGrid').innerHTML=DISPOS.map(d=>`<button class="dispo ${d==='Disputed'?'orangeText':['Promise to Pay','Settled'].includes(d)?'greenText':['Bad Number','DNC'].includes(d)?'redText':d==='Callback'?'purpleText':''} ${(currentDisposition||a?.disposition)===d?'selected':''}" onclick="selectDisposition('${d}')">${d}</button>`).join('')}
 async function selectDisposition(d){let cur=getCurrent();if(!cur)return;currentDisposition=d;let old=cur.status,newStatus=d==='Disputed'?'Disputed':d;let body={status:newStatus,disposition:d,updated_at:new Date().toISOString()};if(d==='DNC')body.do_not_call=true;if(d==='Disputed')body.disputed_flag=true;if(d==='Bad Number')body.wrong_number_flag=true;let updated;try{updated=(await dbFetch(`/accounts?id=eq.${cur.id}`,{method:'PATCH',body:JSON.stringify(body)}))[0]}catch(e){delete body.do_not_call;delete body.disputed_flag;delete body.wrong_number_flag;updated=(await dbFetch(`/accounts?id=eq.${cur.id}`,{method:'PATCH',body:JSON.stringify(body)}))[0]}await insertActivity(cur.id,'Status Updated','Disposition set to '+d,'',old,newStatus);await insertAudit('Status Updated','Disposition set to '+d,'account',cur.id);let i=accounts.findIndex(a=>a.id===cur.id);if(i>=0)accounts[i]=toCamel(updated);render();if(d==='Callback')openFollowUpModal('Callback');if(d==='Disputed')openDisputeModal();if(d==='Promise to Pay')openPaymentPlan();}
@@ -6631,7 +6761,7 @@ function monitorAccountCard(a){
      </div>
      <div style="text-align:right">
        <div class="monitorMoney">${money(accountBalance(a))}</div>
-       ${phone?`<a href="tel:${phone}" onclick="recordDial('${a.id}','${phone}')">Call ${fmtPhone(phone)}</a>`:''}
+       ${phone?`<a href="tel:${phone}" onclick="event.preventDefault(); return dialPhone('${a.id}','${phone}')">Call ${fmtPhone(phone)}</a>`:''}
      </div>
    </div>
  </div>`;
@@ -8779,18 +8909,37 @@ function openContactUpdate(){
  document.getElementById('contactEmail').value=a.email||'';
  document.getElementById('contactPhone1').value=a.phone1||'';
  document.getElementById('contactPhone2').value=a.phone2||'';
+ let testWrap=document.getElementById('contactTestOverrideWrap');
+ if(testWrap)testWrap.style.display=currentUser&&currentUser.isAdmin?'block':'none';
+ let testInput=document.getElementById('contactTestOverride');
+ if(testInput)testInput.value=a.testPhoneOverride||a.test_phone_override||'';
  document.getElementById('contactAddress').value=a.address||'';
  document.getElementById('contactCity').value=a.city||'';
  document.getElementById('contactState').value=a.state||'';
  document.getElementById('contactZip').value=a.zip||'';
  document.getElementById('contactModal').classList.add('open');
 }
+function normalizeAccountTestPhone(value){
+ let digits=String(value||'').replace(/\D/g,'');
+ if(!digits)return '';
+ if(digits.length===10)return '+1'+digits;
+ if(digits.length===11&&digits.startsWith('1'))return '+'+digits;
+ if(digits.length>=8&&digits.length<=15)return '+'+digits;
+ return '';
+}
+function clearContactTestOverride(){let input=document.getElementById('contactTestOverride');if(input)input.value=''}
 async function saveContactUpdate(){
  let a=getCurrent();if(!a)return;
  let body={email:document.getElementById('contactEmail').value.trim(),phone1:document.getElementById('contactPhone1').value.trim(),phone2:document.getElementById('contactPhone2').value.trim(),address:document.getElementById('contactAddress').value.trim(),city:document.getElementById('contactCity').value.trim(),state:document.getElementById('contactState').value.trim(),zip:document.getElementById('contactZip').value.trim(),updatedAt:new Date().toISOString()};
  let db={};Object.entries(body).forEach(([k,v])=>{if(reverse[k])db[reverse[k]]=v});
+ if(currentUser&&currentUser.isAdmin){
+   let raw=document.getElementById('contactTestOverride')?.value||'';
+   let normalized=normalizeAccountTestPhone(raw);
+   if(raw.trim()&&!normalized)return alert('Enter a valid test phone number with 10 to 15 digits.');
+   db.test_phone_override=normalized||null;
+ }
  let updated=(await dbFetch(`/accounts?id=eq.${a.id}`,{method:'PATCH',body:JSON.stringify(db)}))[0];
- await insertActivity(a.id,'Contact Updated','Contact info updated');
+ await insertActivity(a.id,'Contact Updated','Contact info updated'+(db.test_phone_override?' with an admin test broadcast override.':db.test_phone_override===null?' and the test broadcast override cleared.':''));
  let i=accounts.findIndex(x=>x.id===a.id);if(i>=0)accounts[i]=toCamel(updated);
  closeModal('contactModal');render();
 }
@@ -9181,6 +9330,7 @@ async function runQaHealthCheck(){
     ['todayDashboardModal','Today dashboard'],
     ['followUpModal','Follow-up modal'],
     ['paymentLedgerModal','Payment ledger'],
+    ['nmiPaymentModal','NMI secure card payment'],
     ['paymentPlanModal','Payment plan modal'],
     ['employeeAdminModal','Manage employees'],
     ['employeeMonitorModal','Employee monitor'],
@@ -9779,8 +9929,8 @@ function chatContactRole(email){
   return 'Employee';
 }
 function openTeamMessenger(){openChatDock()}
-function openTeamMessengerForCurrent(){openChatDock();attachCurrentAccountToChat()}
-function openChatForCurrentAccount(){openChatDock();attachCurrentAccountToChat()}
+function openTeamMessengerForCurrent(){openChatDock()}
+function openChatForCurrentAccount(){openChatDock()}
 function toggleChatDock(){
   let el=document.getElementById('chatDock');
   if(el?.classList.contains('open'))closeChatDock(); else openChatDock();
@@ -9789,7 +9939,7 @@ async function openChatDock(){
   let dock=document.getElementById('chatDock');
   if(!dock)return alert('Chat dock not found. Republish the latest package.');
   dock.classList.add('open');
-  if(!chatAttachedAccountId && getCurrent()?.id)chatAttachedAccountId=getCurrent().id;
+  chatAttachedAccountId='';
   await chatRefreshAll(false);
   if(!chatActiveEmail && chatContactsData[0])selectChatContact(chatContactsData[0].email);
   startChatPolling();
@@ -9898,11 +10048,8 @@ async function selectChatContact(email){
   document.getElementById('chatInput')?.focus();
 }
 function attachCurrentAccountToChat(){
-  let a=getCurrent();
-  if(!a)return alert('No account selected.');
-  chatAttachedAccountId=a.id;
-  let sub=document.getElementById('chatActiveStatus');
-  if(sub && chatActiveEmail)sub.textContent=`Attached: ${nameOf(a)} • ${acctNo(a)}`;
+  chatAttachedAccountId='';
+  alert('Attached accounts were removed from Messenger. Messenger is staff/admin communication only.');
 }
 function activeChatMessages(){
   let me=chatMe(), other=chatActiveEmail;
@@ -9927,8 +10074,7 @@ function renderChatConversation(){
   if(btn)btn.disabled=false;
   if(nameEl)nameEl.textContent=chatName(chatActiveEmail);
   let contact=chatContactsData.find(c=>c.email===chatActiveEmail);
-  let attached=chatAttachedAccountId?accountById(chatAttachedAccountId):null;
-  if(statusEl)statusEl.textContent=`${chatContactRole(chatActiveEmail)} • ${contact?.online?'Online':'Offline'}${attached?' • Attached: '+nameOf(attached):''}`;
+  if(statusEl)statusEl.textContent=`${chatContactRole(chatActiveEmail)} • ${contact?.online?'Online':'Offline'}`;
   if(av)av.textContent=chatInitials(chatActiveEmail);
   box.innerHTML=msgs.map(m=>chatMessageBubble(m)).join('')||'<div class="chatEmpty">No messages yet. Type below to start the conversation.</div>';
   box.scrollTop=box.scrollHeight;
@@ -9937,11 +10083,10 @@ function renderChatConversation(){
 function chatMessageBubble(m){
   let mine=String(m.fromEmail||'').toLowerCase()===chatMe();
   let seen=mine && (m.readAt||m.read_at);
-  let a=m.accountId?accountById(m.accountId):null;
-  let attach=a?` • ${esc(nameOf(a))}`:(m.accountName?` • ${esc(m.accountName)}`:'');
   return `<div class="chatBubbleWrap ${mine?'mine':'theirs'}">
+    <div class="chatSenderName ${mine?'mine':'theirs'}">${esc(chatName(m.fromEmail||m.from_email||''))}</div>
     <div class="chatBubble">${esc(m.body||'')}</div>
-    <div class="chatMetaLine">${new Date(m.createdAt||m.created_at||Date.now()).toLocaleTimeString([], {hour:'numeric',minute:'2-digit'})}${attach}${seen?' • Seen':''}</div>
+    <div class="chatMetaLine">${new Date(m.createdAt||m.created_at||Date.now()).toLocaleString([], {month:'short',day:'numeric',year:'numeric',hour:'numeric',minute:'2-digit'})}${seen?' • Seen':''}</div>
   </div>`;
 }
 async function sendChatMessage(){
@@ -9949,18 +10094,17 @@ async function sendChatMessage(){
   let body=String(input?.value||'').trim();
   if(!chatActiveEmail)return alert('Select an employee/admin first.');
   if(!body)return;
-  let a=chatAttachedAccountId?accountById(chatAttachedAccountId):getCurrent();
   let row={
-    account_id:a?.id||null,
-    account_name:a?nameOf(a):'',
-    account_number:a?acctNo(a):'',
+    account_id:null,
+    account_name:'',
+    account_number:'',
     from_email:currentUser.email,
     to_email:chatActiveEmail,
     message_type:'Direct Message',
     priority:'Normal',
     subject:'Direct Message',
     body,
-    phone_number:a?normPhone(phones(a)[0]||''):'',
+    phone_number:'',
     status:'Open',
     created_by_email:currentUser.email,
     updated_at:new Date().toISOString()
@@ -10170,7 +10314,7 @@ openChatDock = async function(){
   let dock=document.getElementById('chatDock');
   if(!dock)return alert('Chat dock not found. Republish the latest package.');
   dock.classList.add('open');
-  if(!chatAttachedAccountId && getCurrent()?.id)chatAttachedAccountId=getCurrent().id;
+  chatAttachedAccountId='';
   await chatRefreshAll(false);
   if(chatIsSelf(chatActiveEmail))chatActiveEmail='';
   if(!chatActiveEmail && chatContactsData[0])await selectChatContact(chatContactsData[0].email);
@@ -10225,18 +10369,17 @@ sendChatMessage = async function(){
   if(!chatActiveEmail)return alert('Select an employee/admin first.');
   if(chatIsSelf(chatActiveEmail))return alert('You cannot send a message to yourself.');
   if(!body)return;
-  let a=chatAttachedAccountId?accountById(chatAttachedAccountId):getCurrent();
   let row={
-    account_id:a?.id||null,
-    account_name:a?nameOf(a):'',
-    account_number:a?acctNo(a):'',
+    account_id:null,
+    account_name:'',
+    account_number:'',
     from_email:currentUser.email,
     to_email:chatActiveEmail,
     message_type:'Direct Message',
     priority:'Normal',
     subject:'Direct Message',
     body,
-    phone_number:a?normPhone(phones(a)[0]||''):'',
+    phone_number:'',
     status:'Open',
     created_by_email:currentUser.email,
     updated_at:new Date().toISOString()
@@ -10494,8 +10637,7 @@ renderChatConversation = function(){
   if(btn)btn.disabled=false;
   if(nameEl)nameEl.textContent=chatName(chatActiveEmail);
   let online=presenceIsOnlineEmail(chatActiveEmail);
-  let attached=chatAttachedAccountId?accountById(chatAttachedAccountId):null;
-  if(statusEl)statusEl.innerHTML=`${chatContactRole(chatActiveEmail)} • <span class="${online?'onlineText':'offlineText'}">${online?'Online':'Offline'}</span>${attached?' • Attached: '+esc(nameOf(attached)):''}`;
+  if(statusEl)statusEl.innerHTML=`${chatContactRole(chatActiveEmail)} • <span class="${online?'onlineText':'offlineText'}">${online?'Online':'Offline'}</span>`;
   if(av){
     av.innerHTML=`${esc(chatInitials(chatActiveEmail))}<span class="chatOnlineDot ${online?'live':'off'}"></span>`;
   }
@@ -10526,7 +10668,7 @@ function callDateRange(){let range=document.getElementById('contactRange')?.valu
 function callDateOnly(v){let d=String(v||'').slice(0,10);return /^\d{4}-\d{2}-\d{2}$/.test(d)?d:''}
 function callTs(v){let t=Date.parse(v||'');return isNaN(t)?0:t}
 function contactSetText(id,text){let el=document.getElementById(id);if(el)el.textContent=text}
-function renderCallInsight(a){let box=document.getElementById('callInsightPanel');if(!box)return;if(!a){box.innerHTML='<div class="callInsightTop"><div><div class="callInsightTitle">☎ Call Intelligence</div><div class="hint">No account selected.</div></div></div>';return}let last=a.lastCalledAt||a.last_called_at||'';let next=a.nextCallAt||a.next_call_at||'';let result=a.lastCallResult||a.last_call_result||a.lastCallOutcome||a.last_call_outcome||a.disposition||'—';let callCount=Number(a.callCount||a.call_count||0),contacts=Number(a.contactCount||a.contact_count||0),rpc=Number(a.rpcCount||a.rpc_count||0);box.innerHTML=`<div class="callInsightTop"><div><div class="callInsightTitle">☎ Call Intelligence</div><div class="hint">Auto-updates when call outcomes are saved.</div></div><button class="outline" onclick="openContactIntelligence()">Open Calls</button></div><div class="callInsightGrid"><div class="callInsightStat"><div class="callInsightLabel">Last Called</div><div class="callInsightValue">${esc(last?new Date(last).toLocaleString():'Never')}</div></div><div class="callInsightStat"><div class="callInsightLabel">Last Result</div><div class="callInsightValue">${esc(result)}</div></div><div class="callInsightStat"><div class="callInsightLabel">Next Call</div><div class="callInsightValue">${esc(next?new Date(next).toLocaleString():'—')}</div></div><div class="callInsightStat"><div class="callInsightLabel">Calls</div><div class="callInsightValue">${callCount}</div></div><div class="callInsightStat"><div class="callInsightLabel">Contacts</div><div class="callInsightValue">${contacts}</div></div><div class="callInsightStat"><div class="callInsightLabel">RPC</div><div class="callInsightValue">${rpc}</div></div></div>`}
+function renderCallInsight(a){let box=document.getElementById('callInsightPanel');if(!box)return;if(!a){box.innerHTML='<div class="callInsightTop"><div><div class="callInsightTitle">☎ Call Intelligence</div><div class="hint">No account selected.</div></div></div>';return}let last=a.lastCalledAt||a.last_called_at||'';let next=a.nextCallAt||a.next_call_at||'';let result=a.lastCallResult||a.last_call_result||a.lastCallOutcome||a.last_call_outcome||a.disposition||'—';let callCount=Number(a.callCount||a.call_count||0),contacts=Number(a.contactCount||a.contact_count||0),rpc=Number(a.rpcCount||a.rpc_count||0);box.innerHTML=`<div class="callInsightTop"><div><div class="callInsightTitle">☎ Call Intelligence</div><div class="hint">Auto-updates when a phone number is launched and when the outcome is saved.</div></div><button class="outline" onclick="openContactIntelligence()">Open Calls</button></div><div class="callInsightGrid"><div class="callInsightStat"><div class="callInsightLabel">Last Called</div><div class="callInsightValue">${esc(last?new Date(last).toLocaleString():'Never')}</div></div><div class="callInsightStat"><div class="callInsightLabel">Last Result</div><div class="callInsightValue">${esc(result)}</div></div><div class="callInsightStat"><div class="callInsightLabel">Next Call</div><div class="callInsightValue">${esc(next?new Date(next).toLocaleString():'—')}</div></div><div class="callInsightStat"><div class="callInsightLabel">Calls</div><div class="callInsightValue">${callCount}</div></div><div class="callInsightStat"><div class="callInsightLabel">Contacts</div><div class="callInsightValue">${contacts}</div></div><div class="callInsightStat"><div class="callInsightLabel">RPC</div><div class="callInsightValue">${rpc}</div></div></div>`}
 function syncCallOutcomeFields(){let result=val('callResultStatus')||'No Answer';let cat=callOutcomeCategory(result);let el=document.getElementById('callOutcomeCategory');if(el)el.value=cat;let notice=document.getElementById('callOutcomeNotice');if(notice){notice.className='callOutcomeNotice';let msg='Log what happened on the call. This updates activity, reports, callback queue, and contact intelligence.';if(result==='Promise to Pay')msg='Promise to Pay selected. Save the outcome, then create/update the payment promise or payment plan.';if(result==='Dispute'){msg='Dispute selected. Saving will mark this account disputed and open the dispute tracker.';notice.classList.add('warn')}if(result==='Wrong Number'){msg='Wrong Number selected. Saving will mark this number/account as bad number for compliance protection.';notice.classList.add('block')}if(result==='DNC'){msg='DNC selected. Saving will mark this account Do Not Call.';notice.classList.add('block')}notice.textContent=msg}}
 function openCallResultModal(opts={}){let a=getCurrent();if(opts.accountId)a=accountById(opts.accountId)||a;if(!a)return alert('No account selected.');let phone=normPhone(opts.phone||lastDialContext.phone||a.lastContactNumber||phones(a)[0]||'');document.getElementById('callResultPhone').value=phone;document.getElementById('callDirection').value=opts.direction||'Outbound';document.getElementById('callResultStatus').value=opts.defaultResult||'No Answer';document.getElementById('callDuration').value=opts.durationSeconds||'0';document.getElementById('callAnsweredBy').value='';document.getElementById('callCallbackDate').value='';document.getElementById('callCallbackTime').value='';document.getElementById('callResultNotes').value=opts.auto?'Auto-opened after phone click. Add call result notes here.':'';contactSetText('callOutcomeAccount',`${nameOf(a)} · ${acctNo(a)||'—'}`);contactSetText('callOutcomePhonePreview',phone?fmtPhone(phone):'—');contactSetText('callOutcomeLastResult',a.lastCallResult||a.last_call_result||a.disposition||'—');contactSetText('callOutcomeNextCall',(a.nextCallAt||a.next_call_at)?new Date(a.nextCallAt||a.next_call_at).toLocaleString():'—');syncCallOutcomeFields();document.getElementById('callResultModal').classList.add('open')}
 async function recordDial(id,phone){phone=normPhone(phone);lastDialContext={accountId:id,phone,startedAt:new Date()};document.getElementById('callNumber').textContent=fmtPhone(phone);document.getElementById('lastDialed').textContent='Dialing '+fmtPhone(phone);await dbFetch(`/accounts?id=eq.${id}`,{method:'PATCH',body:JSON.stringify({last_contact_number:phone,last_called_at:new Date().toISOString(),updated_at:new Date().toISOString()})}).catch(async()=>{await dbFetch(`/accounts?id=eq.${id}`,{method:'PATCH',body:JSON.stringify({last_contact_number:phone,updated_at:new Date().toISOString()})}).catch(()=>{})});await insertActivity(id,'Outbound Call','Clicked phone number '+fmtPhone(phone),phone);await insertAudit('Outbound Call','Clicked phone '+fmtPhone(phone),'account',id);setTimeout(()=>{try{let cur=getCurrent();if(cur&&String(cur.id)===String(id)&&!document.getElementById('callResultModal')?.classList.contains('open'))openCallResultModal({accountId:id,phone,auto:true})}catch(e){}},1500)}
@@ -12242,8 +12384,8 @@ function exportContactIntelligenceCSV(){let calls=filteredContactCalls();let row
 (function(){
   if(window.__cpcmSystemQaVersionLockLoaded) return;
   window.__cpcmSystemQaVersionLockLoaded = true;
-  var BUILD_NAME = "Co Pilot Collections Manager — Stability QA / Version Lock";
-  var BUILD_VERSION = "STABLE_SINGLE_FILE_QA_LOCK_2026_07_18_R8";
+  var BUILD_NAME = "Co Pilot Collections Manager — Live Source of Truth Cleanup";
+  var BUILD_VERSION = "LIVE_SOURCE_OF_TRUTH_MESSENGER_CLEANUP_R8N20";
   var EXPECTED_ENV = "LIVE";
   var EXPECTED_URL = "https://bwvufgzbkaymffwxuuzr.supabase.co";
   var EXPECTED_KEY_PREFIX = "sb_publishable_cvwkN3fOovsYvAvzXvrmRA";
@@ -12288,15 +12430,18 @@ function exportContactIntelligenceCSV(){let calls=filteredContactCalls();let row
     checks.push(line('Account details area found', !!(qs('.accountCard')||visibleTextIncludes('Account Details')), 'Account card/details check'));
     checks.push(line('Payment Plan area found', visibleTextIncludes('Payment Plan')||!!qs('.paymentPlanPanel'), 'Payment Plan card check'));
     checks.push(line('Compliance Guard found', visibleTextIncludes('Compliance Guard'), 'Compliance card/check'));
-    checks.push(line('Softphone found', visibleTextIncludes('Softphone')||!!qs('.softphone'), 'Softphone/right panel check'));
-    checks.push(line('Team Messenger available', visibleTextIncludes('Team Messenger')||visibleTextIncludes('Messenger'), 'Chat/messenger check'));
-    checks.push(line('Reports button/page present', btnByText('reports')||visibleTextIncludes('Reports'), 'Reports nav/text check'));
-    checks.push(line('Cleanup button/page present', btnByText('cleanup')||visibleTextIncludes('Cleanup'), 'Cleanup nav/text check'));
-    checks.push(line('Tickler/Scorecards present', visibleTextIncludes('Tickler')&&visibleTextIncludes('Scorecards'), 'Tickler + Scorecards check'));
+    checks.push(line('Quick Actions at top', !!qs('.right > .quickActions:first-child'), 'Right column starts with Quick Actions'));
+    checks.push(line('Team Messenger available', !!(window.openTeamMessenger||window.openChatDock||document.getElementById('chatDock')||visibleTextIncludes('Team Messenger')||visibleTextIncludes('Messenger')), 'Chat/messenger function/dock check'));
+    checks.push(line('Reports button/page present', !!(window.openReports||window.openReportsPage||document.getElementById('reportsPageStable')||btnByText('reports')||visibleTextIncludes('Reports')), 'Reports function/page check'));
+    checks.push(line('Cleanup button/page present', !!(window.openCleanupPage||document.querySelector('.cleanupPage')||btnByText('cleanup')||visibleTextIncludes('Cleanup')), 'Cleanup function/page check'));
+    checks.push(line('Tickler/Scorecards present', !!(window.openTicklerCommandCenter||window.openTicklerPage||document.getElementById('ticklerPage')) && !!(window.openManagerQaScorecards||document.getElementById('managerQaPage')), 'Tickler + Scorecards function/page check'));
     checks.push(line('Admin role detected when logged in as admin', isAdmin() || !curEmail(), curEmail()?('email='+curEmail()+' roleText='+roleText()):'Not logged in yet', !!curEmail()&&!isAdmin()));
     checks.push(line('Professional CSS appears active', bodyFont.indexOf('Arial')>=0 || !!qs('style'), bodyFont||'No computed font', bodyFont && /Times/i.test(bodyFont)));
     checks.push(line('Build marker installed', !!window.__cpcmSystemQaVersionLockLoaded, BUILD_VERSION));
     checks.push(line('Client remittance module installed', !!window.CPCM_CLIENT_REMITTANCE_BUILD, window.CPCM_CLIENT_REMITTANCE_BUILD||'Missing R8 module'));
+    checks.push(line('Dynamic call attempts + live statistics installed', !!window.CPCM_DYNAMIC_ACTIVITY_STATS_BUILD, window.CPCM_DYNAMIC_ACTIVITY_STATS_BUILD||'Missing R8N11 dynamic statistics module'));
+    checks.push(line('NMI admin approval payment queue installed', !!window.CPCM_NMI_APPROVAL_QUEUE_BUILD&&!!document.getElementById('nmiApprovalModal')&&!!document.getElementById('nmiPaymentModal'), window.CPCM_NMI_APPROVAL_QUEUE_BUILD||'Missing NMI approval queue module'));
+    checks.push(line('NMI private key excluded from browser', !String(document.documentElement.innerHTML).includes('NMI_PRIVATE_API_KEY='), 'Private API key must remain in Supabase Secrets only'));
     checks.push(line('Document PDF engine loaded', !!(window.html2canvas&&window.jspdf&&window.jspdf.jsPDF), 'Local html2canvas + jsPDF'));
     checks.push(line('DocuSign-style typed signature controls loaded', !!(window.downloadCurrentDocumentPDF&&window.clearDocumentSignature&&window.applyTypedDocumentSignature&&window.selectDocumentSignatureStyle), 'Document Builder PDF + typed signature chooser'));
     return checks;
@@ -12330,7 +12475,7 @@ function exportContactIntelligenceCSV(){let calls=filteredContactCalls();let row
   function ensurePage(){
     var p=document.getElementById('cpcmSystemQaPage'); if(p) return p;
     p=document.createElement('div'); p.id='cpcmSystemQaPage';
-    p.innerHTML='<div class="cpcmQaTop"><div><div class="cpcmQaTitle">System Check + Version Lock</div><div class="cpcmQaSub">'+esc(BUILD_NAME)+' • '+esc(BUILD_VERSION)+' • '+esc(EXPECTED_ENV)+'</div></div><div class="cpcmQaActions"><button class="cpcmQaBtn green" onclick="window.cpcmRunSystemCheck()">Run Check</button><button class="cpcmQaBtn white" onclick="window.cpcmCopySystemDiagnostics()">Copy Diagnostics</button><button class="cpcmQaBtn gray" onclick="window.cpcmCloseSystemCheck()">Back to App</button></div></div><div class="cpcmQaWrap"><div class="cpcmQaNote">This screen is a safe admin QA checklist. It does not change account data. Use it after every ZIP upload to verify environment, layout, admin detection, and core app sections before adding new features.</div><div id="cpcmQaMetrics" class="cpcmQaGrid"></div><div class="cpcmQaCard"><div class="cpcmQaCardHead"><div class="cpcmQaCardTitle">Automatic Checks</div><span class="cpcmQaPill info">Safe read-only</span></div><div class="cpcmQaCardBody" id="cpcmQaChecks"></div></div><div class="cpcmQaCard"><div class="cpcmQaCardHead"><div class="cpcmQaCardTitle">Manual Smoke Test Checklist</div><span class="cpcmQaPill warn">Click through after upload</span></div><div class="cpcmQaCardBody"><div class="cpcmQaManual"><div>1. Login works</div><div>2. Queue opens first 5 accounts</div><div>3. Notes save and stay after refresh</div><div>4. Employee can create payment plan</div><div>5. Admin can edit/delete payment plan</div><div>6. Compliance Guard opens</div><div>7. Reports full page opens and Back works</div><div>8. Chat opens without blocking screen</div><div>9. Pay Desk / Ledger open</div><div>10. Tickler opens</div><div>11. Scorecards opens</div><div>12. Receipt downloads as a PDF matching Preview</div><div>13. Electronic signature appears above Authorized Representative</div><div>14. No plain raw HTML layout</div></div></div></div><div class="cpcmQaCard"><div class="cpcmQaCardHead"><div class="cpcmQaCardTitle">Diagnostics</div><button class="cpcmQaBtn" onclick="window.cpcmCopySystemDiagnostics()">Copy</button></div><div class="cpcmQaCardBody"><pre id="cpcmQaDiag" class="cpcmQaCode"></pre></div></div></div>';
+    p.innerHTML='<div class="cpcmQaTop"><div><div class="cpcmQaTitle">System Check + Version Lock</div><div class="cpcmQaSub">'+esc(BUILD_NAME)+' • '+esc(BUILD_VERSION)+' • '+esc(EXPECTED_ENV)+'</div></div><div class="cpcmQaActions"><button class="cpcmQaBtn green" onclick="window.cpcmRunSystemCheck()">Run Check</button><button class="cpcmQaBtn white" onclick="window.cpcmCopySystemDiagnostics()">Copy Diagnostics</button><button class="cpcmQaBtn gray" onclick="window.cpcmCloseSystemCheck()">Back to App</button></div></div><div class="cpcmQaWrap"><div class="cpcmQaNote">This screen is a safe admin QA checklist. It does not change account data. Use it after every ZIP upload to verify environment, layout, admin detection, and core app sections before adding new features.</div><div id="cpcmQaMetrics" class="cpcmQaGrid"></div><div class="cpcmQaCard"><div class="cpcmQaCardHead"><div class="cpcmQaCardTitle">Automatic Checks</div><span class="cpcmQaPill info">Safe read-only</span></div><div class="cpcmQaCardBody" id="cpcmQaChecks"></div></div><div class="cpcmQaCard"><div class="cpcmQaCardHead"><div class="cpcmQaCardTitle">Manual Smoke Test Checklist</div><span class="cpcmQaPill warn">Click through after upload</span></div><div class="cpcmQaCardBody"><div class="cpcmQaManual"><div>1. Login works</div><div>2. Queue opens first 5 accounts</div><div>3. Notes save and stay after refresh</div><div>4. Employee can create payment plan</div><div>5. Admin can edit/delete payment plan</div><div>6. Compliance Guard opens</div><div>7. Reports full page opens and Back works</div><div>8. Chat opens without blocking screen</div><div>9. Pay Desk / Ledger open</div><div>10. Tickler opens</div><div>11. Scorecards opens</div><div>12. Receipt downloads as a PDF matching Preview</div><div>13. Electronic signature appears above Authorized Representative</div><div>14. No plain raw HTML layout</div><div>15. Clicking a phone number adds exactly one Call Attempt</div><div>16. Saving the outcome updates that same call instead of adding a second call</div><div>17. Calls, Monitor, Reports, and Scorecards refresh after activity</div><div>18. NMI secure card fields load and Card Number accepts keyboard input</div><div>19. Approved NMI test payment posts once to ledger and balance</div><div>20. Admin refund/void changes balance only after NMI approval</div></div></div></div><div class="cpcmQaCard"><div class="cpcmQaCardHead"><div class="cpcmQaCardTitle">Diagnostics</div><button class="cpcmQaBtn" onclick="window.cpcmCopySystemDiagnostics()">Copy</button></div><div class="cpcmQaCardBody"><pre id="cpcmQaDiag" class="cpcmQaCode"></pre></div></div></div>';
     document.body.appendChild(p); return p;
   }
   function addButton(){
@@ -12350,276 +12495,16 @@ function exportContactIntelligenceCSV(){let calls=filteredContactCalls();let row
 
 
 
-/* MESSENGER PRESENCE + CONTACTS + FACEBOOK-LIKE MESSAGE LAYOUT FIX
-   - Online count now includes the current logged-in user and all signed-up staff.
-   - Messenger left panel shows all staff/admin accounts, including the current user as "You".
-   - Current user is shown online but cannot be selected for self-chat.
-   - Legacy base layout is overridden below: final Messenger patch shows staff name, timestamp/date, and seen status with no account attachment. */
-(function(){
-  if(window.__cpcmMessengerPresenceContactsFbLayoutFix)return;
-  window.__cpcmMessengerPresenceContactsFbLayoutFix=true;
+/* MESSENGER_PRESENCE_LEGACY_BLOCK_REMOVED_R8N20: old attached-account messenger patch removed. Final staff-name/no-account messenger implementation is the only active messenger override. */
 
-  function normEmail(v){return String(v||'').toLowerCase().trim()}
-  function safeEsc(v){try{return esc(v)}catch(e){return String(v??'').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;')}}
-  function meEmail(){try{return normEmail(chatMe())}catch(e){return normEmail(currentUser&&currentUser.email)}}
-  function getUserEmail(u){return normEmail(u && (u.email||u.userEmail||u.user_email))}
-  function findStaffUser(email){email=normEmail(email);return (appUsers||[]).find(function(u){return getUserEmail(u)===email})||null}
-  function valueOf(u,keys){for(var i=0;i<keys.length;i++){var v=u&&u[keys[i]];if(v!==undefined&&v!==null&&String(v).trim())return String(v).trim()}return ''}
-  function humanizeEmail(email){
-    var left=String(email||'').split('@')[0]||'User';
-    left=left.replace(/[._-]+/g,' ').replace(/\d+/g,' ').replace(/\s+/g,' ').trim();
-    if(!left)return String(email||'User');
-    return left.split(' ').map(function(w){return w?w.charAt(0).toUpperCase()+w.slice(1).toLowerCase():''}).join(' ');
-  }
-  function displayNameForEmail(email){
-    email=normEmail(email);
-    var u=findStaffUser(email);
-    var n=valueOf(u,['displayName','display_name','fullName','full_name','employeeName','employee_name','name','userName','username']);
-    if(!n){
-      var first=valueOf(u,['firstName','first_name']);
-      var last=valueOf(u,['lastName','last_name']);
-      n=[first,last].filter(Boolean).join(' ').trim();
-    }
-    if(!n && email==='afinch2678@gmail.com')n='Antonio Finch';
-    if(!n && email===meEmail() && currentUser){
-      n=valueOf(currentUser,['displayName','display_name','fullName','full_name','employeeName','employee_name','name']);
-    }
-    return n || humanizeEmail(email) || email || 'User';
-  }
-
-  chatName = function(email){return displayNameForEmail(email)};
-  chatInitials = function(email){
-    var n=displayNameForEmail(email);
-    return n.split(/\s+/).filter(Boolean).slice(0,2).map(function(x){return x[0]}).join('').toUpperCase() || '?';
-  };
-
-  function staffRoleForEmail(email){
-    email=normEmail(email);
-    var u=findStaffUser(email);
-    if((typeof isAdminEmail==='function' && isAdminEmail(email)) || String(u&&u.role||'').toLowerCase()==='admin')return 'Admin';
-    return 'Employee';
-  }
-  chatContactRole = function(email){return staffRoleForEmail(email)};
-
-  function userAllowedInMessenger(u){
-    var email=getUserEmail(u);
-    if(!email)return false;
-    var status=String(u.approvalStatus||u.approval_status||'').toLowerCase();
-    var role=String(u.role||'employee').toLowerCase();
-    if(status==='removed'||status==='rejected'||status==='fired')return false;
-    if(u.isActive===false || u.is_active===false)return false;
-    return role==='admin'||role==='employee'||!!email;
-  }
-  function ensureSelfUser(map){
-    var me=meEmail();
-    if(!me)return;
-    var u=findStaffUser(me)||{email:me,role:(currentUser&&currentUser.isAdmin)?'admin':'employee',approvalStatus:'approved',isApproved:true,isActive:true};
-    map[me]={email:me,user:u,self:true,online:true,unread:0,lastMessageAt:'',lastPreview:''};
-  }
-  function addChatUser(map,email,u){
-    email=normEmail(email);
-    if(!email)return;
-    var me=meEmail();
-    if(!u)u=findStaffUser(email)||{email:email,role:(typeof isAdminEmail==='function'&&isAdminEmail(email))?'admin':'employee'};
-    if(!map[email])map[email]={email:email,user:u,self:email===me,online:false,unread:0,lastMessageAt:'',lastPreview:''};
-    if(email===me)map[email].self=true;
-    map[email].user=map[email].user||u;
-  }
-  function allMessengerUsers(){
-    var map={};
-    ensureSelfUser(map);
-    (appUsers||[]).forEach(function(u){if(userAllowedInMessenger(u))addChatUser(map,getUserEmail(u),u)});
-    (chatPresenceData||[]).forEach(function(p){addChatUser(map,p.userEmail||p.user_email,{email:p.userEmail||p.user_email})});
-    (chatAllMessages||[]).forEach(function(m){
-      addChatUser(map,m.fromEmail||m.from_email);
-      addChatUser(map,m.toEmail||m.to_email);
-    });
-    return Object.values(map).map(function(c){c.self=normEmail(c.email)===meEmail();c.online=c.self?true:presenceIsOnlineEmail(c.email);return c});
-  }
-  function onlineMessengerCount(){
-    var seen={};
-    return allMessengerUsers().filter(function(c){
-      var e=normEmail(c.email); if(!e||seen[e])return false; seen[e]=true;
-      return c.self || presenceIsOnlineEmail(e);
-    }).length;
-  }
-
-  buildChatContacts = function(){
-    var me=meEmail();
-    var rows=allMessengerUsers();
-    rows.forEach(function(c){
-      c.unread=0; c.lastMessageAt=''; c.lastPreview='';
-      if(c.self)return;
-      var msgs=(chatAllMessages||[]).filter(function(m){
-        var from=normEmail(m.fromEmail||m.from_email), to=normEmail(m.toEmail||m.to_email);
-        return (from===me&&to===c.email)||(from===c.email&&to===me);
-      });
-      c.unread=msgs.filter(function(m){
-        var from=normEmail(m.fromEmail||m.from_email), to=normEmail(m.toEmail||m.to_email);
-        return to===me && from!==me && !m.readAt && !m.read_at && String(m.status||'Open')!=='Closed';
-      }).length;
-      var last=msgs[msgs.length-1];
-      if(last){c.lastMessageAt=last.createdAt||last.created_at||'';c.lastPreview=String(last.body||'').slice(0,70)}
-    });
-    chatContactsData=rows.sort(function(a,b){
-      if(a.self!==b.self)return a.self?-1:1;
-      if(a.unread!==b.unread)return b.unread-a.unread;
-      if(a.online!==b.online)return a.online?-1:1;
-      return String(chatName(a.email)).localeCompare(String(chatName(b.email)));
-    });
-  };
-
-  window.cpcmChatSelfNotice=function(){alert('This is you. Your online status is shown here, but you cannot message yourself. Choose another employee or admin.')} ;
-
-  renderPresenceBanner = function(){
-    var head=document.querySelector('.chatContactsHead');
-    if(!head)return;
-    var existing=document.getElementById('chatPresenceBanner');
-    if(!existing){existing=document.createElement('div');existing.id='chatPresenceBanner';existing.className='chatPresenceBanner';head.insertAdjacentElement('afterend',existing)}
-    var n=onlineMessengerCount();
-    var you=presenceIsOnlineEmail(meEmail());
-    existing.innerHTML='<span><b>'+n+'</b> online</span><span>'+(you?'You are online 🟢':'You appear offline ⚪')+'</span>';
-  };
-
-  renderChatContacts = function(){
-    var list=document.getElementById('chatContactList');
-    if(!list)return;
-    var q=String(document.getElementById('chatSearch')&&document.getElementById('chatSearch').value||'').toLowerCase();
-    var rows=(chatContactsData||[]).filter(function(c){return !q || c.email.includes(q) || chatName(c.email).toLowerCase().includes(q) || staffRoleForEmail(c.email).toLowerCase().includes(q)});
-    list.innerHTML=rows.map(function(c){
-      var online=c.self?true:presenceIsOnlineEmail(c.email);
-      var selfLabel=c.self?' <span class="chatSelfBadge">You</span>':'';
-      var meta=(c.self?'You • ':'')+staffRoleForEmail(c.email)+' • <span class="'+(online?'onlineText':'offlineText')+'">'+(online?'Online':'Offline')+'</span>'+(c.lastPreview&&!c.self?' • '+safeEsc(c.lastPreview):'');
-      var click=c.self?'onclick="window.cpcmChatSelfNotice()"':'onclick="selectChatContact(\''+safeEsc(c.email)+'\')"';
-      return '<div class="chatContact '+(c.self?'self':'')+' '+(c.email===chatActiveEmail?'active':'')+' '+(c.unread?'hasUnread':'')+'" '+click+'>'+ 
-        '<div class="chatAvatar">'+safeEsc(chatInitials(c.email))+'<span class="chatOnlineDot '+(online?'live':'off')+'"></span></div>'+ 
-        '<div class="chatContactMain"><div class="chatContactName">'+safeEsc(chatName(c.email))+selfLabel+'</div><div class="chatContactMeta">'+meta+'</div></div>'+ 
-        '<div class="chatContactUnread '+(c.unread?'':'zero')+'">'+(c.unread?(c.unread>99?'99+':c.unread):'')+'</div>'+ 
-      '</div>';
-    }).join('') || '<div class="tmEmpty">No employees/admin are available yet.</div>';
-    renderPresenceBanner();
-  };
-
-  function formatChatDate(v){
-    var d=new Date(v||Date.now()); if(isNaN(d.getTime()))d=new Date();
-    var now=new Date();
-    var ds=d.toDateString(), ns=now.toDateString();
-    var y=new Date(now); y.setDate(now.getDate()-1);
-    var time=d.toLocaleTimeString([], {hour:'numeric',minute:'2-digit'});
-    if(ds===ns)return 'Today '+time;
-    if(ds===y.toDateString())return 'Yesterday '+time;
-    return d.toLocaleDateString([], {month:'short',day:'numeric',year:'numeric'})+' '+time;
-  }
-  function messageAccountLabel(m){
-    var a=null; try{a=m.accountId?accountById(m.accountId):null}catch(e){}
-    var name=a?(typeof nameOf==='function'?nameOf(a):''):(m.accountName||m.account_name||'');
-    var num=a?(typeof acctNo==='function'?acctNo(a):''):(m.accountNumber||m.account_number||'');
-    return {name:name||'', num:num||''};
-  }
-
-  chatMessageBubble = function(m){
-    var from=normEmail(m.fromEmail||m.from_email);
-    var mine=from===meEmail();
-    var seen=mine && (m.readAt||m.read_at);
-    var acct=messageAccountLabel(m);
-    var attached=acct.name?'<div class="chatAttachedLine">Attached Account: '+safeEsc(acct.name)+(acct.num?' · '+safeEsc(acct.num):'')+'</div>':'';
-    return '<div class="chatBubbleWrap '+(mine?'mine':'theirs')+'">'+
-      '<div class="chatSenderName '+(mine?'mine':'theirs')+'">'+safeEsc(chatName(from))+'</div>'+
-      '<div class="chatBubble">'+safeEsc(m.body||'')+'</div>'+
-      attached+
-      '<div class="chatMetaLine">'+safeEsc(formatChatDate(m.createdAt||m.created_at||Date.now()))+(seen?' • Seen':'')+'</div>'+ 
-    '</div>';
-  };
-
-  var _oldSelectChatContact=selectChatContact;
-  selectChatContact = async function(email){
-    email=normEmail(email);
-    if(!email || email===meEmail()){window.cpcmChatSelfNotice();return;}
-    return _oldSelectChatContact(email);
-  };
-
-  renderChatConversation = function(){
-    var msgs=activeChatMessages();
-    var box=document.getElementById('chatMessages');
-    var nameEl=document.getElementById('chatActiveName');
-    var statusEl=document.getElementById('chatActiveStatus');
-    var av=document.getElementById('chatActiveAvatar');
-    var btn=document.getElementById('chatSendBtn');
-    if(!box)return;
-    if(!chatActiveEmail || chatActiveEmail===meEmail()){
-      box.innerHTML='<div class="chatEmpty">Pick an employee or admin to start a direct chat.</div>';
-      if(btn)btn.disabled=true;
-      chatActiveEmail='';
-      return;
-    }
-    if(btn)btn.disabled=false;
-    if(nameEl)nameEl.textContent=chatName(chatActiveEmail);
-    var online=presenceIsOnlineEmail(chatActiveEmail);
-    var attached=chatAttachedAccountId?accountById(chatAttachedAccountId):null;
-    if(statusEl)statusEl.innerHTML=staffRoleForEmail(chatActiveEmail)+' • <span class="'+(online?'onlineText':'offlineText')+'">'+(online?'Online':'Offline')+'</span>'+(attached?' • Attached Account: '+safeEsc(nameOf(attached)):'');
-    if(av)av.innerHTML=safeEsc(chatInitials(chatActiveEmail))+'<span class="chatOnlineDot '+(online?'live':'off')+'"></span>';
-    box.innerHTML=msgs.map(function(m){return chatMessageBubble(m)}).join('')||'<div class="chatEmpty">No messages yet. Type below to start the conversation.</div>';
-    box.scrollTop=box.scrollHeight;
-    try{loadTypingStatus()}catch(e){}
-  };
-
-  var _oldOpenChatDock=openChatDock;
-  openChatDock = async function(){
-    var dock=document.getElementById('chatDock');
-    if(!dock)return alert('Chat dock not found. Republish the latest package.');
-    dock.classList.add('open');
-    if(!chatAttachedAccountId && getCurrent&&getCurrent()&&getCurrent().id)chatAttachedAccountId=getCurrent().id;
-    await chatRefreshAll(false);
-    if(chatActiveEmail===meEmail())chatActiveEmail='';
-    if(!chatActiveEmail){
-      var first=(chatContactsData||[]).find(function(c){return !c.self && c.email!==meEmail()});
-      if(first)await selectChatContact(first.email);
-    }
-    startChatPolling();
-  };
-
-  var _oldSendChatMessage=sendChatMessage;
-  sendChatMessage = async function(){
-    if(chatActiveEmail===meEmail()){window.cpcmChatSelfNotice();return;}
-    return _oldSendChatMessage();
-  };
-
-  function injectMessengerFixCss(){
-    if(document.getElementById('cpcmMessengerFbLayoutCss'))return;
-    var st=document.createElement('style'); st.id='cpcmMessengerFbLayoutCss';
-    st.textContent='\n.chatContact.self{background:#f8fafc;border-style:dashed;cursor:default}.chatSelfBadge{margin-left:6px;background:#dbeafe;color:#1d4ed8;border-radius:999px;padding:2px 6px;font-size:9px;font-weight:1000}.chatSenderName{font-size:10.5px;font-weight:1000;color:#334155;margin:0 6px 3px}.chatSenderName.mine{text-align:right;color:#1d4ed8}.chatSenderName.theirs{text-align:left}.chatAttachedLine{font-size:10px;font-weight:900;color:#1d4ed8;background:#eff6ff;border:1px solid #bfdbfe;border-radius:999px;padding:4px 8px;margin-top:4px;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.chatBubbleWrap.mine .chatAttachedLine{align-self:flex-end}.chatBubbleWrap.theirs .chatAttachedLine{align-self:flex-start}.chatMetaLine{font-size:10px!important;color:#64748b!important;font-weight:800!important;margin-top:4px!important}.chatContactName{display:flex;align-items:center;gap:4px}.chatContact.self .chatContactName{color:#0f172a}.chatPresenceBanner b{font-weight:1000}.chatOnlineDot.live{background:#22c55e!important;box-shadow:0 0 0 2px #dcfce7}.chatOnlineDot.off{background:#94a3b8!important}\n';
-    document.head.appendChild(st);
-  }
-  injectMessengerFixCss();
-
-  var _oldChatRefreshAll=chatRefreshAll;
-  chatRefreshAll = async function(manual){
-    if(!token()||!currentUser.email)return;
-    try{startPresenceHeartbeat()}catch(e){}
-    try{await upsertPresence()}catch(e){}
-    try{await loadPresence()}catch(e){}
-    try{await chatHeartbeat()}catch(e){}
-    try{await loadAppUsers()}catch(e){}
-    try{await loadChatMessages()}catch(e){}
-    buildChatContacts();
-    if(chatActiveEmail===meEmail())chatActiveEmail='';
-    if(document.getElementById('chatDock')&&document.getElementById('chatDock').classList.contains('open') && chatActiveEmail){try{await markActiveChatRead()}catch(e){}}
-    buildChatContacts();
-    renderChatContacts();
-    if(chatActiveEmail)renderChatConversation();
-    updateChatUnreadBadge();
-    renderPresenceBanner();
-  };
-
-  setTimeout(function(){try{if(token()&&currentUser.email){upsertPresence();loadPresence().then(function(){buildChatContacts();renderChatContacts();renderPresenceBanner()}).catch(function(){})}}catch(e){}},1200);
-})();
 
 </script>
 
 <script>
 /* MESSENGER_NAMES_NO_ATTACHED_ACCOUNTS_FIX — staff display names + no debtor/account attachment in messenger */
 (function(){
-  const BUILD='MESSENGER_NAMES_NO_ATTACHED_ACCOUNTS_2026_07_18';
+  const BUILD='MESSENGER_NAMES_NO_ATTACHED_ACCOUNTS_R8N20_SOURCE_CLEAN';
+  try{chatAttachedAccountId=''}catch(e){}
   function lower(v){return String(v||'').trim().toLowerCase()}
   function safe(v){try{return (typeof esc==='function'?esc(String(v||'')):String(v||'').replace(/[&<>"']/g,function(m){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]}))}catch(e){return String(v||'')}}
   function cleanName(v){return String(v||'').replace(/\s+/g,' ').trim()}
@@ -12662,11 +12547,16 @@ function exportContactIntelligenceCSV(){let calls=filteredContactCalls();let row
     let role=lower(u.role||'employee');
     let approved=(u.isApproved===true||u.is_approved===true||lower(u.approvalStatus||u.approval_status)==='approved'||role==='admin'||email==='afinch2678@gmail.com');
     let active=!(u.isActive===false||u.is_active===false||lower(u.approvalStatus||u.approval_status)==='removed');
-    return approved && active;
+    return approved && active && (role==='admin'||role==='employee'||email==='afinch2678@gmail.com');
+  }
+  function isStaffEmail(email,u){
+    email=lower(email); u=u||findUser(email);
+    let role=lower(u&&u.role||'');
+    return email===meEmail() || email==='afinch2678@gmail.com' || role==='admin' || role==='employee';
   }
   window.buildChatContacts=function(){
     let me=meEmail(), map={};
-    function add(email,u){email=lower(email); if(!email)return; if(!map[email])map[email]={email:email,user:u||findUser(email)||{email:email},unread:0,lastMessageAt:'',lastPreview:''};}
+    function add(email,u){email=lower(email); if(!email)return; u=u||findUser(email)||{email:email}; if(!isStaffEmail(email,u))return; if(!map[email])map[email]={email:email,user:u,unread:0,lastMessageAt:'',lastPreview:''};}
     add(me, findUser(me)||{email:me,role:(currentUser&&currentUser.isAdmin)?'admin':'employee',fullName:window.cpcmStaffDisplayName(me)});
     try{(appUsers||[]).forEach(function(u){if(isAllowedUser(u))add(userEmail(u),u)})}catch(e){}
     try{(chatPresenceData||[]).forEach(function(p){add(p.userEmail||p.user_email,{email:p.userEmail||p.user_email})})}catch(e){}
@@ -12740,7 +12630,8 @@ function exportContactIntelligenceCSV(){let calls=filteredContactCalls();let row
     try{loadTypingStatus()}catch(e){}
   };
 
-  window.attachCurrentAccountToChat=function(){ alert('Attached accounts were removed from Messenger. Send only staff/admin messages here.'); };
+  window.attachCurrentAccountToChat=function(){ alert('Attached accounts were removed from Messenger. Messenger is staff/admin communication only.'); };
+  window.cpcmClearMessengerAttachment=function(){try{chatAttachedAccountId=''}catch(e){}};
   window.sendChatMessage=async function(){
     let input=document.getElementById('chatInput');
     let body=String(input&&input.value||'').trim();
@@ -12755,7 +12646,7 @@ function exportContactIntelligenceCSV(){let calls=filteredContactCalls();let row
   };
   window.openChatDock=async function(){
     let dock=document.getElementById('chatDock'); if(!dock)return alert('Chat dock not found.');
-    chatAttachedAccountId='';
+    try{chatAttachedAccountId=''}catch(e){}
     ensureMessengerNameUi();
     dock.classList.add('open');
     await chatRefreshAll(false);
@@ -13021,7 +12912,7 @@ function exportContactIntelligenceCSV(){let calls=filteredContactCalls();let row
     try{clearLoginError();setLoginBusy(true,'Creating access request...');let email=val('loginEmail').toLowerCase().trim(),password=val('loginPassword'),requested=ce('loginAccessType')?.value==='client'?'client':'employee';if(!email||!password)throw new Error('Enter email and password.');if(password.length<6)throw new Error('Password must be at least 6 characters.');let data=await authFetch('/auth/v1/signup',{email,password,data:{requested_role:requested}});currentUser={email,isAdmin:isAdminEmail(email),isClient:false,requestedRole:requested};if(data.access_token){storeSession(data);let profile=await upsertCurrentUser();forceCurrentUserRole(profile);ce('loginScreen').classList.remove('open');if(currentUser.isAdmin||isUserApproved(profile)){ce('pendingScreen').classList.remove('open');applyRoleUI();if(currentUser.isClient)await openClientPortal();else await loadAccounts();}else ce('pendingScreen').classList.add('open');}else{ce('loginScreen').classList.remove('open');ce('pendingScreen').classList.add('open')}}catch(e){showLoginError(friendlyError(e.message||String(e)))}finally{setLoginBusy(false,'')}
   };
 
-  function init(){injectPortalCss();injectAccessType();injectAdminButtons();ensureClientPortal();ensureClientAdmin();applyClientBranding();try{applyRoleUI()}catch(e){}setTimeout(function(){injectAdminButtons();try{applyRoleUI()}catch(e){}},800);if(token())setTimeout(function(){boot().catch(function(){})},50);}
+  function init(){injectPortalCss();injectAccessType();injectAdminButtons();ensureClientPortal();ensureClientAdmin();applyClientBranding();try{applyRoleUI()}catch(e){}setTimeout(function(){injectAdminButtons();try{applyRoleUI()}catch(e){}},800);}
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
   window.CPCM_CLIENT_PORTAL_BUILD=BUILD;
 })();
@@ -13125,5 +13016,942 @@ function exportContactIntelligenceCSV(){let calls=filteredContactCalls();let row
 })();
 </script>
 
+
+<script>
+/* DYNAMIC ACTIVITY + STATISTICS R8N11
+   One call attempt per phone launch, one outcome update per attempt,
+   automatic account/activity refresh, and live open-dashboard refresh. */
+(function(){
+  if(window.__cpcmDynamicActivityStatsR8N11)return;
+  window.__cpcmDynamicActivityStatsR8N11=true;
+  const BUILD='DYNAMIC_ACTIVITY_STATS_CALL_DEDUPE_R8N11';
+  const PENDING_PREFIX='cpcm.pending.call.r8n11.';
+  const OPEN_PREFIX='cpcm.account.open.r8n11.';
+  const originalDbFetch=window.dbFetch;
+  const originalSetCurrent=window.setCurrent;
+  const recentDial=new Map();
+  let refreshTimer=0;
+  let refreshRunning=false;
+  let refreshAgain=false;
+  let callSaveBusy=false;
+
+  function nowIso(){return new Date().toISOString()}
+  function email(){try{return String((typeof currentUser!=='undefined'&&currentUser&&currentUser.email)||'').trim().toLowerCase()}catch(e){return ''}}
+  function cleanPhone(v){try{return normPhone(v)}catch(e){return String(v||'').replace(/\D/g,'')}}
+  function account(id){try{return accountById(id)||((typeof getCurrent==='function')?getCurrent():null)}catch(e){return null}}
+  function isOpen(id){const el=document.getElementById(id);return !!(el&&el.classList.contains('open'))}
+  function safeJson(v){try{return JSON.parse(v)}catch(e){return null}}
+  function uuid(){try{return crypto.randomUUID()}catch(e){return 'cpcm-'+Date.now()+'-'+Math.random().toString(36).slice(2)}}
+  function pendingKey(accountId,phone){return PENDING_PREFIX+email()+'.'+String(accountId||'')+'.'+cleanPhone(phone)}
+  function rememberPending(row){
+    if(!row||!row.accountId)return;
+    try{localStorage.setItem(pendingKey(row.accountId,row.phone),JSON.stringify(row))}catch(e){}
+    try{lastDialContext={accountId:row.accountId,phone:row.phone,startedAt:new Date(row.startedAt||Date.now()),attemptId:row.attemptId,callResultId:row.callResultId||''}}catch(e){}
+  }
+  function pendingFor(accountId,phone){
+    const exact=safeJson(localStorage.getItem(pendingKey(accountId,phone))||'');
+    const fresh=function(r){return r&&r.accountId&&Date.now()-Number(r.startedMs||Date.parse(r.startedAt)||0)<6*60*60*1000};
+    if(fresh(exact))return exact;
+    let best=null;
+    try{
+      const prefix=PENDING_PREFIX+email()+'.'+String(accountId||'')+'.';
+      for(let i=0;i<localStorage.length;i++){
+        const k=localStorage.key(i)||'';
+        if(!k.startsWith(prefix))continue;
+        const r=safeJson(localStorage.getItem(k)||'');
+        if(fresh(r)&&(!best||Number(r.startedMs||0)>Number(best.startedMs||0)))best=r;
+      }
+    }catch(e){}
+    return best;
+  }
+  function clearPending(row){
+    if(!row)return;
+    try{localStorage.removeItem(pendingKey(row.accountId,row.phone))}catch(e){}
+    try{if(lastDialContext&&String(lastDialContext.attemptId||'')===String(row.attemptId||''))lastDialContext={accountId:'',phone:'',startedAt:null,attemptId:'',callResultId:''}}catch(e){}
+  }
+  function resultObject(v){if(Array.isArray(v))return v[0]||{};return v||{}}
+  function updateLocalAccount(id,patch){
+    try{
+      const i=accounts.findIndex(function(x){return String(x.id)===String(id)});
+      if(i>=0)accounts[i]=Object.assign({},accounts[i],patch||{});
+      return i>=0?accounts[i]:null;
+    }catch(e){return null}
+  }
+  async function fetchCurrentAccount(){
+    if(!currentAccountId||!originalDbFetch)return null;
+    try{
+      const rows=await originalDbFetch('/accounts?id=eq.'+encodeURIComponent(currentAccountId)+'&select=*&limit=1');
+      if(rows&&rows[0]){
+        const row=typeof toCamel==='function'?toCamel(rows[0]):rows[0];
+        updateLocalAccount(currentAccountId,row);
+        return row;
+      }
+    }catch(e){}
+    return null;
+  }
+  async function refreshOpenSurfaces(reason){
+    if(refreshRunning){refreshAgain=true;return}
+    if(!email()||!(typeof token==='function'&&token()))return;
+    refreshRunning=true;
+    try{
+      const row=await fetchCurrentAccount();
+      if(row&&typeof render==='function')render();
+      if(currentAccountId&&typeof loadHistory==='function')await loadHistory(currentAccountId).catch(function(){});
+      const jobs=[];
+      if(isOpen('contactIntelligenceModal')&&typeof loadContactIntelligence==='function')jobs.push(loadContactIntelligence());
+      if(isOpen('employeeMonitorModal')&&typeof loadEmployeeMonitor==='function'&&currentUser.isAdmin)jobs.push(loadEmployeeMonitor());
+      if(isOpen('todayDashboardModal')&&typeof openTodayDashboard==='function')jobs.push(openTodayDashboard());
+      if(isOpen('leaderboardModal')&&typeof loadLeaderboard==='function')jobs.push(loadLeaderboard());
+      if(isOpen('paymentsDashboardModal')&&typeof loadPaymentsDashboard==='function')jobs.push(loadPaymentsDashboard());
+      if(isOpen('promiseDashboardModal')&&typeof loadPromiseDashboard==='function')jobs.push(loadPromiseDashboard());
+      if(isOpen('dailyWorkQueueModal')&&typeof loadDailyWorkQueue==='function')jobs.push(loadDailyWorkQueue());
+      if(isOpen('paymentTrackerModal')&&typeof loadPaymentTracker==='function')jobs.push(loadPaymentTracker());
+      if(isOpen('reportsPageStable')&&typeof refreshReportsPageStable==='function')jobs.push(refreshReportsPageStable());
+      if(isOpen('managerQaPage')&&typeof refreshManagerQaScorecards==='function')jobs.push(refreshManagerQaScorecards());
+      await Promise.allSettled(jobs);
+      window.dispatchEvent(new CustomEvent('cpcm:stats-refreshed',{detail:{reason:reason||'activity',at:nowIso()}}));
+    }finally{
+      refreshRunning=false;
+      if(refreshAgain){refreshAgain=false;setTimeout(function(){refreshOpenSurfaces('queued')},250)}
+    }
+  }
+  function queueRefresh(reason,delay){
+    clearTimeout(refreshTimer);
+    refreshTimer=setTimeout(function(){refreshOpenSurfaces(reason)},Number(delay||450));
+  }
+  window.cpcmRefreshDynamicStats=function(){return refreshOpenSurfaces('manual')};
+  window.cpcmQueueDynamicStatsRefresh=queueRefresh;
+
+  if(typeof originalDbFetch==='function'){
+    window.dbFetch=async function(path,opt){
+      const options=opt||{};
+      const data=await originalDbFetch(path,options);
+      const method=String(options.method||'GET').toUpperCase();
+      if(method!=='GET'&&method!=='HEAD'){
+        window.dispatchEvent(new CustomEvent('cpcm:data-changed',{detail:{path:path,method:method,at:nowIso()}}));
+        queueRefresh(path,500);
+      }
+      return data;
+    };
+  }
+
+  async function fallbackCallAttempt(a,phone,attemptId,startedAt){
+    let inserted=null;
+    const enhanced={account_id:a.id,phone_number:phone,call_result:'Call Attempt',disposition:'Pending Outcome',notes:'Phone application launched from Co Pilot Collections Manager.',result_at:startedAt,created_by_email:email(),attempt_id:attemptId,attempt_status:'pending',event_type:'attempt',dialed_at:startedAt,direction:'Outbound',outcome_category:'Pending Outcome',call_source:'Phone Link',updated_at:startedAt};
+    try{inserted=resultObject(await dbFetch('/call_results',{method:'POST',body:JSON.stringify([enhanced])}))}catch(e){
+      inserted=resultObject(await dbFetch('/call_results',{method:'POST',body:JSON.stringify([{account_id:a.id,phone_number:phone,call_result:'Call Attempt',disposition:'Pending Outcome',notes:'Phone application launched from Co Pilot Collections Manager.',result_at:startedAt,created_by_email:email()}])}));
+    }
+    const nextCount=Number(a.callCount||a.call_count||0)+1;
+    try{await dbFetch('/accounts?id=eq.'+encodeURIComponent(a.id),{method:'PATCH',body:JSON.stringify({last_contact_number:phone,last_called_at:startedAt,call_count:nextCount,last_worked_at:startedAt,updated_at:startedAt})})}catch(e){
+      await dbFetch('/accounts?id=eq.'+encodeURIComponent(a.id),{method:'PATCH',body:JSON.stringify({last_contact_number:phone,updated_at:startedAt})}).catch(function(){})
+    }
+    try{await dbFetch('/activity_logs',{method:'POST',body:JSON.stringify([{account_id:a.id,action_type:'Call Attempt',action_text:'Outbound call attempt launched to '+(typeof fmtPhone==='function'?fmtPhone(phone):phone),phone_number:phone,created_by_email:email(),event_key:'call-attempt:'+attemptId,metadata:{attempt_id:attemptId,source:'Phone Link'}}])})}catch(e){
+      if(typeof insertActivity==='function')await insertActivity(a.id,'Call Attempt','Outbound call attempt launched to '+(typeof fmtPhone==='function'?fmtPhone(phone):phone),phone).catch(function(){})
+    }
+    return {call_result_id:inserted&&inserted.id,attempt_id:attemptId,call_count:nextCount,inserted:true};
+  }
+
+  async function logCallAttempt(id,phone){
+    const a=account(id);
+    phone=cleanPhone(phone);
+    if(!a||phone.length<7)return null;
+    const rapidKey=String(id)+'|'+phone+'|'+email();
+    const prior=recentDial.get(rapidKey);
+    if(prior&&Date.now()-prior.at<3000)return prior.row;
+    const attemptId='call-'+uuid();
+    const startedAt=nowIso();
+    let result={};
+    try{
+      result=resultObject(await dbFetch('/rpc/cpcm_record_call_attempt',{method:'POST',body:JSON.stringify({p_account_id:a.id,p_phone_number:phone,p_attempt_id:attemptId,p_created_by_email:email(),p_call_source:'Phone Link'})}));
+    }catch(e){
+      result=await fallbackCallAttempt(a,phone,attemptId,startedAt);
+    }
+    const row={accountId:a.id,phone:phone,attemptId:attemptId,callResultId:result.call_result_id||result.callResultId||'',startedAt:result.dialed_at||startedAt,startedMs:Date.now()};
+    rememberPending(row);
+    recentDial.set(rapidKey,{at:Date.now(),row:row});
+    const count=Number(result.call_count||result.callCount||Number(a.callCount||a.call_count||0)+1);
+    const local=updateLocalAccount(a.id,{lastContactNumber:phone,last_contact_number:phone,lastCalledAt:row.startedAt,last_called_at:row.startedAt,callCount:count,call_count:count,lastWorkedAt:row.startedAt,last_worked_at:row.startedAt});
+    try{if(local&&typeof renderCallInsight==='function')renderCallInsight(local)}catch(e){}
+    try{if(typeof insertAudit==='function')await insertAudit('Call Attempt','Phone application launched for '+(typeof fmtPhone==='function'?fmtPhone(phone):phone),'account',a.id)}catch(e){}
+    const number=document.getElementById('callNumber');if(number)number.textContent=typeof fmtPhone==='function'?fmtPhone(phone):phone;
+    const last=document.getElementById('lastDialed');if(last)last.textContent='Call attempt logged · '+(typeof fmtPhone==='function'?fmtPhone(phone):phone);
+    setTimeout(function(){
+      try{
+        const cur=typeof getCurrent==='function'?getCurrent():null;
+        if(cur&&String(cur.id)===String(a.id)&&!isOpen('callResultModal')&&typeof openCallResultModal==='function')openCallResultModal({accountId:a.id,phone:phone,auto:true});
+      }catch(e){}
+    },1500);
+    queueRefresh('call-attempt',250);
+    return row;
+  }
+  window.cpcmLogCallAttempt=logCallAttempt;
+  window.recordDial=async function(id,phone){return logCallAttempt(id,phone)};
+  window.dialPhone=async function(id,phone){
+    const a=account(id);
+    phone=cleanPhone(phone);
+    if(!a||phone.length<7)return false;
+    if(typeof complianceCheckBeforeCall==='function'){
+      const ok=await complianceCheckBeforeCall(a,phone);
+      if(!ok)return false;
+    }
+    await logCallAttempt(a.id,phone);
+    try{
+      const link=document.createElement('a');
+      link.href='tel:'+phone;
+      link.style.display='none';
+      document.body.appendChild(link);
+      link.click();
+      setTimeout(function(){link.remove()},250);
+    }catch(e){window.location.href='tel:'+phone}
+    return false;
+  };
+
+  async function fallbackComplete(a,pending,details){
+    let rowId=pending&&pending.callResultId;
+    let usedPending=!!rowId;
+    const enhanced={phone_number:details.phone,call_result:details.result,disposition:details.status,notes:details.notes,result_at:details.attemptAt,attempt_status:'completed',event_type:'result',direction:details.direction,outcome_category:details.category,duration_seconds:details.duration,answered_by:details.answeredBy,is_contact:details.flags.is_contact,is_rpc:details.flags.is_rpc,is_promise:details.flags.is_promise,is_callback:details.flags.is_callback,is_wrong_number:details.flags.is_wrong_number,next_call_at:details.nextAt,account_balance_snapshot:details.balance,updated_at:details.attemptAt};
+    if(rowId){
+      try{await dbFetch('/call_results?id=eq.'+encodeURIComponent(rowId),{method:'PATCH',body:JSON.stringify(enhanced)})}catch(e){
+        await dbFetch('/call_results?id=eq.'+encodeURIComponent(rowId),{method:'PATCH',body:JSON.stringify({phone_number:details.phone,call_result:details.result,disposition:details.status,notes:details.notes,result_at:details.attemptAt})})
+      }
+    }else{
+      usedPending=false;
+      const insert=Object.assign({account_id:a.id,created_by_email:email(),attempt_id:pending&&pending.attemptId||'result-'+uuid(),attempt_status:'completed',event_type:'result',dialed_at:details.attemptAt,call_source:'Manual Call Result'},enhanced);
+      try{rowId=resultObject(await dbFetch('/call_results',{method:'POST',body:JSON.stringify([insert])})).id}catch(e){
+        rowId=resultObject(await dbFetch('/call_results',{method:'POST',body:JSON.stringify([{account_id:a.id,phone_number:details.phone,call_result:details.result,disposition:details.status,duration_seconds:details.duration,notes:details.notes,result_at:details.attemptAt,created_by_email:email()}])})).id
+      }
+    }
+    const addCall=usedPending?0:1;
+    const patch={status:details.status,disposition:details.status,last_contact_number:details.phone,last_called_at:details.attemptAt,last_call_result:details.result,last_call_outcome:details.category,next_call_at:details.nextAt,call_count:Number(a.callCount||a.call_count||0)+addCall,contact_count:Number(a.contactCount||a.contact_count||0)+(details.flags.is_contact?1:0),rpc_count:Number(a.rpcCount||a.rpc_count||0)+(details.flags.is_rpc?1:0),voicemail_count:Number(a.voicemailCount||a.voicemail_count||0)+(/voicemail/i.test(details.result)?1:0),no_answer_count:Number(a.noAnswerCount||a.no_answer_count||0)+(details.result==='No Answer'?1:0),wrong_number_count:Number(a.wrongNumberCount||a.wrong_number_count||0)+(details.flags.is_wrong_number?1:0),refused_count:Number(a.refusedCount||a.refused_count||0)+(details.result==='Refused to Pay'?1:0),last_worked_at:details.attemptAt,updated_at:details.attemptAt};
+    if(details.result==='DNC')patch.do_not_call=true;
+    if(details.result==='Dispute')patch.disputed_flag=true;
+    if(details.flags.is_wrong_number)patch.wrong_number_flag=true;
+    try{await dbFetch('/accounts?id=eq.'+encodeURIComponent(a.id),{method:'PATCH',body:JSON.stringify(patch)})}catch(e){
+      await dbFetch('/accounts?id=eq.'+encodeURIComponent(a.id),{method:'PATCH',body:JSON.stringify({status:details.status,disposition:details.status,last_contact_number:details.phone,updated_at:details.attemptAt})}).catch(function(){})
+    }
+    if(typeof insertActivity==='function')await insertActivity(a.id,'Call Result',(details.result+' '+(details.phone?(typeof fmtPhone==='function'?fmtPhone(details.phone):details.phone):'')+(details.duration?' · '+details.duration+'s':'')+'. '+details.notes).trim(),details.phone,a.status||a.disposition,details.status).catch(function(){});
+    return {call_result_id:rowId,completed:true,created_without_attempt:!usedPending};
+  }
+
+  window.saveCallResult=async function(){
+    if(callSaveBusy)return;
+    callSaveBusy=true;
+    const btn=document.querySelector('#callResultModal button.green,#callResultModal button[onclick="saveCallResult()"]');
+    if(btn)btn.disabled=true;
+    try{
+      let a=typeof getCurrent==='function'?getCurrent():null;
+      try{if(lastDialContext&&lastDialContext.accountId)a=accountById(lastDialContext.accountId)||a}catch(e){}
+      if(!a)return alert('No account selected.');
+      const result=(typeof val==='function'?val('callResultStatus'):'')||'No Answer';
+      const phone=cleanPhone((typeof val==='function'?val('callResultPhone'):'')||(lastDialContext&&lastDialContext.phone)||'');
+      const duration=Number((typeof val==='function'?val('callDuration'):'')||0);
+      const notes=(typeof val==='function'?val('callResultNotes'):'')||'';
+      const direction=(typeof val==='function'?val('callDirection'):'')||'Outbound';
+      const answeredBy=(typeof val==='function'?val('callAnsweredBy'):'')||'';
+      const category=(typeof val==='function'?val('callOutcomeCategory'):'')||(typeof callOutcomeCategory==='function'?callOutcomeCategory(result):'No Contact');
+      const nextDate=(typeof val==='function'?val('callCallbackDate'):'')||'';
+      const nextTime=(typeof val==='function'?val('callCallbackTime'):'')||'09:00';
+      const nextAt=nextDate?new Date(nextDate+'T'+nextTime+':00').toISOString():null;
+      if(typeof complianceCheckBeforeCallResultSave==='function'){
+        const ok=await complianceCheckBeforeCallResultSave(a,result,phone);
+        if(!ok)return;
+      }
+      const flags={
+        is_contact:typeof isContactOutcome==='function'?isContactOutcome(result):false,
+        is_rpc:typeof isRpcOutcome==='function'?isRpcOutcome(result):false,
+        is_promise:typeof isPromiseOutcome==='function'?isPromiseOutcome(result):false,
+        is_callback:typeof isCallbackOutcome==='function'?isCallbackOutcome(result):false,
+        is_wrong_number:typeof isWrongNumberOutcome==='function'?isWrongNumberOutcome(result):false
+      };
+      const status=typeof callStatusForResult==='function'?callStatusForResult(result):result;
+      const pending=pendingFor(a.id,phone)||(lastDialContext&&lastDialContext.attemptId?{accountId:a.id,phone:phone,attemptId:lastDialContext.attemptId,callResultId:lastDialContext.callResultId||'',startedAt:lastDialContext.startedAt,startedMs:Date.parse(lastDialContext.startedAt)||Date.now()}:null);
+      const details={phone:phone,result:result,status:status,direction:direction,category:category,duration:duration,answeredBy:answeredBy,flags:flags,nextAt:nextAt,balance:typeof accountBalance==='function'?accountBalance(a):0,notes:notes,attemptAt:nowIso()};
+      let completed={};
+      try{
+        completed=resultObject(await dbFetch('/rpc/cpcm_complete_call_attempt',{method:'POST',body:JSON.stringify({p_account_id:a.id,p_attempt_id:pending&&pending.attemptId||null,p_phone_number:phone,p_call_result:result,p_disposition:status,p_direction:direction,p_outcome_category:category,p_duration_seconds:duration,p_answered_by:answeredBy||null,p_is_contact:flags.is_contact,p_is_rpc:flags.is_rpc,p_is_promise:flags.is_promise,p_is_callback:flags.is_callback,p_is_wrong_number:flags.is_wrong_number,p_next_call_at:nextAt,p_account_balance_snapshot:details.balance,p_notes:notes,p_created_by_email:email()})}));
+      }catch(e){
+        completed=await fallbackComplete(a,pending,details);
+      }
+      if(pending)clearPending(pending);
+      if(nextAt){
+        await dbFetch('/follow_ups',{method:'POST',body:JSON.stringify([{account_id:a.id,follow_up_type:'Callback',due_date:nextDate,due_time:nextTime,status:'Open',assigned_to_email:typeof currentAssignee==='function'?currentAssignee(a):email(),reason:'Callback from call outcome',notes:(nextTime+' - '+notes).trim(),created_by_email:email()}])}).catch(function(){})
+      }
+      try{if(typeof insertAudit==='function')await insertAudit('Call Result',result+' for '+(typeof nameOf==='function'?nameOf(a):'account'),'account',a.id)}catch(e){}
+      await fetchCurrentAccount();
+      if(typeof closeModal==='function')closeModal('callResultModal');
+      if(typeof render==='function')render();
+      queueRefresh('call-result',150);
+      if(result==='Promise to Pay')setTimeout(function(){try{if(confirm('Open Pay Desk / Payment Promise now?'))openPaymentTrackerForCurrent()}catch(e){}},150);
+      if(result==='Dispute')setTimeout(function(){try{openDisputeModal()}catch(e){}},150);
+    }finally{
+      callSaveBusy=false;
+      if(btn)btn.disabled=false;
+    }
+  };
+
+  window.isCallActivity=function(row){
+    const type=String((row&&(row.actionType||row.action_type))||'').toLowerCase();
+    const text=String((row&&(row.actionText||row.action_text))||'').toLowerCase();
+    if(type.indexOf('call result')>=0)return false;
+    return /call attempt|outbound call|dial/.test(type)||/clicked phone|phone application launched|call attempt launched/.test(text);
+  };
+
+  async function logAccountOpened(id){
+    if(!id||!email())return;
+    const bucket=Math.floor(Date.now()/(10*60*1000));
+    const key=OPEN_PREFIX+email()+'.'+id+'.'+bucket;
+    try{if(sessionStorage.getItem(key))return;sessionStorage.setItem(key,'1')}catch(e){}
+    const at=nowIso();
+    try{
+      await dbFetch('/activity_logs',{method:'POST',body:JSON.stringify([{account_id:id,action_type:'Account Opened',action_text:'Collector opened the account workspace.',created_by_email:email(),event_key:'account-open:'+email()+':'+id+':'+bucket,metadata:{source:'Queue',bucket:bucket}}])});
+    }catch(e){
+      if(typeof insertActivity==='function')await insertActivity(id,'Account Opened','Collector opened the account workspace.').catch(function(){})
+    }
+    await dbFetch('/accounts?id=eq.'+encodeURIComponent(id),{method:'PATCH',body:JSON.stringify({last_worked_at:at,updated_at:at})}).catch(function(){});
+  }
+  if(typeof originalSetCurrent==='function'){
+    window.setCurrent=function(id){
+      const before=String((typeof currentAccountId!=='undefined'&&currentAccountId)||'');
+      const out=originalSetCurrent.apply(this,arguments);
+      if(id&&String(id)!==before)setTimeout(function(){logAccountOpened(id)},30);
+      return out;
+    };
+  }
+
+  document.addEventListener('visibilitychange',function(){if(!document.hidden)queueRefresh('visibility',250)});
+  window.addEventListener('focus',function(){queueRefresh('focus',300)});
+  setInterval(function(){
+    if(document.hidden||!email()||!(typeof token==='function'&&token()))return;
+    const analyticsOpen=isOpen('contactIntelligenceModal')||isOpen('employeeMonitorModal')||isOpen('todayDashboardModal')||isOpen('leaderboardModal')||isOpen('paymentsDashboardModal')||isOpen('promiseDashboardModal')||isOpen('dailyWorkQueueModal')||isOpen('paymentTrackerModal')||isOpen('reportsPageStable')||isOpen('managerQaPage');
+    if(analyticsOpen)refreshOpenSurfaces('live-poll');
+  },12000);
+
+  window.CPCM_DYNAMIC_ACTIVITY_STATS_BUILD=BUILD;
+  window.dispatchEvent(new CustomEvent('cpcm:dynamic-stats-ready',{detail:{build:BUILD}}));
+})();
+
+</script>
+
+<script id="cpcmNmiPhase1Module">
+(function(){
+  'use strict';
+  var BUILD='LIVE_SOURCE_OF_TRUTH_MESSENGER_CLEANUP_R8N20_2';
+  var collectScriptPromise=null, collectReadyPromise=null, collectConfigured=false, paymentBusy=false, paymentContext=null, lastReceipt=null, collectGeneration=0;
+  function byId(id){return document.getElementById(id)}
+  function cfg(){return window.CO_PILOT_NMI_CONFIG||{}}
+  function str(v){return String(v==null?'':v)}
+  function amount(v){var n=Number(str(v).replace(/[^0-9.-]/g,''));return isFinite(n)?Math.round(n*100)/100:0}
+  function usd(v){return amount(v).toLocaleString('en-US',{style:'currency',currency:'USD'})}
+  function nmiKey(){return str(cfg().publicTokenizationKey).trim()}
+  function keyReady(){var key=nmiKey();return !!key&&!/PASTE_|YOUR_|REPLACE_/i.test(key)&&key.length>12}
+  function uuid(){return (window.crypto&&crypto.randomUUID)?crypto.randomUUID():'nmi-'+Date.now()+'-'+Math.random().toString(36).slice(2)}
+  function isAdmin(){
+    var u=(typeof currentUser!=='undefined'&&currentUser)?currentUser:null;
+    return !!(u&&(u.isAdmin===true||str(u.role).toLowerCase()==='admin'||str(u.email).toLowerCase()==='afinch2678@gmail.com'));
+  }
+
+  function nmiToast(message,type,title,timeout){
+    var stack=byId('nmiToastStack');
+    if(!stack){
+      stack=document.createElement('div');
+      stack.id='nmiToastStack';
+      stack.className='nmiToastStack';
+      document.body.appendChild(stack);
+    }
+    type=type||'info';
+    title=title||(type==='success'?'Success':type==='error'?'Action Required':type==='warning'?'Please Review':'Notice');
+    var item=document.createElement('div');
+    item.className='nmiToast '+type;
+    item.innerHTML='<button class="nmiToastClose" aria-label="Close">×</button><div class="nmiToastTitle">'+safeHtml(title)+'</div><div class="nmiToastMessage">'+safeHtml(message)+'</div>';
+    var remove=function(){if(item&&item.parentNode)item.parentNode.removeChild(item)};
+    item.querySelector('.nmiToastClose').onclick=remove;
+    stack.appendChild(item);
+    setTimeout(remove,Number(timeout||6000));
+  }
+
+  function status(text,type){var el=byId('nmiPaymentStatus');if(!el)return;el.textContent=text;el.className='nmiPaymentStatus'+(type?' '+type:'')}
+  function setBusy(on){paymentBusy=!!on;var btn=byId('nmiPayButton');if(btn){btn.disabled=!!on;btn.textContent=on?'Processing — Do Not Close':'Process Secure Payment'}}
+  function field(id){return byId(id)?byId(id).value.trim():''}
+  function current(){return typeof getCurrent==='function'?getCurrent():null}
+  function firstPhone(a){try{return typeof phones==='function'?(phones(a)[0]||''):(a.phone1||'')}catch(e){return a&&a.phone1||''}}
+  function setField(id,value){if(byId(id))byId(id).value=value==null?'':value}
+  function safeHtml(v){return typeof esc==='function'?esc(v):str(v).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
+
+  window.updateNmiPaymentPreview=function(){
+    var a=current(), bal=typeof accountBalance==='function'?accountBalance(a):0, pay=amount(field('nmiAmount'));
+    if(byId('nmiCurrentBalance'))byId('nmiCurrentBalance').textContent=usd(bal);
+    if(byId('nmiBalanceAfter'))byId('nmiBalanceAfter').textContent=usd(Math.max(0,bal-pay));
+  };
+
+  function collectHosts(){return ['ccnumber','ccexp','cvv'].map(byId)}
+  function collectFramesReady(){
+    var hosts=collectHosts();
+    return hosts.every(function(host){
+      if(!host)return false;
+      var frame=host.querySelector('iframe');
+      if(!frame)return false;
+      var rect=frame.getBoundingClientRect();
+      return rect.width>20&&rect.height>20;
+    });
+  }
+  function setFieldDiagnostic(text,isError){
+    var el=byId('nmiFieldDiagnostic');
+    if(!el)return;
+    el.textContent=text;
+    el.style.color=isError?'#b91c1c':'#64748b';
+  }
+  function clearCollectHosts(){
+    collectHosts().forEach(function(host){if(host)host.replaceChildren()});
+    collectConfigured=false;
+  }
+  function configureCollect(force){
+    if(!window.CollectJS||!byId('ccnumber'))return Promise.reject(new Error('NMI Collect.js is not ready.'));
+    if(!force&&collectConfigured&&collectFramesReady())return Promise.resolve(true);
+    if(collectReadyPromise&&!force)return collectReadyPromise;
+    var generation=++collectGeneration;
+    clearCollectHosts();
+    setFieldDiagnostic('Loading fresh NMI-hosted card fields…',false);
+    collectReadyPromise=new Promise(function(resolve,reject){
+      var finished=false;
+      var finish=function(ok,error){
+        if(finished||generation!==collectGeneration)return;
+        finished=true;
+        collectReadyPromise=null;
+        if(ok){collectConfigured=true;setFieldDiagnostic('All three secure fields are ready.',false);resolve(true)}
+        else{collectConfigured=false;setFieldDiagnostic(error||'Secure fields did not initialize.',true);reject(new Error(error||'Secure fields did not initialize.'))}
+      };
+      var watchdog=setTimeout(function(){finish(false,'NMI secure fields timed out. Click Reload Secure Fields.')},16000);
+      try{
+        CollectJS.configure({
+          variant:'inline',
+          styleSniffer:false,
+          customCss:{'background-color':'#ffffff','color':'#0f172a','font-size':'15px','font-family':'Arial, Helvetica, sans-serif','padding':'12px','height':'42px','line-height':'20px','box-sizing':'border-box','width':'100%'},
+          invalidCss:{'color':'#b91c1c','background-color':'#fff7f7'},
+          validCss:{'color':'#0f172a','background-color':'#ffffff'},
+          focusCss:{'color':'#0f172a','background-color':'#ffffff','outline':'none'},
+          placeholderCss:{'color':'#94a3b8'},
+          fields:{
+            ccnumber:{selector:'#ccnumber',title:'Card Number',placeholder:'0000 0000 0000 0000'},
+            ccexp:{selector:'#ccexp',title:'Expiration Date',placeholder:'MM / YY'},
+            cvv:{selector:'#cvv',title:'CVV',placeholder:'CVV'}
+          },
+          timeoutDuration:15000,
+          timeoutCallback:function(){clearTimeout(watchdog);setBusy(false);finish(false,'NMI secure fields did not respond. Check the public key or click Reload Secure Fields.')},
+          fieldsAvailableCallback:function(){
+            setTimeout(function(){
+              clearTimeout(watchdog);
+              if(collectFramesReady()){
+                status('Secure card fields loaded. Click Card Number and enter the card information.','');
+                finish(true);
+              }else finish(false,'One or more NMI fields did not render correctly. Click Reload Secure Fields.');
+            },180);
+          },
+          callback:window.cpcmNmiCollectCallback
+        });
+      }catch(e){clearTimeout(watchdog);finish(false,'Unable to configure NMI secure fields: '+(e.message||e))}
+    });
+    return collectReadyPromise;
+  }
+
+  function loadCollect(force){
+    if(!keyReady())return Promise.reject(new Error('Paste the NMI public tokenization key into public/nmi-config.js first.'));
+    if(window.CollectJS)return configureCollect(!!force);
+    if(!collectScriptPromise){
+      collectScriptPromise=new Promise(function(resolve,reject){
+        var prior=byId('cpcmNmiCollectScript');
+        if(prior)prior.remove();
+        var script=document.createElement('script');
+        script.id='cpcmNmiCollectScript';
+        script.src='https://secure.nmi.com/token/Collect.js';
+        script.setAttribute('data-tokenization-key',nmiKey());
+        script.async=true;
+        script.onload=function(){resolve(true)};
+        script.onerror=function(){reject(new Error('NMI Collect.js could not be loaded.'))};
+        document.head.appendChild(script);
+      }).catch(function(e){collectScriptPromise=null;throw e});
+    }
+    return collectScriptPromise.then(function(){return configureCollect(!!force)});
+  }
+
+  window.reloadNmiSecureFields=async function(){
+    if(paymentBusy)return;
+    setBusy(true);
+    status('Reloading NMI secure card fields…','processing');
+    try{await loadCollect(true);status('Secure fields reloaded. Click Card Number and try again.','')}
+    catch(e){status(e.message||String(e),'error')}
+    finally{setBusy(false)}
+  };
+
+  window.openNmiPayment=async function(){
+    var a=current();if(!a)return alert('No account selected.');
+    var modal=byId('nmiPaymentModal');if(!modal)return alert('NMI payment screen is unavailable.');
+    lastReceipt=null;paymentContext=null;setBusy(false);
+    if(byId('nmiPaymentResult')){byId('nmiPaymentResult').classList.add('hidden');byId('nmiPaymentResult').innerHTML=''}
+    if(byId('nmiReceiptButton'))byId('nmiReceiptButton').style.display='none';
+    if(byId('nmiAuthorization'))byId('nmiAuthorization').checked=false;
+    if(byId('nmiConsumerName'))byId('nmiConsumerName').textContent=typeof nameOf==='function'?nameOf(a):str(a.fullName||'Consumer');
+    if(byId('nmiAccountNumber'))byId('nmiAccountNumber').textContent=typeof acctNo==='function'?acctNo(a):str(a.accountNumber||'');
+    setField('nmiAmount','');setField('nmiCardholderName',typeof nameOf==='function'?nameOf(a):a.fullName||'');
+    setField('nmiAddress1',a.address||'');setField('nmiCity',a.city||'');setField('nmiState',a.state||'');setField('nmiZip',a.zip||'');
+    setField('nmiEmail',a.email||'');setField('nmiPhone',firstPhone(a));setField('nmiNotes','');
+    window.updateNmiPaymentPreview();
+    var warning=byId('nmiSetupWarning');
+    if(warning){warning.classList.toggle('hidden',keyReady());warning.textContent=keyReady()?'':'NMI is not configured yet. Paste only the public tokenization key into public/nmi-config.js, then deploy the Edge Functions and add the private key in Supabase Secrets.'}
+    modal.classList.add('open');
+    if(!keyReady()){status('NMI setup is incomplete. No payment can be submitted.','error');return}
+    status('Loading NMI secure card fields…','processing');
+    try{await loadCollect(true)}catch(e){status(e.message||String(e),'error')}
+  };
+
+  window.startNmiPayment=async function(){
+    if(paymentBusy)return;
+    var a=current();if(!a)return alert('No account selected.');
+    if(!keyReady())return status('Paste the NMI public tokenization key into public/nmi-config.js first.','error');
+    var pay=amount(field('nmiAmount')), bal=typeof accountBalance==='function'?accountBalance(a):0;
+    if(pay<=0)return status('Enter a payment amount greater than zero.','error');
+    if(pay>bal+0.01)return status('Payment cannot exceed the current balance of '+usd(bal)+'.','error');
+    if(!field('nmiCardholderName'))return status('Enter the cardholder name.','error');
+    if(!field('nmiZip'))return status('Enter the billing ZIP code.','error');
+    if(!byId('nmiAuthorization').checked)return status('Confirm the consumer authorized this one-time charge.','error');
+    try{
+      await loadCollect(false);
+      if(!collectFramesReady())throw new Error('The NMI card fields are not ready. Click Reload Secure Fields and try again.');
+      paymentContext={
+        accountId:a.id,amount:pay,idempotencyKey:'sale-'+uuid(),
+        billing:{cardholderName:field('nmiCardholderName'),address1:field('nmiAddress1'),city:field('nmiCity'),state:field('nmiState'),zip:field('nmiZip'),email:field('nmiEmail'),phone:field('nmiPhone')},
+        metadata:{source:'Co Pilot LIVE NMI Phase 1',notes:field('nmiNotes'),billingEmail:field('nmiEmail'),billingPhone:field('nmiPhone'),accountNumber:typeof acctNo==='function'?acctNo(a):a.accountNumber||'',consumerName:typeof nameOf==='function'?nameOf(a):a.fullName||''}
+      };
+      setBusy(true);status('Securing card information with NMI… Do not close or press the button again.','processing');
+      CollectJS.startPaymentRequest();
+    }catch(e){setBusy(false);status(e.message||String(e),'error')}
+  };
+
+  async function invokeNmi(body){
+    if(typeof ensureFreshToken==='function')await ensureFreshToken();
+    var functionName=str(cfg().edgeFunctionName||'nmi-payments');
+    var response=await fetch(url()+'/functions/v1/'+encodeURIComponent(functionName),{
+      method:'POST',
+      headers:{'Content-Type':'application/json','apikey':pubKey(),'Authorization':'Bearer '+token()},
+      body:JSON.stringify(body)
+    });
+    var data={};try{data=await response.json()}catch(e){data={error:'The payment service returned an unreadable response.'}}
+    if(!response.ok||!data.success){var err=new Error(data.error||'The NMI request was not approved.');err.details=data;throw err}
+    return data;
+  }
+
+  window.cpcmNmiCollectCallback=async function(response){
+    if(!paymentContext){setBusy(false);return status('Payment context expired. Reopen the payment screen and try again.','error')}
+    var ctx=paymentContext;paymentContext=null;
+    var tokenized=response&&response.token;
+    if(!tokenized){setBusy(false);return status('NMI did not return a payment token. Check the card fields and try again.','error')}
+    try{
+      status('NMI is processing the card. Do not retry or close this screen.','processing');
+      var masked=str(response&&response.card&&response.card.number), digits=masked.replace(/\D/g,'');
+      var result=await invokeNmi({action:'sale',accountId:ctx.accountId,amount:ctx.amount,paymentToken:tokenized,idempotencyKey:ctx.idempotencyKey,billing:ctx.billing,metadata:ctx.metadata,cardMetadata:{brand:str(response&&response.card&&response.card.type),last4:digits.slice(-4)}});
+      lastReceipt=result.receipt_number||result.receiptNumber||'';
+      status('Payment approved and posted to the account ledger.','success');
+      nmiToast(usd(result.amount||ctx.amount)+' was approved and posted. Receipt '+str(result.receipt_number||result.receiptNumber||lastReceipt||'generated')+'.','success','Payment Approved',7000);
+      var box=byId('nmiPaymentResult');
+      if(box){box.classList.remove('hidden');box.innerHTML='<h4>Payment Approved</h4><div class="nmiResultGrid"><div><span>Amount</span><b>'+safeHtml(usd(result.amount||ctx.amount))+'</b></div><div><span>Receipt</span><b>'+safeHtml(lastReceipt||'Generated')+'</b></div><div><span>Balance After</span><b>'+safeHtml(usd(result.balance_after!=null?result.balance_after:result.balanceAfter))+'</b></div><div><span>NMI Transaction</span><b>'+safeHtml(result.transactionId||result.gateway_transaction_id||'')+'</b></div><div><span>Authorization</span><b>'+safeHtml(result.authorizationCode||'—')+'</b></div><div><span>Card</span><b>'+safeHtml([result.card_brand||result.cardBrand||'',(result.card_last4||result.cardLast4)?'•••• '+(result.card_last4||result.cardLast4):''].filter(Boolean).join(' ')||'Masked by NMI')+'</b></div></div>'}
+      if(byId('nmiReceiptButton'))byId('nmiReceiptButton').style.display='inline-flex';
+      try{if(window.CollectJS&&CollectJS.clearInputs)CollectJS.clearInputs()}catch(e){}
+      var activeId=ctx.accountId;
+      if(typeof loadAccounts==='function')await loadAccounts();
+      if(typeof currentAccountId!=='undefined')currentAccountId=activeId;
+      if(typeof loadPaymentLedgerForCurrent==='function')await loadPaymentLedgerForCurrent();
+      if(typeof renderPaymentPlanSummary==='function')await renderPaymentPlanSummary(activeId).catch(function(){});
+      if(typeof loadHistory==='function')await loadHistory(activeId).catch(function(){});
+      if(typeof render==='function')render();
+      if(typeof cpcmQueueDynamicStatsRefresh==='function')cpcmQueueDynamicStatsRefresh('nmi-sale',100);
+    }catch(e){
+      var details=e.details||{};
+      if(details.gatewayApproved||details.needsReview){status((e.message||e)+' Transaction: '+str(details.transactionId||'')+' — DO NOT RETRY.','error')}
+      else status(e.message||String(e),'error');
+    }finally{setBusy(false)}
+  };
+
+  window.openNmiReceiptCenter=function(){
+    if(typeof closeModal==='function')closeModal('nmiPaymentModal');
+    if(typeof openReceiptsLettersPage==='function')return openReceiptsLettersPage('receipt');
+    if(typeof openDocumentGenerator==='function')return openDocumentGenerator();
+    alert('Receipt '+(lastReceipt||'')+' is saved in the Payment Ledger.');
+  };
+
+  async function refreshAfterAdjustment(accountId){
+    if(typeof loadAccounts==='function')await loadAccounts();
+    if(typeof currentAccountId!=='undefined')currentAccountId=accountId;
+    if(typeof loadPaymentLedgerForCurrent==='function')await loadPaymentLedgerForCurrent();
+    if(typeof renderPaymentPlanSummary==='function')await renderPaymentPlanSummary(accountId).catch(function(){});
+    if(typeof loadHistory==='function')await loadHistory(accountId).catch(function(){});
+    if(typeof render==='function')render();
+    if(typeof cpcmQueueDynamicStatsRefresh==='function')cpcmQueueDynamicStatsRefresh('nmi-adjustment',100);
+  }
+
+  window.nmiVoidPayment=async function(ledgerId){
+    if(!isAdmin())return nmiToast('Only an administrator can void an NMI payment.','error','Admin Required');
+    var row=(window.paymentLedgerData||[]).find(function(x){return str(x.id)===str(ledgerId)});if(!row)return nmiToast('The payment ledger row could not be found. Refresh the ledger and try again.','error','Payment Not Found');
+    if(!confirm('Void this NMI payment? A void is intended for an unsettled transaction and will add the amount back to the account balance only after NMI approves it.'))return;
+    try{
+      nmiToast('The void request is being sent to NMI. Do not click again.','info','Processing Void',9000);
+      var result=await invokeNmi({action:'void',originalLedgerId:ledgerId,idempotencyKey:'void-'+uuid(),metadata:{source:'Payment Ledger',accountNumber:typeof acctNo==='function'?acctNo(current()):''}});
+      nmiToast('NMI approved the void. '+usd(result.amount)+' was added back to the account balance.','success','Payment Voided',8000);
+      await refreshAfterAdjustment(row.accountId||row.account_id);
+    }catch(e){nmiToast(e.message||String(e),'error','Void Not Completed',10000)}
+  };
+
+  window.nmiRefundPayment=async function(ledgerId){
+    if(!isAdmin())return nmiToast('Only an administrator can refund an NMI payment.','error','Admin Required');
+    var row=(window.paymentLedgerData||[]).find(function(x){return str(x.id)===str(ledgerId)});if(!row)return nmiToast('The payment ledger row could not be found. Refresh the ledger and try again.','error','Payment Not Found');
+    var remaining=Math.max(0,amount(row.amount)-amount(row.refundedAmount||row.refunded_amount));
+    var requested=prompt('Refund amount (maximum '+usd(remaining)+'):',remaining.toFixed(2));if(requested===null)return;
+    var refund=amount(requested);if(refund<=0||refund>remaining+0.01)return nmiToast('Enter a refund amount from $0.01 to '+usd(remaining)+'.','error','Invalid Refund Amount');
+    if(!confirm('Refund '+usd(refund)+' through NMI and add it back to the account balance?'))return;
+    try{
+      nmiToast('The refund request is being sent to NMI. Do not click again.','info','Processing Refund',9000);
+      var result=await invokeNmi({action:'refund',originalLedgerId:ledgerId,amount:refund,idempotencyKey:'refund-'+uuid(),metadata:{source:'Payment Ledger',accountNumber:typeof acctNo==='function'?acctNo(current()):''}});
+      nmiToast('NMI approved the refund. '+usd(result.amount)+' was added back to the account balance.','success','Refund Approved',8000);
+      await refreshAfterAdjustment(row.accountId||row.account_id);
+    }catch(e){nmiToast(e.message||String(e),'error','Refund Not Completed',10000)}
+  };
+
+  window.nmiLedgerActions=function(row){
+    var provider=str(row.gatewayProvider||row.gateway_provider).toUpperCase();
+    var type=str(row.paymentType||row.payment_type).toLowerCase();
+    var gatewayId=str(row.gatewayTransactionId||row.gateway_transaction_id);
+    if(!isAdmin()||provider!=='NMI'||type!=='payment')return '—';
+    if(!gatewayId)return '<span style="font-size:10px;font-weight:800;color:#b45309">Gateway link missing</span>';
+    var remaining=Math.max(0,amount(row.amount)-amount(row.refundedAmount||row.refunded_amount));
+    if(remaining<=0.009)return '<span class="nmiGatewayPill">Fully reversed</span>';
+    return '<div class="nmiActionButtons"><button class="outline" onclick="nmiVoidPayment(\''+safeHtml(row.id)+'\')">Void</button><button class="danger" onclick="nmiRefundPayment(\''+safeHtml(row.id)+'\')">Refund</button></div>';
+  };
+
+  // Replace only the account-ledger renderer; the existing save and dashboard logic remains intact.
+  window.loadPaymentLedgerForCurrent=async function(){
+    var a=current();if(!a)return;
+    var rows=[];try{rows=(await dbFetch('/payments_ledger?account_id=eq.'+encodeURIComponent(a.id)+'&select=*&order=payment_date.desc,created_at.desc&limit=500')).map(toCamel)}catch(e){rows=[]}
+    window.paymentLedgerData=rows;
+    var body=byId('ledgerHistoryBody');if(!body)return;
+    body.innerHTML=rows.map(function(r){
+      var provider=str(r.gatewayProvider||r.gateway_provider), gateway=provider?'<span class="nmiGatewayPill">'+safeHtml(provider)+'</span><div style="font-size:9px;color:#64748b;margin-top:4px">'+safeHtml(r.gatewayStatus||r.gateway_status||'')+'</div>':'—';
+      var cls=(r.paymentType==='Payment'||r.paymentType==='Adjustment Credit')?'green':'red';
+      return '<tr><td>'+safeHtml(r.paymentDate||str(r.createdAt||'').slice(0,10))+'</td><td><span class="ledgerPill '+cls+'">'+safeHtml(r.paymentType||'Payment')+'</span></td><td><b>'+usd(r.amount)+'</b></td><td>'+safeHtml(r.paymentMethod||'')+'</td><td>'+safeHtml(r.status||'')+'</td><td>'+gateway+'</td><td>'+usd(r.balanceBefore)+'</td><td>'+usd(r.balanceAfter)+'</td><td>'+safeHtml(r.receiptNumber||'')+'</td><td>'+safeHtml(r.createdByEmail||'')+'</td><td>'+safeHtml(r.notes||'')+'</td><td>'+window.nmiLedgerActions(r)+'</td></tr>';
+    }).join('')||'<tr><td colspan="12"><div class="powerEmpty">No payment ledger entries yet.</div></td></tr>';
+  };
+
+
+  // Keep the ledger balance preview synchronized with the latest database state.
+  var cpcmOriginalOpenPaymentLedger=window.openPaymentLedger;
+  if(typeof cpcmOriginalOpenPaymentLedger==='function'){
+    window.openPaymentLedger=async function(){
+      try{if(typeof loadAccounts==='function')await loadAccounts()}catch(e){}
+      return cpcmOriginalOpenPaymentLedger.apply(this,arguments);
+    };
+  }
+
+  window.CPCM_NMI_PHASE1_BUILD=BUILD;
+  window.dispatchEvent(new CustomEvent('cpcm:nmi-phase1-ready',{detail:{build:BUILD}}));
+})();
+</script>
+
+
+<script id="cpcmNmiApprovalQueueR8N17">
+(function(){
+  'use strict';
+  var BUILD='LIVE_SOURCE_OF_TRUTH_MESSENGER_CLEANUP_R8N20';
+  var approvalContext=null, approvalActionBusy={};
+  function el(id){return document.getElementById(id)}
+  function s(v){return String(v==null?'':v)}
+  function num(v){var n=Number(s(v).replace(/[^0-9.-]/g,''));return isFinite(n)?Math.round(n*100)/100:0}
+  function cash(v){return num(v).toLocaleString('en-US',{style:'currency',currency:'USD'})}
+  function h(v){return typeof esc==='function'?esc(v):s(v).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
+  function actor(){return (typeof currentUser!=='undefined'&&currentUser)?currentUser:{}}
+  function admin(){var u=actor();return !!(u.isAdmin===true||s(u.role).toLowerCase()==='admin'||s(u.email).toLowerCase()==='afinch2678@gmail.com')}
+  function currentAccount(){return typeof getCurrent==='function'?getCurrent():null}
+  function val(id){return el(id)?el(id).value.trim():''}
+  function uid(){return (window.crypto&&crypto.randomUUID)?crypto.randomUUID():'cpcm-'+Date.now()+'-'+Math.random().toString(36).slice(2)}
+  function payStatus(message,type){var node=el('nmiPaymentStatus');if(!node)return;node.textContent=message;node.className='nmiPaymentStatus'+(type?' '+type:'')}
+  function toast(message,type,title,timeout){
+    if(typeof nmiToast==='function')return nmiToast(message,type,title,timeout);
+    var stack=el('nmiToastStack');if(!stack){stack=document.createElement('div');stack.id='nmiToastStack';stack.className='nmiToastStack';document.body.appendChild(stack)}
+    type=type||'info';var item=document.createElement('div');item.className='nmiToast '+type;item.innerHTML='<button class="nmiToastClose">×</button><div class="nmiToastTitle">'+h(title||'Notice')+'</div><div class="nmiToastMessage">'+h(message)+'</div>';item.querySelector('button').onclick=function(){item.remove()};stack.appendChild(item);setTimeout(function(){item.remove()},timeout||6500)
+  }
+  function setPayBusy(on){var b=el('nmiPayButton');if(!b)return;b.disabled=!!on;b.textContent=on?'Securing Payment Information…':(admin()?'Process Secure Payment':'Submit for Admin Approval');var reload=el('nmiPaymentModal')&&el('nmiPaymentModal').querySelector('.nmiFieldTools button');if(reload)reload.disabled=!!on}
+  async function invoke(body){
+    if(typeof ensureFreshToken==='function')await ensureFreshToken();
+    var config=window.CO_PILOT_NMI_CONFIG||{};var fn=s(config.edgeFunctionName||'nmi-payments');
+    var response=await fetch(url()+'/functions/v1/'+encodeURIComponent(fn),{method:'POST',headers:{'Content-Type':'application/json','apikey':pubKey(),'Authorization':'Bearer '+token()},body:JSON.stringify(body)});
+    var data={};try{data=await response.json()}catch(e){data={error:'The secure payment service returned an unreadable response.'}}
+    if(!response.ok||!data.success){var error=new Error(data.error||'The payment request could not be completed.');error.details=data;throw error}return data;
+  }
+  function applyRolePaymentUI(){
+    var isAdmin=admin();
+    if(el('nmiPaymentModalTitle'))el('nmiPaymentModalTitle').textContent=isAdmin?'Secure Card Payment':'Submit Card Payment for Approval';
+    if(el('nmiPaymentModalSub'))el('nmiPaymentModalSub').textContent=isAdmin?'Administrator processing • NMI hosted card fields':'Employee capture • Administrator approval required before any charge';
+    if(el('nmiConsentText'))el('nmiConsentText').textContent=isAdmin?'I confirm the consumer authorized this one-time card charge for the amount shown.':'I confirm the consumer authorized this exact amount and understands an administrator will review and process the card.';
+    if(el('nmiSecurityNote'))el('nmiSecurityNote').innerHTML=isAdmin?'<b>Secure card entry:</b> NMI-hosted fields protect the full card number and CVV. As an administrator, you may process the authorized charge.':'<b>Approval protection:</b> NMI securely stores a temporary payment reference. You cannot charge the card. An administrator must approve and process the exact authorized amount.';
+    setPayBusy(false);
+    if(!isAdmin&&el('nmiPaymentResult')){el('nmiPaymentResult').classList.remove('hidden');el('nmiPaymentResult').innerHTML='<div class="nmiEmployeeApprovalBanner"><b>Employee restriction:</b> Submitting this form creates an approval request only. It does not charge the card or change the account balance.</div>'}
+  }
+  var originalOpenNmiPayment=window.openNmiPayment;
+  if(typeof originalOpenNmiPayment==='function')window.openNmiPayment=async function(){var result=await originalOpenNmiPayment.apply(this,arguments);applyRolePaymentUI();return result};
+
+  window.startNmiPayment=async function(){
+    if(approvalContext)return;
+    var a=currentAccount();if(!a)return toast('Select an account before entering a card payment.','error','No Account Selected');
+    var amount=num(val('nmiAmount')), balance=typeof accountBalance==='function'?accountBalance(a):0;
+    if(amount<=0)return payStatus('Enter a payment amount greater than zero.','error');
+    if(amount>balance+0.01)return payStatus('Payment cannot exceed the current balance of '+cash(balance)+'.','error');
+    if(!val('nmiCardholderName'))return payStatus('Enter the cardholder name.','error');
+    if(!val('nmiZip'))return payStatus('Enter the billing ZIP code.','error');
+    if(!el('nmiAuthorization')||!el('nmiAuthorization').checked)return payStatus('Confirm the consumer authorized the exact amount shown.','error');
+    var frames=['ccnumber','ccexp','cvv'].every(function(id){var host=el(id),frame=host&&host.querySelector('iframe');return !!frame});
+    if(!frames)return payStatus('The NMI card fields are not ready. Click Reload Secure Fields and try again.','error');
+    approvalContext={
+      mode:admin()?'sale':'submit_for_approval',accountId:a.id,amount:amount,
+      idempotencyKey:(admin()?'sale-':'approval-')+uid(),
+      billing:{cardholderName:val('nmiCardholderName'),address1:val('nmiAddress1'),city:val('nmiCity'),state:val('nmiState'),zip:val('nmiZip'),email:val('nmiEmail'),phone:val('nmiPhone')},
+      metadata:{source:admin()?'Co Pilot LIVE Admin Payment':'Co Pilot LIVE Employee Approval Request',notes:val('nmiNotes'),billingEmail:val('nmiEmail'),billingPhone:val('nmiPhone'),accountNumber:typeof acctNo==='function'?acctNo(a):s(a.accountNumber),consumerName:typeof nameOf==='function'?nameOf(a):s(a.fullName)}
+    };
+    setPayBusy(true);payStatus(admin()?'Securing card information with NMI before processing…':'Securing a temporary NMI payment reference for administrator review…','processing');
+    try{CollectJS.startPaymentRequest()}catch(error){approvalContext=null;setPayBusy(false);payStatus(error.message||s(error),'error')}
+  };
+
+  window.cpcmNmiCollectCallback=async function(response){
+    var ctx=approvalContext;approvalContext=null;
+    if(!ctx){setPayBusy(false);return payStatus('Payment context expired. Reopen the payment screen and try again.','error')}
+    var paymentToken=response&&response.token;if(!paymentToken){setPayBusy(false);return payStatus('NMI did not return a secure payment token. Check the card fields and try again.','error')}
+    var masked=s(response&&response.card&&response.card.number),digits=masked.replace(/\D/g,''),card={brand:s(response&&response.card&&response.card.type),last4:digits.slice(-4)};
+    try{
+      if(ctx.mode==='submit_for_approval'){
+        payStatus('Creating the administrator approval request. The card is not being charged.','processing');
+        var request=await invoke({action:'submit_for_approval',accountId:ctx.accountId,amount:ctx.amount,paymentToken:paymentToken,idempotencyKey:ctx.idempotencyKey,billing:ctx.billing,metadata:ctx.metadata,cardMetadata:card,authorizationConfirmed:true});
+        payStatus('Submitted for administrator approval. No card charge has occurred.','success');
+        var box=el('nmiPaymentResult');if(box){box.classList.remove('hidden');box.innerHTML='<h4>Submitted for Admin Approval</h4><div class="nmiResultGrid"><div><span>Amount</span><b>'+h(cash(request.amount||ctx.amount))+'</b></div><div><span>Status</span><b>Waiting for Administrator</b></div><div><span>Card</span><b>'+h([request.cardBrand||card.brand,(request.cardLast4||card.last4)?'•••• '+(request.cardLast4||card.last4):''].filter(Boolean).join(' ')||'Securely vaulted by NMI')+'</b></div><div><span>Expires</span><b>'+h(formatApprovalDate(request.expiresAt))+'</b></div></div><div class="nmiEmployeeApprovalBanner">The account balance has not changed. An administrator will receive this request in Payment Approvals.</div>'}
+        toast(cash(request.amount||ctx.amount)+' was submitted for administrator approval. The card was not charged.','success','Approval Request Submitted',8000);
+        try{if(window.CollectJS&&CollectJS.clearInputs)CollectJS.clearInputs()}catch(e){}
+        refreshNmiApprovalBadge();
+      }else{
+        payStatus('NMI is processing the administrator-approved card charge. Do not retry.','processing');
+        var result=await invoke({action:'sale',accountId:ctx.accountId,amount:ctx.amount,paymentToken:paymentToken,idempotencyKey:ctx.idempotencyKey,billing:ctx.billing,metadata:ctx.metadata,cardMetadata:card});
+        payStatus('Payment approved and posted to the account ledger.','success');
+        var resultBox=el('nmiPaymentResult');if(resultBox){resultBox.classList.remove('hidden');resultBox.innerHTML='<h4>Payment Approved</h4><div class="nmiResultGrid"><div><span>Amount</span><b>'+h(cash(result.amount||ctx.amount))+'</b></div><div><span>Receipt</span><b>'+h(result.receipt_number||result.receiptNumber||'Generated')+'</b></div><div><span>Balance After</span><b>'+h(cash(result.balance_after!=null?result.balance_after:result.balanceAfter))+'</b></div><div><span>NMI Transaction</span><b>'+h(result.transactionId||'')+'</b></div></div>'}
+        if(el('nmiReceiptButton'))el('nmiReceiptButton').style.display='inline-flex';
+        toast(cash(result.amount||ctx.amount)+' was approved and posted to the ledger.','success','Payment Approved',8000);
+        try{if(window.CollectJS&&CollectJS.clearInputs)CollectJS.clearInputs()}catch(e){}
+        await refreshPaymentAccount(ctx.accountId,'nmi-admin-sale');
+      }
+    }catch(error){var d=error.details||{};if(d.gatewayApproved||d.needsReview){payStatus((error.message||s(error))+' Transaction: '+s(d.transactionId)+' — DO NOT RETRY.','error');toast('NMI may have approved this transaction. Do not retry. Review transaction '+s(d.transactionId||'')+'.','error','Manual Review Required',12000)}else{payStatus(error.message||s(error),'error');toast(error.message||s(error),'error','Payment Request Not Completed',9000)}}finally{setPayBusy(false)}
+  };
+
+  async function refreshPaymentAccount(accountId,source){
+    try{if(typeof loadAccounts==='function')await loadAccounts()}catch(e){}
+    if(typeof currentAccountId!=='undefined'&&accountId)currentAccountId=accountId;
+    try{if(typeof loadPaymentLedgerForCurrent==='function')await loadPaymentLedgerForCurrent()}catch(e){}
+    try{if(typeof renderPaymentPlanSummary==='function')await renderPaymentPlanSummary(accountId)}catch(e){}
+    try{if(typeof loadHistory==='function')await loadHistory(accountId)}catch(e){}
+    try{if(typeof render==='function')render()}catch(e){}
+    try{if(typeof cpcmQueueDynamicStatsRefresh==='function')cpcmQueueDynamicStatsRefresh(source||'nmi-approval',100)}catch(e){}
+  }
+  function formatApprovalDate(value){if(!value)return '—';var d=new Date(value);return isNaN(d.getTime())?s(value):d.toLocaleString()}
+  function statusClass(value){return s(value).toLowerCase().replace(/[^a-z_]/g,'_')}
+  function approvalLabel(value){var x=s(value).toLowerCase();return {pending:'Waiting for Admin',processing:'Processing',approved:'Approved',declined:'Declined by Admin',cancelled:'Cancelled',expired:'Expired',gateway_declined:'Gateway Declined',failed:'Failed',needs_review:'Needs Review',vaulting:'Securing Card'}[x]||s(value||'Unknown')}
+  function setQueueStatus(message,type){var node=el('nmiApprovalQueueStatus');if(!node)return;node.textContent=message;node.className='nmiPaymentStatus'+(type?' '+type:'')}
+
+  window.openNmiApprovalQueue=async function(){
+    var modal=el('nmiApprovalModal');if(!modal)return toast('The Payment Approvals screen is unavailable.','error','Missing Approval Screen');
+    var isAdmin=admin();
+    if(el('nmiApprovalTitle'))el('nmiApprovalTitle').textContent=isAdmin?'Payment Approvals':'My Payment Requests';
+    if(el('nmiApprovalSub'))el('nmiApprovalSub').textContent=isAdmin?'Review employee-submitted card requests and decide whether to charge the card.':'Track payment information you submitted for administrator review.';
+    if(el('nmiApprovalHeroTitle'))el('nmiApprovalHeroTitle').textContent=isAdmin?'Only an administrator can process a submitted card.':'Your submitted card information cannot be charged by an employee.';
+    if(el('nmiApprovalHeroText'))el('nmiApprovalHeroText').textContent=isAdmin?'Approving processes the exact employee-entered amount. Declining removes the temporary NMI vault record.':'An administrator must approve the exact amount before NMI processes a sale.';
+    modal.classList.add('open');await window.loadNmiApprovalQueue(true);
+  };
+  window.loadNmiApprovalQueue=async function(showLoading){
+    if(showLoading)setQueueStatus('Loading secure payment requests…','processing');
+    try{var data=await invoke({action:'list_approval_requests'});renderApprovalRequests(data.requests||[]);setQueueStatus((data.requests||[]).length?'Payment requests are current.':'No payment requests were found.','');refreshNmiApprovalBadgeFromData(data)}catch(error){setQueueStatus(error.message||s(error),'error');if(el('nmiApprovalList'))el('nmiApprovalList').innerHTML='<div class="nmiApprovalEmpty">Unable to load payment requests.</div>'}
+  };
+  function refreshNmiApprovalBadgeFromData(data){var count=Number(data.pendingCount||0),badge=el('nmiApprovalBadge'),button=el('nmiApprovalNavButton');if(badge){badge.textContent=count>99?'99+':s(count);badge.classList.toggle('hidden',count<1)}if(button)button.childNodes[0].nodeValue=admin()?'Approvals ':'My Payments '}
+  window.refreshNmiApprovalBadge=async function(){if(!s(actor().email))return;try{var data=await invoke({action:'approval_count'});refreshNmiApprovalBadgeFromData(data)}catch(e){}}
+  function renderApprovalRequests(rows){
+    var list=el('nmiApprovalList');if(!list)return;var pending=0,approved=0,closed=0;
+    rows.forEach(function(r){var st=s(r.status).toLowerCase();if(st==='pending'||st==='processing'||st==='vaulting')pending++;else if(st==='approved')approved++;else closed++});
+    if(el('nmiApprovalPendingStat'))el('nmiApprovalPendingStat').textContent=pending;if(el('nmiApprovalApprovedStat'))el('nmiApprovalApprovedStat').textContent=approved;if(el('nmiApprovalClosedStat'))el('nmiApprovalClosedStat').textContent=closed;
+    list.innerHTML=rows.map(function(r){
+      var st=s(r.status).toLowerCase(),canApprove=admin()&&st==='pending',canCancel=!admin()&&st==='pending';
+      var actions='';if(canApprove)actions='<div class="nmiApprovalActions"><button class="danger" onclick="declineNmiApproval(\''+h(r.id)+'\')">Decline Request</button><button class="green" onclick="approveNmiApproval(\''+h(r.id)+'\')">Approve & Process</button></div>';else if(canCancel)actions='<div class="nmiApprovalActions"><button class="danger" onclick="cancelNmiApproval(\''+h(r.id)+'\')">Cancel Request</button></div>';
+      return '<div class="nmiApprovalCard '+statusClass(st)+'"><div class="nmiApprovalTop"><div><div class="nmiApprovalName">'+h(r.consumerName||'Consumer')+'</div><div class="nmiApprovalAccount">Account '+h(r.accountNumber||'—')+'</div><span class="nmiApprovalStatus">'+h(approvalLabel(st))+'</span></div><div class="nmiApprovalAmount">'+h(cash(r.amount))+'</div></div><div class="nmiApprovalGrid"><div><span>Submitted By</span><b>'+h(r.requestedByEmail||'—')+'</b></div><div><span>Submitted</span><b>'+h(formatApprovalDate(r.createdAt))+'</b></div><div><span>Card</span><b>'+h([r.cardBrand,r.cardLast4?'•••• '+r.cardLast4:''].filter(Boolean).join(' ')||'NMI secure reference')+'</b></div><div><span>Expires</span><b>'+h(formatApprovalDate(r.expiresAt))+'</b></div><div><span>Reviewed By</span><b>'+h(r.reviewedByEmail||'—')+'</b></div><div><span>Reviewed</span><b>'+h(formatApprovalDate(r.reviewedAt))+'</b></div><div><span>NMI Transaction</span><b>'+h(r.gatewayTransactionId||'—')+'</b></div><div><span>Balance at Request</span><b>'+h(cash(r.balanceAtRequest))+'</b></div></div>'+(r.authorizationNotes?'<div class="nmiApprovalNotes"><b>Authorization / Notes:</b> '+h(r.authorizationNotes)+'</div>':'')+(r.decisionNotes?'<div class="nmiApprovalNotes"><b>Decision:</b> '+h(r.decisionNotes)+'</div>':'')+actions+'</div>';
+    }).join('')||'<div class="nmiApprovalEmpty">No payment requests yet.</div>';
+  }
+  window.approveNmiApproval=async function(id){if(!admin())return toast('Only an administrator can approve and process a card.','error','Admin Required');if(approvalActionBusy[id])return;if(!confirm('Approve this exact payment request and process the card through NMI now?'))return;approvalActionBusy[id]=true;setQueueStatus('Processing the approved payment through NMI. Do not click again…','processing');try{var result=await invoke({action:'approve_request',requestId:id,idempotencyKey:'approve-'+id});toast(cash(result.amount)+' was approved, charged, and posted to the ledger.','success','Payment Approved',9000);await window.loadNmiApprovalQueue(false);await refreshPaymentAccount(result.accountId,'nmi-approved-request')}catch(error){var d=error.details||{};if(d.gatewayApproved||d.needsReview)toast('NMI may have approved this card. Do not retry. Review transaction '+s(d.transactionId||'')+'.','error','Manual Review Required',13000);else toast(error.message||s(error),'error','Approval Not Completed',10000);await window.loadNmiApprovalQueue(false)}finally{approvalActionBusy[id]=false;setQueueStatus('Payment requests are current.','')}};
+  window.declineNmiApproval=async function(id){if(!admin())return;var notes=prompt('Reason for declining this payment request:','');if(notes===null)return;if(!confirm('Decline this request and remove the temporary NMI card reference?'))return;try{await invoke({action:'decline_request',requestId:id,decisionNotes:notes,idempotencyKey:'decline-'+id});toast('The payment request was declined. No card charge occurred.','success','Request Declined',7000);await window.loadNmiApprovalQueue(false)}catch(error){toast(error.message||s(error),'error','Decline Not Completed',9000)}};
+  window.cancelNmiApproval=async function(id){if(admin())return;if(!confirm('Cancel this pending payment request? No card charge will occur.'))return;try{await invoke({action:'cancel_request',requestId:id,idempotencyKey:'cancel-'+id});toast('Your pending payment request was cancelled.','success','Request Cancelled',6500);await window.loadNmiApprovalQueue(false)}catch(error){toast(error.message||s(error),'error','Cancellation Not Completed',9000)}};
+
+  function initialize(){if(el('nmiApprovalNavButton'))el('nmiApprovalNavButton').childNodes[0].nodeValue=admin()?'Approvals ':'My Payments ';setTimeout(window.refreshNmiApprovalBadge,1200);setInterval(window.refreshNmiApprovalBadge,20000)}
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',initialize);else initialize();
+  window.CPCM_NMI_APPROVAL_QUEUE_BUILD=BUILD;
+  window.dispatchEvent(new CustomEvent('cpcm:nmi-approval-queue-ready',{detail:{build:BUILD}}));
+})();
+</script>
+
+
+<!-- CO_PILOT_SIMPLE_VOICE_BROADCAST_R8N19 -->
+<style id="cpcmVoiceBroadcastR8N19Styles">
+#cpcmVoiceBroadcastPage{position:fixed;inset:0;z-index:69000;background:#eef3f9;color:#0f172a;font-family:Arial,Helvetica,sans-serif;display:none;overflow:hidden}
+#cpcmVoiceBroadcastPage.open{display:flex;flex-direction:column}
+.vbcTop{min-height:72px;background:linear-gradient(90deg,#05225f,#0b45c6);color:#fff;display:flex;align-items:center;justify-content:space-between;gap:14px;padding:12px 18px;box-shadow:0 6px 22px rgba(15,23,42,.22)}
+.vbcTitle{font-size:23px;font-weight:1000;letter-spacing:-.3px}.vbcSub{font-size:12px;color:#dbeafe;margin-top:4px}.vbcTopActions,.vbcActions{display:flex;align-items:center;gap:9px;flex-wrap:wrap}
+.vbcBody{min-height:0;flex:1;overflow:auto;padding:16px 18px 34px}.vbcNotice{padding:11px 13px;border:1px solid #bfdbfe;background:#eff6ff;color:#1e3a8a;border-radius:12px;font-size:13px;font-weight:850;margin-bottom:12px}.vbcNotice.success{border-color:#bbf7d0;background:#f0fdf4;color:#166534}.vbcNotice.error{border-color:#fecaca;background:#fef2f2;color:#991b1b}.vbcNotice.warn{border-color:#fed7aa;background:#fff7ed;color:#9a3412}
+.vbcTabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}.vbcBtn{border:0;border-radius:9px;padding:10px 13px;font-weight:900;cursor:pointer;background:#1d4ed8;color:#fff;font-size:12px;display:inline-flex;align-items:center;justify-content:center;gap:6px}.vbcBtn.white{background:#fff;color:#1d4ed8;border:1px solid #bfdbfe}.vbcBtn.gray{background:#334155}.vbcBtn.green{background:#15803d}.vbcBtn.orange{background:#c2410c}.vbcBtn.red{background:#b91c1c}.vbcBtn.purple{background:#6d28d9}.vbcBtn:disabled{opacity:.5;cursor:not-allowed}.vbcTab.active{background:#0f766e;color:#fff;border-color:#0f766e}
+.vbcPanel{display:none}.vbcPanel.active{display:block}.vbcGrid{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:12px}.vbcCard{grid-column:span 6;background:#fff;border:1px solid #dbe3ef;border-radius:15px;box-shadow:0 3px 14px rgba(15,23,42,.055);overflow:hidden}.vbcCard.full{grid-column:1/-1}.vbcCard.third{grid-column:span 4}.vbcCardHead{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:13px 15px;border-bottom:1px solid #e5edf7;background:linear-gradient(180deg,#fff,#f8fbff)}.vbcCardTitle{font-size:15px;font-weight:1000}.vbcCardBody{padding:14px 15px}.vbcHelp{font-size:12px;color:#64748b;line-height:1.45}.vbcStrong{font-weight:1000;color:#0f172a}.vbcEmpty{padding:18px;border:1px dashed #cbd5e1;border-radius:12px;background:#f8fafc;color:#64748b;text-align:center}
+.vbcForm{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:11px}.vbcForm.two{grid-template-columns:repeat(2,minmax(0,1fr))}.vbcField{min-width:0}.vbcField.full{grid-column:1/-1}.vbcField.half{grid-column:span 2}.vbcField label{display:block;font-size:11px;font-weight:950;color:#334155;margin-bottom:5px}.vbcField input,.vbcField select,.vbcField textarea{width:100%;border:1px solid #cbd5e1;border-radius:9px;padding:9px 10px;background:#fff;color:#0f172a;font:inherit;font-size:13px}.vbcField textarea{min-height:88px;resize:vertical}.vbcCheck{display:flex;gap:8px;align-items:flex-start;border:1px solid #dbe3ef;border-radius:11px;background:#f8fbff;padding:10px;font-size:12px;color:#334155}.vbcCheck input{width:auto;margin-top:2px}
+.vbcPill{display:inline-flex;align-items:center;border-radius:999px;padding:4px 8px;background:#e2e8f0;color:#334155;font-size:10px;font-weight:950;text-transform:capitalize}.vbcPill.running,.vbcPill.connected{background:#dcfce7;color:#166534}.vbcPill.paused,.vbcPill.human,.vbcPill.pressed_1{background:#ffedd5;color:#9a3412}.vbcPill.stopped,.vbcPill.failed,.vbcPill.blocked,.vbcPill.canceled{background:#fee2e2;color:#991b1b}.vbcPill.ringing,.vbcPill.transferring,.vbcPill.initiated{background:#dbeafe;color:#1e40af}.vbcPill.machine,.vbcPill.no_answer,.vbcPill.busy{background:#f3e8ff;color:#6b21a8}
+.vbcMetrics{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:10px}.vbcMetric{border:1px solid #dbe3ef;background:#f8fbff;border-radius:12px;padding:11px}.vbcMetricLabel{font-size:10px;color:#64748b;font-weight:950;text-transform:uppercase;letter-spacing:.03em}.vbcMetricValue{font-size:22px;font-weight:1000;margin-top:5px}.vbcMetricSub{font-size:10px;color:#64748b;margin-top:3px}
+.vbcTableWrap{overflow:auto;border:1px solid #e2e8f0;border-radius:12px}.vbcTable{width:100%;border-collapse:collapse;font-size:12px}.vbcTable th{background:#f8fafc;text-align:left;padding:9px;color:#475569;font-size:10px;text-transform:uppercase;letter-spacing:.03em;white-space:nowrap}.vbcTable td{padding:9px;border-top:1px solid #edf2f8;vertical-align:top}.vbcTable tr:hover td{background:#f8fbff}.vbcMiniActions{display:flex;gap:5px;flex-wrap:wrap}.vbcMiniActions .vbcBtn{padding:6px 8px;font-size:10px}
+.vbcFlow{display:grid;grid-template-columns:repeat(7,1fr);gap:8px;align-items:center}.vbcFlowStep{border:1px solid #bfdbfe;background:#eff6ff;color:#1e3a8a;border-radius:11px;padding:11px 8px;text-align:center;font-size:11px;font-weight:950;min-height:60px;display:grid;place-items:center}.vbcArrow{text-align:center;font-weight:1000;color:#64748b}.vbcCode{background:#0f172a;color:#e2e8f0;border-radius:11px;padding:12px;white-space:pre-wrap;word-break:break-word;font:12px/1.45 ui-monospace,SFMono-Regular,Menlo,monospace}.vbcSetupLine{border-bottom:1px solid #edf2f8;padding:10px 0}.vbcSetupLine:last-child{border-bottom:0}.vbcSetupLine b{display:block;margin-bottom:4px}.vbcPump{position:fixed;right:18px;bottom:18px;z-index:69100;background:#0f766e;color:#fff;border-radius:999px;padding:9px 13px;font-size:11px;font-weight:950;box-shadow:0 8px 24px rgba(15,118,110,.28);display:none}.vbcPump.show{display:block}.topActions .cpcmBroadcastTopBtn{background:#0f766e!important;color:#fff!important}.navIcon.cpcmBroadcastNavBtn{background:linear-gradient(145deg,#0f766e,#14b8a6)!important;color:#fff!important;border:0}
+@media(max-width:1300px){.vbcCard,.vbcCard.third{grid-column:1/-1}.vbcMetrics{grid-template-columns:repeat(3,1fr)}.vbcForm{grid-template-columns:repeat(2,1fr)}.vbcFlow{grid-template-columns:1fr}.vbcArrow{transform:rotate(90deg)}}
+@media(max-width:760px){.vbcTop{align-items:flex-start;flex-direction:column}.vbcBody{padding:12px}.vbcForm,.vbcForm.two,.vbcMetrics{grid-template-columns:1fr}.vbcField.half{grid-column:1/-1}.vbcCard{grid-column:1/-1}}
+
+.vbcProgressGrid{display:grid;grid-template-columns:minmax(220px,320px) 1fr;gap:18px;align-items:center}.vbcPie{width:220px;height:220px;border-radius:50%;margin:auto;position:relative;background:conic-gradient(#0f766e 0 var(--called),#2563eb var(--called) var(--left),#f59e0b var(--left) var(--skipped),#dc2626 var(--skipped) 100%);box-shadow:inset 0 0 0 1px rgba(15,23,42,.08)}.vbcPie:after{content:"";position:absolute;inset:42px;border-radius:50%;background:#fff;box-shadow:0 0 0 1px #e2e8f0}.vbcPieCenter{position:absolute;inset:0;z-index:2;display:grid;place-content:center;text-align:center;font-weight:950}.vbcPieCenter b{font-size:28px}.vbcLegend{display:grid;grid-template-columns:repeat(2,minmax(130px,1fr));gap:10px}.vbcLegendItem{border:1px solid #e2e8f0;border-radius:12px;padding:12px;background:#fff}.vbcLegendItem b{display:block;font-size:23px;margin-top:3px}.vbcDot{width:10px;height:10px;border-radius:50%;display:inline-block;margin-right:7px}.vbcEligibility{margin-top:12px;border:1px solid #bfdbfe;background:#eff6ff;border-radius:12px;padding:12px;line-height:1.5}.vbcHold{color:#92400e;font-weight:900}@media(max-width:800px){.vbcProgressGrid{grid-template-columns:1fr}.vbcPie{width:190px;height:190px}}
+</style>
+<script id="cpcmVoiceBroadcastR8N19Script">
+(function(){
+  'use strict';
+  var BUILD='STABLE_SINGLE_FILE_QA_LOCK_2026_07_22_R8N19_19';
+  var state={tab:'campaigns',settings:null,campaigns:[],rows:[],calls:[],busy:false,pumping:false,poll:null,pump:null,selectedCampaignId:'',campaignDraft:{},campaignMode:'filters',selectedAccountIds:[],accountSearch:''};
+  function el(id){return document.getElementById(id)}
+  function s(v){return String(v==null?'':v)}
+  function low(v){return s(v).trim().toLowerCase()}
+  function h(v){return typeof esc==='function'?esc(v):s(v).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
+  function actor(){return typeof currentUser!=='undefined'&&currentUser?currentUser:{}}
+  function email(){return low(actor().email)}
+  function admin(){return actor().isAdmin===true||low(actor().role)==='admin'||email()==='afinch2678@gmail.com'}
+  function phone(v){var d=s(v).replace(/\D/g,'');if(d.length===10)return '+1'+d;if(d.length===11&&d[0]==='1')return '+'+d;if(d.length>=8&&d.length<=15)return '+'+d;return ''}
+  function normalizePhone(v){return phone(v)}
+  function testHistory(){try{return JSON.parse(localStorage.getItem('cpcm_voice_test_history')||'[]')}catch(e){return []}}
+  function saveTestHistory(row){var rows=testHistory();rows.unshift(row);localStorage.setItem('cpcm_voice_test_history',JSON.stringify(rows.slice(0,20)));localStorage.setItem('cpcm_voice_last_test',JSON.stringify(row))}
+  function lastTest(){try{return JSON.parse(localStorage.getItem('cpcm_voice_last_test')||'null')}catch(e){return null}}
+  function fmtPhone(v){var d=s(v).replace(/\D/g,'');return d.length===11&&d[0]==='1'?'('+d.slice(1,4)+') '+d.slice(4,7)+'-'+d.slice(7):d.length===10?'('+d.slice(0,3)+') '+d.slice(3,6)+'-'+d.slice(6):s(v||'—')}
+  function fmtDate(v){if(!v)return '—';var d=new Date(v);return isNaN(d.getTime())?s(v):d.toLocaleString()}
+  function cash(v){return Number(v||0).toLocaleString('en-US',{style:'currency',currency:'USD'})}
+  function firstPhone(a){var test=phone(a&&(a.testPhoneOverride||a.test_phone_override));if(test)return {phone:test,slot:'test_phone_override'};for(var i=1;i<=10;i++){var p=phone(a&&a['phone'+i]);if(p)return {phone:p,slot:'phone'+i}}return null}
+  function accountName(id){var a=((typeof accounts!=='undefined'&&accounts)||[]).find(function(x){return x.id===id});return a?(a.fullName||a.full_name||a.name||a.consumerName||a.accountNumber||a.account_number||id):id}
+  function accountNumber(id){var a=((typeof accounts!=='undefined'&&accounts)||[]).find(function(x){return x.id===id});return a?s(a.accountNumber||a.account_number||'—'):'—'}
+  function notice(message,type){var n=el('vbcNotice');if(!n)return;n.textContent=message;n.className='vbcNotice'+(type?' '+type:'')}
+  function defaults(){return {id:'default',transfer_number:'',connect_mode:'press_1',live_message_text:'',voicemail_message_text:'',leave_voicemail:false,calls_per_minute:6,max_concurrent:1,max_attempts:2}}
+  async function invoke(body){
+    if(typeof ensureFreshToken==='function')await ensureFreshToken();
+    var response=await fetch(url()+'/functions/v1/voice-broadcast',{method:'POST',headers:{'Content-Type':'application/json','apikey':pubKey(),'Authorization':'Bearer '+token()},body:JSON.stringify(body)});
+    var raw=await response.text(),data={};try{data=raw?JSON.parse(raw):{}}catch(e){data={error:raw||'The voice broadcast service returned an unreadable response.'}}
+    if(!response.ok||data.success===false&&!data.idle){var error=new Error(data.error||data.message||raw||('Voice broadcast request failed with HTTP '+response.status+'.'));error.details=data;error.status=response.status;throw error}return data;
+  }
+  function pageHtml(){return `<div id="cpcmVoiceBroadcastPage"><div class="vbcTop"><div><div class="vbcTitle">Voice Broadcast & Live Transfer</div><div class="vbcSub">Uploaded account numbers → human answer → RingCentral group line → first collector answers • ${h(BUILD)}</div></div><div class="vbcTopActions"><button class="vbcBtn white" onclick="window.cpcmBroadcastRefreshAll()">Refresh</button><button class="vbcBtn gray" onclick="window.closeVoiceBroadcast()">Back to Accounts</button></div></div><div class="vbcBody"><div id="vbcNotice" class="vbcNotice">Loading voice broadcast…</div><div class="vbcTabs"><button id="vbcTabCampaigns" class="vbcBtn vbcTab" onclick="window.cpcmBroadcastTab('campaigns')">Campaigns</button><button id="vbcTabSettings" class="vbcBtn vbcTab" onclick="window.cpcmBroadcastTab('settings')">Recording & Queue</button><button id="vbcTabLive" class="vbcBtn vbcTab" onclick="window.cpcmBroadcastTab('live')">Live Results</button><button id="vbcTabSetup" class="vbcBtn vbcTab" onclick="window.cpcmBroadcastTab('setup')">Setup</button></div><section id="vbcPanelCampaigns" class="vbcPanel"></section><section id="vbcPanelSettings" class="vbcPanel"></section><section id="vbcPanelLive" class="vbcPanel"></section><section id="vbcPanelSetup" class="vbcPanel"></section></div><div id="vbcPump" class="vbcPump">Broadcast engine running while this page is open</div></div>`}
+  function ensurePage(){if(!el('cpcmVoiceBroadcastPage'))document.body.insertAdjacentHTML('beforeend',pageHtml());ensureNav()}
+  function ensureNav(){
+    var top=document.querySelector('.topActions');
+    if(top&&!el('cpcmBroadcastTopBtn')){var b=document.createElement('button');b.id='cpcmBroadcastTopBtn';b.className='gray cpcmBroadcastTopBtn';b.textContent='Broadcast';b.onclick=window.openVoiceBroadcast;var ref=Array.from(top.querySelectorAll('button')).find(function(x){return /Calls|Monitor/i.test(x.textContent||'')});ref&&ref.parentNode?ref.parentNode.insertBefore(b,ref.nextSibling):top.insertBefore(b,top.firstChild)}
+    var rail=document.querySelector('.navRail');
+    if(rail&&!el('cpcmBroadcastNavBtn')){var n=document.createElement('button');n.id='cpcmBroadcastNavBtn';n.className='navIcon cpcmBroadcastNavBtn';n.title='Voice Broadcast';n.innerHTML='<span class="navEmoji">📣</span>';n.onclick=window.openVoiceBroadcast;var ref2=Array.from(rail.querySelectorAll('button')).find(function(x){return /Call Intelligence/i.test(x.title||'')});ref2&&ref2.parentNode?ref2.parentNode.insertBefore(n,ref2.nextSibling):rail.insertBefore(n,rail.firstChild)}
+    var hide=!admin()||!email();if(el('cpcmBroadcastTopBtn'))el('cpcmBroadcastTopBtn').classList.toggle('hidden',hide);if(el('cpcmBroadcastNavBtn'))el('cpcmBroadcastNavBtn').classList.toggle('hidden',hide)
+  }
+  async function loadData(){
+    var results=await Promise.all([
+      dbFetch('/voice_broadcast_settings?id=eq.default&select=*').catch(function(){return []}),
+      dbFetch('/voice_broadcast_campaigns?select=*&order=created_at.desc&limit=100').catch(function(){return []}),
+      dbFetch('/voice_broadcast_campaign_accounts?select=*&order=created_at.desc&limit=30000').catch(function(){return []}),
+      dbFetch('/voice_broadcast_calls?select=*&order=created_at.desc&limit=1000').catch(function(){return []})
+    ]);
+    state.settings=results[0]&&results[0][0]?results[0][0]:defaults();state.campaigns=results[1]||[];state.rows=results[2]||[];state.calls=results[3]||[];
+    if(!state.selectedCampaignId&&state.campaigns[0])state.selectedCampaignId=state.campaigns[0].id;
+  }
+  function applyTab(){['campaigns','settings','live','setup'].forEach(function(t){var p=el('vbcPanel'+t.charAt(0).toUpperCase()+t.slice(1)),b=el('vbcTab'+t.charAt(0).toUpperCase()+t.slice(1));if(p)p.classList.toggle('active',state.tab===t);if(b)b.classList.toggle('active',state.tab===t)})}
+  window.cpcmBroadcastTab=function(tab){state.tab=tab;renderAll()}
+  window.openVoiceBroadcast=async function(){ensurePage();if(!admin())return alert('Administrator access is required.');el('cpcmVoiceBroadcastPage').classList.add('open');await window.cpcmBroadcastRefreshAll();startLoops()}
+  window.closeVoiceBroadcast=function(){if(el('cpcmVoiceBroadcastPage'))el('cpcmVoiceBroadcastPage').classList.remove('open');stopLoops()}
+  window.cpcmBroadcastRefreshAll=async function(){if(state.busy)return;state.busy=true;notice('Refreshing campaigns, queued accounts, calls, and settings…');try{await loadData();renderAll();notice('Voice broadcast data refreshed.','success')}catch(e){notice(e.message||s(e),'error')}finally{state.busy=false}}
+  function settings(){return Object.assign(defaults(),state.settings||{})}
+  function renderFlow(){return '<div class="vbcFlow"><div class="vbcFlowStep">Uploaded Co Pilot Accounts</div><div class="vbcArrow">→</div><div class="vbcFlowStep">Twilio Voice Broadcast</div><div class="vbcArrow">→</div><div class="vbcFlowStep">Human Answers / Presses 1</div><div class="vbcArrow">→</div><div class="vbcFlowStep">RingCentral Group Line Rings Everyone</div></div>'}
+  function employeeOptions(){var rows=(typeof appUsers!=='undefined'&&Array.isArray(appUsers))?appUsers:[];return rows.filter(function(u){return low(u.role)!=='client'&&low(u.email)}).map(function(u){return '<option value="'+h(low(u.email))+'">'+h(u.fullName||u.full_name||u.name||u.email)+'</option>'}).join('')}
+  function campaignDraftValue(id,fallback){var v=state.campaignDraft[id];return v===undefined||v===null?fallback:v}
+  function captureCampaignDraft(){
+    ['vbcCampaignName','vbcCampaignPortfolio','vbcCampaignState','vbcCampaignStatus','vbcCampaignEmployee','vbcCampaignMin','vbcCampaignMax','vbcCampaignAttempts','vbcCampaignRate','vbcCampaignConcurrent','vbcCampaignTransfer','vbcCampaignMode','vbcCampaignMessage','vbcCampaignVoicemail','vbcCampaignMessageType','vbcCampaignAudioUrl','vbcCampaignRecordingId'].forEach(function(id){var node=el(id);if(node)state.campaignDraft[id]=node.value});
+    ['vbcCampaignLeaveVoicemail','vbcCampaignConfirm'].forEach(function(id){var node=el(id);if(node)state.campaignDraft[id]=!!node.checked});
+    var search=el('vbcSpecificAccountSearch');if(search)state.accountSearch=search.value||'';
+  }
+  window.cpcmBroadcastCaptureDraft=captureCampaignDraft;
+  window.cpcmBroadcastSetCampaignMode=function(mode){captureCampaignDraft();state.campaignMode=mode==='specific'?'specific':'filters';renderCampaigns()};
+  function specificAccountMatches(){
+    var q=low(state.accountSearch),accts=(typeof accounts!=='undefined'&&accounts)||[];
+    return accts.filter(function(a){if(!firstPhone(a))return false;if(!q)return state.selectedAccountIds.indexOf(a.id)>=0;var text=[a.fullName,a.full_name,a.name,a.consumerName,a.accountNumber,a.account_number,a.portfolio,a.status,a.state,a.phone1,a.phone2,a.testPhoneOverride,a.test_phone_override].map(low).join(' ');return text.indexOf(q)>=0}).slice(0,100);
+  }
+  function specificAccountRows(){var rows=specificAccountMatches();if(!rows.length)return '<div class="vbcEmpty">'+(state.accountSearch?'No callable accounts match this search.':'Search by name, account number, phone number, portfolio, status, or state.')+'</div>';return '<div class="vbcTableWrap"><table class="vbcTable"><thead><tr><th></th><th>Consumer</th><th>Account</th><th>Phone Used</th><th>Balance</th></tr></thead><tbody>'+rows.map(function(a){var fp=firstPhone(a),checked=state.selectedAccountIds.indexOf(a.id)>=0;return '<tr><td><input type="checkbox" '+(checked?'checked':'')+' onchange="window.cpcmBroadcastToggleSpecificAccount(\''+h(a.id)+'\',this.checked)"></td><td><b>'+h(a.fullName||a.full_name||a.name||a.consumerName||'Account')+'</b><div class="vbcHelp">'+h(a.portfolio||a.status||'')+'</div></td><td>'+h(a.accountNumber||a.account_number||'—')+'</td><td>'+h(fmtPhone(fp&&fp.phone))+'<div class="vbcHelp">'+h(fp&&fp.slot==='test_phone_override'?'Admin test override':fp&&fp.slot||'')+'</div></td><td>'+h(cash(a.currentBalance||a.current_balance||a.originalBalance||a.original_balance||0))+'</td></tr>'}).join('')+'</tbody></table></div>'}
+  window.cpcmBroadcastSpecificSearch=function(value){state.accountSearch=value||'';var box=el('vbcSpecificAccountResults');if(box)box.innerHTML=specificAccountRows()};
+  window.cpcmBroadcastToggleSpecificAccount=function(id,checked){var i=state.selectedAccountIds.indexOf(id);if(checked&&i<0)state.selectedAccountIds.push(id);if(!checked&&i>=0)state.selectedAccountIds.splice(i,1);var c=el('vbcSpecificSelectedCount');if(c)c.textContent=state.selectedAccountIds.length+' account'+(state.selectedAccountIds.length===1?'':'s')+' selected'};
+  window.cpcmBroadcastClearSpecificSelection=function(){state.selectedAccountIds=[];var box=el('vbcSpecificAccountResults');if(box)box.innerHTML=specificAccountRows();var c=el('vbcSpecificSelectedCount');if(c)c.textContent='0 accounts selected'};
+  function renderCampaigns(){
+    var p=el('vbcPanelCampaigns');if(!p)return;captureCampaignDraft();var cfg=settings();var accts=(typeof accounts!=='undefined'&&accounts)||[];
+    var portfolios=[...new Set(accts.map(function(a){return s(a.portfolio)}).filter(Boolean))].sort();var statuses=[...new Set(accts.map(function(a){return s(a.status)}).filter(Boolean))].sort();var states=[...new Set(accts.map(function(a){return s(a.state).toUpperCase()}).filter(Boolean))].sort();
+    function opt(rows,current){return rows.map(function(x){return '<option '+(s(current)===s(x)?'selected':'')+'>'+h(x)+'</option>'}).join('')}
+    var d=state.campaignDraft,mode=state.campaignMode;
+    p.innerHTML='<div class="vbcGrid"><div class="vbcCard full"><div class="vbcCardHead"><div class="vbcCardTitle">Simple Broadcast Flow</div><span class="vbcPill">No employee credentials</span></div><div class="vbcCardBody">'+renderFlow()+'</div></div><div class="vbcCard full"><div class="vbcCardHead"><div class="vbcCardTitle">Create Broadcast from Uploaded Accounts</div><span class="vbcPill">Draft fields stay saved while this page refreshes</span></div><div class="vbcCardBody"><div class="vbcActions" style="margin-bottom:12px"><button class="vbcBtn '+(mode==='filters'?'green':'white')+'" onclick="window.cpcmBroadcastSetCampaignMode(\'filters\')">Use Portfolio & Account Filters</button><button class="vbcBtn '+(mode==='specific'?'green':'white')+'" onclick="window.cpcmBroadcastSetCampaignMode(\'specific\')">Select Specific Accounts Only</button></div><div class="vbcForm"><div class="vbcField"><label>Campaign Name</label><input id="vbcCampaignName" oninput="window.cpcmBroadcastCaptureDraft()" value="'+h(campaignDraftValue('vbcCampaignName',''))+'" placeholder="July Cashlink Broadcast"></div><div class="vbcField"><label>Portfolio / Client</label><select id="vbcCampaignPortfolio" onchange="window.cpcmBroadcastCaptureDraft()"><option value="">All portfolios</option>'+opt(portfolios,campaignDraftValue('vbcCampaignPortfolio',''))+'</select></div><div class="vbcField"><label>State</label><select id="vbcCampaignState" onchange="window.cpcmBroadcastCaptureDraft()"><option value="">All states</option>'+opt(states,campaignDraftValue('vbcCampaignState',''))+'</select></div><div class="vbcField"><label>Account Status</label><select id="vbcCampaignStatus" onchange="window.cpcmBroadcastCaptureDraft()"><option value="">All statuses</option>'+opt(statuses,campaignDraftValue('vbcCampaignStatus',''))+'</select></div><div class="vbcField"><label>Assigned Employee</label><select id="vbcCampaignEmployee" onchange="window.cpcmBroadcastCaptureDraft()"><option value="">Any employee / unassigned</option>'+employeeOptions()+'</select></div><div class="vbcField"><label>Minimum Balance</label><input id="vbcCampaignMin" oninput="window.cpcmBroadcastCaptureDraft()" type="number" min="0" step="0.01" value="'+h(campaignDraftValue('vbcCampaignMin',''))+'" placeholder="0"></div><div class="vbcField"><label>Maximum Balance</label><input id="vbcCampaignMax" oninput="window.cpcmBroadcastCaptureDraft()" type="number" min="0" step="0.01" value="'+h(campaignDraftValue('vbcCampaignMax',''))+'" placeholder="No maximum"></div><div class="vbcField"><label>Maximum Attempts</label><input id="vbcCampaignAttempts" oninput="window.cpcmBroadcastCaptureDraft()" type="number" min="1" max="10" value="'+h(campaignDraftValue('vbcCampaignAttempts',Number(cfg.max_attempts||2)))+'"></div><div class="vbcField"><label>Calls Per Minute</label><input id="vbcCampaignRate" oninput="window.cpcmBroadcastCaptureDraft()" type="number" min="1" max="60" value="'+h(campaignDraftValue('vbcCampaignRate',Number(cfg.calls_per_minute||6)))+'"></div><div class="vbcField"><label>Simultaneous Calls</label><input id="vbcCampaignConcurrent" oninput="window.cpcmBroadcastCaptureDraft()" type="number" min="1" max="10" value="'+h(campaignDraftValue('vbcCampaignConcurrent',Number(cfg.max_concurrent||1)))+'"></div><div class="vbcField"><label>RingCentral Group Number</label><input id="vbcCampaignTransfer" oninput="window.cpcmBroadcastCaptureDraft()" value="'+h(campaignDraftValue('vbcCampaignTransfer',cfg.transfer_number||''))+'"></div><div class="vbcField"><label>Connection Method</label><select id="vbcCampaignMode" onchange="window.cpcmBroadcastCaptureDraft()"><option value="press_1" '+(campaignDraftValue('vbcCampaignMode',cfg.connect_mode)==='press_1'?'selected':'')+'>Press 1, then transfer</option><option value="auto_transfer" '+(campaignDraftValue('vbcCampaignMode',cfg.connect_mode)==='auto_transfer'?'selected':'')+'>Auto-transfer detected humans</option></select></div><div class="vbcField half"><label>Recorded Voice Message</label><input type="hidden" id="vbcCampaignMessage" value=""><input type="hidden" id="vbcCampaignMessageType" value="recorded"><input type="hidden" id="vbcCampaignAudioUrl" value="'+h(campaignDraftValue('vbcCampaignAudioUrl',''))+'"><input type="hidden" id="vbcCampaignRecordingId" value="'+h(campaignDraftValue('vbcCampaignRecordingId',''))+'"><div id="vbcVoiceRecorderMount" class="vbcVoiceMount"></div></div><div class="vbcField half"><label>Broadcast Audio Mode</label><div style="padding:12px;border:1px solid #bbf7d0;border-radius:10px;background:#f0fdf4;color:#166534;font-weight:800">Recorded voice only. Test calls and campaigns always use the active saved recording.</div><input type="hidden" id="vbcCampaignVoicemail" value=""><input type="checkbox" id="vbcCampaignLeaveVoicemail" style="display:none"></div><div class="vbcField full"><label class="vbcCheck"><input id="vbcCampaignConfirm" onchange="window.cpcmBroadcastCaptureDraft()" type="checkbox" '+(campaignDraftValue('vbcCampaignConfirm',false)?'checked':'')+'><span><b>I confirm this campaign has been reviewed for applicable calling and collection rules.</b></span></label></div></div>'+(mode==='specific'?'<div class="vbcCard" style="margin-top:14px"><div class="vbcCardHead"><div><div class="vbcCardTitle">Select Specific Accounts</div><div class="vbcHelp">Search by consumer name, account number, phone number, portfolio, status, or state.</div></div><input id="vbcSpecificAccountSearch" value="'+h(state.accountSearch)+'" placeholder="Search accounts" oninput="window.cpcmBroadcastSpecificSearch(this.value)"></div><div class="vbcCardBody"><div id="vbcSpecificAccountResults">'+specificAccountRows()+'</div><div class="vbcActions" style="margin-top:10px"><button class="vbcBtn white" onclick="window.cpcmBroadcastClearSpecificSelection()">Clear Selection</button><span id="vbcSpecificSelectedCount" class="vbcHelp">'+state.selectedAccountIds.length+' account'+(state.selectedAccountIds.length===1?'':'s')+' selected</span></div></div></div>':'')+'<div class="vbcActions" style="margin-top:12px"><button class="vbcBtn white" onclick="window.cpcmBroadcastPreviewCampaign()">'+(mode==='specific'?'Preview Selected Accounts':'Preview Matching Accounts')+'</button><button class="vbcBtn green" onclick="window.cpcmBroadcastCreateCampaign()">Create Broadcast Campaign</button><span id="vbcCampaignPreview" class="vbcHelp">'+(mode==='specific'?'Select one or more specific accounts.':'Choose filters, message, and group number.')+'</span></div></div></div><div class="vbcCard full"><div class="vbcCardHead"><div class="vbcCardTitle">Campaign Control</div><span class="vbcPill">Keep this page open while running</span></div><div class="vbcCardBody">'+campaignTable()+'</div></div></div>';
+    var emp=el('vbcCampaignEmployee');if(emp)emp.value=campaignDraftValue('vbcCampaignEmployee','');if(window.CPCMVoiceRecorder)window.CPCMVoiceRecorder.mount();
+  }
+  function campaignFilter(){
+    captureCampaignDraft();var all=(typeof accounts!=='undefined'&&accounts)||[];
+    if(state.campaignMode==='specific'){
+      var chosen=all.filter(function(a){return state.selectedAccountIds.indexOf(a.id)>=0&&!!firstPhone(a)});
+      var blockedChosen=chosen.filter(function(a){try{return typeof complianceRules==='function'&&complianceRules(a).hard.length>0}catch(e){return false}}).length;
+      return {accounts:chosen,blocked:blockedChosen,filters:{mode:'specific_accounts',accountIds:chosen.map(function(a){return a.id})}};
+    }
+    var portfolio=s(el('vbcCampaignPortfolio')&&el('vbcCampaignPortfolio').value),status=s(el('vbcCampaignStatus')&&el('vbcCampaignStatus').value),stateCode=low(el('vbcCampaignState')&&el('vbcCampaignState').value),employee=low(el('vbcCampaignEmployee')&&el('vbcCampaignEmployee').value),min=Number(el('vbcCampaignMin')&&el('vbcCampaignMin').value||0),maxRaw=s(el('vbcCampaignMax')&&el('vbcCampaignMax').value),max=maxRaw?Number(maxRaw):Infinity;
+    var rows=all.filter(function(a){var assigned=low(a.assignedToEmail||a.assigned_to_email);var bal=Number(a.currentBalance||a.current_balance||a.originalBalance||a.original_balance||0);return (!portfolio||s(a.portfolio)===portfolio)&&(!status||s(a.status)===status)&&(!stateCode||low(a.state)===stateCode)&&(!employee||assigned===employee)&&bal>=min&&bal<=max&&!!firstPhone(a)});
+    var blocked=rows.filter(function(a){try{return typeof complianceRules==='function'&&complianceRules(a).hard.length>0}catch(e){return false}}).length;
+    return {accounts:rows,blocked:blocked,filters:{mode:'filters',portfolio:portfolio,status:status,state:stateCode,assignedEmployee:employee,minBalance:min,maxBalance:isFinite(max)?max:null}};
+  }
+  async function campaignEligibility(accountsForCampaign){
+    var since=new Date(Date.now()-24*60*60*1000).toISOString();
+    var recent=await dbFetch('/voice_broadcast_calls?select=phone_number,normalized_phone,started_at,status&started_at=gte.'+encodeURIComponent(since)+'&order=started_at.desc&limit=50000').catch(function(){return []});
+    var lastByPhone={};(recent||[]).forEach(function(r){var p=phone(r.normalized_phone||r.phone_number);if(p&&!lastByPhone[p])lastByPhone[p]=r});
+    var seen={},ready=[],held=[],duplicates=[];
+    (accountsForCampaign||[]).forEach(function(a){var fp=firstPhone(a),p=phone(fp&&fp.phone);if(!p)return;if(seen[p]){duplicates.push({account:a,phone:p,duplicateOf:seen[p]});return}seen[p]=a.id;var last=lastByPhone[p];if(last){held.push({account:a,phone:p,lastCalledAt:last.started_at,eligibleAt:new Date(new Date(last.started_at).getTime()+24*60*60*1000).toISOString()})}else ready.push({account:a,phone:p,slot:fp.slot})});
+    return {selected:(accountsForCampaign||[]).length,unique:Object.keys(seen).length,ready:ready,held:held,duplicates:duplicates};
+  }
+  function eligibilityText(e,x){return 'Selected: '+e.selected+' · Unique numbers: '+e.unique+' · Ready: '+e.ready.length+' · 24-hour hold: '+e.held.length+' · Duplicates: '+e.duplicates.length+' · Compliance flags: '+Number(x.blocked||0)}
+  window.cpcmBroadcastPreviewCampaign=async function(){var x=campaignFilter(),target=el('vbcCampaignPreview');if(target)target.textContent='Checking the rolling 24-hour call history…';try{var e=await campaignEligibility(x.accounts);if(target)target.innerHTML='<b>'+h(eligibilityText(e,x))+'</b><div class="vbcEligibility">Numbers called by any campaign during the prior 24 hours will be placed on hold and will not dial. Duplicate numbers in this selection will also be skipped.</div>'}catch(err){if(target)target.textContent=err.message||s(err)}}
+  window.cpcmBroadcastCreateCampaign=async function(){
+    if(!admin())return;captureCampaignDraft();var x=campaignFilter(),name=s(el('vbcCampaignName')&&el('vbcCampaignName').value).trim(),transfer=phone(el('vbcCampaignTransfer')&&el('vbcCampaignTransfer').value),message=s(el('vbcCampaignMessage')&&el('vbcCampaignMessage').value).trim(),messageType='recorded',audioUrl=s(el('vbcCampaignAudioUrl')&&el('vbcCampaignAudioUrl').value).trim(),recordingId=s(el('vbcCampaignRecordingId')&&el('vbcCampaignRecordingId').value).trim(),vm=s(el('vbcCampaignVoicemail')&&el('vbcCampaignVoicemail').value).trim(),mode=s(el('vbcCampaignMode')&&el('vbcCampaignMode').value),leave=!!(el('vbcCampaignLeaveVoicemail')&&el('vbcCampaignLeaveVoicemail').checked),confirmed=!!(el('vbcCampaignConfirm')&&el('vbcCampaignConfirm').checked),attempts=Math.max(1,Math.min(10,Number(el('vbcCampaignAttempts')&&el('vbcCampaignAttempts').value||2))),rate=Math.max(1,Math.min(60,Number(el('vbcCampaignRate')&&el('vbcCampaignRate').value||6))),concurrent=Math.max(1,Math.min(10,Number(el('vbcCampaignConcurrent')&&el('vbcCampaignConcurrent').value||1)));
+    if(!name)return notice('Enter a campaign name.','error');if(!transfer)return notice('Enter the RingCentral group/queue phone number.','error');if(!audioUrl||!recordingId)return notice('Select an ACTIVE saved recording before creating the campaign.','error');if(!x.accounts.length)return notice(state.campaignMode==='specific'?'Select at least one specific account.':'No uploaded accounts match the selected filters.','error');if(!confirmed)return notice('Review and check the campaign compliance confirmation.','error');
+    try{state.busy=true;notice('Checking global 24-hour call history…');var eligibility=await campaignEligibility(x.accounts);if(!eligibility.ready.length&&!eligibility.held.length&&!eligibility.duplicates.length)throw new Error('No usable phone numbers were found.');if(!confirm('Create '+name+'?\n\n'+eligibilityText(eligibility,x)+'\n\nOnly Ready numbers will dial.'))return;
+      notice('Creating campaign with 24-hour suppression…');var rows=await dbFetch('/voice_broadcast_campaigns',{method:'POST',body:JSON.stringify([{name:name,status:'draft',filters:Object.assign({},x.filters,{suppressionHours:24,selectedCount:eligibility.selected,readyCount:eligibility.ready.length,holdCount:eligibility.held.length,duplicateCount:eligibility.duplicates.length}),transfer_number:transfer,connect_mode:mode,message_type:'recorded',recording_id:recordingId||null,live_audio_url:audioUrl,live_message_text:'',voicemail_message_text:'',leave_voicemail:leave,compliance_confirmed:true,calls_per_minute:rate,max_concurrent:concurrent,max_attempts:attempts,created_by_email:email(),created_at:new Date().toISOString(),updated_at:new Date().toISOString()}])});var c=rows&&rows[0];if(!c)throw new Error('Campaign row was not returned.');var order=0,now=new Date().toISOString(),queue=[];
+      eligibility.ready.forEach(function(r){queue.push({campaign_id:c.id,account_id:r.account.id,phone_number:r.phone,normalized_phone:r.phone,phone_slot:r.slot,status:'queued',attempt_count:0,sort_order:++order,created_at:now,updated_at:now})});
+      eligibility.held.forEach(function(r){queue.push({campaign_id:c.id,account_id:r.account.id,phone_number:r.phone,normalized_phone:r.phone,phone_slot:(firstPhone(r.account)||{}).slot||null,status:'24_hour_hold',attempt_count:0,sort_order:++order,last_result:'Called within prior 24 hours',last_error:'Eligible again '+r.eligibleAt,eligible_at:r.eligibleAt,created_at:now,updated_at:now})});
+      eligibility.duplicates.forEach(function(r){queue.push({campaign_id:c.id,account_id:r.account.id,phone_number:r.phone,normalized_phone:r.phone,phone_slot:(firstPhone(r.account)||{}).slot||null,status:'duplicate_skipped',attempt_count:0,sort_order:++order,last_result:'Duplicate number in campaign',last_error:'Another selected account uses the same normalized phone number.',created_at:now,updated_at:now})});
+      for(var i=0;i<queue.length;i+=250)await dbFetch('/voice_broadcast_campaign_accounts',{method:'POST',body:JSON.stringify(queue.slice(i,i+250))});state.selectedCampaignId=c.id;state.campaignDraft.vbcCampaignName='';state.campaignDraft.vbcCampaignConfirm=false;state.campaignDraft.vbcCampaignMessageType='recorded';state.campaignDraft.vbcCampaignAudioUrl=audioUrl;state.campaignDraft.vbcCampaignRecordingId=recordingId;await loadData();renderAll();notice('Campaign created: '+eligibility.ready.length+' ready, '+eligibility.held.length+' on 24-hour hold, '+eligibility.duplicates.length+' duplicate(s) skipped.','success')
+    }catch(e){notice(e.message||s(e),'error')}finally{state.busy=false}
+  }
+  function counts(id){var rows=state.rows.filter(function(r){return r.campaign_id===id}),calls=state.calls.filter(function(c){return c.campaign_id===id}),out={total:rows.length,queued:0,active:0,human:0,machine:0,transferred:0,completed:0,exceptions:0,hold:0,duplicates:0,called:0,failed:0};rows.forEach(function(r){var st=low(r.status);if(st==='queued'||st==='retry')out.queued++;if(['initiating','ringing','human','pressed_1','transferring','connected'].indexOf(st)>=0)out.active++;if(st==='human'||st==='pressed_1')out.human++;if(st==='machine')out.machine++;if(st==='connected')out.transferred++;if(st==='completed')out.completed++;if(st==='24_hour_hold')out.hold++;if(st==='duplicate_skipped')out.duplicates++;if(['blocked','failed','no_answer','busy','canceled'].indexOf(st)>=0){out.exceptions++;out.failed++}if(['queued','retry','24_hour_hold','duplicate_skipped','blocked'].indexOf(st)<0)out.called++});out.called=Math.max(out.called,calls.length);out.human=Math.max(out.human,calls.filter(function(c){return low(c.answered_by)==='human'}).length);out.machine=Math.max(out.machine,calls.filter(function(c){return low(c.answered_by).indexOf('machine')===0}).length);out.transferred=Math.max(out.transferred,calls.filter(function(c){return c.result==='Transferred to Agent Queue'}).length);out.skipped=out.hold+out.duplicates;out.left=out.queued;return out}
+  function campaignTable(){if(!state.campaigns.length)return '<div class="vbcEmpty">No voice broadcast campaigns have been created.</div>';return '<div class="vbcTableWrap"><table class="vbcTable"><thead><tr><th>Campaign</th><th>Status</th><th>Total</th><th>Left</th><th>Called</th><th>24h Hold</th><th>Duplicates</th><th>Active</th><th>Transfers</th><th>Failed</th><th>Rate</th><th>Controls</th></tr></thead><tbody>'+state.campaigns.map(function(c){var n=counts(c.id),ctl='';if(low(c.status)==='draft'||low(c.status)==='stopped')ctl='<button class="vbcBtn green" onclick="window.cpcmBroadcastControl(\''+h(c.id)+'\',\'start\')">Start</button>';else if(low(c.status)==='running')ctl='<button class="vbcBtn orange" onclick="window.cpcmBroadcastControl(\''+h(c.id)+'\',\'pause\')">Pause</button><button class="vbcBtn red" onclick="window.cpcmBroadcastControl(\''+h(c.id)+'\',\'stop\')">Stop</button>';else if(low(c.status)==='paused')ctl='<button class="vbcBtn green" onclick="window.cpcmBroadcastControl(\''+h(c.id)+'\',\'resume\')">Resume</button><button class="vbcBtn red" onclick="window.cpcmBroadcastControl(\''+h(c.id)+'\',\'stop\')">Stop</button>';return '<tr><td><button class="vbcBtn white" onclick="window.cpcmBroadcastSelectCampaign(\''+h(c.id)+'\')">'+h(c.name)+'</button><div class="vbcHelp">'+h(fmtPhone(c.transfer_number))+'</div></td><td><span class="vbcPill '+h(low(c.status))+'">'+h(c.status)+'</span></td><td>'+n.total+'</td><td>'+n.left+'</td><td>'+n.called+'</td><td class="vbcHold">'+n.hold+'</td><td>'+n.duplicates+'</td><td>'+n.active+'</td><td>'+n.transferred+'</td><td>'+n.failed+'</td><td>'+Number(c.calls_per_minute||0)+'/min · '+Number(c.max_concurrent||0)+' live</td><td><div class="vbcMiniActions">'+ctl+'</div></td></tr>'}).join('')+'</tbody></table></div>'}
+  window.cpcmBroadcastSelectCampaign=function(id){state.selectedCampaignId=id;state.tab='live';renderAll()}
+  window.cpcmBroadcastControl=async function(id,command){try{notice(command.charAt(0).toUpperCase()+command.slice(1)+'ing campaign…');var data=await invoke({action:'campaign_control',campaignId:id,command:command,dispatchImmediately:(command==='start'||command==='resume')});state.selectedCampaignId=id;await loadData();renderAll();if(command==='start'||command==='resume'){var d=data&&data.dispatch||{};if(Number(d.launchedCount||0)>0){notice('Campaign started. '+Number(d.launchedCount||0)+' call(s) sent to Twilio.','success')}else if(d.campaignComplete){var detail=(d.blockedReasons&&d.blockedReasons.length)?' '+d.blockedReasons.join(' | '):'';notice((d.message||'Campaign completed because no callable accounts remained.')+detail,'error')}else{notice(d.message||'Campaign is running and waiting for dialing capacity.','success')}pumpCampaigns()}else{notice('Campaign '+command+' completed.','success')}}catch(e){notice(e.message||s(e),'error')}}
+  function renderSettings(){var p=el('vbcPanelSettings');if(!p)return;var cfg=settings(),hist=testHistory(),last=lastTest(),activeName='';try{var mount=el('vbcVoiceRecorderMount');if(mount){var txt=mount.textContent||'';var m=txt.match(/ACTIVE:\s*([^\n]+)/i);if(m)activeName=m[1].trim()}}catch(e){}p.innerHTML='<div class="vbcGrid"><div class="vbcCard full"><div class="vbcCardHead"><div class="vbcCardTitle">Recording & RingCentral Queue</div><span class="vbcPill">Recorded voice only</span></div><div class="vbcCardBody"><div class="vbcForm two"><div class="vbcField"><label>RingCentral Call Queue / Group Phone Number</label><input id="vbcSettingTransfer" inputmode="tel" autocomplete="off" value="'+h(cfg.transfer_number||'')+'" placeholder="+13232842154"><div class="vbcHelp">This public number rings your collector group. Whoever answers first receives the transferred consumer.</div></div><div class="vbcField"><label>Default Connection Method</label><select id="vbcSettingMode"><option value="press_1" '+(cfg.connect_mode==='press_1'?'selected':'')+'>Press 1, then transfer</option><option value="auto_transfer" '+(cfg.connect_mode==='auto_transfer'?'selected':'')+'>Auto-transfer detected humans</option></select><div class="vbcHelp">Every consumer-facing message uses the active saved recording. Text-to-speech is disabled.</div></div><div class="vbcField full"><label>Active Broadcast Recording</label><div style="padding:13px;border:2px solid '+(activeName?'#16a34a':'#dc2626')+';border-radius:10px;background:'+(activeName?'#f0fdf4':'#fef2f2')+';font-weight:900;color:'+(activeName?'#166534':'#991b1b')+'">'+(activeName?'ACTIVE: '+h(activeName):'NO ACTIVE RECORDING — select one under Campaigns before testing or starting a campaign.')+'</div></div><div class="vbcField"><label>Default Calls Per Minute</label><input id="vbcSettingRate" type="number" min="1" max="60" value="'+Number(cfg.calls_per_minute||6)+'"></div><div class="vbcField"><label>Default Simultaneous Calls</label><input id="vbcSettingConcurrent" type="number" min="1" max="10" value="'+Number(cfg.max_concurrent||1)+'"></div><div class="vbcField"><label>Default Maximum Attempts</label><input id="vbcSettingAttempts" type="number" min="1" max="10" value="'+Number(cfg.max_attempts||2)+'"></div></div><div class="vbcActions" style="margin-top:12px"><button class="vbcBtn green" onclick="window.cpcmBroadcastSaveSettings()">Save Queue Defaults</button><button class="vbcBtn white" onclick="window.cpcmBroadcastCheckConnection()">Check Twilio Connection</button></div></div></div><div class="vbcCard full"><div class="vbcCardHead"><div class="vbcCardTitle">Recorded-Voice Test Center</div><span class="vbcPill">Uses active recording only</span></div><div class="vbcCardBody"><div style="margin-bottom:12px;padding:11px;border:1px solid #bbf7d0;border-radius:9px;background:#f0fdf4;color:#166534;font-weight:900">Test Call and Test Transfer always play the active saved recording. There is no text-to-speech fallback.</div><div class="vbcForm two"><div class="vbcField"><label>Manual Test Phone Number</label><input id="vbcManualTestNumber" inputmode="tel" autocomplete="off" value="'+h(last&&last.testNumber||'')+'" placeholder="+15551234567"><div class="vbcHelp">Twilio calls this number from your connected outbound number.</div></div><div class="vbcField"><label>Active Recording Used for Test</label><div style="padding:11px;border:1px solid #cbd5e1;border-radius:9px;background:#fff;font-weight:900">'+(activeName?h(activeName):'No active recording selected')+'</div></div></div><div class="vbcActions" style="margin-top:12px"><button class="vbcBtn white" onclick="window.cpcmBroadcastManualTest(&quot;call&quot;)">Test Recorded Call</button><button class="vbcBtn green" onclick="window.cpcmBroadcastManualTest(&quot;transfer&quot;)">Test Recorded Transfer</button><button class="vbcBtn white" onclick="window.cpcmBroadcastManualTest(&quot;queue&quot;)">Test Queue Only</button>'+(last?'<button class="vbcBtn white" onclick="window.cpcmBroadcastReplayLastTest()">Replay Last Test</button>':'')+'</div><div style="margin-top:14px"><div class="vbcCardTitle" style="font-size:13px;margin-bottom:8px">Recent Test History</div>'+(hist.length?'<div class="vbcTableWrap"><table class="vbcTable"><thead><tr><th>Time</th><th>Test</th><th>Number</th><th>Status</th></tr></thead><tbody>'+hist.slice(0,10).map(function(r){return '<tr><td>'+h(fmtDate(r.time))+'</td><td>'+h(r.mode==='queue'?'Queue Test':r.mode==='transfer'?'Recorded Transfer':'Recorded Call')+'</td><td>'+h(fmtPhone(r.testNumber||r.transferNumber||''))+'</td><td><span class="vbcPill '+h(r.ok?'connected':'failed')+'">'+h(r.status||'Started')+'</span></td></tr>'}).join('')+'</tbody></table></div>':'<div class="vbcEmpty">No manual tests have been started yet.</div>')+'</div></div></div></div>'}
+  window.cpcmBroadcastSaveSettings=async function(){var row={id:'default',transfer_number:phone(el('vbcSettingTransfer')&&el('vbcSettingTransfer').value)||null,connect_mode:s(el('vbcSettingMode')&&el('vbcSettingMode').value),live_message_text:'',voicemail_message_text:'',leave_voicemail:false,calls_per_minute:Math.max(1,Math.min(60,Number(el('vbcSettingRate')&&el('vbcSettingRate').value||6))),max_concurrent:Math.max(1,Math.min(10,Number(el('vbcSettingConcurrent')&&el('vbcSettingConcurrent').value||1))),max_attempts:Math.max(1,Math.min(10,Number(el('vbcSettingAttempts')&&el('vbcSettingAttempts').value||2))),updated_by_email:email(),updated_at:new Date().toISOString()};if(!row.transfer_number)return notice('Enter the RingCentral group phone number.','error');try{await dbFetch('/voice_broadcast_settings?on_conflict=id',{method:'POST',headers:{Prefer:'resolution=merge-duplicates,return=representation'},body:JSON.stringify([row])});await loadData();renderAll();notice('Recorded-voice queue defaults saved.','success')}catch(e){notice(e.message||s(e),'error')}}
+  window.cpcmBroadcastManualTest=async function(mode){var num=(el('vbcManualTestNumber')||{}).value||'',cfg=settings(),transfer=(el('vbcSettingTransfer')||{}).value||cfg.transfer_number||'',audioUrl=((el('vbcCampaignAudioUrl')||{}).value||''),recordingId=((el('vbcCampaignRecordingId')||{}).value||''),normalized=normalizePhone(num),queue=normalizePhone(transfer),row={time:new Date().toISOString(),mode:mode,testNumber:normalized,transferNumber:queue,ok:false,status:'Failed',messageType:mode==='queue'?'queue':'recorded'};try{if(mode!=='queue'&&!normalized)throw new Error('Enter a valid manual test number.');if((mode==='transfer'||mode==='queue')&&!queue)throw new Error('Enter and save a valid RingCentral queue number first.');if(el('vbcManualTestNumber')&&normalized)el('vbcManualTestNumber').value=normalized;notice(mode==='queue'?'Ringing the RingCentral queue…':mode==='transfer'?'Starting recorded-voice transfer test…':'Starting recorded-voice test call…');if(mode!=='queue'&&(!audioUrl||!recordingId))throw new Error('Select an ACTIVE saved recording before testing.');var data=await invoke({action:'manual_test',testMode:mode,testNumber:normalized,transferNumber:queue,messageType:'recorded',audioUrl:audioUrl,recordingId:recordingId});row.ok=true;row.status=(data.providerStatus||'Queued')+' · '+(mode==='queue'?'Queue':'Recorded Voice');saveTestHistory(row);notice(data.message||(mode==='queue'?'Queue test started.':mode==='transfer'?'Recorded-voice transfer test started.':'Recorded-voice test call started.'),'success');renderSettings()}catch(e){row.status=e.message||s(e);saveTestHistory(row);notice(row.status,'error');renderSettings()}}
+  window.cpcmBroadcastReplayLastTest=function(){var row=lastTest();if(!row)return notice('No previous test is available.','error');if(el('vbcManualTestNumber')&&row.testNumber)el('vbcManualTestNumber').value=row.testNumber;window.cpcmBroadcastManualTest(row.mode||'call')}
+
+  function renderLive(){var p=el('vbcPanelLive');if(!p)return;var campaign=state.campaigns.find(function(c){return c.id===state.selectedCampaignId})||state.campaigns[0];if(!campaign){p.innerHTML='<div class="vbcEmpty">Create a campaign first.</div>';return}var n=counts(campaign.id),calls=state.calls.filter(function(c){return c.campaign_id===campaign.id}),total=Math.max(1,n.total),calledPct=(n.called/total*100),leftPct=calledPct+(n.left/total*100),skippedPct=leftPct+(n.skipped/total*100),donePct=Math.round((n.called+n.skipped+n.failed)/total*100);p.innerHTML='<div class="vbcGrid"><div class="vbcCard full"><div class="vbcCardHead"><div><div class="vbcCardTitle">'+h(campaign.name)+'</div><div class="vbcHelp">Rolling 24-hour global suppression · '+h(campaign.connect_mode==='auto_transfer'?'Automatic live-human transfer':'Press 1 before transfer')+' · Queue '+h(fmtPhone(campaign.transfer_number))+'</div></div><select id="vbcLiveCampaign" onchange="window.cpcmBroadcastSelectCampaign(this.value)">'+state.campaigns.map(function(c){return '<option value="'+h(c.id)+'" '+(c.id===campaign.id?'selected':'')+'>'+h(c.name)+'</option>'}).join('')+'</select></div><div class="vbcCardBody"><div class="vbcProgressGrid"><div class="vbcPie" style="--called:'+calledPct+'%;--left:'+leftPct+'%;--skipped:'+skippedPct+'%"><div class="vbcPieCenter"><b>'+donePct+'%</b><span>processed</span></div></div><div><div class="vbcLegend"><div class="vbcLegendItem"><span class="vbcDot" style="background:#0f766e"></span>Called<b>'+n.called+'</b></div><div class="vbcLegendItem"><span class="vbcDot" style="background:#2563eb"></span>Still left<b>'+n.left+'</b></div><div class="vbcLegendItem"><span class="vbcDot" style="background:#f59e0b"></span>Skipped / hold<b>'+n.skipped+'</b><small>'+n.hold+' called in 24h · '+n.duplicates+' duplicates</small></div><div class="vbcLegendItem"><span class="vbcDot" style="background:#dc2626"></span>Failed / blocked<b>'+n.failed+'</b></div></div><div class="vbcMetrics" style="margin-top:14px"><div class="vbcMetric"><div class="vbcMetricLabel">Total Selected</div><div class="vbcMetricValue">'+n.total+'</div></div><div class="vbcMetric"><div class="vbcMetricLabel">Currently Dialing</div><div class="vbcMetricValue">'+n.active+'</div></div><div class="vbcMetric"><div class="vbcMetricLabel">Humans</div><div class="vbcMetricValue">'+n.human+'</div></div><div class="vbcMetric"><div class="vbcMetricLabel">Agent Transfers</div><div class="vbcMetricValue">'+n.transferred+'</div></div></div></div></div></div></div><div class="vbcCard full"><div class="vbcCardHead"><div class="vbcCardTitle">Recent Calls</div><span class="vbcPill '+h(low(campaign.status))+'">'+h(campaign.status)+'</span></div><div class="vbcCardBody">'+callsTable(calls)+'</div></div></div>'}
+  function callsTable(rows){if(!rows.length)return '<div class="vbcEmpty">No calls have started for this campaign.</div>';return '<div class="vbcTableWrap"><table class="vbcTable"><thead><tr><th>Consumer</th><th>Account</th><th>Phone</th><th>Status</th><th>Answered By</th><th>Transfer</th><th>Result</th><th>Started</th><th>Duration</th></tr></thead><tbody>'+rows.slice(0,250).map(function(c){return '<tr><td><b>'+h(accountName(c.account_id))+'</b></td><td>'+h(accountNumber(c.account_id))+'</td><td>'+h(fmtPhone(c.phone_number))+'</td><td><span class="vbcPill '+h(low(c.status))+'">'+h(c.status)+'</span></td><td>'+h(c.answered_by||'—')+'</td><td>'+h(c.transfer_status||'—')+'</td><td>'+h(c.result||'—')+'</td><td>'+h(fmtDate(c.started_at))+'</td><td>'+Number(c.duration_seconds||0)+'s</td></tr>'}).join('')+'</tbody></table></div>'}
+  function renderSetup(){var p=el('vbcPanelSetup');if(!p)return;p.innerHTML='<div class="vbcGrid"><div class="vbcCard full"><div class="vbcCardHead"><div class="vbcCardTitle">Simple Provider Setup</div><span class="vbcPill">3 secrets only</span></div><div class="vbcCardBody"><div class="vbcSetupLine"><b>1. Twilio places the broadcast calls.</b><div class="vbcHelp">Use one Twilio Programmable Voice account and one Twilio outbound phone number.</div></div><div class="vbcSetupLine"><b>2. Add these three LIVE Supabase secrets.</b><div class="vbcCode">TWILIO_ACCOUNT_SID\nTWILIO_AUTH_TOKEN\nTWILIO_FROM_NUMBER</div></div><div class="vbcSetupLine"><b>3. Deploy these two Edge Functions.</b><div class="vbcCode">voice-broadcast\nvoice-broadcast-webhook</div></div><div class="vbcSetupLine"><b>4. Enter one RingCentral group/queue phone number under Recording & Queue.</b><div class="vbcHelp">No RingCentral Client ID, Client Secret, employee JWT JSON, extension mapping, or employee forwarding numbers are used by R8N19.</div></div><div class="vbcSetupLine"><b>5. Test with numbers you control.</b><div class="vbcHelp">Begin with one campaign account, one simultaneous call, and one call per minute. Select an active saved recording, confirm the recorded message reaches the test phone, and confirm the transfer rings the RingCentral group.</div></div><div class="vbcActions" style="margin-top:12px"><button class="vbcBtn green" onclick="window.cpcmBroadcastCheckConnection()">Check Twilio Connection</button></div></div></div></div>'}
+  function renderAll(){var active=document.activeElement;var editingCampaign=!!(active&&active.closest&&active.closest('#vbcPanelCampaigns'));var editingSettings=!!(active&&active.closest&&active.closest('#vbcPanelSettings'));if(!editingCampaign)renderCampaigns();if(!editingSettings)renderSettings();renderLive();renderSetup();applyTab();var running=state.campaigns.some(function(c){return low(c.status)==='running'});if(el('vbcPump'))el('vbcPump').classList.toggle('show',running&&el('cpcmVoiceBroadcastPage')&&el('cpcmVoiceBroadcastPage').classList.contains('open'))}
+  async function pumpCampaigns(){if(state.pumping||!admin()||!el('cpcmVoiceBroadcastPage')||!el('cpcmVoiceBroadcastPage').classList.contains('open'))return;var running=state.campaigns.filter(function(c){return low(c.status)==='running'});if(!running.length)return;state.pumping=true;try{for(var i=0;i<running.length;i++){try{await invoke({action:'dispatch_batch',campaignId:running[i].id,maxBatch:10})}catch(e){console.warn('Voice broadcast pump',running[i].name,e)}}await loadData();renderAll()}finally{state.pumping=false}}
+  function startLoops(){stopLoops();state.poll=setInterval(async function(){if(state.busy||state.pumping)return;try{await loadData();renderAll()}catch(e){}},4000);state.pump=setInterval(pumpCampaigns,5000);pumpCampaigns()}
+  function stopLoops(){if(state.poll)clearInterval(state.poll);if(state.pump)clearInterval(state.pump);state.poll=null;state.pump=null}
+  function initialize(){ensurePage();ensureNav();setInterval(ensureNav,1500);window.CPCM_VOICE_BROADCAST_BUILD=BUILD;window.dispatchEvent(new CustomEvent('cpcm:voice-broadcast-ready',{detail:{build:BUILD}}))}
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',initialize);else initialize();
+})();
+</script>
+
+
+
+<script src="./voice-recording.js?v=R8N19_20" defer></script>
+<script src="./screen-pop.js?v=R8N19_18" defer></script>
 </body>
 </html>

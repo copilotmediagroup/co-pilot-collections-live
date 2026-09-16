@@ -51,6 +51,44 @@ $$;
 
 grant execute on function public.cpcm_update_staff_display_name(text,text) to authenticated;
 
+-- Staff directory RPC for Messenger.
+-- This lets admin/employee Messenger load all active staff names/statuses without exposing debtor data.
+create or replace function public.cpcm_staff_directory()
+returns table(
+  email text,
+  role text,
+  full_name text,
+  approval_status text,
+  is_approved boolean,
+  is_active boolean,
+  last_seen_at timestamptz,
+  updated_at timestamptz,
+  created_at timestamptz
+)
+language sql
+security definer
+set search_path = public
+as $
+  select
+    u.email,
+    u.role,
+    u.full_name,
+    u.approval_status,
+    u.is_approved,
+    u.is_active,
+    u.last_seen_at,
+    u.updated_at,
+    u.created_at
+  from public.app_users u
+  where lower(coalesce(u.role,'')) in ('admin','employee')
+    and coalesce(u.is_active,true) is not false
+    and lower(coalesce(u.approval_status,'')) not in ('removed','rejected','fired')
+  order by lower(u.email);
+$;
+
+grant execute on function public.cpcm_staff_directory() to authenticated;
+
+
 -- Keep the LIVE admin's real name set by default.
 update public.app_users
    set full_name = coalesce(nullif(full_name,''),'Antonio Finch'),

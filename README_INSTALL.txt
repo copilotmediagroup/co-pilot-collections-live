@@ -1,3 +1,25 @@
+Co Pilot Collections Manager - LIVE Source of Truth + Messenger Cleanup R8N20
+
+Upload/use this repository only for GitHub repo: co-pilot-collections-live
+Supabase project locked to: https://bwvufgzbkaymffwxuuzr.supabase.co
+
+Run in Bolt terminal:
+npm install
+npm run dev
+
+SQL required before testing Messenger names/staff directory:
+RUN_THIS_MESSENGER_STAFF_NAMES_SQL.sql
+
+R8N20 cleanup:
+- Removed DEMO setup SQL/files from LIVE repo.
+- Removed stale phase-2 main.js/styles.css split files.
+- Removed old attached-account Messenger patch block.
+- Messenger now stays staff/admin only: staff name, message body, date/time, Seen status.
+- System Check version updated to LIVE_SOURCE_OF_TRUTH_MESSENGER_CLEANUP_R8N20.
+- Active source of truth is index.html.
+
+--- Previous README notes kept below ---
+
 Co Pilot Collections Manager - LIVE Production Stability Refactor Phase 1
 
 Upload this ZIP only to GitHub repo: co-pilot-collections-live

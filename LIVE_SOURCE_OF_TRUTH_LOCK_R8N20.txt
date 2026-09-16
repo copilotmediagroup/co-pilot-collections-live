@@ -1,0 +1,27 @@
+Co Pilot Collections Manager — LIVE Source of Truth Lock R8N20
+
+Active application source:
+- index.html is the active single-file app source.
+- config.js and public/config.js are LIVE only and must point to https://bwvufgzbkaymffwxuuzr.supabase.co.
+- /nmi-config.js remains public browser config only. Private NMI keys must stay in Supabase Secrets.
+- voice-recording.js and screen-pop.js remain separate runtime modules loaded by index.html.
+
+Removed from LIVE repo in R8N20:
+- DEMO_SETUP/
+- RUN_THIS_DEMO_ACCOUNTS_ADMIN_SQL.sql
+- RUN_THIS_DEMO_ROLE_FIX_SQL.sql
+- RUN_THIS_FINAL_DEMO_ROLE_CONFIRM_SQL.sql
+- RUN_THIS_FRESH_DEMO_DATABASE_SETUP_SQL.sql
+- RUN_THIS_HARD_DEMO_ADMIN_ROLE_SQL.sql
+- index(5).html
+- unused phase-2 main.js
+- unused phase-2 styles.css
+
+Messenger lock:
+- Attached debtor/account display is removed from Team Messenger.
+- Team Messenger is staff/admin communication only.
+- Messages show staff display name, body, date/time, and Seen status.
+- Staff directory loads through cpcm_staff_directory() when SQL is run.
+- Admin can rename any staff member; employees can rename themselves through cpcm_update_staff_display_name().
+
+Do not reintroduce demo login buttons, demo role override SQL, or attached-account Messenger behavior into LIVE.
