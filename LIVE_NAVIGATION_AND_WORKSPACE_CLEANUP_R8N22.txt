@@ -1,0 +1,12 @@
+LIVE_NAVIGATION_AND_WORKSPACE_CLEANUP_R8N22
+
+Purpose:
+- Turn the crowded feature wall into grouped SaaS navigation.
+- Preserve every existing feature behind Work, Payments, Compliance, Reports, Clients, and Admin menus.
+- Keep No-Dialer Safe Mode active and remove Broadcast from the visible UI.
+- Add Collector Workspace directly under the account summary for the core daily workflow.
+
+Preserved:
+- Manual click-to-call, call logging, call result popup, compliance guard, payments, payment plans, ledger, settlements, documents, reports, cleanup, imports, staff, messenger, scorecards, tickler, client portal, and remittance.
+
+No SQL required for this UI cleanup.
