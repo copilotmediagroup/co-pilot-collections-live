@@ -1,0 +1,26 @@
+LIVE_NO_DIALER_SAFE_MODE_R8N21
+
+Purpose:
+- Keep Co Pilot Collections Manager fully usable without an approved outbound dialer/voice broadcast provider.
+- Disable automatic campaign dialing and provider test-call actions.
+- Preserve manual click-to-call, call attempt logging, call result popup, compliance guard, callbacks, reports, payments, messenger, settlements, documents, and client portal.
+
+Disabled UI/actions:
+- Voice Broadcast top/side navigation
+- Create Broadcast Campaign
+- Start/Pause/Resume campaign controls
+- Twilio/provider connection check
+- Recorded test call / transfer / queue test
+- Background campaign pump entry point from the UI
+
+Still active:
+- Phone number click-to-call through local/RingCentral/browser phone handling
+- Manual call result logging
+- Compliance Guard
+- Call intelligence reports
+- Tickler/follow-ups
+- Payments/payment plans/ledger/promises
+- Messenger
+- Client portal/remittance
+
+No SQL required.
