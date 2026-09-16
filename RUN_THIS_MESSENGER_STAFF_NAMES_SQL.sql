@@ -68,7 +68,7 @@ returns table(
 language sql
 security definer
 set search_path = public
-as $
+as $$
   select
     u.email,
     u.role,
@@ -84,7 +84,7 @@ as $
     and coalesce(u.is_active,true) is not false
     and lower(coalesce(u.approval_status,'')) not in ('removed','rejected','fired')
   order by lower(u.email);
-$;
+$$;
 
 grant execute on function public.cpcm_staff_directory() to authenticated;
 
