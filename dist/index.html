@@ -12417,7 +12417,7 @@ function exportContactIntelligenceCSV(){let calls=filteredContactCalls();let row
   if(window.__cpcmSystemQaVersionLockLoaded) return;
   window.__cpcmSystemQaVersionLockLoaded = true;
   var BUILD_NAME = "Co Pilot Collections Manager — Live Source of Truth Cleanup";
-  var BUILD_VERSION = "LIVE_NAVIGATION_AND_WORKSPACE_CLEANUP_R8N22";
+  var BUILD_VERSION = "LIVE_NAVIGATION_AND_WORKSPACE_CLEANUP_R8N22A";
   var EXPECTED_ENV = "LIVE";
   var EXPECTED_URL = "https://bwvufgzbkaymffwxuuzr.supabase.co";
   var EXPECTED_KEY_PREFIX = "sb_publishable_cvwkN3fOovsYvAvzXvrmRA";
@@ -14006,11 +14006,9 @@ function exportContactIntelligenceCSV(){let calls=filteredContactCalls();let row
   function injectCss(){
     if(byId('cpcmNoDialerSafeModeCss'))return;
     var st=document.createElement('style'); st.id='cpcmNoDialerSafeModeCss';
-    st.textContent='
-.cpcmNoDialerHidden{display:none!important}
+    st.textContent=`.cpcmNoDialerHidden{display:none!important}
 #cpcmManualCallingBadge{position:fixed;right:14px;bottom:128px;z-index:85000;background:#064e3b;color:#d1fae5;border:1px solid rgba(255,255,255,.2);border-radius:999px;padding:6px 10px;font:900 10px Arial,Helvetica,sans-serif;box-shadow:0 8px 18px rgba(15,23,42,.18)}
-#cpcmNoDialerPage{position:fixed;inset:0;z-index:79000;background:#eef3f9;color:#0f172a;font-family:Arial,Helvetica,sans-serif;display:none;overflow:auto}#cpcmNoDialerPage.open{display:block}.ndTop{background:linear-gradient(90deg,#05225f,#0b45c6);color:#fff;padding:16px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px}.ndTitle{font-size:22px;font-weight:1000}.ndSub{font-size:12px;color:#dbeafe;margin-top:3px}.ndBtn{border:0;border-radius:10px;padding:10px 13px;font-weight:900;cursor:pointer;background:#2563eb;color:#fff}.ndBtn.gray{background:#334155}.ndWrap{max-width:1180px;margin:0 auto;padding:18px}.ndHero{background:#fff;border:1px solid #dbe3ef;border-radius:18px;padding:18px;box-shadow:0 4px 18px rgba(15,23,42,.06);margin-bottom:12px}.ndHero h2{margin:0 0 8px;font-size:24px}.ndHero p{margin:0;color:#475569;font-size:14px;line-height:1.5}.ndGrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.ndCard{background:#fff;border:1px solid #dbe3ef;border-radius:16px;padding:15px;box-shadow:0 3px 12px rgba(15,23,42,.04)}.ndCard b{display:block;font-size:14px;margin-bottom:6px}.ndCard span{color:#64748b;font-size:12px;line-height:1.45}.ndGood{background:#ecfdf5;border-color:#bbf7d0}.ndWarn{background:#fff7ed;border-color:#fed7aa}@media(max-width:900px){.ndGrid{grid-template-columns:1fr}.ndTop{display:block}.ndTop button{margin-top:10px}}
-';
+#cpcmNoDialerPage{position:fixed;inset:0;z-index:79000;background:#eef3f9;color:#0f172a;font-family:Arial,Helvetica,sans-serif;display:none;overflow:auto}#cpcmNoDialerPage.open{display:block}.ndTop{background:linear-gradient(90deg,#05225f,#0b45c6);color:#fff;padding:16px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px}.ndTitle{font-size:22px;font-weight:1000}.ndSub{font-size:12px;color:#dbeafe;margin-top:3px}.ndBtn{border:0;border-radius:10px;padding:10px 13px;font-weight:900;cursor:pointer;background:#2563eb;color:#fff}.ndBtn.gray{background:#334155}.ndWrap{max-width:1180px;margin:0 auto;padding:18px}.ndHero{background:#fff;border:1px solid #dbe3ef;border-radius:18px;padding:18px;box-shadow:0 4px 18px rgba(15,23,42,.06);margin-bottom:12px}.ndHero h2{margin:0 0 8px;font-size:24px}.ndHero p{margin:0;color:#475569;font-size:14px;line-height:1.5}.ndGrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.ndCard{background:#fff;border:1px solid #dbe3ef;border-radius:16px;padding:15px;box-shadow:0 3px 12px rgba(15,23,42,.04)}.ndCard b{display:block;font-size:14px;margin-bottom:6px}.ndCard span{color:#64748b;font-size:12px;line-height:1.45}.ndGood{background:#ecfdf5;border-color:#bbf7d0}.ndWarn{background:#fff7ed;border-color:#fed7aa}@media(max-width:900px){.ndGrid{grid-template-columns:1fr}.ndTop{display:block}.ndTop button{margin-top:10px}}`;
     document.head.appendChild(st);
   }
   function ensureBadge(){
@@ -14049,7 +14047,7 @@ function exportContactIntelligenceCSV(){let calls=filteredContactCalls();let row
 <script id="cpcmNavigationWorkspaceCleanupR8N22">
 (function(){
   'use strict';
-  var BUILD='LIVE_NAVIGATION_AND_WORKSPACE_CLEANUP_R8N22';
+  var BUILD='LIVE_NAVIGATION_AND_WORKSPACE_CLEANUP_R8N22A';
   window.CPCM_NAV_WORKSPACE_BUILD=BUILD;
   function byId(id){return document.getElementById(id)}
   function s(v){return String(v==null?'':v)}
@@ -14069,7 +14067,11 @@ function exportContactIntelligenceCSV(){let calls=filteredContactCalls();let row
   }
   window.cpcmNavRun=call;
   window.cpcmWorkspaceRun=call;
-  function item(label,fn,arg,admin){return '<button type="button" class="cpcmNavItem" '+(admin?'data-admin-only="1"':'')+' onclick="cpcmNavRun(''+esc(fn)+'''+(arg!==undefined?',''+esc(arg)+''':'')+')">'+esc(label)+'</button>'}
+  function item(label,fn,arg,admin){
+    var args=JSON.stringify(String(fn));
+    if(arg!==undefined)args+=','+JSON.stringify(String(arg));
+    return '<button type="button" class="cpcmNavItem" '+(admin?'data-admin-only="1"':'')+' onclick="cpcmNavRun('+esc(args)+')">'+esc(label)+'</button>';
+  }
   function group(label,items){return '<div class="cpcmNavGroup"><button type="button" class="cpcmNavGroupBtn">'+esc(label)+' ▾</button><div class="cpcmNavMenu">'+items.join('')+'</div></div>'}
   function groupedNavHtml(){
     return group('Work',[
@@ -14119,9 +14121,7 @@ function exportContactIntelligenceCSV(){let calls=filteredContactCalls();let row
   function injectCss(){
     if(byId('cpcmNavWorkspaceCss'))return;
     var st=document.createElement('style'); st.id='cpcmNavWorkspaceCss';
-    st.textContent='
-.cpcmGroupedNav{display:flex!important;gap:6px;align-items:center;flex-wrap:wrap;margin-right:4px}.cpcmNavGroup{position:relative}.cpcmNavGroupBtn{height:28px!important;border-radius:9px!important;background:#092a78!important;color:#fff!important;border:1px solid rgba(255,255,255,.18)!important;padding:0 10px!important;font-weight:1000!important;font-size:11px!important}.cpcmNavGroup:hover .cpcmNavMenu,.cpcmNavGroup:focus-within .cpcmNavMenu{display:block}.cpcmNavMenu{display:none;position:absolute;right:0;top:31px;min-width:218px;background:#fff;color:#0f172a;border:1px solid #cbd5e1;border-radius:13px;box-shadow:0 18px 42px rgba(15,23,42,.22);padding:7px;z-index:82000}.cpcmNavItem{display:block!important;width:100%!important;height:32px!important;text-align:left!important;background:#fff!important;color:#0f172a!important;border:0!important;border-radius:8px!important;padding:0 10px!important;font-size:11px!important;font-weight:900!important;line-height:32px!important}.cpcmNavItem:hover{background:#eef6ff!important;color:#1457ff!important}.cpcmNavHidden,.topActions>.cpcmNavHidden{display:none!important}.cpcmCollectorWorkspace{margin-top:10px!important;padding:13px!important;border:1px solid #bfdbfe!important;background:linear-gradient(180deg,#ffffff,#f8fbff)!important}.cpcmWsHead{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:10px}.cpcmWsTitle{font-size:15px;font-weight:1000;color:#0f172a}.cpcmWsSub{font-size:11px;color:#64748b;margin-top:2px}.cpcmWsMode{border:1px solid #bbf7d0;background:#ecfdf5;color:#166534;border-radius:999px;padding:5px 9px;font-size:10px;font-weight:1000;white-space:nowrap}.cpcmWsGrid{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:7px}.cpcmWsGrid button{height:34px;border:1px solid #bfdbfe;background:#fff;color:#1d4ed8;border-radius:9px;font-weight:1000;font-size:11px;cursor:pointer}.cpcmWsGrid button:hover{background:#eff6ff}.cpcmWsGrid .cpcmWsPrimary{background:#1457ff;color:#fff;border-color:#1457ff}.cpcmWsFacts{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.cpcmWsFacts span{background:#fff;border:1px solid #e2e8f0;border-radius:999px;padding:5px 8px;color:#475569;font-size:10px;font-weight:900}.topbar{gap:10px!important}.topActions{align-items:flex-start!important}.topActions #cpcmNoDialerStaticTopBtn{order:-2!important;height:28px!important}.topActions #cpcmGroupedNav{order:-1!important}.topActions #roleBadge{margin-left:4px!important}@media(max-width:1200px){.cpcmWsGrid{grid-template-columns:repeat(4,1fr)}.cpcmNavMenu{left:0;right:auto}}@media(max-width:760px){.cpcmWsGrid{grid-template-columns:repeat(2,1fr)}.cpcmGroupedNav{width:100%;justify-content:flex-start}.cpcmNavGroupBtn{font-size:10px!important;padding:0 7px!important}}
-';
+    st.textContent=`.cpcmGroupedNav{display:flex!important;gap:6px;align-items:center;flex-wrap:wrap;margin-right:4px}.cpcmNavGroup{position:relative}.cpcmNavGroupBtn{height:28px!important;border-radius:9px!important;background:#092a78!important;color:#fff!important;border:1px solid rgba(255,255,255,.18)!important;padding:0 10px!important;font-weight:1000!important;font-size:11px!important}.cpcmNavGroup:hover .cpcmNavMenu,.cpcmNavGroup:focus-within .cpcmNavMenu{display:block}.cpcmNavMenu{display:none;position:absolute;right:0;top:31px;min-width:218px;background:#fff;color:#0f172a;border:1px solid #cbd5e1;border-radius:13px;box-shadow:0 18px 42px rgba(15,23,42,.22);padding:7px;z-index:82000}.cpcmNavItem{display:block!important;width:100%!important;height:32px!important;text-align:left!important;background:#fff!important;color:#0f172a!important;border:0!important;border-radius:8px!important;padding:0 10px!important;font-size:11px!important;font-weight:900!important;line-height:32px!important}.cpcmNavItem:hover{background:#eef6ff!important;color:#1457ff!important}.cpcmNavHidden,.topActions>.cpcmNavHidden{display:none!important}.cpcmCollectorWorkspace{margin-top:10px!important;padding:13px!important;border:1px solid #bfdbfe!important;background:linear-gradient(180deg,#ffffff,#f8fbff)!important}.cpcmWsHead{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:10px}.cpcmWsTitle{font-size:15px;font-weight:1000;color:#0f172a}.cpcmWsSub{font-size:11px;color:#64748b;margin-top:2px}.cpcmWsMode{border:1px solid #bbf7d0;background:#ecfdf5;color:#166534;border-radius:999px;padding:5px 9px;font-size:10px;font-weight:1000;white-space:nowrap}.cpcmWsGrid{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:7px}.cpcmWsGrid button{height:34px;border:1px solid #bfdbfe;background:#fff;color:#1d4ed8;border-radius:9px;font-weight:1000;font-size:11px;cursor:pointer}.cpcmWsGrid button:hover{background:#eff6ff}.cpcmWsGrid .cpcmWsPrimary{background:#1457ff;color:#fff;border-color:#1457ff}.cpcmWsFacts{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.cpcmWsFacts span{background:#fff;border:1px solid #e2e8f0;border-radius:999px;padding:5px 8px;color:#475569;font-size:10px;font-weight:900}.topbar{gap:10px!important}.topActions{align-items:flex-start!important}.topActions #cpcmNoDialerStaticTopBtn{order:-2!important;height:28px!important}.topActions #cpcmGroupedNav{order:-1!important}.topActions #roleBadge{margin-left:4px!important}@media(max-width:1200px){.cpcmWsGrid{grid-template-columns:repeat(4,1fr)}.cpcmNavMenu{left:0;right:auto}}@media(max-width:760px){.cpcmWsGrid{grid-template-columns:repeat(2,1fr)}.cpcmGroupedNav{width:100%;justify-content:flex-start}.cpcmNavGroupBtn{font-size:10px!important;padding:0 7px!important}}`;
     document.head.appendChild(st);
   }
   function ensureGroupedNav(){
@@ -14134,7 +14134,7 @@ function exportContactIntelligenceCSV(){let calls=filteredContactCalls();let row
     var top=document.querySelector('.topActions'); if(!top)return;
     Array.prototype.slice.call(top.children).forEach(function(el){
       if(el.id==='cpcmGroupedNav'||el.id==='roleBadge'||el.id==='cpcmNoDialerStaticTopBtn')return;
-      var txt=s(el.textContent).replace(/s+/g,' ').trim();
+      var txt=s(el.textContent).replace(/\s+/g,' ').trim();
       if(txt==='Logout'||txt==='Available'||/Available$/.test(txt))return;
       if(el.tagName==='SPAN' && /Available/i.test(txt))return;
       el.classList.add('cpcmNavHidden');
@@ -14147,6 +14147,10 @@ function exportContactIntelligenceCSV(){let calls=filteredContactCalls();let row
   function applyRoleVisibility(){
     var admin=isAdmin();
     Array.prototype.slice.call(document.querySelectorAll('#cpcmGroupedNav [data-admin-only="1"]')).forEach(function(el){el.classList.toggle('cpcmNavHidden',!admin)});
+    Array.prototype.slice.call(document.querySelectorAll('#cpcmGroupedNav .cpcmNavGroup')).forEach(function(group){
+      var hasVisible=Array.prototype.slice.call(group.querySelectorAll('.cpcmNavItem')).some(function(el){return !el.classList.contains('cpcmNavHidden')});
+      group.classList.toggle('cpcmNavHidden',!hasVisible);
+    });
   }
   function currentAccount(){try{return (typeof getCurrent==='function')?getCurrent():null}catch(e){return null}}
   function text(id,value){var el=byId(id); if(el)el.textContent=value}
@@ -14157,7 +14161,7 @@ function exportContactIntelligenceCSV(){let calls=filteredContactCalls();let row
     var name=(typeof nameOf==='function')?nameOf(a):(a.fullName||a.full_name||'Current Account');
     var acct=(typeof acctNo==='function')?acctNo(a):(a.accountNumber||a.account_number||'');
     var bal=(typeof accountBalance==='function')?accountBalance(a):(a.currentBalance||a.current_balance||0);
-    var money=(typeof window.money==='function')?window.money(bal):('+Number(bal||0).toFixed(2));
+    var money=(typeof window.money==='function')?window.money(bal):('$'+Number(bal||0).toFixed(2));
     var phone=''; try{var ps=(typeof phones==='function')?phones(a):[]; phone=ps&&ps[0]||''; if(typeof normPhone==='function')phone=normPhone(phone); if(typeof fmtPhone==='function')phone=fmtPhone(phone)}catch(e){}
     var status=a.status||a.disposition||'New';
     text('cpcmWsAccountLine',name+(acct?' • Account '+acct:'')+' • work the account from left to right.');
@@ -14165,7 +14169,127 @@ function exportContactIntelligenceCSV(){let calls=filteredContactCalls();let row
     text('cpcmWsBalance','Balance: '+money);
     text('cpcmWsPhone','Primary Phone: '+(phone||'—'));
     var comp='Compliance: review before call';
-    try{var c=byId('complianceBanner'); if(c&&c.textContent)comp='Compliance: '+c.textContent.replace(/s+/g,' ').trim().slice(0,80)}catch(e){}
+    try{var c=byId('complianceBanner'); if(c&&c.textContent)comp='Compliance: '+c.textContent.replace(/\s+/g,' ').trim().slice(0,80)}catch(e){}
+    text('cpcmWsCompliance',comp);
+  }
+
+  function cpcmEnsureLegacyAdminFallbacks(){
+    if(typeof window.openAuditLog!=='function'){
+      window.openAuditLog=function(){
+        if(!isAdmin())return alert('Admin only.');
+        var m=byId('auditLogModal'); if(m)m.classList.add('open');
+        var body=byId('auditLogBody');
+        if(body && !body.innerHTML.trim())body.innerHTML='<tr><td colspan="5"><div class="muted">Audit log screen is available. Refresh/load audit data from the existing audit table when connected.</div></td></tr>';
+      };
+    }
+    if(typeof window.openPermissionsModal!=='function'){
+      window.openPermissionsModal=function(){
+        if(!isAdmin())return alert('Admin only.');
+        var m=byId('permissionsModal'); if(m)m.classList.add('open');
+        var body=byId('permissionsBody');
+        if(body && !body.innerHTML.trim()){
+          var rows=[['Work assigned accounts','Yes','Yes','Yes'],['Save notes and dispositions','Yes','Yes','Yes'],['Create promises/payment plans','Yes','Yes','Yes'],['Edit/delete saved payment plans','Yes','No','No'],['Approve settlements','Yes','No','No'],['Reports / Cleanup / Imports','Yes','No','No'],['Staff and client admin','Yes','No','No']];
+          body.innerHTML=rows.map(function(r){return '<tr><td><b>'+esc(r[0])+'</b></td><td>'+r[1]+'</td><td>'+r[2]+'</td><td>'+r[3]+'</td></tr>';}).join('');
+        }
+      };
+    }
+  }
+  function boot(){cpcmEnsureLegacyAdminFallbacks();injectCss();ensureGroupedNav();updateWorkspace();setTimeout(ensureGroupedNav,500);setTimeout(updateWorkspace,650);setInterval(function(){ensureGroupedNav();updateWorkspace();applyRoleVisibility()},2000)}
+  var oldRender=window.render;
+  if(typeof oldRender==='function'&&!oldRender.__cpcmNavWorkspaceWrapped){var wrapped=function(){var r=oldRender.apply(this,arguments);setTimeout(updateWorkspace,0);setTimeout(ensureGroupedNav,0);return r};wrapped.__cpcmNavWorkspaceWrapped=true;window.render=wrapped;}
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();
+})();
+</script>
+</body>
+</html>+Number(bal||0).toFixed(2));
+    var phone=''; try{var ps=(typeof phones==='function')?phones(a):[]; phone=ps&&ps[0]||''; if(typeof normPhone==='function')phone=normPhone(phone); if(typeof fmtPhone==='function')phone=fmtPhone(phone)}catch(e){}
+    var status=a.status||a.disposition||'New';
+    text('cpcmWsAccountLine',name+(acct?' • Account '+acct:'')+' • work the account from left to right.');
+    text('cpcmWsStatus','Status: '+status);
+    text('cpcmWsBalance','Balance: '+money);
+    text('cpcmWsPhone','Primary Phone: '+(phone||'—'));
+    var comp='Compliance: review before call';
+    try{var c=byId('complianceBanner'); if(c&&c.textContent)comp='Compliance: '+c.textContent.replace(/\s+/g,' ').trim().slice(0,80)}catch(e){}
+    text('cpcmWsCompliance',comp);
+  }
+
+  function cpcmEnsureLegacyAdminFallbacks(){
+    if(typeof window.openAuditLog!=='function'){
+      window.openAuditLog=function(){
+        if(!isAdmin())return alert('Admin only.');
+        var m=byId('auditLogModal'); if(m)m.classList.add('open');
+        var body=byId('auditLogBody');
+        if(body && !body.innerHTML.trim())body.innerHTML='<tr><td colspan="5"><div class="muted">Audit log screen is available. Refresh/load audit data from the existing audit table when connected.</div></td></tr>';
+      };
+    }
+    if(typeof window.openPermissionsModal!=='function'){
+      window.openPermissionsModal=function(){
+        if(!isAdmin())return alert('Admin only.');
+        var m=byId('permissionsModal'); if(m)m.classList.add('open');
+        var body=byId('permissionsBody');
+        if(body && !body.innerHTML.trim()){
+          var rows=[['Work assigned accounts','Yes','Yes','Yes'],['Save notes and dispositions','Yes','Yes','Yes'],['Create promises/payment plans','Yes','Yes','Yes'],['Edit/delete saved payment plans','Yes','No','No'],['Approve settlements','Yes','No','No'],['Reports / Cleanup / Imports','Yes','No','No'],['Staff and client admin','Yes','No','No']];
+          body.innerHTML=rows.map(function(r){return '<tr><td><b>'+esc(r[0])+'</b></td><td>'+r[1]+'</td><td>'+r[2]+'</td><td>'+r[3]+'</td></tr>';}).join('');
+        }
+      };
+    }
+  }
+  function boot(){cpcmEnsureLegacyAdminFallbacks();injectCss();ensureGroupedNav();updateWorkspace();setTimeout(ensureGroupedNav,500);setTimeout(updateWorkspace,650);setInterval(function(){ensureGroupedNav();updateWorkspace();applyRoleVisibility()},2000)}
+  var oldRender=window.render;
+  if(typeof oldRender==='function'&&!oldRender.__cpcmNavWorkspaceWrapped){var wrapped=function(){var r=oldRender.apply(this,arguments);setTimeout(updateWorkspace,0);setTimeout(ensureGroupedNav,0);return r};wrapped.__cpcmNavWorkspaceWrapped=true;window.render=wrapped;}
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();
+})();
+</script>
+</body>
+</html>+Number(bal||0).toFixed(2));
+    var phone=''; try{var ps=(typeof phones==='function')?phones(a):[]; phone=ps&&ps[0]||''; if(typeof normPhone==='function')phone=normPhone(phone); if(typeof fmtPhone==='function')phone=fmtPhone(phone)}catch(e){}
+    var status=a.status||a.disposition||'New';
+    text('cpcmWsAccountLine',name+(acct?' • Account '+acct:'')+' • work the account from left to right.');
+    text('cpcmWsStatus','Status: '+status);
+    text('cpcmWsBalance','Balance: '+money);
+    text('cpcmWsPhone','Primary Phone: '+(phone||'—'));
+    var comp='Compliance: review before call';
+    try{var c=byId('complianceBanner'); if(c&&c.textContent)comp='Compliance: '+c.textContent.replace(/\s+/g,' ').trim().slice(0,80)}catch(e){}
+    text('cpcmWsCompliance',comp);
+  }
+
+  function cpcmEnsureLegacyAdminFallbacks(){
+    if(typeof window.openAuditLog!=='function'){
+      window.openAuditLog=function(){
+        if(!isAdmin())return alert('Admin only.');
+        var m=byId('auditLogModal'); if(m)m.classList.add('open');
+        var body=byId('auditLogBody');
+        if(body && !body.innerHTML.trim())body.innerHTML='<tr><td colspan="5"><div class="muted">Audit log screen is available. Refresh/load audit data from the existing audit table when connected.</div></td></tr>';
+      };
+    }
+    if(typeof window.openPermissionsModal!=='function'){
+      window.openPermissionsModal=function(){
+        if(!isAdmin())return alert('Admin only.');
+        var m=byId('permissionsModal'); if(m)m.classList.add('open');
+        var body=byId('permissionsBody');
+        if(body && !body.innerHTML.trim()){
+          var rows=[['Work assigned accounts','Yes','Yes','Yes'],['Save notes and dispositions','Yes','Yes','Yes'],['Create promises/payment plans','Yes','Yes','Yes'],['Edit/delete saved payment plans','Yes','No','No'],['Approve settlements','Yes','No','No'],['Reports / Cleanup / Imports','Yes','No','No'],['Staff and client admin','Yes','No','No']];
+          body.innerHTML=rows.map(function(r){return '<tr><td><b>'+esc(r[0])+'</b></td><td>'+r[1]+'</td><td>'+r[2]+'</td><td>'+r[3]+'</td></tr>';}).join('');
+        }
+      };
+    }
+  }
+  function boot(){cpcmEnsureLegacyAdminFallbacks();injectCss();ensureGroupedNav();updateWorkspace();setTimeout(ensureGroupedNav,500);setTimeout(updateWorkspace,650);setInterval(function(){ensureGroupedNav();updateWorkspace();applyRoleVisibility()},2000)}
+  var oldRender=window.render;
+  if(typeof oldRender==='function'&&!oldRender.__cpcmNavWorkspaceWrapped){var wrapped=function(){var r=oldRender.apply(this,arguments);setTimeout(updateWorkspace,0);setTimeout(ensureGroupedNav,0);return r};wrapped.__cpcmNavWorkspaceWrapped=true;window.render=wrapped;}
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();
+})();
+</script>
+</body>
+</html>+Number(bal||0).toFixed(2));
+    var phone=''; try{var ps=(typeof phones==='function')?phones(a):[]; phone=ps&&ps[0]||''; if(typeof normPhone==='function')phone=normPhone(phone); if(typeof fmtPhone==='function')phone=fmtPhone(phone)}catch(e){}
+    var status=a.status||a.disposition||'New';
+    text('cpcmWsAccountLine',name+(acct?' • Account '+acct:'')+' • work the account from left to right.');
+    text('cpcmWsStatus','Status: '+status);
+    text('cpcmWsBalance','Balance: '+money);
+    text('cpcmWsPhone','Primary Phone: '+(phone||'—'));
+    var comp='Compliance: review before call';
+    try{var c=byId('complianceBanner'); if(c&&c.textContent)comp='Compliance: '+c.textContent.replace(/\s+/g,' ').trim().slice(0,80)}catch(e){}
     text('cpcmWsCompliance',comp);
   }
 
