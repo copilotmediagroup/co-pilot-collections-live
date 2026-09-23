@@ -5955,13 +5955,23 @@ function renderAllImportedFields(a){
  if(!grid)return;
  if(!a){grid.innerHTML='<div class="allFieldsEmpty">No account selected.</div>';if(count)count.textContent='0 details';return}
 
- let borrower=[], loan=[], bank=[], dates=[];
+ let borrower=[], accountMeta=[], loan=[], financial=[], bank=[], dates=[], employment=[], aceCustom=[];
  addDetail(borrower,'DOB / Birthdate',pickVal(a,['dob','PBirthdate','PBIRTHDATE','birthdate']));
  addDetail(borrower,'Address', [pickVal(a,['address','OrigAddress1','Orig_Address1']),pickVal(a,['address2','OrigAddress2','Orig_Address2'])].filter(Boolean).join(' '));
  addDetail(borrower,'Zip / Postal',pickVal(a,['zip','OrigZipPostal','OrigZip','zipcode']));
  addDetail(borrower,'Employer',pickVal(a,['employer','Employer','Orig_EMPLOYER','origEmployer']));
  addDetail(borrower,'Occupation',pickVal(a,['occupation','Occupation']));
  addDetail(borrower,'Description',pickVal(a,['description','Description']));
+ addDetail(borrower,'Email',pickVal(a,['email','Email','emailaddress']));
+
+ addDetail(accountMeta,'Account Number',pickVal(a,['accountNumber','accountnumber']));
+ addDetail(accountMeta,'File / Case Number',pickVal(a,['fileNumber','filenumber']));
+ addDetail(accountMeta,'Client Account Number',pickVal(a,['clientAccountNumber','clientaccountnumber']));
+ addDetail(accountMeta,'Original Creditor',pickVal(a,['originalCreditor','originalcreditor']));
+ addDetail(accountMeta,'Portfolio / File',pickVal(a,['portfolio','SourceFile','fileName','FileName']));
+ addDetail(accountMeta,'Issuer / Lender',pickVal(a,['issuerName','IssuerName']));
+ addDetail(accountMeta,'Debt / Account Type',pickVal(a,['typeOfDebt','typeofdebt','AccountType']));
+ addDetail(accountMeta,'Account Description',pickVal(a,['accountDescription','description']));
 
  addDetail(loan,'Store Name',pickVal(a,['origStoreName','Orig_StoreName','StoreName','store_name','IssuerName','issuerName']));
  let storeCity=pickVal(a,['origStoreCity','Orig_Store_City','StoreCity','store_city']);
@@ -5971,6 +5981,17 @@ function renderAllImportedFields(a){
  addDetail(loan,'Account Type',pickVal(a,['typeOfDebt','AccountType','accountType','Orig_LoanType','origLoanType']));
  addDetail(loan,'Principal',compactMoney(pickVal(a,['principal','Principal','COPrincipal','Orig_PRINCIPALBALANCE','origPrincipalBalance'])));
  addDetail(loan,'Original Loan Amount',compactMoney(pickVal(a,['origOriginalLoanAmount','Orig_ORIGINALLOANAMOUNT','Orig_PrincipalLoanAmount','origPrincipalLoanAmount','originalBalance'])));
+ addDetail(loan,'Loan Location',pickVal(a,['loanLocation','Loan Location','loan_location']));
+ addDetail(loan,'Brick or Online',pickVal(a,['brickOrOnline','Brick or Online','brick_or_online']));
+
+ addDetail(financial,'Original Balance',compactMoney(pickVal(a,['originalBalance','originalbalance'])));
+ addDetail(financial,'Current Balance',compactMoney(pickVal(a,['currentBalance','currentbalance'])));
+ addDetail(financial,'Principal',compactMoney(pickVal(a,['principal','Principal'])));
+ addDetail(financial,'Paid To Date',compactMoney(pickVal(a,['paidToDate','paidtodate'])));
+ addDetail(financial,'Charged Off Principal',compactMoney(pickVal(a,['chargedOffPrincipal','chargedoffprincipal'])));
+ addDetail(financial,'Original Principal',compactMoney(pickVal(a,['originalPrincipal','originalprincipal'])));
+ addDetail(financial,'Original Principal Balance',compactMoney(pickVal(a,['origPrincipalBalance','Orig_PRINCIPALBALANCE'])));
+ addDetail(financial,'Original Charge-off Balance',compactMoney(pickVal(a,['origChargeOffBalance','Orig_CHARGEOFFBALANCE'])));
 
  addDetail(bank,'Bank Name',pickVal(a,['origBankName','Orig_BankName','BankName','bank_name']));
  addDetail(bank,'Bank Account Last 4',pickVal(a,['origBankAcctLast4Digits','Orig_BankAcctLast4Digits','BankAccountLast4','bankAccountNumber','bank_account_number']));
@@ -5989,12 +6010,27 @@ function renderAllImportedFields(a){
  addDetail(dates,'Assigned By',a.assignedByEmail||'');
  addDetail(dates,'Assigned At',a.assignedAt||'');
  addDetail(dates,'Assignment Method',a.assignmentMethod||'');
+ addDetail(dates,'Statute of Limitations Date',pickVal(a,['statuteOfLimDate','statuteoflimdate','SOL Date']));
+
+ addDetail(employment,'Employer',pickVal(a,['employer','Employer']));
+ addDetail(employment,'Original Employer',pickVal(a,['origEmployer','Orig_EMPLOYER']));
+ addDetail(employment,'Occupation',pickVal(a,['occupation','Occupation']));
+
+ addDetail(aceCustom,'Custom 2',pickVal(a,['custom2','custom 2']));
+ addDetail(aceCustom,'Custom 3',pickVal(a,['custom3','custom 3']));
+ addDetail(aceCustom,'Custom 57',pickVal(a,['custom57','custom 57']));
+ addDetail(aceCustom,'Custom 58',pickVal(a,['custom58','custom 58']));
+ addDetail(aceCustom,'Custom 60',pickVal(a,['custom60','custom 60']));
 
  let groups=[
    ['Borrower Details',borrower],
+   ['Account / Portfolio',accountMeta],
    ['Store / Loan Details',loan],
+   ['Balance / Financials',financial],
    ['Bank / Payment Details',bank],
-   ['Dates / Metadata',dates]
+   ['Dates / Statute Information',dates],
+   ['Employment',employment],
+   ['ACE / Custom Fields',aceCustom]
  ].filter(g=>g[1].length);
 
  let total=groups.reduce((s,g)=>s+g[1].length,0);
@@ -6002,7 +6038,7 @@ function renderAllImportedFields(a){
 
  grid.innerHTML=groups.map(([title,rows])=>{
    return `<div class="detailGroup"><div class="detailGroupTitle">${esc(title)}</div><div class="detailGroupGrid">`+
-     rows.slice(0,8).map(([label,k,v,type])=>fieldCard(label,k,v,a)).join('')+
+     rows.map(([label,k,v,type])=>fieldCard(label,k,v,a)).join('')+
      `</div></div>`;
  }).join('')||'<div class="allFieldsEmpty">No extra mapped fields were saved on this account. Run SQL, clear accounts, and re-import.</div>';
 
