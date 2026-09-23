@@ -9285,6 +9285,10 @@ async function clearAllAccounts(){
      try{rpcData=rpcText?JSON.parse(rpcText):null}catch{rpcData=rpcText}
      if(!rpcRes.ok)throw new Error(rpcData?.message||rpcData?.hint||rpcText||('Clear RPC failed HTTP '+rpcRes.status));
      result=Array.isArray(rpcData)&&rpcData.length===1?rpcData[0]:rpcData;
+     // Some PostgREST versions/clients surface a JSON return value as a JSON string.
+     if(typeof result==='string'){
+       try{result=JSON.parse(result)}catch(_){}
+     }
    }catch(rpcErr){
      // Fallback for users who have not run the SQL yet.
      console.warn('admin_clear_accounts RPC failed, falling back to client deletes:', rpcErr);
@@ -9313,7 +9317,9 @@ async function clearAllAccounts(){
 
    const clearedCount=Number(result?.counts?.accounts ?? result?.deleted?.accounts ?? NaN);
    if(!result || result.ok!==true || !Number.isFinite(clearedCount)){
-     throw new Error('Database did not confirm the account clear operation.');
+     const shape=(result===null?'null':Array.isArray(result)?'array':typeof result);
+     const keys=(result&&typeof result==='object'&&!Array.isArray(result))?Object.keys(result).join(','):'';
+     throw new Error('Database did not confirm the account clear operation. Response type: '+shape+(keys?' | keys: '+keys:''));
    }
 
    // Do not fake an empty queue before Supabase confirms and reloads authoritative state.
