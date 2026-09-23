@@ -108,6 +108,7 @@ header.topbar{height:66px;background:linear-gradient(90deg,#05225f,#07379a,#0b45
 .allFieldCard{padding:7px 10px;min-height:38px;display:grid;grid-template-columns:minmax(105px,.9fr) minmax(0,1.15fr);gap:10px;align-items:center}
 .allFieldKey{font-size:11px;font-weight:600;line-height:1.2}
 .allFieldVal{font-size:12px;font-weight:800;line-height:1.25;overflow-wrap:anywhere}
+.accountIntelStrip{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));padding:0!important;overflow:hidden;border-radius:14px!important}.intelItem{padding:10px 12px;border-right:1px solid #e5edf7;min-width:0}.intelItem:last-child{border-right:0}.intelItem span{display:block;font-size:10px;font-weight:800;color:#64748b;margin-bottom:4px}.intelItem b{display:block;font-size:12px;color:#0f172a;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.intelNext{background:#f5f9ff}.intelNext b{color:#1457ff}.accountFlagsStrip{display:none!important;padding:8px 10px!important;gap:6px;flex-wrap:wrap}.accountFlagsStrip.hasFlags{display:flex!important}.accountFlag{font-size:11px;font-weight:900;padding:5px 8px;border-radius:999px;background:#fff1f2;color:#b42318;border:1px solid #fecdd3}.accountFlag.good{background:#ecfdf3;color:#067647;border-color:#abefc6}.accountFlag.warn{background:#fffaeb;color:#b54708;border-color:#fedf89}@media(max-width:1400px){.accountIntelStrip{grid-template-columns:repeat(3,1fr)}.intelItem:nth-child(3){border-right:0}}@media(max-width:850px){.accountIntelStrip{grid-template-columns:repeat(2,1fr)}}
 .phonePanel,.dispoPanel,.notePanel,.activity{padding:15px;border-radius:16px}.phonePanel{grid-column:1/-1}.phoneGrid{grid-template-columns:repeat(4,1fr)}.phoneChip{padding:10px;border-radius:12px}.phoneIcon{width:31px;height:31px}.phoneNum{font-size:13px}.phoneType{font-size:11px}
 .dispoPanel{grid-column:1/-1}.dispoGrid{grid-template-columns:repeat(8,1fr);gap:8px}.dispo{height:44px;font-size:12px;border-radius:10px;padding:0 8px}
 .notePanel{grid-column:1/2}.notePanel textarea{height:90px;background:#fffdf3;border-color:#f3d38a}.centerActivity{grid-column:2/3}.timeline{max-height:160px;overflow:auto}
@@ -3844,6 +3845,17 @@ button {
         </div>
       </section>
 
+      <section class="panel accountIntelStrip" id="accountIntelStrip">
+        <div class="intelItem"><span>Last Contact</span><b id="intelLastContact">—</b></div>
+        <div class="intelItem"><span>Last Payment</span><b id="intelLastPayment">—</b></div>
+        <div class="intelItem"><span>Promise</span><b id="intelPromise">—</b></div>
+        <div class="intelItem"><span>Attempts</span><b id="intelAttempts">0</b></div>
+        <div class="intelItem"><span>Best Phone</span><b id="intelBestPhone">—</b></div>
+        <div class="intelItem intelNext"><span>Next Action</span><b id="intelNextAction">Review account</b></div>
+      </section>
+
+      <section class="panel accountFlagsStrip" id="accountFlagsStrip"></section>
+
       <section class="panel complianceBanner" id="complianceBanner"></section>
 
       <section class="panel allFieldsTopPanel">
@@ -6183,6 +6195,8 @@ function renderCurrent(a,q){
    document.getElementById('statusDisplay').innerHTML='<span class="badge">—</span>';
    document.getElementById('email').textContent='—';
    renderAllImportedFields(null);
+   renderAccountIntelligence(null);
+   let flagBox=document.getElementById('accountFlagsStrip');if(flagBox){flagBox.innerHTML='';flagBox.classList.remove('hasFlags')}
    renderComplianceBanner(null);
    let pp=document.getElementById('paymentPlanSummary'); if(pp)pp.innerHTML='<div class="emptyMain"><b>No accounts yet</b><span>Import a CSV portfolio to start the workflow.</span></div>';
    let pg=document.getElementById('phoneGrid'); if(pg)pg.innerHTML='<div class="muted">No phone numbers until an account is selected.</div>';
@@ -6210,6 +6224,7 @@ function renderCurrent(a,q){
  document.getElementById('email').textContent=a.email||'—';
 
  renderAllImportedFields(a);
+ renderAccountIntelligence(a);
  renderComplianceBanner(a);
  renderPaymentPlanSummary(a.id);
  renderCallInsight(a);
@@ -6217,6 +6232,35 @@ function renderCurrent(a,q){
  renderDispos(a);
 }
 
+function renderAccountIntelligence(a){
+ const set=(id,v)=>{let e=document.getElementById(id);if(e)e.textContent=v||'—'};
+ if(!a){['intelLastContact','intelLastPayment','intelPromise','intelBestPhone','intelNextAction'].forEach(id=>set(id,'—'));set('intelAttempts','0');return}
+ const date=v=>{if(!v)return '';let d=new Date(v);return Number.isNaN(d.getTime())?String(v):d.toLocaleDateString()};
+ let lastContact=a.lastCalledAt||a.updatedAt||'';
+ let lastPayDate=a.lastPaymentDate||a.origLastPmtDate||'';
+ let lastPayAmt=moneyNum(a.lastPaymentAmount);
+ let attempts=Number(a.callCount||0);
+ let best=phones(a)[0]||a.lastContactNumber||'';
+ let status=String(a.disposition||a.status||'').toLowerCase();
+ let next=a.nextCallAt?('Call '+date(a.nextCallAt)):(status.includes('promise')?'Review promise':status.includes('dispute')?'Review dispute':status.includes('settled')?'Account resolved':'Work account');
+ set('intelLastContact',lastContact?date(lastContact)+(a.lastCallResult?' · '+a.lastCallResult:''):'No contact yet');
+ set('intelLastPayment',lastPayDate?((lastPayAmt?money(lastPayAmt)+' · ':'')+date(lastPayDate)):'No payment');
+ set('intelPromise',status.includes('promise')?'Promise to Pay':'—');
+ set('intelAttempts',String(attempts));
+ set('intelBestPhone',best?fmtPhone(best):'No valid phone');
+ set('intelNextAction',next);
+ let flags=[];
+ const add=(text,cls='')=>flags.push('<span class="accountFlag '+cls+'">'+esc(text)+'</span>');
+ if(a.doNotCall||status.includes('dnc'))add('DO NOT CALL');
+ if(a.disputedFlag||status.includes('dispute'))add('DISPUTE','warn');
+ if(a.wrongNumberFlag||status.includes('wrong number'))add('WRONG NUMBER');
+ if(status.includes('promise'))add('PROMISE TO PAY','good');
+ if(status.includes('settled')||accountBalance(a)<=0)add('SETTLED','good');
+ if(a.bankruptcyFlag)add('BANKRUPTCY');
+ if(a.deceasedFlag)add('DECEASED');
+ let box=document.getElementById('accountFlagsStrip');
+ if(box){box.innerHTML=flags.join('');box.classList.toggle('hasFlags',flags.length>0)}
+}
 function renderPhones(a){
  let ps=phones(a).map(p=>normPhone(p)).filter(p=>p.length>=10);
  let seen=new Set();
