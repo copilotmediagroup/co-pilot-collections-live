@@ -3828,6 +3828,7 @@ button {
         <div class="centerProgressBar"><div class="centerProgressFill" id="centerProgressFill"></div></div>
       </div>
 
+      <div id="archivedWorkspaceBanner" class="archivedWorkspaceBanner hidden"><div><b>ARCHIVED ACCOUNT</b><span>Retained for lookup; not in the active collector queue.</span></div><div><button onclick="restoreCurrentArchivedAccount()">Restore to Active</button><button onclick="deleteCurrentArchivedAccount()">Delete Permanently</button><button onclick="closeArchivedWorkspace()">Back to Active Queue</button></div></div>
       <section class="panel accountCard">
         <div class="avatar" id="avatar">--</div>
         <div>
@@ -6168,6 +6169,7 @@ function renderMappedFields(a){
 }
 function render(){
  let q=queue(),cur=getCurrent();
+ syncArchivedWorkspaceBanner();
  let portfolioSignature=accounts.map(a=>a.portfolio||a.accountDescription||'').join('|');
  if(portfolioSignature!==lastPortfolioSignature){
    updatePortfolioFilter(accounts);
@@ -9530,6 +9532,22 @@ async function deleteAllRows(table){
  return total;
 }
 
+let archivedWorkspaceAccount=null;
+async function restoreArchivedAccount(a){
+ let now=new Date().toISOString();
+ await dbFetch('/accounts?id=eq.'+encodeURIComponent(a.id),{method:'PATCH',body:JSON.stringify({archived_at:null,archived_by:null,archive_reason:null,updated_at:now})});
+ try{await insertAudit('Account Restored','Restored archived account '+nameOf(a)+' to active queue','account',a.id)}catch(e){}
+ archivedWorkspaceAccount=null;await loadAccounts();currentAccountId=a.id;render();
+ alert(nameOf(a)+' was restored to the active queue with history intact.');
+}
+async function permanentlyDeleteArchivedAccount(a){
+ let phrase=prompt('PERMANENT DELETE\n\nThis permanently removes '+nameOf(a)+' from the accounts table. This cannot be undone.\n\nType DELETE to continue.');
+ if(phrase!=='DELETE')return;
+ if(!confirm('Final confirmation: permanently delete this archived account?'))return;
+ await dbFetch('/accounts?id=eq.'+encodeURIComponent(a.id)+'&archived_at=not.is.null',{method:'DELETE'});
+ try{await insertAudit('Archived Account Permanently Deleted','Permanently deleted archived account '+nameOf(a),'account',a.id)}catch(e){}
+ archivedWorkspaceAccount=null;alert('Archived account permanently deleted.');
+}
 async function openArchivedAccounts(){
  if(!currentUser.isAdmin)return alert('Admin only');
  let term=prompt('Search archived accounts by name, phone, account number, SSN, email, or portfolio.\n\nLeave blank to show the most recently archived accounts.');
@@ -9541,20 +9559,28 @@ async function openArchivedAccounts(){
    if(q)rows=rows.filter(a=>accountMatchesSearch(a,q)||String(a.portfolio||'').toLowerCase().includes(q.toLowerCase()));
    if(!rows.length)return alert('No archived accounts matched that search.');
    let preview=rows.slice(0,25).map((a,i)=>(i+1)+'. '+nameOf(a)+' | '+(a.accountNumber||a.clientAccountNumber||'No acct #')+' | '+(a.phone1?fmtPhone(a.phone1):'No phone')+' | '+money(accountBalance(a))+' | '+(a.portfolio||'No portfolio')).join('\n');
-   let pick=prompt('Archived Accounts — '+rows.length+' match'+(rows.length===1?'':'es')+'\n\n'+preview+'\n\nEnter the number to restore/open an account, or Cancel to close.');
+   let pick=prompt('Archived Accounts — '+rows.length+' match'+(rows.length===1?'':'es')+'\n\n'+preview+'\n\nEnter a number to manage that archived account.');
    if(pick===null)return;
-   let n=Number(pick);
-   if(!Number.isInteger(n)||n<1||n>Math.min(rows.length,25))return alert('Enter a number shown in the archived results.');
+   let n=Number(pick);if(!Number.isInteger(n)||n<1||n>Math.min(rows.length,25))return alert('Enter a number shown in the archived results.');
    let a=rows[n-1];
-   if(!confirm('Restore '+nameOf(a)+' to the active queue?\n\nThe same account ID and all related history will be preserved.'))return;
-   let now=new Date().toISOString();
-   await dbFetch('/accounts?id=eq.'+encodeURIComponent(a.id),{method:'PATCH',body:JSON.stringify({archived_at:null,archived_by:null,archive_reason:null,updated_at:now})});
-   try{await insertAudit('Account Restored','Restored archived account '+nameOf(a)+' to active queue','account',a.id)}catch(e){}
-   await loadAccounts();currentAccountId=a.id;render();
-   alert(nameOf(a)+' was restored to the active queue with history intact.');
- }catch(err){alert('Archived account search failed: '+(err.message||err))}
+   let action=prompt('ARCHIVED: '+nameOf(a)+'\n\n1 = Open archived account in workspace\n2 = Restore to active queue\n3 = Permanently delete\n\nEnter 1, 2, or 3.');
+   if(action==='1'){
+     archivedWorkspaceAccount=a;
+     accounts=[a].concat(accounts.filter(x=>x.id!==a.id));currentAccountId=a.id;render();
+     alert('Archived account opened in the workspace for review. It remains archived and will not enter the active queue.');
+   }else if(action==='2'){
+     if(confirm('Restore '+nameOf(a)+' to the active queue?'))await restoreArchivedAccount(a);
+   }else if(action==='3'){
+     await permanentlyDeleteArchivedAccount(a);
+   }
+ }catch(err){alert('Archived account action failed: '+(err.message||err))}
  finally{setGlobalBusy(false)}
 }
+
+async function restoreCurrentArchivedAccount(){let a=archivedWorkspaceAccount;if(!a)return;if(confirm('Restore '+nameOf(a)+' to the active queue?'))await restoreArchivedAccount(a)}
+async function deleteCurrentArchivedAccount(){let a=archivedWorkspaceAccount;if(!a)return;await permanentlyDeleteArchivedAccount(a);await closeArchivedWorkspace()}
+async function closeArchivedWorkspace(){archivedWorkspaceAccount=null;currentAccountId='';await loadAccounts()}
+function syncArchivedWorkspaceBanner(){let b=document.getElementById('archivedWorkspaceBanner');if(!b)return;b.classList.toggle('hidden',!(archivedWorkspaceAccount&&String(currentAccountId)===String(archivedWorkspaceAccount.id)))}
 
 async function clearAllAccounts(){
  if(!currentUser.isAdmin)return alert('Admin only');
