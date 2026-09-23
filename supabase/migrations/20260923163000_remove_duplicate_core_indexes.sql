@@ -1,0 +1,13 @@
+drop index if exists public.idx_account_notes_account_id_savefix;
+drop index if exists public.idx_account_notes_account_security;
+drop index if exists public.idx_accounts_status_security;
+drop index if exists public.idx_activity_logs_account_security;
+drop index if exists public.idx_call_results_account_security;
+drop index if exists public.idx_follow_ups_account_security;
+drop index if exists public.idx_payment_plan_payments_account_security;
+drop index if exists public.idx_payment_plans_account_security;
+drop index if exists public.idx_payment_promises_account_id_savefix;
+drop index if exists public.idx_payment_promises_due_date_savefix;
+drop index if exists public.idx_payment_promises_status_savefix;
+drop index if exists public.idx_payments_ledger_account_security;
+drop index if exists public.payments_ledger_receipt_number_unique_idx;
