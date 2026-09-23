@@ -9148,13 +9148,31 @@ function smartNextScore(a){
  if(accountBalance(a)>0)score+=Math.min(25,Math.floor(accountBalance(a)/500));
  return score;
 }
-function getSmartNextAccount(cur){
- let q=queue(),idx=q.findIndex(a=>a.id===cur?.id),candidates=q.filter(a=>a.id!==cur?.id);
- if(!candidates.length)return q[idx+1]||q[0]||null;
- let ranked=candidates.map((a,i)=>({a,score:smartNextScore(a),i})).filter(x=>x.score>-999999).sort((x,y)=>y.score-x.score||x.i-y.i);
- return ranked[0]?.a||q[idx+1]||candidates[0]||null;
+function smartNextEligible(a){
+ if(!a)return false;
+ if(typeof ownsAccount==='function'&&!ownsAccount(a))return false;
+ let status=String(a.disposition||a.status||'').toLowerCase();
+ if(a.doNotCall||a.do_not_call||a.bankruptcyFlag||a.bankruptcy_flag||a.deceasedFlag||a.deceased_flag||status.includes('dnc')||status.includes('settled'))return false;
+ return true;
 }
-async function saveAndNext(){let before=getCurrent();await saveCurrent();let current=before?accountById(before.id)||before:getCurrent();let next=getSmartNextAccount(current);if(next)setCurrent(next.id)}
+function getSmartNextAccount(cur){
+ let q=queue(),idx=q.findIndex(a=>a.id===cur?.id),candidates=q.filter(a=>a.id!==cur?.id&&smartNextEligible(a));
+ if(!candidates.length)return q.slice(idx+1).find(smartNextEligible)||q.find(a=>a.id!==cur?.id&&smartNextEligible(a))||null;
+ let ranked=candidates.map((a,i)=>({a,score:smartNextScore(a),i})).filter(x=>x.score>-999999).sort((x,y)=>y.score-x.score||x.i-y.i);
+ return ranked[0]?.a||q.slice(idx+1).find(smartNextEligible)||null;
+}
+let saveAndNextBusy=false;
+async function saveAndNext(){
+ if(saveAndNextBusy)return;
+ saveAndNextBusy=true;
+ let before=getCurrent(),btns=Array.from(document.querySelectorAll('button')).filter(b=>/save\s*&\s*next/i.test(b.textContent||''));btns.forEach(b=>b.disabled=true);
+ try{
+  if(!before)return;
+  await saveCurrent();
+  let current=accountById(before.id)||before,next=getSmartNextAccount(current);
+  if(next&&next.id!==before.id)setCurrent(next.id);
+ }finally{saveAndNextBusy=false;btns.forEach(b=>b.disabled=false)}
+}
 function nextAccount(){let q=queue(),cur=getCurrent(),idx=q.findIndex(a=>a.id===cur?.id);if(q[idx+1])setCurrent(q[idx+1].id)}
 function skipAccount(){nextAccount()}
 async function callPrimary(){let a=getCurrent();let p=phones(a)[0];if(p)await dialPhone(a.id,normPhone(p))}
