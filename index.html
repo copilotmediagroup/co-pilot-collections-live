@@ -9134,29 +9134,17 @@ async function savePaymentPlan(){
  let status=document.getElementById('planStatus').value||'Active';
  let frequency=document.getElementById('planFrequency').value||'Custom';
  let notes=document.getElementById('planNotes').value.trim();
- let existing=await loadPaymentPlanForAccount(a.id,true);
- if(existing){
-   await dbFetch(`/payment_plans?id=eq.${existing.id}`,{method:'PATCH',body:JSON.stringify({status:'Replaced',updated_at:new Date().toISOString()})}).catch(()=>{});
- }
  let paidFromSchedule=paymentScheduleDraft.reduce((s,p)=>s+moneyNum(p.amountPaid),0);
  let paidTotal=paidToday+paidFromSchedule;
  let remaining=Math.max(0,total-paidTotal);
- let planRows=await dbFetch('/payment_plans',{method:'POST',body:JSON.stringify([{
-   account_id:a.id,total_amount:total,starting_balance:acctBal,remaining_amount:remaining,frequency,status,notes,created_by_email:currentUser.email,updated_at:new Date().toISOString()
- }])});
- let plan=Array.isArray(planRows)?planRows[0]:planRows;
- let pid=plan.id;
- let rows=paymentScheduleDraft.map(p=>({
-   plan_id:pid,account_id:a.id,due_date:p.dueDate,amount_due:moneyNum(p.amountDue),amount_paid:moneyNum(p.amountPaid),paid_date:p.paidDate||null,status:p.status||'Scheduled',created_by_email:currentUser.email,updated_at:new Date().toISOString()
- }));
- if(rows.length)await dbFetch('/payment_plan_payments',{method:'POST',body:JSON.stringify(rows)});
- if(paidToday>0){
-   await dbFetch('/payment_plan_payments',{method:'POST',body:JSON.stringify([{
-     plan_id:pid,account_id:a.id,due_date:todayISO(),amount_due:paidToday,amount_paid:paidToday,paid_date:todayISO(),status:'Paid',created_by_email:currentUser.email,updated_at:new Date().toISOString()
-   }])});
- }
- let acctPatch={current_balance:remaining,status:status==='Active'?'Promise to Pay':a.status,disposition:'Promise to Pay',updated_at:new Date().toISOString()};
- await dbFetch(`/accounts?id=eq.${a.id}`,{method:'PATCH',body:JSON.stringify(acctPatch)});
+ let nextDue=(paymentScheduleDraft.find(p=>String(p.status||'Scheduled')!=='Paid')||paymentScheduleDraft[0]||{}).dueDate||todayISO();
+ let each=0;try{each=regularPaymentAmount({payments:paymentScheduleDraft})}catch(e){each=paymentScheduleDraft.length?Number((scheduledDue/paymentScheduleDraft.length).toFixed(2)):0}
+ let schedule=paymentScheduleDraft.map(p=>({due_date:p.dueDate||todayISO(),amount_due:moneyNum(p.amountDue),amount_paid:moneyNum(p.amountPaid),paid_date:p.paidDate||null,status:p.status||'Scheduled'}));
+ let result=await dbFetch('/rpc/cpcm_create_payment_plan',{method:'POST',body:JSON.stringify({target_account_id:a.id,plan_total:total,plan_frequency:frequency,plan_status:status,plan_notes:notes,plan_start_date:(paymentScheduleDraft[0]?.dueDate||todayISO()),plan_next_due_date:nextDue,regular_payment_amount:each,schedule,actor_email:currentUser.email})});
+ let rpcResult=Array.isArray(result)?result[0]:result;
+ if(!rpcResult||rpcResult.ok!==true||!rpcResult.plan_id)throw new Error('Database did not confirm payment-plan creation.');
+ let pid=rpcResult.plan_id;
+ remaining=moneyNum(rpcResult.remaining_amount);
  await insertActivity(a.id,'Payment Plan','Payment plan saved: total '+money(total)+', payment today '+money(paidToday)+', paid total '+money(paidTotal)+', remaining '+money(remaining)+', frequency '+frequency);
  closeModal('paymentPlanModal');
  delete paymentPlanCache[a.id];
