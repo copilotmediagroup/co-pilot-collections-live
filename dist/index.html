@@ -9272,13 +9272,19 @@ async function clearAllAccounts(){
 
    // Preferred method: secure SQL function. This avoids long delete URLs and bypasses client-side fetch failures.
    try{
-     result=await dbFetch('/rpc/admin_clear_accounts',{
+     // Call the RPC directly here so we can validate its exact HTTP response.
+     // dbFetch() always injects Prefer:return=representation, which is useful for table writes
+     // but can obscure a scalar JSON RPC response in this older single-file client.
+     const rpcRes=await fetch(url()+'/rest/v1/rpc/admin_clear_accounts',{
        method:'POST',
-       body:JSON.stringify({}),
-       headers:{Prefer:'return=representation'}
+       headers:{apikey:pubKey(),Authorization:'Bearer '+token(),'Content-Type':'application/json'},
+       body:'{}'
      });
-     // PostgREST may return a one-row array for RPC results; normalize it before verification.
-     if(Array.isArray(result) && result.length===1)result=result[0];
+     const rpcText=await rpcRes.text();
+     let rpcData=null;
+     try{rpcData=rpcText?JSON.parse(rpcText):null}catch{rpcData=rpcText}
+     if(!rpcRes.ok)throw new Error(rpcData?.message||rpcData?.hint||rpcText||('Clear RPC failed HTTP '+rpcRes.status));
+     result=Array.isArray(rpcData)&&rpcData.length===1?rpcData[0]:rpcData;
    }catch(rpcErr){
      // Fallback for users who have not run the SQL yet.
      console.warn('admin_clear_accounts RPC failed, falling back to client deletes:', rpcErr);
@@ -9320,7 +9326,7 @@ async function clearAllAccounts(){
    try{await insertAudit('Clear Accounts','Cleared '+clearedCount+' accounts and related records','accounts','')}catch(e){}
    alert('Clear complete.\n\n'+summary+'\n\nThe database has been verified at 0 accounts. You can now import a CSV.');
  }catch(err){
-   alert('Clear failed: '+(err.message||err)+'\n\nFix: open Supabase SQL Editor, run RUN_THIS_CLEAR_ACCOUNTS_SQL.sql from this ZIP, reload Bolt, then try Clear Accounts again.');
+   alert('Clear failed: '+(err.message||err)+'\n\nThe queue remains on the authoritative Supabase data.');
  }
 }
 
