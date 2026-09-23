@@ -11156,81 +11156,18 @@ function exportContactIntelligenceCSV(){let calls=filteredContactCalls();let row
       let status=sfVal('planStatus')||'Active';
       let frequency=sfVal('planFrequency')||'Custom';
       let notes=sfVal('planNotes');
-      let existing=null;
-      try{existing=await loadPaymentPlanForAccount(a.id,true)}catch(e){existing=null}
-      if(existing&&existing.id){
-        await dbFetch(`/payment_plans?id=eq.${existing.id}`,{method:'PATCH',body:JSON.stringify({status:'Replaced',updated_at:new Date().toISOString()})}).catch(()=>{});
-      }
       let paidFromSchedule=paymentScheduleDraft.reduce((s,p)=>s+sfMoneyNum(p.amountPaid ?? p.amount_paid ?? 0),0);
       let paidTotal=Number((paidToday+paidFromSchedule).toFixed(2));
       let remaining=Number(Math.max(0,total-paidTotal).toFixed(2));
       let nextDue=(paymentScheduleDraft.find(p=>String(p.status||'Scheduled')!=='Paid')||paymentScheduleDraft[0]||{}).dueDate || sfToday();
       let each=0;
       try{each=regularPaymentAmount({payments:paymentScheduleDraft})}catch(e){each=paymentScheduleDraft.length?Number((scheduledDue/paymentScheduleDraft.length).toFixed(2)):0}
-      let planPayload={
-        account_id:a.id,
-        total_amount:total,
-        starting_balance:acctBal,
-        remaining_amount:remaining,
-        balance:remaining,
-        payment_amount:each,
-        frequency,
-        start_date:(paymentScheduleDraft[0]?.dueDate||sfToday()),
-        next_due_date:nextDue,
-        status,
-        notes,
-        created_by_email:currentUser.email,
-        updated_at:new Date().toISOString()
-      };
-      let planRows=await dbFetch('/payment_plans',{method:'POST',body:JSON.stringify([planPayload])});
-      let plan=Array.isArray(planRows)?planRows[0]:planRows;
-      if(!plan || !plan.id)throw new Error('Supabase did not return the saved payment plan id.');
-      let pid=plan.id;
-      let rows=paymentScheduleDraft.map(p=>{
-        let due=sfMoneyNum(p.amountDue ?? p.amount_due ?? p.amount ?? p.paymentAmount);
-        let paid=sfMoneyNum(p.amountPaid ?? p.amount_paid ?? 0);
-        let paidDate=p.paidDate||p.paid_date||p.paymentDate||'';
-        return {
-          plan_id:pid,
-          payment_plan_id:pid,
-          account_id:a.id,
-          due_date:p.dueDate||p.due_date||sfToday(),
-          scheduled_date:p.dueDate||p.due_date||sfToday(),
-          amount_due:due,
-          amount:due,
-          payment_amount:paid||due,
-          amount_paid:paid,
-          paid_date:paidDate||null,
-          payment_date:paidDate||null,
-          paid_at:paidDate?new Date(paidDate+'T12:00:00').toISOString():null,
-          status:p.status||'Scheduled',
-          notes,
-          created_by_email:currentUser.email,
-          updated_at:new Date().toISOString()
-        };
-      });
-      if(rows.length)await dbFetch('/payment_plan_payments',{method:'POST',body:JSON.stringify(rows)});
-      if(paidToday>0){
-        await dbFetch('/payment_plan_payments',{method:'POST',body:JSON.stringify([{
-          plan_id:pid,
-          payment_plan_id:pid,
-          account_id:a.id,
-          due_date:sfToday(),
-          scheduled_date:sfToday(),
-          amount_due:paidToday,
-          amount:paidToday,
-          payment_amount:paidToday,
-          amount_paid:paidToday,
-          paid_date:sfToday(),
-          payment_date:sfToday(),
-          paid_at:new Date().toISOString(),
-          status:'Paid',
-          notes:'Payment made today when payment plan was created. '+notes,
-          created_by_email:currentUser.email,
-          updated_at:new Date().toISOString()
-        }])});
-      }
-      await dbFetch(`/accounts?id=eq.${a.id}`,{method:'PATCH',body:JSON.stringify({current_balance:remaining,status:status==='Active'?'Promise to Pay':(a.status||'Promise to Pay'),disposition:'Promise to Pay',updated_at:new Date().toISOString()})});
+      let schedule=paymentScheduleDraft.map(p=>({due_date:p.dueDate||p.due_date||sfToday(),amount_due:sfMoneyNum(p.amountDue ?? p.amount_due ?? p.amount ?? p.paymentAmount),amount_paid:sfMoneyNum(p.amountPaid ?? p.amount_paid ?? 0),paid_date:p.paidDate||p.paid_date||p.paymentDate||null,status:p.status||'Scheduled'}));
+      let result=await dbFetch('/rpc/cpcm_create_payment_plan',{method:'POST',body:JSON.stringify({target_account_id:a.id,plan_total:total,plan_frequency:frequency,plan_status:status,plan_notes:notes,plan_start_date:(paymentScheduleDraft[0]?.dueDate||sfToday()),plan_next_due_date:nextDue,regular_payment_amount:each,schedule,actor_email:currentUser.email})});
+      let rpcResult=Array.isArray(result)?result[0]:result;
+      if(!rpcResult||rpcResult.ok!==true||!rpcResult.plan_id)throw new Error('Database did not confirm payment-plan creation.');
+      let pid=rpcResult.plan_id;
+      remaining=sfMoneyNum(rpcResult.remaining_amount);
       await sfInsertActivity(a.id,'Payment Plan','Payment plan saved: total '+sfMoney(total)+', payment today '+sfMoney(paidToday)+', paid total '+sfMoney(paidTotal)+', remaining '+sfMoney(remaining)+', frequency '+frequency);
       await sfInsertAudit('Payment Plan Saved','Payment plan saved for '+sfName(a)+' totaling '+sfMoney(total),'account',a.id);
       try{delete paymentPlanCache[a.id]}catch(e){}
