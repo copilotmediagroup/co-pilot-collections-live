@@ -9290,36 +9290,19 @@ async function clearAllAccounts(){
        try{result=JSON.parse(result)}catch(_){}
      }
    }catch(rpcErr){
-     // Fallback for users who have not run the SQL yet.
-     console.warn('admin_clear_accounts RPC failed, falling back to client deletes:', rpcErr);
-     const tables=[
-       'payment_plan_payments',
-       'payment_plans',
-       'payments_ledger',
-       'account_docs',
-       'account_notes',
-       'activity_logs',
-       'follow_ups',
-       'call_results',
-       'disputes',
-       'settlements',
-       'import_batches',
-       'accounts'
-     ];
-     let fallbackCounts={};
-     for(const table of tables){
-       try{fallbackCounts[table]=await deleteAllRows(table)}
-       catch(e){fallbackCounts[table]='failed: '+(e.message||e)}
-     }
-     const fallbackRemaining=(await dbFetch('/accounts?select=id&limit=1')).length;
-     result={ok:fallbackRemaining===0,fallback:true,counts:{...fallbackCounts,accounts_remaining:fallbackRemaining}};
+     // Clear has one transactional owner. Partial browser-side deletion is not allowed.
+     throw new Error('Clear RPC failed: '+(rpcErr?.message||rpcErr));
    }
 
-   const clearedCount=Number(result?.counts?.accounts ?? result?.deleted?.accounts ?? NaN);
-   if(!result || result.ok!==true || !Number.isFinite(clearedCount)){
+   // Support both current RPC contract {ok,counts} and the legacy LIVE contract
+   // {ok,fallback,counts}. Verification below still requires the authoritative reload to be 0.
+   const clearedCount=Number(result?.counts?.accounts ?? result?.deleted?.accounts ?? result?.counts?.accounts_remaining ?? NaN);
+   const rpcConfirmed=!!result && result.ok===true && Number.isFinite(clearedCount);
+   if(!rpcConfirmed){
      const shape=(result===null?'null':Array.isArray(result)?'array':typeof result);
      const keys=(result&&typeof result==='object'&&!Array.isArray(result))?Object.keys(result).join(','):'';
-     throw new Error('Database did not confirm the account clear operation. Response type: '+shape+(keys?' | keys: '+keys:''));
+     const countsKeys=(result?.counts&&typeof result.counts==='object')?Object.keys(result.counts).join(','):'';
+     throw new Error('Database did not confirm the account clear operation. Response type: '+shape+(keys?' | keys: '+keys:'')+(countsKeys?' | count keys: '+countsKeys:''));
    }
 
    // Do not fake an empty queue before Supabase confirms and reloads authoritative state.
