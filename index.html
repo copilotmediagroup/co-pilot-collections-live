@@ -3747,7 +3747,7 @@ button {
         <button onclick="openComplianceGuard()">Compliance Guard</button><button onclick="openDocumentGenerator()">Letters</button><button class="adminOnly hidden" onclick="openLetterBodyEditor()">Letter Bodies</button><button class="adminOnly hidden qaBtn" onclick="openQaHealthModal()">QA Health</button><button class="adminOnly hidden" onclick="openAuditLog()">Audit Log</button>
       </div></div>
       <div class="topMenu adminOnly hidden"><button class="gray topMenuMain">Admin ▾</button><div class="topMenuDrop">
-        <button onclick="openEmployeeAdminModal()">Staff</button><button onclick="openPermissionsModal()">Permissions</button><button onclick="openEmployeeMonitorModal()">Monitor</button><button onclick="openReportsPageStable()">Reports</button><button onclick="openBrandingSettingsModal()">Branding</button><button onclick="openAssignModal()">Assign Accounts</button><button onclick="openImportHistoryPage()">Portfolio Manager</button><button onclick="openDataCleanupDashboard()">Cleanup</button><label class="topMenuFile">Import CSV<input type="file" accept=".csv" onchange="importCSV(event)"></label><button onclick="downloadTemplate()">Download Template</button><button onclick="exportCSV()">Export CSV</button><button class="dangerItem" onclick="clearAllAccounts()">Clear Accounts</button>
+        <button onclick="openEmployeeAdminModal()">Staff</button><button onclick="openPermissionsModal()">Permissions</button><button onclick="openEmployeeMonitorModal()">Monitor</button><button onclick="openReportsPageStable()">Reports</button><button onclick="openBrandingSettingsModal()">Branding</button><button onclick="openAssignModal()">Assign Accounts</button><button onclick="openImportHistoryPage()">Portfolio Manager</button><button onclick="openDataCleanupDashboard()">Cleanup</button><label class="topMenuFile">Import CSV<input type="file" accept=".csv" onchange="importCSV(event)"></label><button onclick="downloadTemplate()">Download Template</button><button onclick="exportCSV()">Export CSV</button><button onclick="openArchivedAccounts()">Archived Accounts</button><button class="dangerItem" onclick="clearAllAccounts()">Archive Active Accounts</button>
       </div></div>
       <div class="topMenu"><button class="gray topMenuMain">System ▾</button><div class="topMenuDrop topMenuDropRight">
         <button id="cpcmNoDialerStaticTopBtn" onclick="openNoDialerSafeMode()">Safe Mode</button><button onclick="openHelpModal()">Help</button><button class="dangerItem" onclick="logout()">Logout</button>
@@ -3783,7 +3783,7 @@ button {
       <label class="fileBtn gray adminOnly hidden">Import<input type="file" accept=".csv" onchange="importCSV(event)"></label>
       <button class="purple adminOnly hidden" onclick="downloadTemplate()">Template</button>
       <button class="gray adminOnly hidden" onclick="exportCSV()">Export</button>
-      <button class="red adminOnly hidden" onclick="clearAllAccounts()">Clear</button>
+      <button class="red adminOnly hidden" onclick="clearAllAccounts()">Archive</button>
       <span class="roleBadge" id="roleBadge">Not logged in</span>
       <button class="red" onclick="logout()">Logout</button>
       <span><span class="dot"></span> Available</span>
@@ -5732,7 +5732,7 @@ async function loadAccounts(){
  }
  try{
    setGlobalBusy(true,'Loading accounts','Refreshing queue and dashboards...');
-   accounts=(await dbFetch('/accounts?select=*&order=created_at.asc&limit=20000')).map(toCamel);
+   accounts=(await dbFetch('/accounts?select=*&archived_at=is.null&order=created_at.asc&limit=20000')).map(toCamel);
    if(!currentUser.isAdmin)accounts=accounts.filter(a=>(a.assignedToEmail||'').toLowerCase()===currentUser.email);
    if(!currentAccountId){try{let saved=localStorage.getItem('cpcmCurrentAccount:'+String(currentUser.email||'').toLowerCase());if(saved&&accounts.some(a=>String(a.id)===String(saved)))currentAccountId=saved}catch(e){}}
    if(!currentAccountId&&accounts[0])currentAccountId=accounts[0].id;
@@ -9530,61 +9530,49 @@ async function deleteAllRows(table){
  return total;
 }
 
+async function openArchivedAccounts(){
+ if(!currentUser.isAdmin)return alert('Admin only');
+ let term=prompt('Search archived accounts by name, phone, account number, SSN, email, or portfolio.\n\nLeave blank to show the most recently archived accounts.');
+ if(term===null)return;
+ try{
+   setGlobalBusy(true,'Archived Accounts','Searching retained account records...');
+   let rows=(await dbFetch('/accounts?select=*&archived_at=not.is.null&order=archived_at.desc&limit=5000')).map(toCamel);
+   let q=String(term||'').trim();
+   if(q)rows=rows.filter(a=>accountMatchesSearch(a,q)||String(a.portfolio||'').toLowerCase().includes(q.toLowerCase()));
+   if(!rows.length)return alert('No archived accounts matched that search.');
+   let preview=rows.slice(0,25).map((a,i)=>(i+1)+'. '+nameOf(a)+' | '+(a.accountNumber||a.clientAccountNumber||'No acct #')+' | '+(a.phone1?fmtPhone(a.phone1):'No phone')+' | '+money(accountBalance(a))+' | '+(a.portfolio||'No portfolio')).join('\n');
+   let pick=prompt('Archived Accounts — '+rows.length+' match'+(rows.length===1?'':'es')+'\n\n'+preview+'\n\nEnter the number to restore/open an account, or Cancel to close.');
+   if(pick===null)return;
+   let n=Number(pick);
+   if(!Number.isInteger(n)||n<1||n>Math.min(rows.length,25))return alert('Enter a number shown in the archived results.');
+   let a=rows[n-1];
+   if(!confirm('Restore '+nameOf(a)+' to the active queue?\n\nThe same account ID and all related history will be preserved.'))return;
+   let now=new Date().toISOString();
+   await dbFetch('/accounts?id=eq.'+encodeURIComponent(a.id),{method:'PATCH',body:JSON.stringify({archived_at:null,archived_by:null,archive_reason:null,updated_at:now})});
+   try{await insertAudit('Account Restored','Restored archived account '+nameOf(a)+' to active queue','account',a.id)}catch(e){}
+   await loadAccounts();currentAccountId=a.id;render();
+   alert(nameOf(a)+' was restored to the active queue with history intact.');
+ }catch(err){alert('Archived account search failed: '+(err.message||err))}
+ finally{setGlobalBusy(false)}
+}
+
 async function clearAllAccounts(){
  if(!currentUser.isAdmin)return alert('Admin only');
- let phrase=prompt('This will delete ALL accounts and all account-related records from this Supabase project. Type CLEAR to continue.');
- if(phrase!=='CLEAR')return;
-
+ let active=accounts.filter(a=>!a.archivedAt&&!a.archived_at);
+ if(!active.length)return alert('There are no active accounts to archive.');
+ let phrase=prompt('Archive all '+active.length+' active accounts?\n\nThey will leave the work queue but remain searchable in Archived Accounts with all history intact.\n\nType ARCHIVE to continue.');
+ if(phrase!=='ARCHIVE')return;
  try{
-   let result=null;
-
-   // Preferred method: secure SQL function. This avoids long delete URLs and bypasses client-side fetch failures.
-   try{
-     // Call the RPC directly here so we can validate its exact HTTP response.
-     // dbFetch() always injects Prefer:return=representation, which is useful for table writes
-     // but can obscure a scalar JSON RPC response in this older single-file client.
-     const rpcRes=await fetch(url()+'/rest/v1/rpc/admin_clear_accounts',{
-       method:'POST',
-       headers:{apikey:pubKey(),Authorization:'Bearer '+token(),'Content-Type':'application/json'},
-       body:'{}'
-     });
-     const rpcText=await rpcRes.text();
-     let rpcData=null;
-     try{rpcData=rpcText?JSON.parse(rpcText):null}catch{rpcData=rpcText}
-     if(!rpcRes.ok)throw new Error(rpcData?.message||rpcData?.hint||rpcText||('Clear RPC failed HTTP '+rpcRes.status));
-     result=Array.isArray(rpcData)&&rpcData.length===1?rpcData[0]:rpcData;
-     // Some PostgREST versions/clients surface a JSON return value as a JSON string.
-     if(typeof result==='string'){
-       try{result=JSON.parse(result)}catch(_){}
-     }
-   }catch(rpcErr){
-     // Clear has one transactional owner. Partial browser-side deletion is not allowed.
-     throw new Error('Clear RPC failed: '+(rpcErr?.message||rpcErr));
-   }
-
-   // Support both current RPC contract {ok,counts} and the legacy LIVE contract
-   // {ok,fallback,counts}. Verification below still requires the authoritative reload to be 0.
-   const clearedCount=Number(result?.counts?.accounts ?? result?.deleted?.accounts ?? result?.counts?.accounts_remaining ?? NaN);
-   const rpcConfirmed=!!result && result.ok===true && Number.isFinite(clearedCount);
-   if(!rpcConfirmed){
-     const shape=(result===null?'null':Array.isArray(result)?'array':typeof result);
-     const keys=(result&&typeof result==='object'&&!Array.isArray(result))?Object.keys(result).join(','):'';
-     const countsKeys=(result?.counts&&typeof result.counts==='object')?Object.keys(result.counts).join(','):'';
-     throw new Error('Database did not confirm the account clear operation. Response type: '+shape+(keys?' | keys: '+keys:'')+(countsKeys?' | count keys: '+countsKeys:''));
-   }
-
-   // Do not fake an empty queue before Supabase confirms and reloads authoritative state.
+   setGlobalBusy(true,'Archiving accounts','Moving active accounts out of the work queue without deleting history...');
+   let now=new Date().toISOString(),who=currentUser.email||'admin';
+   await dbFetch('/accounts?archived_at=is.null',{method:'PATCH',body:JSON.stringify({archived_at:now,archived_by:who,archive_reason:'Archived from Clear Accounts workflow',updated_at:now})});
+   try{await insertAudit('Archive Accounts','Archived '+active.length+' active accounts; records and related history retained','accounts','')}catch(e){}
+   currentAccountId='';
    await loadAccounts();
-   if(accounts.length!==0){
-     throw new Error('Database clear returned success, but '+accounts.length+' accounts still exist after reload.');
-   }
-
-   let summary=Object.entries(result.counts||result.deleted||{}).map(([k,v])=>k+': '+v).join('\n');
-   try{await insertAudit('Clear Accounts','Cleared '+clearedCount+' accounts and related records','accounts','')}catch(e){}
-   alert('Clear complete.\n\n'+summary+'\n\nThe database has been verified at 0 accounts. You can now import a CSV.');
+   alert('Archive complete. '+active.length+' accounts were removed from the active queue. No account history was deleted.');
  }catch(err){
-   alert('Clear failed: '+(err.message||err)+'\n\nThe queue remains on the authoritative Supabase data.');
- }
+   alert('Archive failed: '+(err.message||err)+'\n\nNo delete operation was attempted.');
+ }finally{setGlobalBusy(false)}
 }
 
 function exportCSV(){if(!currentUser.isAdmin)return alert('Admin only');let headers=FIELDS,rows=[headers.join(',')].concat(accounts.map(a=>headers.map(h=>`"${String(a[h]??'').replaceAll('"','""')}"`).join(',')));insertAudit('Export CSV','Exported '+accounts.length+' accounts','accounts','');download('co-pilot-accounts-export.csv',rows.join('\n'),'text/csv')}function downloadTemplate(){let headers=FIELDS,sample=['PlainGreen LLC','PlainGreen LLC','36972835','13242556','36972835','John','','Doe','John Doe','123-45-6789','01/01/1980','123 Main St','','Las Vegas','NV','89101','Employer','email@example.com','PlainGreen LLC','installment loan','','',1000,'01/01/2020','','','02/01/2020','','','0','','','702-555-1111','','','','','','New'];download('co-pilot-import-template.csv',headers.join(',')+'\n'+sample.map(v=>`"${String(v).replaceAll('"','""')}"`).join(','),'text/csv')}function download(name,text,type){let blob=new Blob([text],{type}),u=URL.createObjectURL(blob),a=document.createElement('a');a.href=u;a.download=name;a.click();URL.revokeObjectURL(u)}
