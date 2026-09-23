@@ -252,6 +252,22 @@ alter table accounts add column if not exists phone10_note text;
 alter table accounts add column if not exists phone10_status text;
 alter table accounts add column if not exists raw_data jsonb;
 
+-- ACE PORTFOLIO NATIVE IMPORT FIELDS
+-- raw_data remains the lossless copy of every source CSV column.
+alter table accounts add column if not exists file_number text;
+alter table accounts add column if not exists paid_to_date numeric;
+alter table accounts add column if not exists charged_off_principal numeric;
+alter table accounts add column if not exists original_principal numeric;
+alter table accounts add column if not exists statute_of_lim_date text;
+alter table accounts add column if not exists loan_location text;
+alter table accounts add column if not exists brick_or_online text;
+alter table accounts add column if not exists custom2 text;
+alter table accounts add column if not exists custom3 text;
+alter table accounts add column if not exists custom57 text;
+alter table accounts add column if not exists custom58 text;
+alter table accounts add column if not exists custom60 text;
+create index if not exists idx_accounts_file_number on accounts(file_number);
+
 
 -- MAPPED FIELDS DISPLAY PROGRESS FIX
 -- Ensures raw_data exists so the app can display every uploaded/source row field.
