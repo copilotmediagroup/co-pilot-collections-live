@@ -14120,17 +14120,19 @@ function exportContactIntelligenceCSV(){let calls=filteredContactCalls();let row
     ])+group('Clients',[
       item('Client Portal Admin','openClientPortalAdmin',undefined,true),
       item('Remittance','openRemittanceAdmin',undefined,true)
+    ])+group('Accounts',[
+      item('Upload / Import CSV','importCSVClick',undefined,true),
+      item('Import History / Rollback','openImportHistoryPage',undefined,true),
+      item('Assign Accounts','openAssignModal',undefined,true),
+      item('Export Accounts','exportCSV',undefined,true),
+      item('Download CSV Template','downloadTemplate',undefined,true),
+      item('Cleanup / Duplicates','openDataCleanupDashboard',undefined,true),
+      item('DELETE / CLEAR ALL ACCOUNTS','clearAllAccounts',undefined,true)
     ])+group('Admin',[
       item('Staff','openEmployeeAdminModal',undefined,true),
-      item('Assign Accounts','openAssignModal',undefined,true),
-      item('Import Accounts','importCSVClick',undefined,true),
-      item('Download Template','downloadTemplate',undefined,true),
-      item('Export Accounts','exportCSV',undefined,true),
-      item('Cleanup / Duplicates','openDataCleanupDashboard',undefined,true),
       item('Brand Settings','openBrandingSettingsModal',undefined,true),
       item('Permissions','openPermissionsModal',undefined,true),
-      item('QA Health','openQaHealthModal',undefined,true),
-      item('Clear All Accounts','clearAllAccounts',undefined,true)
+      item('QA Health','openQaHealthModal',undefined,true)
     ]);
   }
   function injectCss(){
