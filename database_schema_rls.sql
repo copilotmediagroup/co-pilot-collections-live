@@ -2369,3 +2369,37 @@ where setting_key='pdf_authorized_by_default'
 notify pgrst, 'reload schema';
 
 -- LIVE CLEANUP R8N20: removed legacy demo admin/employee seed block from this LIVE schema reference.
+
+
+-- ADMIN CLEAR ACCOUNTS FK-SAFE OWNERSHIP
+-- Restrictive account references are cleared explicitly; CASCADE owns the remaining account children.
+create or replace function public.admin_clear_accounts()
+returns json
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_email text := lower(coalesce(auth.jwt() ->> 'email',''));
+  c_accounts int := 0;
+  c_payment_approval_requests int := 0;
+  c_nmi_transactions int := 0;
+begin
+  if v_email <> 'afinch2678@gmail.com' then raise exception 'Admin only'; end if;
+  delete from public.payment_approval_requests;
+  get diagnostics c_payment_approval_requests = row_count;
+  delete from public.nmi_transactions;
+  get diagnostics c_nmi_transactions = row_count;
+  update public.team_messages set account_id = null where account_id is not null;
+  delete from public.accounts;
+  get diagnostics c_accounts = row_count;
+  delete from public.import_batches;
+  return json_build_object('ok',true,'counts',json_build_object(
+    'accounts',c_accounts,
+    'payment_approval_requests',c_payment_approval_requests,
+    'nmi_transactions',c_nmi_transactions
+  ));
+end;
+$$;
+revoke all on function public.admin_clear_accounts() from public;
+grant execute on function public.admin_clear_accounts() to authenticated;
