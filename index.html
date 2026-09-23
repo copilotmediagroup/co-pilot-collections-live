@@ -9558,6 +9558,8 @@ async function openArchivedAccounts(){
    let q=String(term||'').trim();
    if(q)rows=rows.filter(a=>accountMatchesSearch(a,q)||String(a.portfolio||'').toLowerCase().includes(q.toLowerCase()));
    if(!rows.length)return alert('No archived accounts matched that search.');
+   // Network work is complete. Never leave the global busy overlay running while a native prompt is open.
+   setGlobalBusy(false);
    let preview=rows.slice(0,25).map((a,i)=>(i+1)+'. '+nameOf(a)+' | '+(a.accountNumber||a.clientAccountNumber||'No acct #')+' | '+(a.phone1?fmtPhone(a.phone1):'No phone')+' | '+money(accountBalance(a))+' | '+(a.portfolio||'No portfolio')).join('\n');
    let pick=prompt('Archived Accounts — '+rows.length+' match'+(rows.length===1?'':'es')+'\n\n'+preview+'\n\nEnter a number to manage that archived account.');
    if(pick===null)return;
