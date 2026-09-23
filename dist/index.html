@@ -11324,6 +11324,9 @@ function exportContactIntelligenceCSV(){let calls=filteredContactCalls();let row
     return !!d && (!start || d >= start) && (!end || d <= end);
   }
   function reportsStatus(row){ return String(row.status || row.call_result || row.disposition || '').toLowerCase(); }
+  function reportsLedgerCompleted(row){var s=reportsStatus(row);return !s || /completed|paid|settled|processed|success/.test(s);}
+  function reportsLedgerEffect(row){var amt=reportsNum(row.amount || row.payment_amount || row.paid_amount),t=String(row.payment_type||row.paymentType||'Payment').toLowerCase();if(!reportsLedgerCompleted(row))return 0;if(/refund|reversal|chargeback|debit/.test(t))return -amt;if(/payment|adjustment credit|credit/.test(t))return amt;return 0;}
+  function reportsLedgerSum(rows){return (rows||[]).reduce(function(sum,r){return sum+reportsLedgerEffect(r);},0);}
   function reportsEmail(row){ return String(row.employee_email || row.assigned_to_email || row.created_by_email || row.createdByEmail || row.processed_by_email || 'Unassigned').toLowerCase().trim() || 'unassigned'; }
   function reportsAccountMap(){
     var map = {};
@@ -11469,18 +11472,19 @@ function exportContactIntelligenceCSV(){let calls=filteredContactCalls();let row
   function renderReports(dataRaw){
     var data = filterReportData(dataRaw);
     var totalBalance = data.accounts.reduce(function(sum,a){return sum+reportsAccountBalance(a);},0);
-    var collected = data.ledger.reduce(function(sum,r){return sum + reportsNum(r.amount || r.payment_amount || r.paid_amount);},0);
+    var collected = reportsLedgerSum(data.ledger);
     var today = reportsToday(), week = reportsStartOfWeek(), month = reportsStartOfMonth();
-    var collectedToday = (dataRaw.ledger||[]).filter(function(r){return reportsInRange(r.payment_date||r.paid_at||r.created_at,today,today);}).reduce(function(s,r){return s+reportsNum(r.amount||r.payment_amount||r.paid_amount);},0);
-    var collectedWeek = (dataRaw.ledger||[]).filter(function(r){return reportsInRange(r.payment_date||r.paid_at||r.created_at,week,today);}).reduce(function(s,r){return s+reportsNum(r.amount||r.payment_amount||r.paid_amount);},0);
-    var collectedMonth = (dataRaw.ledger||[]).filter(function(r){return reportsInRange(r.payment_date||r.paid_at||r.created_at,month,today);}).reduce(function(s,r){return s+reportsNum(r.amount||r.payment_amount||r.paid_amount);},0);
+    var collectedToday = reportsLedgerSum((dataRaw.ledger||[]).filter(function(r){return reportsInRange(r.payment_date||r.paid_at||r.created_at,today,today);}));
+    var collectedWeek = reportsLedgerSum((dataRaw.ledger||[]).filter(function(r){return reportsInRange(r.payment_date||r.paid_at||r.created_at,week,today);}));
+    var collectedMonth = reportsLedgerSum((dataRaw.ledger||[]).filter(function(r){return reportsInRange(r.payment_date||r.paid_at||r.created_at,month,today);}));
     var promisesAmount = data.promises.reduce(function(sum,r){return sum+reportsNum(r.payment_amount||r.total_amount||r.amount);},0);
     var kept = data.promises.filter(function(r){return /paid|kept|processed|complete|settled/.test(reportsStatus(r));});
     var broken = data.promises.filter(function(r){return /broken|failed|missed|nsf|declined|default/.test(reportsStatus(r));});
     var calls = data.calls.length;
     var contacts = data.calls.filter(function(r){return r.is_contact === true || /contact|right party|rpc|promise|refused|dispute|settled/.test(reportsStatus(r));}).length;
     var rpc = data.calls.filter(function(r){return r.is_rpc === true || /right party|rpc/.test(reportsStatus(r));}).length;
-    var liquidation = totalBalance ? (collected / totalBalance * 100) : 0;
+    var liquidationBase = placed || (totalBalance + collected);
+    var liquidation = liquidationBase ? (collected / liquidationBase * 100) : 0;
     var contactRate = calls ? contacts / calls * 100 : 0;
     var rpcRate = calls ? rpc / calls * 100 : 0;
     var placed = data.accounts.reduce(function(sum,a){return sum+reportsNum(a.originalBalance||a.original_balance||a.originalPrincipal||a.original_principal||a.currentBalance||a.current_balance||a.balance||a.principal);},0);
@@ -11490,7 +11494,7 @@ function exportContactIntelligenceCSV(){let calls=filteredContactCalls();let row
       ['Current Balance',reportsMoney(totalBalance),'Selected production workload'],
       ['Collected Today',reportsMoney(collectedToday),'Week: '+reportsMoney(collectedWeek)],
       ['Collected Month',reportsMoney(collectedMonth),'Selected range: '+reportsMoney(collected)],
-      ['Liquidation',liquidation.toFixed(2)+'%','Collected ÷ current loaded balance'],
+      ['Liquidation',liquidation.toFixed(2)+'%','Net collected ÷ placed balance'],
       ['RPC',rpc,'RPC rate: '+rpcRate.toFixed(1)+'%'],
       ['Promises',data.promises.length,promisesAmount?reportsMoney(promisesAmount):'No promised dollars found'],
       ['Promise Kept',kept.length+' / '+data.promises.length,'Kept rate: '+keptRate.toFixed(1)+'% · Broken: '+broken.length],
@@ -11502,14 +11506,14 @@ function exportContactIntelligenceCSV(){let calls=filteredContactCalls();let row
     data.accounts.forEach(function(a){ var e=String(a.assignedToEmail||a.assigned_to_email||'unassigned').toLowerCase(); if(!collectors[e])collectors[e]={email:e,calls:0,contacts:0,rpc:0,promises:0,promiseAmt:0,collected:0,balance:0,accounts:0}; collectors[e].accounts++; collectors[e].balance += reportsAccountBalance(a); });
     data.calls.forEach(function(r){ var e=reportsEmail(r); if(!collectors[e])collectors[e]={email:e,calls:0,contacts:0,rpc:0,promises:0,promiseAmt:0,collected:0,balance:0,accounts:0}; collectors[e].calls++; if(r.is_contact===true || /contact|right party|rpc|promise|refused|dispute|settled/.test(reportsStatus(r))) collectors[e].contacts++; if(r.is_rpc===true || /right party|rpc/.test(reportsStatus(r))) collectors[e].rpc++; });
     data.promises.forEach(function(r){ var e=reportsEmail(r); if(!collectors[e])collectors[e]={email:e,calls:0,contacts:0,rpc:0,promises:0,promiseAmt:0,collected:0,balance:0,accounts:0}; collectors[e].promises++; collectors[e].promiseAmt += reportsNum(r.payment_amount||r.total_amount||r.amount); });
-    data.ledger.forEach(function(r){ var e=reportsEmail(r); if(!collectors[e])collectors[e]={email:e,calls:0,contacts:0,rpc:0,promises:0,promiseAmt:0,collected:0,balance:0,accounts:0}; collectors[e].collected += reportsNum(r.amount||r.payment_amount||r.paid_amount); });
+    data.ledger.forEach(function(r){ var e=reportsEmail(r); if(!collectors[e])collectors[e]={email:e,calls:0,contacts:0,rpc:0,promises:0,promiseAmt:0,collected:0,balance:0,accounts:0}; collectors[e].collected += reportsLedgerEffect(r); });
     var collectorRows = Object.keys(collectors).map(function(k){return collectors[k];}).sort(function(a,b){return b.collected-a.collected || b.promiseAmt-a.promiseAmt || b.calls-a.calls;}).slice(0,25);
     document.getElementById('reportsStableCollectors').innerHTML = collectorRows.length ? '<table class="reportsTable"><thead><tr><th>Collector</th><th>Accounts</th><th>Calls</th><th>Contact</th><th>RPC</th><th>Promises</th><th>Collected</th></tr></thead><tbody>'+collectorRows.map(function(r){return '<tr class="reportsDrillRow" onclick="reportsDrillCollector(\''+reportsEscape(r.email)+'\')" title="Filter dashboard to this collector"><td><b>'+reportsEscape(r.email)+'</b></td><td>'+r.accounts+'</td><td>'+r.calls+'</td><td>'+r.contacts+'</td><td>'+r.rpc+'</td><td>'+r.promises+'<br><small>'+reportsMoney(r.promiseAmt)+'</small></td><td><b>'+reportsMoney(r.collected)+'</b></td></tr>';}).join('')+'</tbody></table>' : '<div class="reportsEmpty">No collector activity found for this filter.</div>';
 
     var ports = {};
     data.accounts.forEach(function(a){ var p=reportsPortfolio(a); if(!ports[p])ports[p]={name:p,accounts:0,balance:0,collected:0,promises:0}; ports[p].accounts++; ports[p].balance += reportsAccountBalance(a); });
     var amap = reportsAccountMap();
-    data.ledger.forEach(function(r){ var p=reportsPortfolio(amap[String(r.account_id)]); if(!ports[p])ports[p]={name:p,accounts:0,balance:0,collected:0,promises:0}; ports[p].collected += reportsNum(r.amount||r.payment_amount||r.paid_amount); });
+    data.ledger.forEach(function(r){ var p=reportsPortfolio(amap[String(r.account_id)]); if(!ports[p])ports[p]={name:p,accounts:0,balance:0,collected:0,promises:0}; ports[p].collected += reportsLedgerEffect(r); });
     data.promises.forEach(function(r){ var p=reportsPortfolio(amap[String(r.account_id)]); if(!ports[p])ports[p]={name:p,accounts:0,balance:0,collected:0,promises:0}; ports[p].promises += reportsNum(r.payment_amount||r.total_amount||r.amount); });
     var portRows = Object.keys(ports).map(function(k){return ports[k];}).sort(function(a,b){return b.balance-a.balance;}).slice(0,25);
     document.getElementById('reportsStablePortfolios').innerHTML = portRows.length ? '<table class="reportsTable"><thead><tr><th>Portfolio</th><th>Accounts</th><th>Balance</th><th>Collected</th><th>Liquidation</th></tr></thead><tbody>'+portRows.map(function(p){var pct=p.balance?(p.collected/p.balance*100):0;return '<tr class="reportsDrillRow" onclick="reportsDrillPortfolio(\''+reportsEscape(String(p.name).replace(/'/g,'&#39;'))+'\')" title="Filter dashboard to this portfolio"><td><b>'+reportsEscape(p.name)+'</b></td><td>'+p.accounts+'</td><td>'+reportsMoney(p.balance)+'</td><td>'+reportsMoney(p.collected)+'</td><td>'+pct.toFixed(2)+'%<div class="reportsProgress"><span style="width:'+Math.min(100,pct).toFixed(1)+'%"></span></div></td></tr>';}).join('')+'</tbody></table>' : '<div class="reportsEmpty">No portfolio data loaded.</div>';
