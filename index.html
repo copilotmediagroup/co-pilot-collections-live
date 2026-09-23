@@ -9298,23 +9298,24 @@ async function clearAllAccounts(){
        try{fallbackCounts[table]=await deleteAllRows(table)}
        catch(e){fallbackCounts[table]='failed: '+(e.message||e)}
      }
-     result={fallback:true,counts:fallbackCounts};
+     const fallbackRemaining=(await dbFetch('/accounts?select=id&limit=1')).length;
+     result={ok:fallbackRemaining===0,fallback:true,counts:{...fallbackCounts,accounts_remaining:fallbackRemaining}};
    }
 
-   accounts=[];
-   currentAccountId='';
-   render();
-
-   let summary='';
-   if(result && result.counts){
-     summary=Object.entries(result.counts).map(([k,v])=>k+': '+v).join('\n');
-   }else{
-     summary='Accounts and related records were cleared.';
+   const clearedCount=Number(result?.counts?.accounts ?? result?.deleted?.accounts ?? NaN);
+   if(!result || result.ok!==true || !Number.isFinite(clearedCount)){
+     throw new Error('Database did not confirm the account clear operation.');
    }
 
-   try{await insertAudit('Clear Accounts','Cleared accounts and related records','accounts','')}catch(e){}
-   alert('Clear complete.\n\n'+summary+'\n\nNow re-import the CSV.');
+   // Do not fake an empty queue before Supabase confirms and reloads authoritative state.
    await loadAccounts();
+   if(accounts.length!==0){
+     throw new Error('Database clear returned success, but '+accounts.length+' accounts still exist after reload.');
+   }
+
+   let summary=Object.entries(result.counts||result.deleted||{}).map(([k,v])=>k+': '+v).join('\n');
+   try{await insertAudit('Clear Accounts','Cleared '+clearedCount+' accounts and related records','accounts','')}catch(e){}
+   alert('Clear complete.\n\n'+summary+'\n\nThe database has been verified at 0 accounts. You can now import a CSV.');
  }catch(err){
    alert('Clear failed: '+(err.message||err)+'\n\nFix: open Supabase SQL Editor, run RUN_THIS_CLEAR_ACCOUNTS_SQL.sql from this ZIP, reload Bolt, then try Clear Accounts again.');
  }
