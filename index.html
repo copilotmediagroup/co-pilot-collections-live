@@ -14275,9 +14275,15 @@ function exportContactIntelligenceCSV(){let calls=filteredContactCalls();let row
   function byId(id){return document.getElementById(id)}
   function s(v){return String(v==null?'':v)}
   function esc(v){return s(v).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
-  function isAdmin(){try{return !!(window.currentUser&&currentUser.isAdmin)}catch(e){return false}}
+  function role(){try{return String((window.currentUser&&currentUser.role)||'employee').toLowerCase().trim()}catch(e){return 'employee'}}
+  function isAdmin(){try{return !!(window.currentUser&&currentUser.isAdmin)||role()==='admin'}catch(e){return false}}
+  function isManager(){return isAdmin()||role()==='manager'}
   function call(fn,arg){
     try{
+      var managerFns=['openReportsPageStable','openEmployeeMonitorModal'];
+      var adminFns=['openClientPortalAdmin','openRemittanceAdmin','importCSVClick','openImportHistoryPage','openAssignModal','exportCSV','downloadTemplate','openDataCleanupDashboard','clearAllAccounts','openEmployeeAdminModal','openBrandingSettingsModal','openPermissionsModal','openQaHealthModal','openAuditLog'];
+      if(managerFns.indexOf(fn)>=0&&!isManager())return alert('Manager or Admin access required.');
+      if(adminFns.indexOf(fn)>=0&&!isAdmin())return alert('Admin only.');
       if(fn==='runPromiseAutomation')return window.runPromiseAutomation(true,true);
       if(fn==='importCSVClick'){var input=document.querySelector('.topActions label.fileBtn input[type="file"]'); if(input){input.click();return} return alert('Import input not found.');}
       if(fn==='downloadTemplate')return window.downloadTemplate&&window.downloadTemplate();
@@ -14290,7 +14296,7 @@ function exportContactIntelligenceCSV(){let calls=filteredContactCalls();let row
   }
   window.cpcmNavRun=call;
   window.cpcmWorkspaceRun=call;
-  function item(label,fn,arg,admin){return '<button type="button" class="cpcmNavItem" '+(admin?'data-admin-only="1"':'')+' onclick="cpcmNavRun(''+esc(fn)+'''+(arg!==undefined?',''+esc(arg)+''':'')+')">'+esc(label)+'</button>'}
+  function item(label,fn,arg,admin,manager){return '<button type="button" class="cpcmNavItem" '+(admin?'data-admin-only="1"':manager?'data-manager-only="1"':'')+' onclick="cpcmNavRun(''+esc(fn)+'''+(arg!==undefined?',''+esc(arg)+''':'')+')">'+esc(label)+'</button>'}
   function group(label,items){return '<div class="cpcmNavGroup"><button type="button" class="cpcmNavGroupBtn">'+esc(label)+' ▾</button><div class="cpcmNavMenu">'+items.join('')+'</div></div>'}
   function groupedNavHtml(){
     return group('Work',[
@@ -14317,9 +14323,9 @@ function exportContactIntelligenceCSV(){let calls=filteredContactCalls();let row
       item('Communication Log','openCommunicationCenter'),
       item('Audit Trail','openAuditLog',undefined,true)
     ])+group('Reports',[
-      item('Reports','openReportsPageStable',undefined,true),
+      item('Executive Reports','openReportsPageStable',undefined,false,true),
       item('My Score / Scorecards','openManagerQaScorecards'),
-      item('Employee Monitor','openEmployeeMonitorModal',undefined,true),
+      item('Employee Monitor','openEmployeeMonitorModal',undefined,false,true),
       item('System Check','cpcmOpenSystemCheck')
     ])+group('Clients',[
       item('Client Portal Admin','openClientPortalAdmin',undefined,true),
@@ -14368,14 +14374,22 @@ function exportContactIntelligenceCSV(){let calls=filteredContactCalls();let row
     });
   }
   function applyRoleVisibility(){
-    var admin=isAdmin();
+    var admin=isAdmin(),manager=isManager(),r=admin?'admin':manager?'manager':'collector';
     Array.prototype.slice.call(document.querySelectorAll('#cpcmGroupedNav [data-admin-only="1"]')).forEach(function(el){el.classList.toggle('cpcmNavHidden',!admin)});
+    Array.prototype.slice.call(document.querySelectorAll('#cpcmGroupedNav [data-manager-only="1"]')).forEach(function(el){el.classList.toggle('cpcmNavHidden',!manager)});
+    var badge=byId('roleBadge');if(badge&&!currentUser?.isClient)badge.textContent=admin?'Admin':manager?'Manager':'Collector';
+    var ws=byId('cpcmWsMode');if(ws)ws.textContent=admin?'ADMIN WORKSPACE':manager?'MANAGER WORKSPACE':'COLLECTOR WORKSPACE';
+    document.body.setAttribute('data-cpcm-role',r);
   }
   function currentAccount(){try{return (typeof getCurrent==='function')?getCurrent():null}catch(e){return null}}
   function text(id,value){var el=byId(id); if(el)el.textContent=value}
-  function updateWorkspace(){
-    var a=currentAccount();
-    if(!byId('cpcmCollectorWorkspace'))return;
+  function call(fn,arg){
+    try{
+      var managerFns=['openReportsPageStable','openEmployeeMonitorModal'];
+      var adminFns=['openClientPortalAdmin','openRemittanceAdmin','importCSVClick','openImportHistoryPage','openAssignModal','exportCSV','downloadTemplate','openDataCleanupDashboard','clearAllAccounts','openEmployeeAdminModal','openBrandingSettingsModal','openPermissionsModal','openQaHealthModal','openAuditLog'];
+      if(managerFns.indexOf(fn)>=0&&!isManager())return alert('Manager or Admin access required.');
+      if(adminFns.indexOf(fn)>=0&&!isAdmin())return alert('Admin only.');
+      if(fn==='runPromiseAutomation')return window.runPromiseAutomation(true,true);
     if(!a){text('cpcmWsAccountLine','Manual calling workflow: review → call → log → promise/follow-up → save next.');text('cpcmWsStatus','Status: —');text('cpcmWsBalance','Balance: —');text('cpcmWsPhone','Primary Phone: —');return;}
     var name=(typeof nameOf==='function')?nameOf(a):(a.fullName||a.full_name||'Current Account');
     var acct=(typeof acctNo==='function')?acctNo(a):(a.accountNumber||a.account_number||'');
