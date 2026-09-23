@@ -8629,20 +8629,15 @@ async function saveLedgerPayment(){
    notes:val('ledgerNotes'),
    created_by_email:currentUser.email
  };
- let saved=null;
- try{
-  let existing=await dbFetch('/payments_ledger?receipt_number=eq.'+encodeURIComponent(receipt)+'&select=id,account_id,amount,status&limit=1').catch(()=>[]);
-  if(existing&&existing.length){ledgerPaymentSaveBusy=false;return alert('This receipt number already exists. Payment was not submitted twice.');}
-  saved=(await dbFetch('/payments_ledger',{method:'POST',body:JSON.stringify([row])}))[0];
- }catch(e){ledgerPaymentSaveBusy=false;throw e}
- let applied=null;
+ let saved=null,applied=null;
+ let result=await dbFetch('/rpc/cpcm_post_manual_ledger_payment',{method:'POST',body:JSON.stringify({target_account_id:a.id,payment_amount:amount,payment_type_text:type,payment_method_text:method,payment_status_text:status,payment_date_value:paymentDate,receipt_text:receipt,processor_fee_value:processorFee,notes_text:val('ledgerNotes'),actor_email:currentUser.email})});
+ let rpcResult=Array.isArray(result)?result[0]:result;
+ if(!rpcResult||rpcResult.ok!==true)throw new Error('Database did not confirm the ledger transaction.');
+ if(rpcResult.already_posted)return alert('This receipt number already exists. Payment was not submitted twice.');
+ saved={id:rpcResult.ledger_id};
+ balBefore=moneyNum(rpcResult.balance_before??balBefore);balAfter=moneyNum(rpcResult.balance_after??balAfter);
  if(status==='Completed' && (type==='Payment'||type==='Adjustment Credit') && val('ledgerApplyPlan')==='auto'){
    applied=await applyLedgerPaymentToPlan(a.id,amount);
- }
- if(status==='Completed'){
-   let accountPatch={current_balance:balAfter,updated_at:new Date().toISOString()};
-   if(balAfter<=0){accountPatch.status='Settled';accountPatch.disposition='Settled'}
-   await dbFetch(`/accounts?id=eq.${a.id}`,{method:'PATCH',body:JSON.stringify(accountPatch)});
  }
  let appliedText=applied&&applied.length?` Applied to ${applied.length} scheduled payment(s).`:'';
  await insertActivity(a.id,'Payment Ledger',`${type} ${money(amount)} via ${method}. Balance ${money(balBefore)} → ${money(balAfter)}. Receipt ${receipt}.${appliedText}`);

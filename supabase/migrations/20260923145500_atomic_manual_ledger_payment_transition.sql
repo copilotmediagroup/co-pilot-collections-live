@@ -1,0 +1,15 @@
+create or replace function public.cpcm_post_manual_ledger_payment(target_account_id uuid, payment_amount numeric, payment_type_text text, payment_method_text text, payment_status_text text, payment_date_value date, receipt_text text, processor_fee_value numeric default 0, notes_text text default null, actor_email text default null)
+returns jsonb language plpgsql security invoker set search_path=public as $$
+declare a public.accounts%rowtype; amt numeric; before_bal numeric; after_bal numeric; ledger_id uuid; effect numeric:=0;
+begin
+ if receipt_text is null or btrim(receipt_text)='' then raise exception 'Receipt number required'; end if;
+ select * into a from public.accounts where id=target_account_id for update; if not found then raise exception 'Account not found'; end if;
+ select id into ledger_id from public.payments_ledger where receipt_number=receipt_text limit 1; if ledger_id is not null then return jsonb_build_object('ok',true,'already_posted',true,'ledger_id',ledger_id,'account_id',target_account_id); end if;
+ amt:=greatest(coalesce(payment_amount,0),0); if amt<=0 then raise exception 'Payment amount must be greater than zero'; end if; before_bal:=greatest(coalesce(a.current_balance,0),0);
+ if lower(coalesce(payment_status_text,''))='completed' then if lower(coalesce(payment_type_text,'')) in ('payment','adjustment credit') then effect:=-amt; elsif lower(coalesce(payment_type_text,'')) in ('reversal','adjustment debit') then effect:=amt; end if; end if;
+ if effect<0 and amt>before_bal+0.01 then raise exception 'Payment exceeds current balance'; end if; after_bal:=greatest(before_bal+effect,0);
+ insert into public.payments_ledger(account_id,payment_date,amount,payment_amount,payment_type,payment_method,processor_fee,status,receipt_number,balance_before,balance_after,notes,created_by_email,idempotency_key) values(target_account_id,coalesce(payment_date_value,current_date),amt,amt,coalesce(payment_type_text,'Payment'),coalesce(payment_method_text,'Other'),coalesce(processor_fee_value,0),coalesce(payment_status_text,'Completed'),receipt_text,before_bal,after_bal,notes_text,coalesce(actor_email,'system'),receipt_text) on conflict (receipt_number) where receipt_number is not null and btrim(receipt_number)<>'' do nothing returning id into ledger_id;
+ if ledger_id is null then select id into ledger_id from public.payments_ledger where receipt_number=receipt_text limit 1; return jsonb_build_object('ok',true,'already_posted',true,'ledger_id',ledger_id,'account_id',target_account_id); end if;
+ if lower(coalesce(payment_status_text,''))='completed' and effect<>0 then update public.accounts set current_balance=after_bal,status=case when after_bal<=0 then 'Settled' else status end,disposition=case when after_bal<=0 then 'Settled' else disposition end,updated_at=now() where id=target_account_id; end if;
+ return jsonb_build_object('ok',true,'already_posted',false,'ledger_id',ledger_id,'account_id',target_account_id,'amount',amt,'balance_before',before_bal,'balance_after',after_bal);
+end; $$;
