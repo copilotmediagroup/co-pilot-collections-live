@@ -7376,9 +7376,10 @@ async function markPromisePaid(paymentId){
  let amount=moneyNum(p.amountDue), balBefore=accountBalance(a), balAfter=Math.max(0,balBefore-amount), receipt=ledgerReceiptNo();
  markPromisePaidBusy[paymentId]=true;
  try{
-   await dbFetch('/payments_ledger',{method:'POST',body:JSON.stringify([{account_id:a.id,payment_date:todayISO(),amount,payment_type:'Payment',payment_method:'Other',status:'Completed',receipt_number:receipt,balance_before:balBefore,balance_after:balAfter,plan_payment_id:paymentId,notes:'Marked paid from Promise Dashboard',created_by_email:currentUser.email}])});
-   await dbFetch(`/accounts?id=eq.${a.id}`,{method:'PATCH',body:JSON.stringify({current_balance:balAfter,status:balAfter<=0?'Settled':a.status,disposition:balAfter<=0?'Settled':a.disposition,updated_at:new Date().toISOString()})});
-   await dbFetch('/payment_plan_payments?id=eq.'+paymentId,{method:'PATCH',body:JSON.stringify({amount_paid:amount,paid_date:todayISO(),status:'Paid',updated_at:new Date().toISOString()})});
+   let result=await dbFetch('/rpc/cpcm_mark_scheduled_plan_payment_paid',{method:'POST',body:JSON.stringify({target_payment_id:paymentId,actor_email:currentUser.email})});
+   let rpcResult=Array.isArray(result)?result[0]:result;
+   if(!rpcResult||rpcResult.ok!==true)throw new Error('Database did not confirm the scheduled payment transaction.');
+   receipt='PLANPAY-'+paymentId;
  }catch(e){alert('Payment was not fully posted. Refresh before retrying. '+friendlyError(e?.message||e));return}
  finally{delete markPromisePaidBusy[paymentId]}
  await insertActivity(p.accountId,'Payment Promise Paid','Promise payment marked paid: '+money(amount)+'. Receipt '+receipt);

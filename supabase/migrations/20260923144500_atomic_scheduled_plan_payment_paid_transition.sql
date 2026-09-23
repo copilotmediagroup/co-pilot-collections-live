@@ -1,0 +1,16 @@
+create or replace function public.cpcm_mark_scheduled_plan_payment_paid(target_payment_id uuid, actor_email text default null)
+returns jsonb language plpgsql security invoker set search_path=public as $$
+declare p public.payment_plan_payments%rowtype; a public.accounts%rowtype; pl public.payment_plans%rowtype; amt numeric; before_bal numeric; after_bal numeric; receipt text; ledger_id uuid; pid uuid;
+begin
+ select * into p from public.payment_plan_payments where id=target_payment_id for update; if not found then raise exception 'Scheduled payment not found'; end if;
+ if lower(coalesce(p.status,''))='paid' or coalesce(p.amount_paid,0)>=coalesce(p.amount_due,p.payment_amount,p.amount,0) then select id into ledger_id from public.payments_ledger where receipt_number='PLANPAY-'||target_payment_id::text limit 1; return jsonb_build_object('ok',true,'already_paid',true,'ledger_id',ledger_id,'account_id',p.account_id); end if;
+ if p.account_id is null then raise exception 'Scheduled payment has no account'; end if; select * into a from public.accounts where id=p.account_id for update; if not found then raise exception 'Account not found'; end if;
+ pid:=coalesce(p.plan_id,p.payment_plan_id); if pid is not null then select * into pl from public.payment_plans where id=pid for update; end if;
+ amt:=greatest(coalesce(p.amount_due,p.payment_amount,p.amount,0),0); if amt<=0 then raise exception 'Payment amount must be greater than zero'; end if; before_bal:=greatest(coalesce(a.current_balance,0),0); after_bal:=greatest(before_bal-amt,0); receipt:='PLANPAY-'||target_payment_id::text;
+ insert into public.payments_ledger(account_id,payment_plan_id,amount,payment_amount,payment_date,paid_at,payment_method,status,notes,created_by_email,payment_type,receipt_number,balance_before,balance_after,plan_payment_id,idempotency_key) values(p.account_id,pid,amt,amt,current_date,now(),coalesce(p.payment_method,'Other'),'Completed','Marked paid from Promise Dashboard',coalesce(actor_email,p.created_by_email,'system'),'Payment',receipt,before_bal,after_bal,target_payment_id,receipt) on conflict (receipt_number) where receipt_number is not null and btrim(receipt_number)<>'' do nothing returning id into ledger_id;
+ if ledger_id is null then select id into ledger_id from public.payments_ledger where receipt_number=receipt limit 1; return jsonb_build_object('ok',true,'already_paid',true,'ledger_id',ledger_id,'account_id',p.account_id); end if;
+ update public.accounts set current_balance=after_bal,status=case when after_bal<=0 then 'Settled' else status end,disposition=case when after_bal<=0 then 'Settled' else disposition end,updated_at=now() where id=p.account_id;
+ update public.payment_plan_payments set amount_paid=amt,paid_date=current_date,payment_date=current_date,paid_at=now(),status='Paid',updated_at=now() where id=target_payment_id;
+ if pid is not null then update public.payment_plans set remaining_amount=greatest(coalesce(remaining_amount,total_amount,balance,0)-amt,0),status=case when greatest(coalesce(remaining_amount,total_amount,balance,0)-amt,0)<=0 then 'Paid' else status end,updated_at=now() where id=pid; end if;
+ return jsonb_build_object('ok',true,'already_paid',false,'ledger_id',ledger_id,'account_id',p.account_id,'amount',amt,'balance_before',before_bal,'balance_after',after_bal);
+end; $$;
