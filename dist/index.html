@@ -114,6 +114,7 @@ header.topbar{height:66px;background:linear-gradient(90deg,#05225f,#07379a,#0b45
 .mappedPanel{display:none}
 .right{padding:16px 14px 84px;background:#f8fbff;overflow:auto}.right .panel{border-radius:14px}.softphone{padding:14px}.ready{border-radius:10px}.dialer{grid-template-columns:1fr;gap:10px}.keys{grid-template-columns:repeat(3,1fr)}.key{height:46px;background:#fff;color:#0f172a;border:1px solid var(--line);border-radius:9px}.callBox{border:0;padding:0}.callBox button{width:100%;justify-content:center;border-radius:8px}.quickActions{padding:14px;margin-top:0}.qaItem{height:42px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #e5edf7;font-weight:800;font-size:13px}.qaItem:last-child{border-bottom:0}.qaIcon{width:26px;height:26px;border-radius:8px;background:#e0ecff;color:#1457ff;display:grid;place-items:center;margin-right:8px}.qaLeft{display:flex;align-items:center}
 .bottom{height:70px;background:white;border-top:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:12px 18px;box-shadow:0 -4px 18px rgba(15,23,42,.06);z-index:6}.rightBtns{gap:14px}.big,.primaryBig{min-width:165px;height:48px;justify-content:center;border-radius:10px}.primaryBig{background:#1457ff}
+.topMenuActions{overflow:visible!important;position:relative;z-index:50;gap:7px!important}.topMenu{position:relative;display:inline-flex}.topMenuMain{min-width:82px;justify-content:center;font-weight:900!important}.topMenuDrop{display:none;position:absolute;top:calc(100% - 1px);left:0;min-width:205px;padding:7px;background:#fff;border:1px solid #d8e3f2;border-radius:10px;box-shadow:0 14px 30px rgba(15,23,42,.2);z-index:9999}.topMenu:hover .topMenuDrop,.topMenu:focus-within .topMenuDrop{display:grid;gap:2px}.topMenuDropRight{left:auto;right:0}.topMenuDrop button,.topMenuFile{width:100%;height:34px!important;padding:0 10px!important;border:0!important;border-radius:7px!important;background:#fff!important;color:#172033!important;text-align:left;font-size:12px!important;font-weight:750!important;display:flex;align-items:center;justify-content:flex-start;cursor:pointer}.topMenuDrop button:hover,.topMenuFile:hover{background:#edf4ff!important;color:#0b4bd4!important}.topMenuDrop .dangerItem{color:#b42318!important}.topMenuFile input{display:none}.legacyTopActions{display:none!important}
 .importProgressBox{z-index:99999}
 @media(max-width:1400px){.main{grid-template-columns:50px 300px 1fr 260px}.summaryGrid{grid-template-columns:repeat(3,1fr)}.allFieldsGrid{grid-template-columns:repeat(3,1fr)}.allFieldCard:nth-child(4n){border-right:1px solid #e5edf7}.allFieldCard:nth-child(3n){border-right:0}.phoneGrid{grid-template-columns:repeat(3,1fr)}.dispoGrid{grid-template-columns:repeat(4,1fr)}}
 
@@ -3706,8 +3707,26 @@ button {
   <header class="topbar">
     <div class="brand"><div class="logo appBrandLogo" id="appBrandLogo">b</div><div><h1 id="appBrandName">Co Pilot Collections Manager</h1><p class="sub" id="appBrandSub">Scorecards, tickler, receipts, settlements, import history, cleanup, communications, reports, compliance, promises, and team chat.</p></div></div>
     <div class="headerSearch"><span class="mag">⌕</span><input id="globalSearch" placeholder="Search phone, name, SSN, address..." oninput="handleSearchInput('global')"><span class="hotkey">⌘ K</span></div>
-    <div class="topActions">
-      <button class="gray" id="cpcmNoDialerStaticTopBtn" onclick="openNoDialerSafeMode()" style="background:#064e3b;color:#fff">Safe Mode</button>
+    <div class="topActions topMenuActions">
+      <div class="topMenu"><button class="gray topMenuMain">Work ▾</button><div class="topMenuDrop">
+        <button onclick="openTodayDashboard()">Today</button><button onclick="openDailyWorkQueue()">Queue</button><button onclick="openPromiseDashboard()">Promises</button><button onclick="runPromiseAutomation(true,true)">Broken Promises</button><button onclick="openCollectorAlerts()">Alerts <span id="collectorAlertBadgeMenu" class="alertBadge hidden">0</span></button><button onclick="openContactIntelligence()">Calls</button><button onclick="openCommunicationCenter()">Communications</button>
+      </div></div>
+      <div class="topMenu"><button class="gray topMenuMain">Payments ▾</button><div class="topMenuDrop">
+        <button onclick="openPaymentTracker()">Pay Desk</button><button onclick="openPaymentsDashboard()">Ledger</button><button onclick="openNmiApprovalQueue()">Approvals</button>
+      </div></div>
+      <div class="topMenu"><button class="gray topMenuMain">Compliance ▾</button><div class="topMenuDrop">
+        <button onclick="openComplianceGuard()">Compliance Guard</button><button onclick="openDocumentGenerator()">Letters</button><button class="adminOnly hidden" onclick="openLetterBodyEditor()">Letter Bodies</button><button class="adminOnly hidden qaBtn" onclick="openQaHealthModal()">QA Health</button><button class="adminOnly hidden" onclick="openAuditLog()">Audit Log</button>
+      </div></div>
+      <div class="topMenu adminOnly hidden"><button class="gray topMenuMain">Admin ▾</button><div class="topMenuDrop">
+        <button onclick="openEmployeeAdminModal()">Staff</button><button onclick="openPermissionsModal()">Permissions</button><button onclick="openEmployeeMonitorModal()">Monitor</button><button onclick="openReportsPageStable()">Reports</button><button onclick="openBrandingSettingsModal()">Branding</button><button onclick="openAssignModal()">Assign Accounts</button><button onclick="openImportHistoryPage()">Import History</button><button onclick="openDataCleanupDashboard()">Cleanup</button><label class="topMenuFile">Import CSV<input type="file" accept=".csv" onchange="importCSV(event)"></label><button onclick="downloadTemplate()">Download Template</button><button onclick="exportCSV()">Export CSV</button><button class="dangerItem" onclick="clearAllAccounts()">Clear Accounts</button>
+      </div></div>
+      <div class="topMenu"><button class="gray topMenuMain">System ▾</button><div class="topMenuDrop topMenuDropRight">
+        <button id="cpcmNoDialerStaticTopBtn" onclick="openNoDialerSafeMode()">Safe Mode</button><button onclick="openHelpModal()">Help</button><button class="dangerItem" onclick="logout()">Logout</button>
+      </div></div>
+      <span class="roleBadge" id="roleBadge">Not logged in</span>
+      <span><span class="dot"></span> Available</span>
+      <div class="legacyTopActions" style="display:none">
+      <button class="gray" onclick="openNoDialerSafeMode()">Safe Mode</button>
       <button class="gray helpBtn" onclick="openHelpModal()">Help</button>
       <button class="gray" onclick="openDocumentGenerator()">Letters</button>
       <button class="gray adminOnly hidden" onclick="openLetterBodyEditor()">Bodies</button>
@@ -3739,6 +3758,7 @@ button {
       <span class="roleBadge" id="roleBadge">Not logged in</span>
       <button class="red" onclick="logout()">Logout</button>
       <span><span class="dot"></span> Available</span>
+      </div>
     </div>
   </header>
 
