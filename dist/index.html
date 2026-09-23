@@ -11472,17 +11472,17 @@ function exportContactIntelligenceCSV(){let calls=filteredContactCalls();let row
   }
   async function safeTable(path){
     if(typeof window.dbFetch !== 'function') return [];
-    return await safeTimeoutPromise(window.dbFetch(path), 3500, []);
+    return await safeTimeoutPromise(window.dbFetch(path), 12000, []);
   }
 
   async function loadReportsData(){
     var accs = Array.isArray(window.accounts) ? window.accounts.slice() : [];
     var results = await Promise.all([
-      safeTable('/payments_ledger?select=*&limit=2000&order=created_at.desc'),
-      safeTable('/payment_promises?select=*&limit=2000&order=created_at.desc'),
-      safeTable('/call_results?select=*&limit=2000&order=created_at.desc'),
-      safeTable('/payment_plans?select=*&limit=2000&order=created_at.desc'),
-      safeTable('/account_notes?select=*&limit=1000&order=created_at.desc')
+      safeTable('/payments_ledger?select=*&limit=50000&order=created_at.desc'),
+      safeTable('/payment_promises?select=*&limit=50000&order=created_at.desc'),
+      safeTable('/call_results?select=*&limit=50000&order=created_at.desc'),
+      safeTable('/payment_plans?select=*&limit=50000&order=created_at.desc'),
+      safeTable('/account_notes?select=*&limit=50000&order=created_at.desc')
     ]);
     return {accounts:accs, ledger:results[0]||[], promises:results[1]||[], calls:results[2]||[], plans:results[3]||[], notes:results[4]||[]};
   }
@@ -11540,11 +11540,11 @@ function exportContactIntelligenceCSV(){let calls=filteredContactCalls();let row
     var calls = data.calls.length;
     var contacts = data.calls.filter(function(r){return r.is_contact === true || /contact|right party|rpc|promise|refused|dispute|settled/.test(reportsStatus(r));}).length;
     var rpc = data.calls.filter(function(r){return r.is_rpc === true || /right party|rpc/.test(reportsStatus(r));}).length;
+    var placed = data.accounts.reduce(function(sum,a){return sum+reportsNum(a.originalBalance||a.original_balance||a.originalPrincipal||a.original_principal||a.currentBalance||a.current_balance||a.balance||a.principal);},0);
     var liquidationBase = placed || (totalBalance + collected);
     var liquidation = liquidationBase ? (collected / liquidationBase * 100) : 0;
     var contactRate = calls ? contacts / calls * 100 : 0;
     var rpcRate = calls ? rpc / calls * 100 : 0;
-    var placed = data.accounts.reduce(function(sum,a){return sum+reportsNum(a.originalBalance||a.original_balance||a.originalPrincipal||a.original_principal||a.currentBalance||a.current_balance||a.balance||a.principal);},0);
     var keptRate = data.promises.length ? kept.length/data.promises.length*100 : 0;
     var kpiHtml = [
       ['Accounts Placed',data.accounts.length,'Placed balance: '+reportsMoney(placed)],
