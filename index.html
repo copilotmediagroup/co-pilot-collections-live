@@ -8576,26 +8576,11 @@ async function loadPaymentLedgerForCurrent(){
 async function applyLedgerPaymentToPlan(accountId,amount){
  amount=moneyNum(amount);
  if(amount<=0)return null;
- let plan=await loadPaymentPlanForAccount(accountId,true);
- if(!plan)return null;
- let payments=(plan.payments||[]).filter(p=>!['Paid','Cancelled'].includes(p.status) && moneyNum(p.amountDue)>moneyNum(p.amountPaid)).sort((a,b)=>String(a.dueDate||'').localeCompare(String(b.dueDate||'')));
- let remainingToApply=amount, applied=[];
- for(let p of payments){
-   if(remainingToApply<=0)break;
-   let dueLeft=Math.max(0,moneyNum(p.amountDue)-moneyNum(p.amountPaid));
-   let apply=Math.min(dueLeft,remainingToApply);
-   let newPaid=Number((moneyNum(p.amountPaid)+apply).toFixed(2));
-   let newStatus=newPaid+0.01>=moneyNum(p.amountDue)?'Paid':'Partial';
-   await dbFetch(`/payment_plan_payments?id=eq.${p.id}`,{method:'PATCH',body:JSON.stringify({amount_paid:newPaid,paid_date:newStatus==='Paid'?todayISO():(p.paidDate||null),status:newStatus,updated_at:new Date().toISOString()})});
-   remainingToApply=Number((remainingToApply-apply).toFixed(2));
-   applied.push({paymentId:p.id,applied:apply,status:newStatus});
- }
- if(applied.length){
-   let paidNow=applied.reduce((s,x)=>s+x.applied,0);
-   let newRemaining=Math.max(0,moneyNum(plan.remainingAmount)-paidNow);
-   await dbFetch(`/payment_plans?id=eq.${plan.id}`,{method:'PATCH',body:JSON.stringify({remaining_amount:newRemaining,status:newRemaining<=0?'Paid':'Active',updated_at:new Date().toISOString()})}).catch(()=>{});
-   delete paymentPlanCache[accountId];
- }
+ let result=await dbFetch('/rpc/cpcm_apply_payment_to_plan',{method:'POST',body:JSON.stringify({target_account_id:accountId,payment_amount:amount})});
+ let rpcResult=Array.isArray(result)?result[0]:result;
+ if(!rpcResult||rpcResult.ok!==true)throw new Error('Database did not confirm payment-plan allocation.');
+ let applied=Array.isArray(rpcResult.applied)?rpcResult.applied:[];
+ if(applied.length)delete paymentPlanCache[accountId];
  return applied;
 }
 let ledgerPaymentSaveBusy=false;
