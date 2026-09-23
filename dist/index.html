@@ -7283,15 +7283,21 @@ async function completeFollowUp(id){await dbFetch('/follow_ups?id=eq.'+id,{metho
 async function openPromiseDashboard(){document.getElementById('promiseDashboardModal').classList.add('open');await loadPromiseDashboard()}
 async function loadPromiseDashboard(){let pays=[],plans=[];try{pays=(await dbFetch('/payment_plan_payments?select=*&order=due_date.asc&limit=10000')).map(toCamel)}catch(e){pays=[]}try{plans=(await dbFetch('/payment_plans?select=*&order=created_at.desc&limit=10000')).map(toCamel)}catch(e){plans=[]}if(!currentUser.isAdmin){let ids=new Set(accounts.map(a=>String(a.id)));pays=pays.filter(p=>ids.has(String(p.accountId)));plans=plans.filter(p=>ids.has(String(p.accountId)))}promiseData={payments:pays,plans};renderPromiseDashboard('due')}
 function promiseCard(p,modalId='promiseDashboardModal'){let plan=promiseData.plans.find(x=>String(x.id)===String(p.planId))||workQueueData.plans.find(x=>String(x.id)===String(p.planId));let a=accountById(p.accountId)||accountById(plan?.accountId);let due=String(p.dueDate||'');let status=p.status||'Scheduled';let owed=Math.max(0,moneyNum(p.amountDue)-moneyNum(p.amountPaid));let cls=status==='Paid'?'green':isPastISO(due)?'red':isTodayISO(due)?'orange':'gray';return `<div class="powerCard"><div class="powerCardTop"><div><div class="powerTitle">${esc(a?nameOf(a):'Unknown Account')} — ${money(owed)} due</div><div class="powerMeta">Due date: ${powerDateLabel(due)} • Status: ${esc(status)}<br>Account: ${esc(a?acctNo(a):'—')} • Balance: ${a?money(accountBalance(a)):'—'}<br>Assigned: ${esc(a?.assignedToEmail||'—')}</div></div><span class="powerPill ${cls}">${isPastISO(due)&&status!=='Paid'?'Broken/Overdue':esc(status)}</span></div><div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap"><button class="outline" onclick="setAccountFromModal('${a?.id||p.accountId}','${modalId}')">Open Account</button><button class="green" onclick="markPromisePaid('${p.id}')">Mark Paid</button></div></div>`}
+let markPromisePaidBusy={};
 async function markPromisePaid(paymentId){
+ if(markPromisePaidBusy[paymentId])return;
  let p=[...promiseData.payments,...workQueueData.payments].find(x=>String(x.id)===String(paymentId));
  if(!p)return alert('Payment not found.');
- let a=accountById(p.accountId), amount=moneyNum(p.amountDue), balBefore=accountBalance(a), balAfter=Math.max(0,balBefore-amount), receipt=ledgerReceiptNo();
- await dbFetch('/payment_plan_payments?id=eq.'+paymentId,{method:'PATCH',body:JSON.stringify({amount_paid:amount,paid_date:todayISO(),status:'Paid',updated_at:new Date().toISOString()})});
- if(a){
-   await dbFetch('/payments_ledger',{method:'POST',body:JSON.stringify([{account_id:a.id,payment_date:todayISO(),amount,payment_type:'Payment',payment_method:'Other',status:'Completed',receipt_number:receipt,balance_before:balBefore,balance_after:balAfter,plan_payment_id:paymentId,notes:'Marked paid from Promise Dashboard',created_by_email:currentUser.email}])}).catch(()=>{});
-   await dbFetch(`/accounts?id=eq.${a.id}`,{method:'PATCH',body:JSON.stringify({current_balance:balAfter,status:balAfter<=0?'Settled':a.status,disposition:balAfter<=0?'Settled':a.disposition,updated_at:new Date().toISOString()})}).catch(()=>{});
- }
+ if(String(p.status||'').toLowerCase()==='paid'||moneyNum(p.amountPaid)>=moneyNum(p.amountDue))return alert('This scheduled payment is already marked Paid.');
+ let a=accountById(p.accountId);if(!a)return alert('Account not found. Payment was not changed.');
+ let amount=moneyNum(p.amountDue), balBefore=accountBalance(a), balAfter=Math.max(0,balBefore-amount), receipt=ledgerReceiptNo();
+ markPromisePaidBusy[paymentId]=true;
+ try{
+   await dbFetch('/payments_ledger',{method:'POST',body:JSON.stringify([{account_id:a.id,payment_date:todayISO(),amount,payment_type:'Payment',payment_method:'Other',status:'Completed',receipt_number:receipt,balance_before:balBefore,balance_after:balAfter,plan_payment_id:paymentId,notes:'Marked paid from Promise Dashboard',created_by_email:currentUser.email}])});
+   await dbFetch(`/accounts?id=eq.${a.id}`,{method:'PATCH',body:JSON.stringify({current_balance:balAfter,status:balAfter<=0?'Settled':a.status,disposition:balAfter<=0?'Settled':a.disposition,updated_at:new Date().toISOString()})});
+   await dbFetch('/payment_plan_payments?id=eq.'+paymentId,{method:'PATCH',body:JSON.stringify({amount_paid:amount,paid_date:todayISO(),status:'Paid',updated_at:new Date().toISOString()})});
+ }catch(e){alert('Payment was not fully posted. Refresh before retrying. '+friendlyError(e?.message||e));return}
+ finally{delete markPromisePaidBusy[paymentId]}
  await insertActivity(p.accountId,'Payment Promise Paid','Promise payment marked paid: '+money(amount)+'. Receipt '+receipt);
  await insertAudit('Promise Paid','Promise payment marked paid '+money(amount),'account',p.accountId);
  await loadAccounts();
@@ -11031,6 +11037,7 @@ function exportContactIntelligenceCSV(){let calls=filteredContactCalls();let row
       if(total<=0)return alert('Plan total must be greater than zero.');
       if(total>acctBal+0.01)return alert('Not allowed: plan total cannot exceed the current account balance of '+sfMoney(acctBal)+'.');
       let paidToday=sfMoneyNum(sfVal('planToday'));
+      if(paidToday>0)return alert('Payment Today must be recorded through Pay Desk / Payment Ledger first. Then create the plan from the updated account balance so the payment has one authoritative ledger record.');
       if(paidToday>total+0.01)return alert('Payment today cannot be greater than the plan total.');
       let remainingAfterToday=Number(Math.max(0,total-paidToday).toFixed(2));
       let scheduledDue=paymentScheduleDraft.reduce((s,p)=>s+sfMoneyNum(p.amountDue ?? p.amount_due ?? p.amount ?? p.paymentAmount),0);
