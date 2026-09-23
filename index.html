@@ -6243,6 +6243,8 @@ function renderAccountIntelligence(a){
  let best=phones(a)[0]||a.lastContactNumber||'';
  let status=String(a.disposition||a.status||'').toLowerCase();
  let next=a.nextCallAt?('Call '+date(a.nextCallAt)):(status.includes('promise')?'Review promise':status.includes('dispute')?'Review dispute':status.includes('settled')?'Account resolved':'Work account');
+ let smart=(typeof getSmartNextAccount==='function')?getSmartNextAccount(a):null;
+ if(smart&&smart.id!==a.id)next+=' · Next: '+nameOf(smart);
  set('intelLastContact',lastContact?date(lastContact)+(a.lastCallResult?' · '+a.lastCallResult:''):'No contact yet');
  set('intelLastPayment',lastPayDate?((lastPayAmt?money(lastPayAmt)+' · ':'')+date(lastPayDate)):'No payment');
  set('intelPromise',status.includes('promise')?'Promise to Pay':'—');
@@ -9106,7 +9108,33 @@ function openPayoffQuote(){
 /* removed old openAccountDocs; enhanced version is inserted later */
 
 
-async function saveCurrent(){let a=getCurrent();if(!a)return;let note=document.getElementById('agentNote').value.trim();if(note){await dbFetch('/account_notes',{method:'POST',body:JSON.stringify([{account_id:a.id,note,created_by_email:currentUser.email}])});await insertActivity(a.id,'Note',note)}document.getElementById('agentNote').value='';await loadAccounts()}async function saveAndNext(){await saveCurrent();nextAccount()}function nextAccount(){let q=queue(),cur=getCurrent(),idx=q.findIndex(a=>a.id===cur?.id);if(q[idx+1])setCurrent(q[idx+1].id)}function skipAccount(){nextAccount()}async function callPrimary(){let a=getCurrent();let p=phones(a)[0];if(p)await dialPhone(a.id,normPhone(p))}function endCall(){document.getElementById('lastDialed').textContent='Call ended';document.getElementById('callNumber').textContent='—'}
+async function saveCurrent(){let a=getCurrent();if(!a)return;let note=document.getElementById('agentNote').value.trim();if(note){await dbFetch('/account_notes',{method:'POST',body:JSON.stringify([{account_id:a.id,note,created_by_email:currentUser.email}])});await insertActivity(a.id,'Note',note)}document.getElementById('agentNote').value='';await loadAccounts()}
+function smartNextScore(a){
+ if(!a)return -999999;
+ let status=String(a.disposition||a.status||'').toLowerCase(),score=0,now=Date.now();
+ if(a.doNotCall||a.do_not_call||a.bankruptcyFlag||a.bankruptcy_flag||a.deceasedFlag||a.deceased_flag||status.includes('dnc')||status.includes('settled'))return -999999;
+ let next=a.nextCallAt||a.next_call_at;if(next){let t=new Date(next).getTime();if(Number.isFinite(t)){if(t<=now)score+=140;else if(t-now<=86400000)score+=45;else score-=35}}
+ if(status.includes('promise'))score+=110;
+ if(a.disputedFlag||a.disputed_flag||status.includes('dispute'))score+=80;
+ if(status.includes('callback')||status.includes('call back'))score+=100;
+ if(status.includes('new')||!status)score+=35;
+ let calls=Number(a.callCount||a.call_count||0);score+=Math.max(0,30-Math.min(calls,6)*5);
+ let updated=new Date(a.updatedAt||a.updated_at||a.createdAt||a.created_at||0).getTime();if(Number.isFinite(updated)&&updated>0)score+=Math.min(40,Math.floor((now-updated)/86400000));
+ if(phones(a).length)score+=15;else score-=25;
+ if(accountBalance(a)>0)score+=Math.min(25,Math.floor(accountBalance(a)/500));
+ return score;
+}
+function getSmartNextAccount(cur){
+ let q=queue(),idx=q.findIndex(a=>a.id===cur?.id),candidates=q.filter(a=>a.id!==cur?.id);
+ if(!candidates.length)return q[idx+1]||q[0]||null;
+ let ranked=candidates.map((a,i)=>({a,score:smartNextScore(a),i})).filter(x=>x.score>-999999).sort((x,y)=>y.score-x.score||x.i-y.i);
+ return ranked[0]?.a||q[idx+1]||candidates[0]||null;
+}
+async function saveAndNext(){let before=getCurrent();await saveCurrent();let current=before?accountById(before.id)||before:getCurrent();let next=getSmartNextAccount(current);if(next)setCurrent(next.id)}
+function nextAccount(){let q=queue(),cur=getCurrent(),idx=q.findIndex(a=>a.id===cur?.id);if(q[idx+1])setCurrent(q[idx+1].id)}
+function skipAccount(){nextAccount()}
+async function callPrimary(){let a=getCurrent();let p=phones(a)[0];if(p)await dialPhone(a.id,normPhone(p))}
+function endCall(){document.getElementById('lastDialed').textContent='Call ended';document.getElementById('callNumber').textContent='—'}
 function val(id){return document.getElementById(id).value.trim()}function setVal(id,v){document.getElementById(id).value=v??''}function inputId(k){return{accountNumber:'accountNumberInput',status:'statusInput',ssn:'ssnInput',state:'stateInput',email:'emailInput'}[k]||k}function openModal(){document.querySelector('#modal form').reset();document.getElementById('id').value='';document.getElementById('modalTitle').textContent='Add Account';document.getElementById('modal').classList.add('open')}function closeModal(id){document.getElementById(id).classList.remove('open')}
 async function saveAccount(e){e.preventDefault();if(!currentUser.isAdmin)return alert('Admin only');let id=val('id'),acct={};FIELDS.forEach(k=>acct[k]=val(inputId(k)));acct.fullName=acct.fullName||[acct.firstName,acct.middleName,acct.lastName].filter(Boolean).join(' ');if(id)await dbFetch(`/accounts?id=eq.${id}`,{method:'PATCH',body:JSON.stringify(toRow(acct))});else await dbFetch('/accounts',{method:'POST',body:JSON.stringify([toRow(acct)])});closeModal('modal');await loadAccounts()}
 
