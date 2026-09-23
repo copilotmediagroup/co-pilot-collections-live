@@ -8506,8 +8506,12 @@ async function applyLedgerPaymentToPlan(accountId,amount){
  }
  return applied;
 }
+let ledgerPaymentSaveBusy=false;
 async function saveLedgerPayment(){
+ if(ledgerPaymentSaveBusy)return;
  let a=getCurrent(); if(!a)return alert('No account selected.');
+ ledgerPaymentSaveBusy=true;
+ try{
  let amount=moneyNum(val('ledgerAmount'));
  let type=val('ledgerType')||'Payment';
  let status=val('ledgerStatus')||'Completed';
@@ -8515,8 +8519,8 @@ async function saveLedgerPayment(){
  let paymentDate=val('ledgerDate')||todayISO();
  let processorFee=moneyNum(val('ledgerProcessorFee'));
  let balBefore=accountBalance(a);
- if(amount<=0)return alert('Enter a payment amount greater than zero.');
- if((type==='Payment'||type==='Adjustment Credit') && status==='Completed' && amount>balBefore+0.01)return alert('Payment cannot be more than current balance of '+money(balBefore)+'.');
+ if(amount<=0){ledgerPaymentSaveBusy=false;return alert('Enter a payment amount greater than zero.');}
+ if((type==='Payment'||type==='Adjustment Credit') && status==='Completed' && amount>balBefore+0.01){ledgerPaymentSaveBusy=false;return alert('Payment cannot be more than current balance of '+money(balBefore)+'.');}
  let balAfter=ledgerBalanceAfter(balBefore,amount,type,status);
  let receipt=val('ledgerReceipt')||ledgerReceiptNo();
  let row={
@@ -8533,7 +8537,12 @@ async function saveLedgerPayment(){
    notes:val('ledgerNotes'),
    created_by_email:currentUser.email
  };
- let saved=(await dbFetch('/payments_ledger',{method:'POST',body:JSON.stringify([row])}))[0];
+ let saved=null;
+ try{
+  let existing=await dbFetch('/payments_ledger?receipt_number=eq.'+encodeURIComponent(receipt)+'&select=id,account_id,amount,status&limit=1').catch(()=>[]);
+  if(existing&&existing.length){ledgerPaymentSaveBusy=false;return alert('This receipt number already exists. Payment was not submitted twice.');}
+  saved=(await dbFetch('/payments_ledger',{method:'POST',body:JSON.stringify([row])}))[0];
+ }catch(e){ledgerPaymentSaveBusy=false;throw e}
  let applied=null;
  if(status==='Completed' && (type==='Payment'||type==='Adjustment Credit') && val('ledgerApplyPlan')==='auto'){
    applied=await applyLedgerPaymentToPlan(a.id,amount);
@@ -8552,6 +8561,7 @@ async function saveLedgerPayment(){
  await renderPaymentPlanSummary(a.id).catch(()=>{});
  updateLedgerPreview();
  alert('Payment saved. New account balance: '+money(balAfter));
+ }finally{ledgerPaymentSaveBusy=false}
 }
 
 /* Payments dashboard */
