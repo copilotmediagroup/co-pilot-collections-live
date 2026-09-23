@@ -8733,19 +8733,15 @@ async function runBrokenPromiseAutomation(showAlert=false){
    let allowed=new Set(accounts.map(a=>String(a.id)));
    rows=rows.filter(p=>allowed.has(String(p.accountId)));
  }
- let accountIds=[...new Set(rows.map(p=>p.accountId).filter(Boolean))];
- let planIds=[...new Set(rows.map(p=>p.planId).filter(Boolean))];
+ let accountIds=[];
  for(let p of rows){
-   await dbFetch(`/payment_plan_payments?id=eq.${p.id}`,{method:'PATCH',body:JSON.stringify({status:'Broken Promise',updated_at:new Date().toISOString()})}).catch(()=>{});
+   try{
+     let result=await dbFetch('/rpc/cpcm_flag_broken_plan_payment',{method:'POST',body:JSON.stringify({target_payment_id:p.id,actor_email:currentUser.email})});
+     let rpcResult=Array.isArray(result)?result[0]:result;
+     if(rpcResult?.flagged&&rpcResult.account_id){accountIds.push(rpcResult.account_id);await insertActivity(rpcResult.account_id,'Broken Promise','Missed promise payment automatically flagged. Follow-up required.').catch(()=>{});}
+   }catch(e){console.warn('Broken promise flag failed',p.id,e)}
  }
- for(let pid of planIds){
-   await dbFetch(`/payment_plans?id=eq.${pid}`,{method:'PATCH',body:JSON.stringify({status:'Broken Promise',updated_at:new Date().toISOString()})}).catch(()=>{});
- }
- for(let aid of accountIds){
-   await dbFetch(`/accounts?id=eq.${aid}`,{method:'PATCH',body:JSON.stringify({status:'Broken Promise',disposition:'Broken Promise',updated_at:new Date().toISOString()})}).catch(()=>{});
-   await insertActivity(aid,'Broken Promise','Missed promise payment automatically flagged. Follow-up required.').catch(()=>{});
-   await dbFetch('/follow_ups',{method:'POST',body:JSON.stringify([{account_id:aid,follow_up_type:'Broken Promise Follow-Up',due_date:today,status:'Open',assigned_to_email:(accountById(aid)?.assignedToEmail||currentUser.email||''),reason:'Missed payment promise',notes:'Automatically created from broken promise automation.',created_by_email:currentUser.email}])}).catch(()=>{});
- }
+ accountIds=[...new Set(accountIds)];
  sessionStorage.setItem(lastKey,'1');
  if(rows.length){
    if(typeof insertAudit==='function')await insertAudit('Broken Promise Automation','Flagged '+rows.length+' missed payment(s) across '+accountIds.length+' account(s)','payment_plan_payments','');
@@ -8791,12 +8787,12 @@ async function runPromiseAutomation(showAlert=false,reloadAfter=false){
  if(!currentUser?.isAdmin){let allowed=new Set(accounts.map(a=>String(a.id)));manual=manual.filter(r=>allowed.has(String(paAccountId(r)))||paEmployee(r,paAccount(r))===(currentUser.email||'').toLowerCase())}
  let broken=manual.filter(r=>paDue(r)&&paDue(r)<today&&!paIsPaid(r)&&!paIsClosed(r)&&!paIsBrokenStatus(r));
  for(let r of broken){
-   let a=paAccount(r);let amt=paAmount(r)-paPaid(r);let note='Auto-flagged missed payment promise due '+paDue(r)+'.';
-   try{await dbFetch('/payment_promises?id=eq.'+encodeURIComponent(r.id),{method:'PATCH',body:JSON.stringify({status:'Broken Promise',admin_note:note,processed_by_email:currentUser?.email||'',processed_at:new Date().toISOString(),updated_at:new Date().toISOString()})});flagged++;}catch(e){}
-   if(a){await dbFetch(`/accounts?id=eq.${a.id}`,{method:'PATCH',body:JSON.stringify({status:'Broken Promise',disposition:'Broken Promise',updated_at:new Date().toISOString()})}).catch(()=>{});}
-   await insertActivity(paAccountId(r),'Broken Promise',`Missed manual payment promise automatically flagged: ${money(amt)} due ${paDue(r)}.`).catch(()=>{});
-   await dbFetch('/follow_ups',{method:'POST',body:JSON.stringify([{account_id:paAccountId(r),follow_up_type:'Broken Promise Follow-Up',due_date:today,status:'Open',assigned_to_email:paEmployee(r,a)||currentUser?.email||'',reason:'Missed manual payment promise',notes:'Automatically created from Promise Automation.',created_by_email:currentUser?.email||''}])}).catch(()=>{});
-   await createCollectorAlert({type:'Broken Promise',severity:'critical',title:'Broken promise needs follow-up',message:`${a?nameOf(a):r.debtorName||'Account'} missed ${money(amt)} due ${paDue(r)}.`,dueDate:today,accountId:paAccountId(r),assignedToEmail:paEmployee(r,a),sourceTable:'payment_promises',sourceId:r.id});alertsMade++;
+   let a=paAccount(r);let amt=paAmount(r)-paPaid(r);
+   try{
+     let result=await dbFetch('/rpc/cpcm_flag_broken_manual_promise',{method:'POST',body:JSON.stringify({target_promise_id:r.id,actor_email:currentUser?.email||''})});
+     let rpcResult=Array.isArray(result)?result[0]:result;
+     if(rpcResult?.flagged){flagged++;alertsMade++;await insertActivity(paAccountId(r),'Broken Promise',`Missed manual payment promise automatically flagged: ${money(amt)} due ${paDue(r)}.`).catch(()=>{});}
+   }catch(e){console.warn('Manual broken promise flag failed',r.id,e)}
  }
  if(flagged&&typeof insertAudit==='function')await insertAudit('Promise Automation','Flagged '+flagged+' manual payment promise(s) as broken.','payment_promises','').catch(()=>{});
  if(showAlert){alert((flagged||alertsMade)?`Promise automation complete. Flagged ${flagged} broken promise(s).`:'Promise automation complete. No new broken promises found.');}
