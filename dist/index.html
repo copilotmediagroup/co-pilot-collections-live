@@ -9578,11 +9578,13 @@ async function restoreArchivedAccount(a){
 }
 async function permanentlyDeleteArchivedAccount(a){
  let phrase=prompt('PERMANENT DELETE\n\nThis permanently removes '+nameOf(a)+' from the accounts table. This cannot be undone.\n\nType DELETE to continue.');
- if(phrase!=='DELETE')return;
- if(!confirm('Final confirmation: permanently delete this archived account?'))return;
- await dbFetch('/accounts?id=eq.'+encodeURIComponent(a.id)+'&archived_at=not.is.null',{method:'DELETE'});
+ if(phrase!=='DELETE')return false;
+ if(!confirm('Final confirmation: permanently delete this archived account?'))return false;
+ let result=await dbFetch('/rpc/cpcm_delete_archived_account',{method:'POST',body:JSON.stringify({target_account_id:a.id})});
+ let rpcResult=Array.isArray(result)?result[0]:result;
+ if(!rpcResult||rpcResult.ok!==true)throw new Error('Database did not confirm archived account deletion.');
  try{await insertAudit('Archived Account Permanently Deleted','Permanently deleted archived account '+nameOf(a),'account',a.id)}catch(e){}
- archivedWorkspaceAccount=null;alert('Archived account permanently deleted.');
+ archivedWorkspaceAccount=null;alert('Archived account permanently deleted.');return true;
 }
 async function permanentlyDeleteArchivedPortfolio(){
  if(!currentUser.isAdmin)return alert('Admin only');
@@ -9603,13 +9605,9 @@ async function permanentlyDeleteArchivedPortfolio(){
    if(phrase!==confirmPhrase)return alert('Delete cancelled. Confirmation text did not match.');
    if(!confirm('Final confirmation: permanently delete all '+g.rows.length+' ARCHIVED accounts in '+g.name+'?'))return;
    setGlobalBusy(true,'Deleting archived portfolio','Permanently removing '+g.rows.length+' archived accounts...');
-   let ids=g.rows.map(a=>a.id).filter(Boolean);
-   for(let i=0;i<ids.length;i+=50){
-     let batch=ids.slice(i,i+50);
-     await dbFetch('/accounts?id=in.('+batch.join(',')+')&archived_at=not.is.null',{method:'DELETE',headers:{Prefer:'return=minimal'}});
-   }
-   let verify=await dbFetch('/accounts?select=id&archived_at=not.is.null&portfolio=eq.'+encodeURIComponent(g.name)+'&limit=1');
-   if(verify&&verify.length)throw new Error('Database verification found archived accounts remaining in this portfolio.');
+   let result=await dbFetch('/rpc/cpcm_delete_archived_portfolio',{method:'POST',body:JSON.stringify({target_portfolio:g.name,expected_count:g.rows.length})});
+   let rpcResult=Array.isArray(result)?result[0]:result;
+   if(!rpcResult||rpcResult.ok!==true||Number(rpcResult.deleted_count)!==g.rows.length)throw new Error('Database did not confirm the complete archived portfolio deletion.');
    try{await insertAudit('Archived Portfolio Permanently Deleted','Permanently deleted '+g.rows.length+' archived accounts from '+g.name,'portfolio',g.name)}catch(e){}
    alert('Permanent delete complete. '+g.rows.length+' archived accounts from '+g.name+' were removed and the database verified none remain archived under that portfolio.');
  }catch(err){alert('Archived portfolio delete failed: '+(err.message||err))}
@@ -9648,7 +9646,7 @@ async function openArchivedAccounts(){
 }
 
 async function restoreCurrentArchivedAccount(){let a=archivedWorkspaceAccount;if(!a)return;if(confirm('Restore '+nameOf(a)+' to the active queue?'))await restoreArchivedAccount(a)}
-async function deleteCurrentArchivedAccount(){let a=archivedWorkspaceAccount;if(!a)return;await permanentlyDeleteArchivedAccount(a);await closeArchivedWorkspace()}
+async function deleteCurrentArchivedAccount(){let a=archivedWorkspaceAccount;if(!a)return;let deleted=await permanentlyDeleteArchivedAccount(a);if(deleted)await closeArchivedWorkspace()}
 async function closeArchivedWorkspace(){archivedWorkspaceAccount=null;currentAccountId='';await loadAccounts()}
 function syncArchivedWorkspaceBanner(){let b=document.getElementById('archivedWorkspaceBanner');if(!b)return;b.classList.toggle('hidden',!(archivedWorkspaceAccount&&String(currentAccountId)===String(archivedWorkspaceAccount.id)))}
 
