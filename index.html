@@ -109,6 +109,7 @@ header.topbar{height:66px;background:linear-gradient(90deg,#05225f,#07379a,#0b45
 .allFieldKey{font-size:11px;font-weight:600;line-height:1.2}
 .allFieldVal{font-size:12px;font-weight:800;line-height:1.25;overflow-wrap:anywhere}
 .accountIntelStrip{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));padding:0!important;overflow:hidden;border-radius:14px!important}.intelItem{padding:10px 12px;border-right:1px solid #e5edf7;min-width:0}.intelItem:last-child{border-right:0}.intelItem span{display:block;font-size:10px;font-weight:800;color:#64748b;margin-bottom:4px}.intelItem b{display:block;font-size:12px;color:#0f172a;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.intelNext{background:#f5f9ff}.intelNext b{color:#1457ff}.accountFlagsStrip{display:none!important;padding:8px 10px!important;gap:6px;flex-wrap:wrap}.accountFlagsStrip.hasFlags{display:flex!important}.accountFlag{font-size:11px;font-weight:900;padding:5px 8px;border-radius:999px;background:#fff1f2;color:#b42318;border:1px solid #fecdd3}.accountFlag.good{background:#ecfdf3;color:#067647;border-color:#abefc6}.accountFlag.warn{background:#fffaeb;color:#b54708;border-color:#fedf89}@media(max-width:1400px){.accountIntelStrip{grid-template-columns:repeat(3,1fr)}.intelItem:nth-child(3){border-right:0}}@media(max-width:850px){.accountIntelStrip{grid-template-columns:repeat(2,1fr)}}
+.timelineEvent{display:grid!important;grid-template-columns:34px 1fr;gap:10px;align-items:start;padding:10px 4px!important}.timelineIcon{width:30px;height:30px;border-radius:9px;background:#eef4ff;color:#1457ff;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:900}.timelineBody{min-width:0}.timelineBody .eventTitle{font-size:12px;font-weight:900;color:#0f172a}.timelineBody>div:nth-child(2){font-size:12px;color:#334155;line-height:1.35;margin-top:2px}.timelineBody .eventMeta{font-size:10px;color:#7b8aa0;margin-top:4px}
 .phonePanel,.dispoPanel,.notePanel,.activity{padding:15px;border-radius:16px}.phonePanel{grid-column:1/-1}.phoneGrid{grid-template-columns:repeat(4,1fr)}.phoneChip{padding:10px;border-radius:12px}.phoneIcon{width:31px;height:31px}.phoneNum{font-size:13px}.phoneType{font-size:11px}
 .dispoPanel{grid-column:1/-1}.dispoGrid{grid-template-columns:repeat(8,1fr);gap:8px}.dispo{height:44px;font-size:12px;border-radius:10px;padding:0 8px}
 .notePanel{grid-column:1/2}.notePanel textarea{height:90px;background:#fffdf3;border-color:#f3d38a}.centerActivity{grid-column:2/3}.timeline{max-height:160px;overflow:auto}
@@ -6452,7 +6453,28 @@ async function saveComplianceGuard(){
   }catch(e){alert('Compliance columns are not ready yet. Run RUN_THIS_COMPLIANCE_GUARD_SQL.sql in Supabase, then reload.\n\n'+e.message)}
 }
 
-async function loadHistory(id){if(!id)return;try{let notes=await dbFetch(`/account_notes?account_id=eq.${id}&select=*&order=created_at.desc&limit=20`),acts=await dbFetch(`/activity_logs?account_id=eq.${id}&select=*&order=created_at.desc&limit=20`);let events=[...acts.map(x=>({date:x.created_at,type:x.action_type,text:x.action_text})),...notes.map(x=>({date:x.created_at,type:'Note',text:x.note}))].sort((a,b)=>new Date(b.date)-new Date(a.date)).slice(0,8);document.getElementById('activityList').innerHTML=events.map(e=>`<div class="event"><div class="eventTitle">${esc(e.type)}</div><div>${esc(e.text)}</div><div class="eventMeta">${new Date(e.date).toLocaleString()}</div></div>`).join('')||'<div class="muted">No activity yet.</div>'}catch{}}
+function timelineIcon(type){let t=String(type||'').toLowerCase();if(t.includes('payment'))return '💳';if(t.includes('promise'))return '✓';if(t.includes('call')||t.includes('dial'))return '☎';if(t.includes('note'))return '✎';if(t.includes('follow')||t.includes('callback'))return '◷';if(t.includes('dispute'))return '⚑';if(t.includes('settle'))return '$';if(t.includes('letter')||t.includes('communication'))return '✉';if(t.includes('status'))return '●';return '•'}
+async function loadHistory(id){
+ if(!id)return;
+ let box=document.getElementById('activityList');if(!box)return;
+ try{
+  let reqs=[
+   dbFetch(`/account_notes?account_id=eq.${id}&select=*&order=created_at.desc&limit=100`).catch(()=>[]),
+   dbFetch(`/activity_logs?account_id=eq.${id}&select=*&order=created_at.desc&limit=200`).catch(()=>[]),
+   dbFetch(`/call_results?account_id=eq.${id}&select=*&order=created_at.desc&limit=100`).catch(()=>[]),
+   dbFetch(`/payments_ledger?account_id=eq.${id}&select=*&order=created_at.desc&limit=100`).catch(()=>[]),
+   dbFetch(`/follow_ups?account_id=eq.${id}&select=*&order=created_at.desc&limit=100`).catch(()=>[])
+  ];
+  let [notes,acts,calls,pays,fus]=await Promise.all(reqs),events=[];
+  acts.forEach(x=>events.push({date:x.created_at,type:x.action_type||'Activity',text:x.action_text||'',by:x.created_by_email||''}));
+  notes.forEach(x=>events.push({date:x.created_at,type:'Note',text:x.note||'',by:x.created_by_email||''}));
+  calls.forEach(x=>events.push({date:x.created_at||x.result_at,type:'Call Result',text:[x.call_result||x.disposition,x.phone_number?fmtPhone(x.phone_number):'',x.duration_seconds?x.duration_seconds+'s':'',x.notes||''].filter(Boolean).join(' · '),by:x.created_by_email||''}));
+  pays.forEach(x=>events.push({date:x.created_at||x.payment_date,type:'Payment',text:[money(x.amount),x.payment_method||'',x.status||'',x.receipt_number?'Receipt '+x.receipt_number:''].filter(Boolean).join(' · '),by:x.created_by_email||''}));
+  fus.forEach(x=>events.push({date:x.created_at||x.due_date,type:x.follow_up_type||'Follow-Up',text:['Due '+(x.due_date||'')+(x.due_time?' '+x.due_time:''),x.status||'',x.reason||x.notes||''].filter(Boolean).join(' · '),by:x.created_by_email||''}));
+  let seen=new Set();events=events.filter(e=>{let k=[e.date,e.type,e.text].join('|');if(seen.has(k))return false;seen.add(k);return true}).sort((a,b)=>new Date(b.date||0)-new Date(a.date||0)).slice(0,60);
+  box.innerHTML=events.map(e=>`<div class="event timelineEvent"><div class="timelineIcon">${timelineIcon(e.type)}</div><div class="timelineBody"><div class="eventTitle">${esc(e.type)}</div><div>${esc(e.text)}</div><div class="eventMeta">${e.date?new Date(e.date).toLocaleString():'—'}${e.by?' · '+esc(e.by):''}</div></div></div>`).join('')||'<div class="muted">No activity yet.</div>';
+ }catch(e){box.innerHTML='<div class="muted">Timeline could not load.</div>'}
+}
 document.getElementById('agentNote').addEventListener('input',()=>{let v=document.getElementById('agentNote').value;document.getElementById('noteCounter').textContent=v.length+' / 2000'})
 
 
