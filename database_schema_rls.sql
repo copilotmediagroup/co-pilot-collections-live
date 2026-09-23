@@ -2386,9 +2386,9 @@ declare
   c_nmi_transactions int := 0;
 begin
   if v_email <> 'afinch2678@gmail.com' then raise exception 'Admin only'; end if;
-  delete from public.payment_approval_requests;
+  delete from public.payment_approval_requests where account_id is not null;
   get diagnostics c_payment_approval_requests = row_count;
-  delete from public.nmi_transactions;
+  delete from public.nmi_transactions where account_id is not null;
   get diagnostics c_nmi_transactions = row_count;
   update public.team_messages set account_id = null where account_id is not null;
   delete from public.accounts;
