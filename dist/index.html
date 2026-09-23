@@ -96,6 +96,18 @@ header.topbar{height:66px;background:linear-gradient(90deg,#05225f,#07379a,#0b45
 .accountCard{grid-column:1/-1;padding:18px 20px;display:grid;grid-template-columns:72px 1.2fr 2.8fr;gap:18px;align-items:center;border-radius:16px}.avatar{width:60px;height:60px;font-size:22px}.name{font-size:22px}.summaryGrid{display:grid;grid-template-columns:repeat(6,1fr);gap:14px}.fieldLabel{font-size:11px;margin-bottom:5px;text-transform:none}.fieldVal{font-size:14px;margin-bottom:0;line-height:1.25}.badge{font-size:11px;padding:4px 8px}
 .allFieldsTopPanel{grid-column:1/-1;border:1px solid var(--line);box-shadow:0 4px 16px rgba(15,23,42,.05);border-radius:16px;padding:16px;background:#fff}.allFieldsTopHeader{margin-bottom:12px}.allFieldsTopTitle{font-size:16px}.allFieldsGrid{display:grid;grid-template-columns:repeat(4,1fr);gap:0;border-top:1px solid #e5edf7;max-height:none;overflow:visible}.allFieldCard{border:0;border-right:1px solid #e5edf7;border-bottom:1px solid #e5edf7;border-radius:0;background:#fff;padding:10px 12px;min-height:54px}.allFieldCard:nth-child(4n){border-right:0}.allFieldKey{font-size:11px;color:#64748b}.allFieldVal{font-size:13px;font-weight:800;color:#0f172a}
 .detailGroup{padding:0}.detailGroupTitle{font-size:13px;font-weight:1000;color:#0f172a;margin:12px 0 8px;display:flex;align-items:center;gap:7px}.detailGroupGrid{display:grid;grid-template-columns:repeat(2,1fr);border:1px solid #e5edf7;border-radius:12px;overflow:hidden}.detailGroupGrid .allFieldCard{border-right:1px solid #e5edf7}.detailGroupGrid .allFieldCard:nth-child(2n){border-right:0}
+/* Compact mapped-detail cards: reference typography, weight hierarchy and section icons. */
+.allFieldsTopTitle{font-size:18px;font-weight:900}
+.allFieldsGrid{grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;border-top:0}
+.detailGroup{padding:0;border:1px solid #dce7f5;border-radius:12px;overflow:hidden;background:#fff;align-self:start}
+.detailGroupTitle{font-size:13px;font-weight:900;margin:0;padding:11px 12px;background:#f8fbff;border-bottom:1px solid #dce7f5;gap:8px}
+.detailGroupTitle:before{content:'◆';font-size:11px;color:#1457ff}
+.detailGroupGrid{grid-template-columns:1fr;border:0;border-radius:0}
+.detailGroupGrid .allFieldCard{border-right:0!important}
+.detailGroupGrid .allFieldCard:last-child{border-bottom:0}
+.allFieldCard{padding:7px 10px;min-height:38px;display:grid;grid-template-columns:minmax(105px,.9fr) minmax(0,1.15fr);gap:10px;align-items:center}
+.allFieldKey{font-size:11px;font-weight:600;line-height:1.2}
+.allFieldVal{font-size:12px;font-weight:800;line-height:1.25;overflow-wrap:anywhere}
 .phonePanel,.dispoPanel,.notePanel,.activity{padding:15px;border-radius:16px}.phonePanel{grid-column:1/-1}.phoneGrid{grid-template-columns:repeat(4,1fr)}.phoneChip{padding:10px;border-radius:12px}.phoneIcon{width:31px;height:31px}.phoneNum{font-size:13px}.phoneType{font-size:11px}
 .dispoPanel{grid-column:1/-1}.dispoGrid{grid-template-columns:repeat(8,1fr);gap:8px}.dispo{height:44px;font-size:12px;border-radius:10px;padding:0 8px}
 .notePanel{grid-column:1/2}.notePanel textarea{height:90px;background:#fffdf3;border-color:#f3d38a}.centerActivity{grid-column:2/3}.timeline{max-height:160px;overflow:auto}
@@ -5950,6 +5962,16 @@ function addDetail(rows,label,value,type='text'){
  if(value===undefined||value===null||String(value).trim()==='')return;
  rows.push([label,label,value,type]);
 }
+function chargeOffAge(v){
+ if(!v)return '';
+ let d=new Date(v), now=new Date();
+ if(Number.isNaN(d.getTime())||d>now)return '';
+ let months=(now.getFullYear()-d.getFullYear())*12+(now.getMonth()-d.getMonth());
+ if(now.getDate()<d.getDate())months--;
+ if(months<0)return '';
+ let years=Math.floor(months/12), rem=months%12;
+ return years+' year'+(years===1?'':'s')+', '+rem+' month'+(rem===1?'':'s');
+}
 function renderAllImportedFields(a){
  let grid=document.getElementById('allFieldsGrid'),count=document.getElementById('allFieldsCount');
  if(!grid)return;
@@ -6005,7 +6027,7 @@ function renderAllImportedFields(a){
  addDetail(dates,'Charge-off Date',pickVal(a,['chargeOffDate','CODate','Charge Off Date','charge_off_date']));
  addDetail(dates,'Account Receive Date',pickVal(a,['accountReceiveDate','AccountReceiveDate']));
  addDetail(dates,'Source / File',pickVal(a,['portfolio','SourceFile','fileName','FileName']));
- addDetail(dates,'Imported By',pickVal(a,['createdByEmail','created_by_email']));
+ addDetail(dates,'Charge-Off Age',chargeOffAge(pickVal(a,['chargeOffDate','CODate','Charge Off Date','charge_off_date'])));
  addDetail(dates,'Assigned To',a.assignedToEmail||'');
  addDetail(dates,'Assigned By',a.assignedByEmail||'');
  addDetail(dates,'Assigned At',a.assignedAt||'');
