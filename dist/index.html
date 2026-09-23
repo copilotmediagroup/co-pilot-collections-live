@@ -3747,7 +3747,7 @@ button {
         <button onclick="openComplianceGuard()">Compliance Guard</button><button onclick="openDocumentGenerator()">Letters</button><button class="adminOnly hidden" onclick="openLetterBodyEditor()">Letter Bodies</button><button class="adminOnly hidden qaBtn" onclick="openQaHealthModal()">QA Health</button><button class="adminOnly hidden" onclick="openAuditLog()">Audit Log</button>
       </div></div>
       <div class="topMenu adminOnly hidden"><button class="gray topMenuMain">Admin ▾</button><div class="topMenuDrop">
-        <button onclick="openEmployeeAdminModal()">Staff</button><button onclick="openPermissionsModal()">Permissions</button><button onclick="openEmployeeMonitorModal()">Monitor</button><button onclick="openReportsPageStable()">Reports</button><button onclick="openBrandingSettingsModal()">Branding</button><button onclick="openAssignModal()">Assign Accounts</button><button onclick="openImportHistoryPage()">Portfolio Manager</button><button onclick="openDataCleanupDashboard()">Cleanup</button><label class="topMenuFile">Import CSV<input type="file" accept=".csv" onchange="importCSV(event)"></label><button onclick="downloadTemplate()">Download Template</button><button onclick="exportCSV()">Export CSV</button><button onclick="openArchivedAccounts()">Archived Accounts</button><button class="dangerItem" onclick="clearAllAccounts()">Archive Active Accounts</button>
+        <button onclick="openEmployeeAdminModal()">Staff</button><button onclick="openPermissionsModal()">Permissions</button><button onclick="openEmployeeMonitorModal()">Monitor</button><button onclick="openReportsPageStable()">Reports</button><button onclick="openBrandingSettingsModal()">Branding</button><button onclick="openAssignModal()">Assign Accounts</button><button onclick="openImportHistoryPage()">Portfolio Manager</button><button onclick="openDataCleanupDashboard()">Cleanup</button><label class="topMenuFile">Import CSV<input type="file" accept=".csv" onchange="importCSV(event)"></label><button onclick="downloadTemplate()">Download Template</button><button onclick="exportCSV()">Export CSV</button><button onclick="openArchivedAccounts()">Archived Accounts</button><button class="dangerItem" onclick="permanentlyDeleteArchivedPortfolio()">Delete Archived Portfolio</button><button class="dangerItem" onclick="clearAllAccounts()">Archive Active Accounts</button>
       </div></div>
       <div class="topMenu"><button class="gray topMenuMain">System ▾</button><div class="topMenuDrop topMenuDropRight">
         <button id="cpcmNoDialerStaticTopBtn" onclick="openNoDialerSafeMode()">Safe Mode</button><button onclick="openHelpModal()">Help</button><button class="dangerItem" onclick="logout()">Logout</button>
@@ -9548,6 +9548,38 @@ async function permanentlyDeleteArchivedAccount(a){
  try{await insertAudit('Archived Account Permanently Deleted','Permanently deleted archived account '+nameOf(a),'account',a.id)}catch(e){}
  archivedWorkspaceAccount=null;alert('Archived account permanently deleted.');
 }
+async function permanentlyDeleteArchivedPortfolio(){
+ if(!currentUser.isAdmin)return alert('Admin only');
+ try{
+   setGlobalBusy(true,'Archived Portfolios','Loading archived portfolio totals...');
+   let rows=(await dbFetch('/accounts?select=id,portfolio,current_balance&archived_at=not.is.null&order=portfolio.asc&limit=20000')).map(toCamel);
+   if(!rows.length)return alert('There are no archived portfolios.');
+   let groups={};
+   rows.forEach(a=>{let p=String(a.portfolio||'Unlabeled Portfolio').trim()||'Unlabeled Portfolio';if(!groups[p])groups[p]={name:p,rows:[],balance:0};groups[p].rows.push(a);groups[p].balance+=accountBalance(a)});
+   let list=Object.values(groups).sort((a,b)=>a.name.localeCompare(b.name));
+   setGlobalBusy(false);
+   let preview=list.map((g,i)=>(i+1)+'. '+g.name+' | '+g.rows.length+' accounts | '+money(g.balance)).join('\n');
+   let pick=prompt('DELETE ARCHIVED PORTFOLIO\n\n'+preview+'\n\nEnter the portfolio number to permanently delete, or Cancel.');
+   if(pick===null)return;
+   let n=Number(pick);if(!Number.isInteger(n)||n<1||n>list.length)return alert('Enter a portfolio number shown in the list.');
+   let g=list[n-1],confirmPhrase='DELETE '+g.name;
+   let phrase=prompt('PERMANENT PORTFOLIO DELETE\n\nPortfolio: '+g.name+'\nArchived accounts: '+g.rows.length+'\nBalance: '+money(g.balance)+'\n\nOnly archived accounts in this portfolio will be targeted. This cannot be undone.\n\nType exactly:\n'+confirmPhrase);
+   if(phrase!==confirmPhrase)return alert('Delete cancelled. Confirmation text did not match.');
+   if(!confirm('Final confirmation: permanently delete all '+g.rows.length+' ARCHIVED accounts in '+g.name+'?'))return;
+   setGlobalBusy(true,'Deleting archived portfolio','Permanently removing '+g.rows.length+' archived accounts...');
+   let ids=g.rows.map(a=>a.id).filter(Boolean);
+   for(let i=0;i<ids.length;i+=50){
+     let batch=ids.slice(i,i+50);
+     await dbFetch('/accounts?id=in.('+batch.join(',')+')&archived_at=not.is.null',{method:'DELETE',headers:{Prefer:'return=minimal'}});
+   }
+   let verify=await dbFetch('/accounts?select=id&archived_at=not.is.null&portfolio=eq.'+encodeURIComponent(g.name)+'&limit=1');
+   if(verify&&verify.length)throw new Error('Database verification found archived accounts remaining in this portfolio.');
+   try{await insertAudit('Archived Portfolio Permanently Deleted','Permanently deleted '+g.rows.length+' archived accounts from '+g.name,'portfolio',g.name)}catch(e){}
+   alert('Permanent delete complete. '+g.rows.length+' archived accounts from '+g.name+' were removed and the database verified none remain archived under that portfolio.');
+ }catch(err){alert('Archived portfolio delete failed: '+(err.message||err))}
+ finally{setGlobalBusy(false)}
+}
+
 async function openArchivedAccounts(){
  if(!currentUser.isAdmin)return alert('Admin only');
  let term=prompt('Search archived accounts by name, phone, account number, SSN, email, or portfolio.\n\nLeave blank to show the most recently archived accounts.');
@@ -14371,7 +14403,7 @@ function exportContactIntelligenceCSV(){let calls=filteredContactCalls();let row
   function call(fn,arg){
     try{
       var managerFns=['openReportsPageStable','openEmployeeMonitorModal'];
-      var adminFns=['openClientPortalAdmin','openRemittanceAdmin','importCSVClick','openImportHistoryPage','openAssignModal','exportCSV','downloadTemplate','openDataCleanupDashboard','clearAllAccounts','openEmployeeAdminModal','openBrandingSettingsModal','openPermissionsModal','openQaHealthModal','openAuditLog'];
+      var adminFns=['openClientPortalAdmin','openRemittanceAdmin','importCSVClick','openImportHistoryPage','openAssignModal','exportCSV','downloadTemplate','openDataCleanupDashboard','clearAllAccounts','openArchivedAccounts','permanentlyDeleteArchivedPortfolio','openEmployeeAdminModal','openBrandingSettingsModal','openPermissionsModal','openQaHealthModal','openAuditLog'];
       if(managerFns.indexOf(fn)>=0&&!isManager())return alert('Manager or Admin access required.');
       if(adminFns.indexOf(fn)>=0&&!isAdmin())return alert('Admin only.');
       if(fn==='runPromiseAutomation')return window.runPromiseAutomation(true,true);
@@ -14476,7 +14508,7 @@ function exportContactIntelligenceCSV(){let calls=filteredContactCalls();let row
   function call(fn,arg){
     try{
       var managerFns=['openReportsPageStable','openEmployeeMonitorModal'];
-      var adminFns=['openClientPortalAdmin','openRemittanceAdmin','importCSVClick','openImportHistoryPage','openAssignModal','exportCSV','downloadTemplate','openDataCleanupDashboard','clearAllAccounts','openEmployeeAdminModal','openBrandingSettingsModal','openPermissionsModal','openQaHealthModal','openAuditLog'];
+      var adminFns=['openClientPortalAdmin','openRemittanceAdmin','importCSVClick','openImportHistoryPage','openAssignModal','exportCSV','downloadTemplate','openDataCleanupDashboard','clearAllAccounts','openArchivedAccounts','permanentlyDeleteArchivedPortfolio','openEmployeeAdminModal','openBrandingSettingsModal','openPermissionsModal','openQaHealthModal','openAuditLog'];
       if(managerFns.indexOf(fn)>=0&&!isManager())return alert('Manager or Admin access required.');
       if(adminFns.indexOf(fn)>=0&&!isAdmin())return alert('Admin only.');
       if(fn==='runPromiseAutomation')return window.runPromiseAutomation(true,true);
