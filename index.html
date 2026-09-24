@@ -3996,7 +3996,7 @@ header.topbar{height:58px!important;padding:0 12px!important;grid-template-colum
         <div class="qaItem" onclick="openPaymentTrackerForCurrent()"><span class="qaLeft"><span class="qaIcon">🧾</span>Record Payment Promise</span><span>›</span></div>
         <div class="qaItem" onclick="openPaymentPlan()"><span class="qaLeft"><span class="qaIcon">💳</span>Payment Plan Schedule</span><span>›</span></div>
         <div class="qaItem nmiQuickAction" onclick="openNmiPayment()"><span class="qaLeft"><span class="qaIcon">🔒</span>Secure Card Payment (NMI)</span><span>›</span></div>
-        <div class="qaItem" onclick="openPaymentLedger()"><span class="qaLeft"><span class="qaIcon">💵</span>Record Payment / Ledger</span><span>›</span></div>
+        <div class="qaItem adminOnly hidden" onclick="openPaymentLedger()"><span class="qaLeft"><span class="qaIcon">💵</span>Record Payment / Ledger</span><span>›</span></div>
         <div class="qaItem" onclick="openDocumentGenerator()"><span class="qaLeft"><span class="qaIcon">🧾</span>Create Debtor Letter / PDF</span><span>›</span></div>
         <div class="qaItem" onclick="openFollowUpModal('Callback')"><span class="qaLeft"><span class="qaIcon">📅</span>Schedule Callback / Follow-Up</span><span>›</span></div>
         <div class="qaItem" onclick="openChatForCurrentAccount()"><span class="qaLeft"><span class="qaIcon">💬</span>Message / Transfer Call</span><span>›</span></div>
@@ -8572,6 +8572,7 @@ function ledgerBalanceAfter(balance,amount,type,status){
  return balance;
 }
 function openPaymentLedger(){
+ if(!currentUser?.isAdmin)return alert('Admin only.');
  let a=getCurrent(); if(!a)return alert('No account selected.');
  document.getElementById('ledgerDate').value=todayISO();
  document.getElementById('ledgerAmount').value='';
@@ -8626,6 +8627,7 @@ async function applyLedgerPaymentToPlan(accountId,amount){
 }
 let ledgerPaymentSaveBusy=false;
 async function saveLedgerPayment(){
+ if(!currentUser?.isAdmin)return alert('Admin only.');
  if(ledgerPaymentSaveBusy)return;
  let a=getCurrent(); if(!a)return alert('No account selected.');
  ledgerPaymentSaveBusy=true;
