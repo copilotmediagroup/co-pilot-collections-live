@@ -3711,6 +3711,9 @@ header.topbar{height:58px!important;padding:0 12px!important;grid-template-colum
 .bottom{position:relative}.bottom:before{content:'Finish this account';font-size:10px;font-weight:900;color:#64748b;margin-right:auto}.bottom .rightBtns{margin-left:auto}.bottom .rightBtns .primaryBig{box-shadow:0 3px 9px rgba(20,87,255,.2)}.bottom .rightBtns button{white-space:nowrap}
 @media(max-width:1350px){.cpcmWsGrid{grid-template-columns:repeat(4,1fr)!important}.quickActions .qaItem:nth-of-type(n+7){display:none}}
 </style>
+<style id="employeeEarningsR8N30">
+.earningsBox{width:min(980px,96vw)!important;max-width:980px!important}.earnSub{font-size:11px;color:#64748b;margin-top:3px;font-weight:800}.earnRate,.earnNotice{border:1px solid #bfdbfe;background:#eff6ff;color:#1e40af;border-radius:12px;padding:11px 12px;font-size:12px;font-weight:850;margin-bottom:12px}.earnKpis{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px}.earnKpi{border:1px solid #dbe5f1;background:#fff;border-radius:12px;padding:13px}.earnKpi span{display:block;font-size:9px;text-transform:uppercase;letter-spacing:.05em;color:#64748b;font-weight:900}.earnKpi b{display:block;margin-top:5px;font-size:20px;color:#0f4ecb}.earnTableWrap{border:1px solid #dbe5f1;border-radius:12px;overflow:auto;max-height:480px}.earnTable{width:100%;border-collapse:collapse;font-size:12px}.earnTable th{position:sticky;top:0;background:#f8fafc;padding:10px;text-align:left;color:#475569}.earnTable td{padding:10px;border-top:1px solid #edf2f7}.earnRateInput{width:95px!important;height:34px!important}.earnSave{height:34px!important;padding:0 12px!important}.earnEmpty{padding:24px;text-align:center;color:#64748b;font-weight:800}@media(max-width:700px){.earnKpis{grid-template-columns:repeat(2,1fr)}}
+</style>
 <style id="rightSidebarFullHeightR8N29">
 /* Restore full-height Quick Actions rail. Rollback: pre-right-sidebar-full-height */
 .right{display:flex!important;flex-direction:column!important;align-self:stretch!important;padding:9px 8px 62px!important;overflow:auto!important}
@@ -3801,7 +3804,7 @@ header.topbar{height:58px!important;padding:0 12px!important;grid-template-colum
     <div class="brand"><div class="logo appBrandLogo" id="appBrandLogo">b</div><div><h1 id="appBrandName">Co Pilot Collections Manager</h1><p class="sub" id="appBrandSub">Scorecards, tickler, receipts, settlements, import history, cleanup, communications, reports, compliance, promises, and team chat.</p></div></div>
     <div class="headerSearch"><span class="mag">⌕</span><input id="globalSearch" placeholder="Search phone, name, SSN, address..." oninput="handleSearchInput('global')"><span class="hotkey">⌘ K</span></div>
     <div class="topActions topMenuActions">
-      <div class="topMenu"><button class="gray topMenuMain">Work ▾</button><div class="topMenuDrop">
+      <div class="topMenu"><button class="gray topMenuMain">Work ▾</button><div class="topMenuDrop"><button onclick="openMyEarnings()">My Earnings</button>
         <button onclick="openTodayDashboard()">Today</button><button onclick="openDailyWorkQueue()">Queue</button><button onclick="openPromiseDashboard()">Promises</button><button onclick="runPromiseAutomation(true,true)">Broken Promises</button><button onclick="openCollectorAlerts()">Alerts <span id="collectorAlertBadgeMenu" class="alertBadge hidden">0</span></button><button onclick="openContactIntelligence()">Calls</button><button onclick="openCommunicationCenter()">Communications</button>
       </div></div>
       <div class="topMenu"><button class="gray topMenuMain">Payments ▾</button><div class="topMenuDrop">
@@ -3811,7 +3814,7 @@ header.topbar{height:58px!important;padding:0 12px!important;grid-template-colum
         <button onclick="openComplianceGuard()">Compliance Guard</button><button onclick="openDocumentGenerator()">Letters</button><button class="adminOnly hidden" onclick="openLetterBodyEditor()">Letter Bodies</button><button class="adminOnly hidden qaBtn" onclick="openQaHealthModal()">QA Health</button><button class="adminOnly hidden" onclick="openAuditLog()">Audit Log</button>
       </div></div>
       <div class="topMenu adminOnly hidden"><button class="gray topMenuMain">Admin ▾</button><div class="topMenuDrop">
-        <button onclick="openEmployeeAdminModal()">Staff</button><button onclick="openPermissionsModal()">Permissions</button><button onclick="openEmployeeMonitorModal()">Monitor</button><button onclick="openReportsPageStable()">Reports</button><button onclick="openBrandingSettingsModal()">Branding</button><button onclick="openAssignModal()">Assign Accounts</button><button onclick="openImportHistoryPage()">Portfolio Manager</button><button onclick="openDataCleanupDashboard()">Cleanup</button><label class="topMenuFile">Import CSV<input type="file" accept=".csv" onchange="importCSV(event)"></label><button onclick="downloadTemplate()">Download Template</button><button onclick="exportCSV()">Export CSV</button><button onclick="openArchivedAccounts()">Archived Accounts</button><button class="dangerItem" onclick="permanentlyDeleteArchivedPortfolio()">Delete Archived Portfolio</button><button class="dangerItem" onclick="clearAllAccounts()">Archive Active Accounts</button>
+        <button onclick="openEmployeeAdminModal()">Staff</button><button onclick="openCommissionAdmin()">Employee Compensation</button><button onclick="openPermissionsModal()">Permissions</button><button onclick="openEmployeeMonitorModal()">Monitor</button><button onclick="openReportsPageStable()">Reports</button><button onclick="openBrandingSettingsModal()">Branding</button><button onclick="openAssignModal()">Assign Accounts</button><button onclick="openImportHistoryPage()">Portfolio Manager</button><button onclick="openDataCleanupDashboard()">Cleanup</button><label class="topMenuFile">Import CSV<input type="file" accept=".csv" onchange="importCSV(event)"></label><button onclick="downloadTemplate()">Download Template</button><button onclick="exportCSV()">Export CSV</button><button onclick="openArchivedAccounts()">Archived Accounts</button><button class="dangerItem" onclick="permanentlyDeleteArchivedPortfolio()">Delete Archived Portfolio</button><button class="dangerItem" onclick="clearAllAccounts()">Archive Active Accounts</button>
       </div></div>
       <div class="topMenu"><button class="gray topMenuMain">System ▾</button><div class="topMenuDrop topMenuDropRight">
         <button id="cpcmNoDialerStaticTopBtn" onclick="openNoDialerSafeMode()">Safe Mode</button><button onclick="openHelpModal()">Help</button><button class="dangerItem" onclick="logout()">Logout</button>
@@ -4011,6 +4014,9 @@ header.topbar{height:58px!important;padding:0 12px!important;grid-template-colum
 
   <div class="bottom"><button class="gray adminOnly hidden" onclick="openModal()">+ Add Account</button><div class="rightBtns"><button class="outline big" onclick="skipAccount()">Skip</button><button class="outline big" onclick="saveCurrent()">Save</button><button class="primaryBig" onclick="saveAndNext()">Save & Next</button><button class="outline big" onclick="nextAccount()">Next Account</button></div></div>
 </div>
+
+<div id="earningsModal" class="modal"><div class="modalbox earningsBox"><div class="modalhead"><div><h2 style="margin:0">My Earnings</h2><div class="earnSub">Only Admin-approved, successfully processed NMI payments count toward earnings.</div></div><button class="gray" onclick="closeModal('earningsModal')">Close</button></div><div class="modalbody"><div id="earnRate" class="earnRate"></div><div id="earnKpis" class="earnKpis"></div><div class="earnTableWrap"><table class="earnTable"><thead><tr><th>Approved</th><th>Collected</th><th>Rate</th><th>Earned</th></tr></thead><tbody id="earnRows"></tbody></table></div></div></div></div>
+<div id="commissionAdminModal" class="modal"><div class="modalbox earningsBox"><div class="modalhead"><div><h2 style="margin:0">Employee Compensation</h2><div class="earnSub">Set the percentage each employee earns from Admin-approved NMI payments.</div></div><button class="gray" onclick="closeModal('commissionAdminModal')">Close</button></div><div class="modalbody"><div class="earnNotice"><b>Commission rule:</b> A submitted promise or payment request earns nothing. Earnings are created only after Admin approves and NMI successfully processes the payment.</div><div class="earnTableWrap"><table class="earnTable"><thead><tr><th>Employee</th><th>Role</th><th>Commission %</th><th>Action</th></tr></thead><tbody id="commissionAdminRows"></tbody></table></div></div></div></div>
 
 <div id="modal" class="modal"><div class="modalbox"><div class="modalhead"><h2 id="modalTitle">Add Account</h2><button class="gray" onclick="closeModal('modal')">Close</button></div><div class="modalbody"><form onsubmit="saveAccount(event)"><input type="hidden" id="id"><div class="grid">
   <div class="sectionTitle">Account / Portfolio</div><div><label>Portfolio</label><input id="portfolio"></div><div><label>Account Description</label><input id="accountDescription"></div><div><label>Original Creditor</label><input id="originalCreditor"></div><div><label>Account Number</label><input id="accountNumberInput"></div><div><label>Client Account Number</label><input id="clientAccountNumber"></div><div><label>Account ID</label><input id="accountId"></div><div><label>Type of Debt</label><input id="typeOfDebt"></div><div><label>Status</label><select id="statusInput"><option>New</option><option>Active</option><option>No Answer</option><option>Left Voicemail</option><option>Promise to Pay</option><option>Disputed</option><option>Callback</option><option>Settled</option><option>DNC</option><option>Bad Number</option><option>Closed</option></select></div>
@@ -5784,6 +5790,32 @@ async function loadAppUsers(){
  return appUsers;
 }
 function validEmail(e){return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(e||'').trim().toLowerCase())}
+function earningsMoney(v){return Number(v||0).toLocaleString('en-US',{style:'currency',currency:'USD'})}
+function earningsDate(v){if(!v)return '—';let d=new Date(v);return isNaN(d)?String(v):d.toLocaleString()}
+async function openMyEarnings(){
+ try{
+  let raw=await dbFetch('/rpc/cpcm_my_commission_summary',{method:'POST',body:'{}'}),d=Array.isArray(raw)?raw[0]:raw;if(!d)d={};
+  let rate=Number(d.commission_rate||d.commissionRate||0),recent=d.recent||[];
+  document.getElementById('earnRate').innerHTML='<b>Your commission rate:</b> '+rate.toFixed(2)+'% &nbsp;•&nbsp; Earnings appear only after Admin approves and NMI successfully processes the payment.';
+  let vals=[['Today',d.today],['This Week',d.week],['This Month',d.month],['This Year',d.year]];
+  document.getElementById('earnKpis').innerHTML=vals.map(x=>'<div class="earnKpi"><span>'+esc(x[0])+'</span><b>'+esc(earningsMoney(x[1]))+'</b></div>').join('');
+  document.getElementById('earnRows').innerHTML=recent.length?recent.map(x=>'<tr><td>'+esc(earningsDate(x.approved_at||x.approvedAt))+'</td><td>'+esc(earningsMoney(x.gross_amount||x.grossAmount))+'</td><td>'+esc(Number(x.commission_rate||x.commissionRate||0).toFixed(2))+'%</td><td><b>'+esc(earningsMoney(x.earned_amount||x.earnedAmount))+'</b></td></tr>').join(''):'<tr><td colspan="4"><div class="earnEmpty">No Admin-approved NMI earnings yet.</div></td></tr>';
+  document.getElementById('earningsModal').classList.add('open');
+ }catch(e){alert('Could not load earnings: '+friendlyError(e.message||e))}
+}
+async function openCommissionAdmin(){
+ if(!currentUser?.isAdmin)return alert('Admin only.');
+ try{
+  let raw=await dbFetch('/rpc/cpcm_admin_commission_staff',{method:'POST',body:'{}'}),rows=(raw||[]).map(toCamel);
+  document.getElementById('commissionAdminRows').innerHTML=rows.map(u=>'<tr><td><b>'+esc(u.fullName||u.email)+'</b><br><span class="muted">'+esc(u.email)+'</span></td><td>'+esc(u.role||'employee')+'</td><td><input class="earnRateInput" id="comm_'+String(u.id||u.email).replace(/[^a-z0-9]/gi,'_')+'" type="number" min="0" max="100" step="0.01" value="'+Number(u.commissionRate||0).toFixed(2)+'"></td><td><button class="green earnSave" onclick="saveEmployeeCommission(\''+esc(u.email)+'\',\'comm_'+String(u.id||u.email).replace(/[^a-z0-9]/gi,'_')+'\')">Save Rate</button></td></tr>').join('')||'<tr><td colspan="4"><div class="earnEmpty">No active employees found.</div></td></tr>';
+  document.getElementById('commissionAdminModal').classList.add('open');
+ }catch(e){alert('Could not load compensation settings: '+friendlyError(e.message||e))}
+}
+async function saveEmployeeCommission(email,inputId){
+ if(!currentUser?.isAdmin)return alert('Admin only.');let rate=Number(document.getElementById(inputId)?.value);
+ if(!Number.isFinite(rate)||rate<0||rate>100)return alert('Commission must be between 0% and 100%.');
+ try{await dbFetch('/rpc/cpcm_set_employee_commission',{method:'POST',body:JSON.stringify({target_email:email,rate_percent:rate})});alert('Commission rate saved: '+rate.toFixed(2)+'%');await openCommissionAdmin()}catch(e){alert('Could not save commission: '+friendlyError(e.message||e))}
+}
 
 function snakeToCamel(k){return String(k).replace(/_([a-z])/g,(_,c)=>c.toUpperCase())}function toCamel(row){let o={id:row.id};Object.entries(row||{}).forEach(([k,v])=>{o[reverse[k]||snakeToCamel(k)||k]=v??''});return o}
 function toRow(a){let r={};Object.entries(map).forEach(([k,v])=>{if(a[k]!==undefined)r[v]=numKey(k)?num(a[k]):a[k]});r.full_name=r.full_name||[r.first_name,r.middle_name,r.last_name].filter(Boolean).join(' ');r.account_number=r.account_number||r.client_account_number||r.source_account_id||'';r.portfolio=r.portfolio||r.issuer_name||r.account_description||r.original_creditor||'Imported Portfolio';r.original_creditor=r.original_creditor||r.issuer_name||r.account_description||r.portfolio;r.status=r.status||'New';r.updated_at=new Date().toISOString();r.created_by_email=currentUser.email;return r}
