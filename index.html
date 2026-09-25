@@ -12905,8 +12905,8 @@ function exportContactIntelligenceCSV(){let calls=filteredContactCalls();let row
   }
   function addButton(){
     injectCss();
-    if(!document.getElementById('cpcmQaFab')){var b=document.createElement('button');b.id='cpcmQaFab';b.type='button';b.innerHTML='🧪 System Check';b.onclick=window.cpcmOpenSystemCheck;document.body.appendChild(b)}
-    if(!document.getElementById('cpcmQaVersionBadge')){var v=document.createElement('div');v.id='cpcmQaVersionBadge';v.textContent='Manual Calling Mode • No Auto Dialer • '+EXPECTED_ENV;v.title=BUILD_VERSION+' • '+EXPECTED_ENV;document.body.appendChild(v)}
+    if(!document.getElementById('cpcmQaFab')){var b=document.createElement('button');b.id='cpcmQaFab';b.type='button';b.innerHTML='🧪 System Check';b.onclick=window.cpcmOpenSystemCheck;document.body.appendChild(b);b.style.display='none'}
+    if(!document.getElementById('cpcmQaVersionBadge')){var v=document.createElement('div');v.id='cpcmQaVersionBadge';v.textContent='Manual Calling Mode • No Auto Dialer • '+EXPECTED_ENV;v.title=BUILD_VERSION+' • '+EXPECTED_ENV;document.body.appendChild(v);v.style.display='none'}
     var top=maybeTopbar();
     if(top && !document.getElementById('cpcmQaTopButton')){var nb=document.createElement('button');nb.id='cpcmQaTopButton';nb.type='button';nb.textContent='System Check';nb.title='Run system QA checks';nb.style.background='#0f766e';nb.style.color='#fff';nb.style.border='0';nb.style.borderRadius='8px';nb.style.padding='8px 10px';nb.style.fontWeight='900';nb.style.cursor='pointer';nb.onclick=window.cpcmOpenSystemCheck;top.appendChild(nb)}
   }
@@ -13129,7 +13129,7 @@ function exportContactIntelligenceCSV(){let calls=filteredContactCalls();let row
   function ensureMessengerNameUi(){
     let attach=document.querySelector('.chatAttachAccount'); if(attach){attach.style.display='none'; attach.textContent='Account Attach Removed'}
     let actions=document.querySelector('.chatTopActions');
-    if(actions && !document.getElementById('cpcmNameBtn')){let b=document.createElement('button');b.id='cpcmNameBtn';b.title='Edit staff display name';b.textContent='Name';b.onclick=function(){cpcmOpenStaffNameModal(meEmail())};actions.insertBefore(b,actions.firstChild)}
+
     let empTop=document.querySelector('#employeeAdminModal .employeeAdminTop');
     if(empTop && !document.getElementById('cpcmStaffNamesBtn')){let b=document.createElement('button');b.id='cpcmStaffNamesBtn';b.className='outline';b.textContent='Edit Staff Names';b.onclick=function(){cpcmOpenStaffNameModal(meEmail())};empTop.appendChild(b)}
   }
@@ -14405,8 +14405,8 @@ function exportContactIntelligenceCSV(){let calls=filteredContactCalls();let row
     document.head.appendChild(st);
   }
   function ensureBadge(){
-    if(byId('cpcmManualCallingBadge'))return;
-    var b=document.createElement('div'); b.id='cpcmManualCallingBadge'; b.textContent='Manual Calling Mode • No Auto Dialer'; document.body.appendChild(b);
+    if(byId('cpcmManualCallingBadge')){byId('cpcmManualCallingBadge').style.display='none';return;}
+    var b=document.createElement('div'); b.id='cpcmManualCallingBadge'; b.textContent='Manual Calling Mode • No Auto Dialer'; b.style.display='none'; document.body.appendChild(b);
   }
   function ensurePage(){
     if(byId('cpcmNoDialerPage'))return byId('cpcmNoDialerPage');
@@ -14603,5 +14603,11 @@ function exportContactIntelligenceCSV(){let calls=filteredContactCalls();let row
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();
 })();
 </script>
+<style id="messengerCleanOverlayR8N30">
+#cpcmQaFab,#cpcmQaVersionBadge,#cpcmManualCallingBadge,#cpcmNameBtn{display:none!important}
+.chatTopActions{margin-left:auto;flex:0 0 auto}
+.chatActiveHead{min-height:58px;height:auto}
+.chatInputBar{position:relative;z-index:2;background:#fff}
+</style>
 </body>
 </html>
