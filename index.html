@@ -3911,7 +3911,6 @@ header.topbar{height:58px!important;padding:0 12px!important;grid-template-colum
         </div>
         <div class="summaryGrid">
           <div><div class="fieldLabel">SSN</div><div class="fieldVal" id="ssn">—</div></div>
-          <div><div class="fieldLabel">State / City</div><div class="fieldVal" id="state">—</div></div>
           <div><div class="fieldLabel">Balance</div><div class="fieldVal" id="balance">$0.00</div></div>
           <div><div class="fieldLabel">Creditor / Portfolio</div><div class="fieldVal" id="creditor">—</div></div>
           <div><div class="fieldLabel">Status</div><div class="fieldVal" id="statusDisplay">—</div></div>
@@ -6151,6 +6150,8 @@ function renderAllImportedFields(a){
  let borrower=[], accountMeta=[], loan=[], financial=[], bank=[], dates=[], employment=[], aceCustom=[];
  addDetail(borrower,'DOB / Birthdate',pickVal(a,['dob','PBirthdate','PBIRTHDATE','birthdate']));
  addDetail(borrower,'Address', [pickVal(a,['address','OrigAddress1','Orig_Address1']),pickVal(a,['address2','OrigAddress2','Orig_Address2'])].filter(Boolean).join(' '));
+ addDetail(borrower,'City',pickVal(a,['city','OrigCity','Orig_City']));
+ addDetail(borrower,'State',pickVal(a,['state','OrigState','Orig_State']));
  addDetail(borrower,'Zip / Postal',pickVal(a,['zip','OrigZipPostal','OrigZip','zipcode']));
  addDetail(borrower,'Employer',pickVal(a,['employer','Employer','Orig_EMPLOYER','origEmployer']));
  addDetail(borrower,'Occupation',pickVal(a,['occupation','Occupation']));
@@ -6362,7 +6363,7 @@ function renderCurrent(a,q){
  document.getElementById('avatar').textContent=initials(a);
  document.getElementById('accountName').innerHTML=esc(nameOf(a))+` <span class="badge">${esc(a.disposition||a.status||'New')}</span>`;
  document.getElementById('accountNumber').textContent=acctNo(a)||'—';
- document.getElementById('state').textContent=[a.state,a.city].filter(Boolean).join(' / ')||'—';
+ let headerState=document.getElementById('state');if(headerState)headerState.textContent=[a.state,a.city].filter(Boolean).join(' / ')||'—';
  document.getElementById('creditor').textContent=creditor(a);
  document.getElementById('ssn').textContent=a.ssn||'—';
  document.getElementById('balance').textContent=money(a.currentBalance||a.principal||a.originalBalance);
