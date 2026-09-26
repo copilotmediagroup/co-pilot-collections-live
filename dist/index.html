@@ -3897,7 +3897,7 @@ header.topbar{height:58px!important;padding:0 12px!important;grid-template-colum
     <main class="center">
       <div class="centerProgress">
         <div class="centerProgressTitle" id="centerProgressTitle">1 of 0 accounts</div>
-        <button class="miniNav" onclick="skipAccount()">‹</button>
+        <button class="miniNav" onclick="previousAccount()">‹</button>
         <button class="miniNav" onclick="nextAccount()">›</button>
         <div class="centerProgressBar"><div class="centerProgressFill" id="centerProgressFill"></div></div>
       </div>
@@ -9358,8 +9358,19 @@ async function saveAndNext(){
   if(next&&next.id!==before.id)setCurrent(next.id);
  }finally{saveAndNextBusy=false;btns.forEach(b=>b.disabled=false)}
 }
-function nextAccount(){let q=queue(),cur=getCurrent(),idx=q.findIndex(a=>a.id===cur?.id);if(q[idx+1])setCurrent(q[idx+1].id)}
-function skipAccount(){nextAccount()}
+function moveAccount(step){
+ let q=queue();if(!q.length)return;
+ let idx=q.findIndex(a=>String(a.id)===String(currentAccountId));
+ if(idx<0){let cur=getCurrent();idx=q.findIndex(a=>String(a.id)===String(cur?.id))}
+ if(idx<0)idx=0;
+ let nextIdx=(idx+Number(step||1)+q.length)%q.length;
+ let target=q[nextIdx];
+ if(!target||String(target.id)===String(currentAccountId))return;
+ setCurrent(target.id);
+}
+function nextAccount(){moveAccount(1)}
+function previousAccount(){moveAccount(-1)}
+function skipAccount(){moveAccount(1)}
 async function callPrimary(){let a=getCurrent();let p=phones(a)[0];if(p)await dialPhone(a.id,normPhone(p))}
 function endCall(){document.getElementById('lastDialed').textContent='Call ended';document.getElementById('callNumber').textContent='—'}
 function val(id){return document.getElementById(id).value.trim()}function setVal(id,v){document.getElementById(id).value=v??''}function inputId(k){return{accountNumber:'accountNumberInput',status:'statusInput',ssn:'ssnInput',state:'stateInput',email:'emailInput'}[k]||k}function openModal(){document.querySelector('#modal form').reset();document.getElementById('id').value='';document.getElementById('modalTitle').textContent='Add Account';document.getElementById('modal').classList.add('open')}function closeModal(id){document.getElementById(id).classList.remove('open')}
