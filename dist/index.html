@@ -6354,7 +6354,7 @@ function renderCurrent(a,q){
    document.getElementById('avatar').textContent='--';
    document.getElementById('accountName').innerHTML='No Account Loaded <span class="badge">Ready</span>';
    document.getElementById('accountNumber').textContent='—';
-   document.getElementById('state').textContent='—';
+   let headerState=document.getElementById('state');if(headerState)headerState.textContent='—';
    document.getElementById('creditor').textContent='—';
    document.getElementById('ssn').textContent='—';
    document.getElementById('balance').textContent=money(0);
