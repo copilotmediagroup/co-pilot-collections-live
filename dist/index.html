@@ -5867,9 +5867,11 @@ function queue(){
  let pf=document.getElementById('portfolioFilter')?.value||'';
  let region=document.getElementById('callRegionFilter')?.value||'';
  let filtered=accounts.filter(a=>{
-   let callRule=typeof complianceRules==='function'?complianceRules(a):null;
+   // Normal queue navigation must stay cheap. Compliance/time-zone evaluation is only
+   // needed when the collector explicitly enables a Smart Call Region filter.
+   let callRule=region&&typeof complianceRules==='function'?complianceRules(a):null;
    let regionMatch=!region||region==='OPEN'||(typeof cgCallRegion==='function'&&cgCallRegion(a).includes(region));
-   let openNow=(!region)?true:!!(callRule&&callRule.window&&callRule.window.inside&&!(callRule.hard||[]).some(x=>x.type!=='timeblock'));
+   let openNow=!region?true:!!(callRule&&callRule.window&&callRule.window.inside&&!(callRule.hard||[]).some(x=>x.type!=='timeblock'));
    return (!q||accountMatchesSearch(a,q))&&(!st||a.status===st)&&(!pf||a.portfolio===pf)&&regionMatch&&openNow;
  });
  if(q){
@@ -6304,10 +6306,13 @@ function updatePortfolioFilter(all){
 }
 function renderQueue(q,cur){
  let regionEl=document.getElementById('callRegionFilter'),regionStatus=document.getElementById('callRegionStatus');
- if(regionStatus&&typeof complianceRules==='function'){
-   let open=accounts.filter(a=>{let r=complianceRules(a);return r.window&&r.window.inside&&!(r.hard||[]).some(x=>x.type!=='timeblock')}).length;
-   let locked=accounts.length-open,selected=regionEl?.value||'';
-   regionStatus.textContent=open+' callable now · '+locked+' locked'+(selected&&selected!=='OPEN'?' · '+selected+' selected':'');
+ if(regionStatus){
+   let selected=regionEl?.value||'';
+   if(!selected)regionStatus.textContent='All accounts · call eligibility checked when a call is launched';
+   else if(typeof complianceRules==='function'){
+     let open=q.length,locked=Math.max(0,accounts.length-open);
+     regionStatus.textContent=open+' callable in selected queue · '+locked+' outside filter'+(selected!=='OPEN'?' · '+selected+' selected':'');
+   }
  }
  let idx=q.findIndex(a=>a.id===cur?.id);if(idx<0)idx=0;
  let start=Math.max(0,idx-1),next=q.slice(start,start+5);
