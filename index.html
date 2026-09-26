@@ -6142,14 +6142,6 @@ function chargeOffAge(v){
  let years=Math.floor(months/12), rem=months%12;
  return years+' year'+(years===1?'':'s')+', '+rem+' month'+(rem===1?'':'s');
 }
-window.cpcmAccountDetailSlide=window.cpcmAccountDetailSlide||0;
-window.cpcmAccountDetailCount=window.cpcmAccountDetailCount||1;
-window.cpcmMoveAccountDetail=function(step){
- let a=getCurrent();if(!a)return;
- let count=Math.max(1,Number(window.cpcmAccountDetailCount||1));
- window.cpcmAccountDetailSlide=(Number(window.cpcmAccountDetailSlide||0)+Number(step||0)+count)%count;
- renderAllImportedFields(a);
-};
 function renderAllImportedFields(a){
  let grid=document.getElementById('allFieldsGrid'),count=document.getElementById('allFieldsCount');
  if(!grid)return;
@@ -6238,22 +6230,11 @@ function renderAllImportedFields(a){
  let total=groups.reduce((s,g)=>s+g[1].length,0);
  if(count)count.textContent=total+' details';
 
- window.cpcmAccountDetailCount=Math.max(1,groups.length);
- let active=Math.max(0,Math.min(Number(window.cpcmAccountDetailSlide||0),groups.length-1));
- window.cpcmAccountDetailSlide=active;
- grid.innerHTML=groups.length?(()=>{
-   let [title,rows]=groups[active];
-   return `<div class="detailCarousel">
-     <div class="detailCarouselNav">
-       <button type="button" class="detailCarouselArrow" onclick="cpcmMoveAccountDetail(-1)" aria-label="Previous section">‹</button>
-       <div class="detailCarouselTitle"><b>${esc(title)}</b><span>${active+1} of ${groups.length}</span></div>
-       <button type="button" class="detailCarouselArrow" onclick="cpcmMoveAccountDetail(1)" aria-label="Next section">›</button>
-     </div>
-     <div class="detailGroup detailGroupSolo"><div class="detailGroupTitle">${esc(title)}</div><div class="detailGroupGrid">`+
-       rows.map(([label,k,v,type])=>fieldCard(label,k,v,a)).join('')+
-       `</div></div>
-   </div>`;
- })():'<div class="allFieldsEmpty">No extra mapped fields were saved on this account. Run SQL, clear accounts, and re-import.</div>';
+ grid.innerHTML=groups.map(([title,rows])=>{
+   return `<div class="detailGroup"><div class="detailGroupTitle">${esc(title)}</div><div class="detailGroupGrid">`+
+     rows.map(([label,k,v,type])=>fieldCard(label,k,v,a)).join('')+
+     `</div></div>`;
+ }).join('')||'<div class="allFieldsEmpty">No extra mapped fields were saved on this account. Run SQL, clear accounts, and re-import.</div>';
 
  renderRawDump(a);
 }
@@ -6389,7 +6370,6 @@ function renderCurrent(a,q){
  document.getElementById('statusDisplay').innerHTML=`<span class="badge">${esc(a.disposition||a.status||'New')}</span>`;
  document.getElementById('email').textContent=a.email||'—';
 
- window.cpcmAccountDetailSlide=0;
  renderAllImportedFields(a);
  renderAccountIntelligence(a);
  renderComplianceBanner(a);
@@ -14629,20 +14609,6 @@ function exportContactIntelligenceCSV(){let calls=filteredContactCalls();let row
 .chatTopActions{margin-left:auto;flex:0 0 auto}
 .chatActiveHead{min-height:58px;height:auto}
 .chatInputBar{position:relative;z-index:2;background:#fff}
-</style>
-<style id="accountDetailsCarouselR8N31">
-#allFieldsGrid{display:block!important}
-.detailCarousel{width:100%;max-width:100%}
-.detailCarouselNav{display:grid;grid-template-columns:42px 1fr 42px;align-items:center;gap:10px;margin:4px 0 9px}
-.detailCarouselArrow{height:38px;border:1px solid #cbdcf5;border-radius:10px;background:#fff;color:#1457ff;font-size:26px;font-weight:900;cursor:pointer}
-.detailCarouselArrow:hover{background:#eef5ff}
-.detailCarouselTitle{text-align:center;display:flex;flex-direction:column;gap:2px;color:#172033}
-.detailCarouselTitle b{font-size:13px}
-.detailCarouselTitle span{font-size:10px;color:#64748b;font-weight:800}
-.detailGroupSolo{width:100%!important;margin:0!important}
-.detailGroupSolo .detailGroupTitle{display:none!important}
-.detailGroupSolo .detailGroupGrid{grid-template-columns:repeat(2,minmax(0,1fr))!important}
-@media(max-width:850px){.detailGroupSolo .detailGroupGrid{grid-template-columns:1fr!important}}
 </style>
 </body>
 </html>
