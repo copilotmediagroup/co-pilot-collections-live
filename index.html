@@ -3743,6 +3743,13 @@ header.topbar{height:58px!important;padding:0 12px!important;grid-template-colum
 @media(max-width:1100px){.center{grid-template-columns:1fr!important}.allFieldsTopPanel,.paymentPlanPanel,.phonePanel,.callInsightPanel,.notePanel,.centerActivity{grid-column:1!important}.accountIntelStrip{grid-template-columns:repeat(3,1fr)!important}}
 </style>
 
+<style id="jobApplicationR8N30">
+.applyLaunch{margin-top:14px;width:100%;background:#0f4c9a!important;color:#fff!important;font-weight:900}.applyIntro{font-size:12px;color:#64748b;text-align:center;margin-top:8px}
+.jobApplyBox{max-width:820px}.jobApplyGrid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.jobApplyGrid .full{grid-column:1/-1}.jobApplyGrid label{font-size:12px;font-weight:900;color:#334155}.jobApplyGrid input,.jobApplyGrid select,.jobApplyGrid textarea{width:100%;margin-top:5px}.jobApplyGrid textarea{min-height:86px;resize:vertical}
+.applicationSuccess{padding:18px;border-radius:14px;background:#ecfdf5;color:#166534;font-weight:800}.applicationCards{display:grid;gap:12px}.applicationCard{border:1px solid #dbe3ef;border-radius:14px;padding:14px;background:#fff}.applicationCardTop{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}.applicationName{font-size:17px;font-weight:950;color:#172033}.applicationMeta{font-size:12px;color:#64748b;margin-top:3px}.applicationStatus{padding:5px 9px;border-radius:999px;background:#eef4ff;color:#174da9;font-size:11px;font-weight:900}
+.applicationFacts{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:12px}.applicationFact{background:#f8fafc;border-radius:9px;padding:9px}.applicationFact b{display:block;font-size:10px;color:#64748b;text-transform:uppercase}.applicationFact span{font-size:13px;font-weight:800}.applicationNotes{margin-top:10px;font-size:12px;line-height:1.45}.applicationActions{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+@media(max-width:700px){.jobApplyGrid{grid-template-columns:1fr}.jobApplyGrid .full{grid-column:1}.applicationFacts{grid-template-columns:1fr 1fr}}
+</style>
 </head>
 <body>
 <div id="loginScreen" class="loginScreen open">
@@ -3773,6 +3780,8 @@ header.topbar{height:58px!important;padding:0 12px!important;grid-template-colum
         <button id="loginBtn" onclick="login()">Login</button>
         <button id="signupBtn" class="gray" onclick="signup()">Request Access</button>
       </div>
+      <button class="applyLaunch" onclick="openJobApplication()">Apply to Join Our Collection Team</button>
+      <div class="applyIntro">Experienced collectors · Atlanta area · Day & evening shifts</div>
       <div id="loginStatus" class="loginStatus"></div>
       <div class="notice cleanNotice">
         New employees can request access here. Admin must approve the account before login is allowed.
@@ -3814,7 +3823,7 @@ header.topbar{height:58px!important;padding:0 12px!important;grid-template-colum
         <button onclick="openComplianceGuard()">Compliance Guard</button><button onclick="openDocumentGenerator()">Letters</button><button class="adminOnly hidden" onclick="openLetterBodyEditor()">Letter Bodies</button><button class="adminOnly hidden qaBtn" onclick="openQaHealthModal()">QA Health</button><button class="adminOnly hidden" onclick="openAuditLog()">Audit Log</button>
       </div></div>
       <div class="topMenu adminOnly hidden"><button class="gray topMenuMain">Admin ▾</button><div class="topMenuDrop">
-        <button onclick="openEmployeeAdminModal()">Staff</button><button onclick="openCommissionAdmin()">Employee Compensation</button><button onclick="openPermissionsModal()">Permissions</button><button onclick="openEmployeeMonitorModal()">Monitor</button><button onclick="openReportsPageStable()">Reports</button><button onclick="openBrandingSettingsModal()">Branding</button><button onclick="openAssignModal()">Assign Accounts</button><button onclick="openImportHistoryPage()">Portfolio Manager</button><button onclick="openDataCleanupDashboard()">Cleanup</button><label class="topMenuFile">Import CSV<input type="file" accept=".csv" onchange="importCSV(event)"></label><button onclick="downloadTemplate()">Download Template</button><button onclick="exportCSV()">Export CSV</button><button onclick="openArchivedAccounts()">Archived Accounts</button><button class="dangerItem" onclick="permanentlyDeleteArchivedPortfolio()">Delete Archived Portfolio</button><button class="dangerItem" onclick="clearAllAccounts()">Archive Active Accounts</button>
+        <button onclick="openEmployeeAdminModal()">Staff</button><button onclick="openJobApplicationsAdmin()">Job Applications</button><button onclick="openCommissionAdmin()">Employee Compensation</button><button onclick="openPermissionsModal()">Permissions</button><button onclick="openEmployeeMonitorModal()">Monitor</button><button onclick="openReportsPageStable()">Reports</button><button onclick="openBrandingSettingsModal()">Branding</button><button onclick="openAssignModal()">Assign Accounts</button><button onclick="openImportHistoryPage()">Portfolio Manager</button><button onclick="openDataCleanupDashboard()">Cleanup</button><label class="topMenuFile">Import CSV<input type="file" accept=".csv" onchange="importCSV(event)"></label><button onclick="downloadTemplate()">Download Template</button><button onclick="exportCSV()">Export CSV</button><button onclick="openArchivedAccounts()">Archived Accounts</button><button class="dangerItem" onclick="permanentlyDeleteArchivedPortfolio()">Delete Archived Portfolio</button><button class="dangerItem" onclick="clearAllAccounts()">Archive Active Accounts</button>
       </div></div>
       <div class="topMenu"><button class="gray topMenuMain">System ▾</button><div class="topMenuDrop topMenuDropRight">
         <button id="cpcmNoDialerStaticTopBtn" onclick="openNoDialerSafeMode()">Safe Mode</button><button onclick="openHelpModal()">Help</button><button class="dangerItem" onclick="logout()">Logout</button>
@@ -4360,6 +4369,26 @@ header.topbar{height:58px!important;padding:0 12px!important;grid-template-colum
     </div>
     <button class="gray" onclick="logout()">Return to Login</button>
   </div>
+</div></div>
+
+<div id="jobApplicationModal" class="modal"><div class="modalbox jobApplyBox">
+  <div class="modalhead"><div><h2>Apply to Join Our Collection Team</h2><div class="hint">Experienced collectors only · 3 high-performer positions</div></div><button class="gray" onclick="closeModal('jobApplicationModal')">Close</button></div>
+  <div class="modalbody"><div id="jobApplicationForm">
+    <div class="notice"><b>Compensation after successful evaluation:</b> $15/hour + 10% commission. Selected candidates begin with a 3-day paid performance evaluation at $10/hour.</div>
+    <div class="jobApplyGrid">
+      <div><label>Full Name *</label><input id="applyName" maxlength="120"></div><div><label>Phone *</label><input id="applyPhone" maxlength="40" autocomplete="tel"></div>
+      <div><label>Email *</label><input id="applyEmail" maxlength="180" autocomplete="email"></div><div><label>Atlanta Area / City *</label><input id="applyCity" maxlength="120" placeholder="Atlanta, Decatur, Marietta..."></div>
+      <div><label>Years of Collection Experience *</label><input id="applyYears" type="number" min="0" max="50" step=".5"></div><div><label>Preferred Shift *</label><select id="applyShift"><option value="">Select shift</option><option>Day — 9:00 AM–4:00 PM</option><option>Evening — 2:00 PM–10:00 PM</option></select></div>
+      <div><label>Average Monthly Collections *</label><input id="applyAverage" type="number" min="0" step="100" placeholder="$"></div><div><label>Best Month Ever Collected</label><input id="applyBest" type="number" min="0" step="100" placeholder="$"></div>
+      <div class="full"><label>Types of Debt Collected *</label><input id="applyDebtTypes" maxlength="500" placeholder="Credit cards, installment loans, payday loans..."></div>
+      <div><label>Ready to Start Monday? *</label><select id="applyMonday"><option value="">Select</option><option value="Yes">Yes</option><option value="No">No</option></select></div><div><label>Work-from-home equipment ready? *</label><select id="applyEquipment"><option value="">Select</option><option value="Yes">Yes</option><option value="No">No</option></select></div>
+      <div class="full"><label>Tell us why you're a high-performing collector</label><textarea id="applyNotes" maxlength="2000"></textarea></div>
+    </div><button id="applySubmitBtn" style="margin-top:14px;width:100%" onclick="submitJobApplication()">Submit Application</button>
+  </div><div id="jobApplicationSuccess" class="applicationSuccess hidden">Application received. If your experience matches what we're looking for, we will contact you.</div></div>
+</div></div>
+<div id="jobApplicationsAdminModal" class="modal"><div class="modalbox">
+  <div class="modalhead"><div><h2>Job Applications</h2><div class="hint">Admin review of collector applicants.</div></div><button class="gray" onclick="closeModal('jobApplicationsAdminModal')">Close</button></div>
+  <div class="modalbody"><div style="display:flex;gap:10px;margin-bottom:12px"><select id="applicationStatusFilter" onchange="loadJobApplicationsAdmin()"><option value="">All Applications</option><option>new</option><option>reviewing</option><option>interview</option><option>hired</option><option>rejected</option></select><button class="gray" onclick="loadJobApplicationsAdmin()">Refresh</button></div><div id="jobApplicationsAdminBody" class="applicationCards"><div class="muted">Loading applications...</div></div></div>
 </div></div>
 
 <div id="employeeAdminModal" class="modal"><div class="modalbox employeeAdminBox">
@@ -5571,6 +5600,29 @@ window.addEventListener('focus', async ()=>{
   }
 });
 
+
+
+function openJobApplication(){
+ ['applyName','applyPhone','applyEmail','applyCity','applyYears','applyAverage','applyBest','applyDebtTypes','applyNotes'].forEach(id=>{let e=document.getElementById(id);if(e)e.value=''});
+ ['applyShift','applyMonday','applyEquipment'].forEach(id=>{let e=document.getElementById(id);if(e)e.value=''});
+ document.getElementById('jobApplicationForm')?.classList.remove('hidden');document.getElementById('jobApplicationSuccess')?.classList.add('hidden');document.getElementById('jobApplicationModal')?.classList.add('open');
+}
+async function submitJobApplication(){
+ let g=id=>(document.getElementById(id)?.value||'').trim(),payload={full_name:g('applyName'),phone:g('applyPhone'),email:g('applyEmail').toLowerCase(),city:g('applyCity'),years_experience:Number(g('applyYears')||0),preferred_shift:g('applyShift'),average_monthly_collections:Number(g('applyAverage')||0),best_month_collections:Number(g('applyBest')||0),debt_types:g('applyDebtTypes'),ready_monday:g('applyMonday')==='Yes',equipment_ready:g('applyEquipment')==='Yes',applicant_notes:g('applyNotes')};
+ if(!payload.full_name||!payload.phone||!payload.email||!payload.city||!g('applyYears')||!payload.preferred_shift||!g('applyAverage')||!payload.debt_types||!g('applyMonday')||!g('applyEquipment'))return alert('Please complete all required fields.');
+ if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(payload.email))return alert('Enter a valid email address.');
+ let btn=document.getElementById('applySubmitBtn');if(btn)btn.disabled=true;
+ try{let res=await fetch(url()+'/rest/v1/job_applications',{method:'POST',headers:{apikey:pubKey(),'Content-Type':'application/json',Prefer:'return=minimal'},body:JSON.stringify(payload)});if(!res.ok){let x=await res.json().catch(()=>({}));throw new Error(x.message||'Application could not be submitted.')}document.getElementById('jobApplicationForm')?.classList.add('hidden');document.getElementById('jobApplicationSuccess')?.classList.remove('hidden')}
+ catch(e){alert(e.message||String(e))}finally{if(btn)btn.disabled=false}
+}
+async function openJobApplicationsAdmin(){if(!currentUser.isAdmin)return alert('Admin only');document.getElementById('jobApplicationsAdminModal')?.classList.add('open');await loadJobApplicationsAdmin()}
+async function loadJobApplicationsAdmin(){
+ if(!currentUser.isAdmin)return;let box=document.getElementById('jobApplicationsAdminBody');if(!box)return;box.innerHTML='<div class="muted">Loading applications...</div>';
+ try{let filter=document.getElementById('applicationStatusFilter')?.value||'',path='/job_applications?select=*&order=created_at.desc&limit=500'+(filter?'&status=eq.'+encodeURIComponent(filter):''),rows=await dbFetch(path);
+ box.innerHTML=(rows||[]).map(a=>'<div class="applicationCard"><div class="applicationCardTop"><div><div class="applicationName">'+esc(a.full_name)+'</div><div class="applicationMeta">'+esc(a.email)+' · '+esc(a.phone)+' · '+esc(a.city)+'</div></div><span class="applicationStatus">'+esc(a.status||'new')+'</span></div><div class="applicationFacts"><div class="applicationFact"><b>Experience</b><span>'+esc(a.years_experience)+' years</span></div><div class="applicationFact"><b>Average / month</b><span>'+money(a.average_monthly_collections)+'</span></div><div class="applicationFact"><b>Best month</b><span>'+money(a.best_month_collections)+'</span></div><div class="applicationFact"><b>Shift</b><span>'+esc(a.preferred_shift)+'</span></div><div class="applicationFact"><b>Start Monday</b><span>'+(a.ready_monday?'Yes':'No')+'</span></div><div class="applicationFact"><b>Equipment</b><span>'+(a.equipment_ready?'Ready':'Not ready')+'</span></div><div class="applicationFact"><b>Applied</b><span>'+esc(String(a.created_at||'').slice(0,10))+'</span></div><div class="applicationFact"><b>Debt Types</b><span>'+esc(a.debt_types||'—')+'</span></div></div>'+(a.applicant_notes?'<div class="applicationNotes"><b>Applicant:</b> '+esc(a.applicant_notes)+'</div>':'')+'<div class="applicationActions"><button onclick="setJobApplicationStatus(\''+a.id+'\',\'reviewing\')">Reviewing</button><button onclick="setJobApplicationStatus(\''+a.id+'\',\'interview\')">Interview</button><button class="green" onclick="setJobApplicationStatus(\''+a.id+'\',\'hired\')">Hired</button><button class="gray" onclick="setJobApplicationStatus(\''+a.id+'\',\'rejected\')">Reject</button></div></div>').join('')||'<div class="muted">No applications found.</div>'}
+ catch(e){box.innerHTML='<div class="error">Could not load applications: '+esc(e.message||String(e))+'</div>'}
+}
+async function setJobApplicationStatus(id,status){if(!currentUser.isAdmin)return;try{await dbFetch('/job_applications?id=eq.'+encodeURIComponent(id),{method:'PATCH',body:JSON.stringify({status,reviewed_at:new Date().toISOString(),reviewed_by_email:currentUser.email,updated_at:new Date().toISOString()})});await loadJobApplicationsAdmin()}catch(e){alert(e.message||String(e))}}
 
 async function signup(){
  try{
