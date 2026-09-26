@@ -5948,7 +5948,7 @@ function onQueueFilterChange(){
  render();
  scheduleHistoryLoad(id);
 }function getCurrent(){return queue().find(a=>a.id===currentAccountId)||queue()[0]||accounts[0]}
-function money(n){return Number(n||0).toLocaleString('en-US',{style:'currency',currency:'USD'})}function moneyNum(v){let n=Number(String(v??'').replace(/[^0-9.-]/g,''));return isNaN(n)?0:n}function accountBalance(a){return moneyNum(a?.currentBalance||a?.principal||a?.originalBalance)}function esc(s){return String(s??'').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;')}function normPhone(p){return String(p||'').replace(/\D/g,'')}function fmtPhone(p){let d=normPhone(p);return d.length===10?'('+d.slice(0,3)+') '+d.slice(3,6)+'-'+d.slice(6):(p||'')}function acctNo(a){return a?.accountNumber||a?.clientAccountNumber||a?.accountId||''}function nameOf(a){return a?.fullName||[a?.firstName,a?.middleName,a?.lastName].filter(Boolean).join(' ')||'Unknown Account'}function initials(a){return nameOf(a).split(/\s+/).filter(Boolean).slice(0,2).map(x=>x[0]).join('').toUpperCase()||'--'}function creditor(a){return a?.originalCreditor||a?.accountDescription||a?.portfolio||'—'}function phones(a){return[1,2,3,4,5,6,7,8,9,10].map(i=>a?.['phone'+i]||(typeof pickVal==='function'?pickVal(a,['Phone'+i,'Phone '+i]):'')).filter(p=>p&&normPhone(p).length>=10)}
+function money(n){return Number(n||0).toLocaleString('en-US',{style:'currency',currency:'USD'})}function moneyNum(v){let n=Number(String(v??'').replace(/[^0-9.-]/g,''));return isNaN(n)?0:n}function accountBalance(a){return moneyNum(a?.currentBalance||a?.principal||a?.originalBalance)}function esc(s){return String(s??'').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;')}function normPhone(p){return String(p||'').replace(/\D/g,'')}function fmtPhone(p){let d=normPhone(p);return d.length===10?'('+d.slice(0,3)+') '+d.slice(3,6)+'-'+d.slice(6):(p||'')}function acctNo(a){return a?.accountNumber||a?.clientAccountNumber||a?.accountId||''}function nameOf(a){return a?.fullName||[a?.firstName,a?.middleName,a?.lastName].filter(Boolean).join(' ')||'Unknown Account'}function initials(a){return nameOf(a).split(/\s+/).filter(Boolean).slice(0,2).map(x=>x[0]).join('').toUpperCase()||'--'}function creditor(a){return a?.originalCreditor||a?.accountDescription||a?.portfolio||'—'}function phones(a){return[a?.phone1,a?.phone2,a?.phone3,a?.phone4,a?.phone5,a?.phone6,a?.phone7,a?.phone8,a?.phone9,a?.phone10].filter(p=>p&&normPhone(p).length>=10)}
 function rawObj(a){return a?.rawData||a?.raw_data||{}}
 
 function phoneSearchDigitsList(a){
@@ -6155,7 +6155,7 @@ function renderAllImportedFields(a){
  if(!grid)return;
  if(!a){grid.innerHTML='<div class="allFieldsEmpty">No account selected.</div>';if(count)count.textContent='0 details';return}
 
- let borrower=[], accountMeta=[], loan=[], financial=[], bank=[], dates=[], employment=[], phonesDetail=[], aceCustom=[];
+ let borrower=[], accountMeta=[], loan=[], financial=[], bank=[], dates=[], employment=[], aceCustom=[];
  addDetail(borrower,'DOB / Birthdate',pickVal(a,['dob','PBirthdate','PBIRTHDATE','birthdate']));
  addDetail(borrower,'Address', [pickVal(a,['address','OrigAddress1','Orig_Address1']),pickVal(a,['address2','OrigAddress2','Orig_Address2'])].filter(Boolean).join(' '));
  addDetail(borrower,'City',pickVal(a,['city','OrigCity','Orig_City']));
@@ -6218,8 +6218,6 @@ function renderAllImportedFields(a){
  addDetail(employment,'Original Employer',pickVal(a,['origEmployer','Orig_EMPLOYER']));
  addDetail(employment,'Occupation',pickVal(a,['occupation','Occupation']));
 
- for(let i=1;i<=10;i++)addDetail(phonesDetail,'Phone '+i,pickVal(a,['phone'+i,'Phone'+i,'Phone '+i]));
-
  addDetail(aceCustom,'Custom 2',pickVal(a,['custom2','custom 2']));
  addDetail(aceCustom,'Custom 3',pickVal(a,['custom3','custom 3']));
  addDetail(aceCustom,'Custom 57',pickVal(a,['custom57','custom 57']));
@@ -6234,29 +6232,26 @@ function renderAllImportedFields(a){
    ['Bank / Payment Details',bank],
    ['Dates / Statute Information',dates],
    ['Employment',employment],
-   ['Phone Numbers 1–10',phonesDetail],
    ['ACE / Custom Fields',aceCustom]
  ].filter(g=>g[1].length);
 
  let total=groups.reduce((s,g)=>s+g[1].length,0);
  if(count)count.textContent=total+' details';
 
- let pages=Math.max(1,Math.ceil(groups.length/2));
- window.cpcmAccountDetailCount=pages;
- let active=Math.max(0,Math.min(Number(window.cpcmAccountDetailSlide||0),pages-1));
+ window.cpcmAccountDetailCount=Math.max(1,groups.length);
+ let active=Math.max(0,Math.min(Number(window.cpcmAccountDetailSlide||0),groups.length-1));
  window.cpcmAccountDetailSlide=active;
  grid.innerHTML=groups.length?(()=>{
-   let visible=groups.slice(active*2,active*2+2);
+   let [title,rows]=groups[active];
    return `<div class="detailCarousel">
      <div class="detailCarouselNav">
-       <button type="button" class="detailCarouselArrow" onclick="cpcmMoveAccountDetail(-1)" aria-label="Previous sections">‹</button>
-       <div class="detailCarouselTitle"><b>${visible.map(g=>g[0]).join(' + ')}</b><span>${active+1} of ${pages}</span></div>
-       <button type="button" class="detailCarouselArrow" onclick="cpcmMoveAccountDetail(1)" aria-label="Next sections">›</button>
+       <button type="button" class="detailCarouselArrow" onclick="cpcmMoveAccountDetail(-1)" aria-label="Previous section">‹</button>
+       <div class="detailCarouselTitle"><b>${esc(title)}</b><span>${active+1} of ${groups.length}</span></div>
+       <button type="button" class="detailCarouselArrow" onclick="cpcmMoveAccountDetail(1)" aria-label="Next section">›</button>
      </div>
-     <div class="detailCarouselPair">`+visible.map(([title,rows])=>
-       `<div class="detailGroup detailGroupSolo"><div class="detailGroupTitle">${esc(title)}</div><div class="detailGroupGrid">`+
-       rows.map(([label,k,v,type])=>fieldCard(label,k,v,a)).join('')+`</div></div>`
-     ).join('')+`</div>
+     <div class="detailGroup detailGroupSolo"><div class="detailGroupTitle">${esc(title)}</div><div class="detailGroupGrid">`+
+       rows.map(([label,k,v,type])=>fieldCard(label,k,v,a)).join('')+
+       `</div></div>
    </div>`;
  })():'<div class="allFieldsEmpty">No extra mapped fields were saved on this account. Run SQL, clear accounts, and re-import.</div>';
 
@@ -6438,7 +6433,7 @@ function renderAccountIntelligence(a){
 function renderPhones(a){
  let ps=phones(a).map(p=>normPhone(p)).filter(p=>p.length>=10);
  let seen=new Set();
- ps=ps.filter(p=>{let key=p.slice(-10); if(seen.has(key))return false; seen.add(key); return true;}).slice(0,10);
+ ps=ps.filter(p=>{let key=p.slice(-10); if(seen.has(key))return false; seen.add(key); return true;}).slice(0,6);
  let blocked=phoneIsBlocked(a);
  document.getElementById('phoneGrid').innerHTML=ps.map((p,i)=>`<a class="phoneChip ${blocked?'blocked':''}" href="tel:${normPhone(p)}" data-ringcentral-extension-number="${normPhone(p)}" onclick="event.preventDefault(); return dialPhone('${a.id}','${normPhone(p)}')"><div class="phoneIcon">☎</div><div><div class="phoneNum">${fmtPhone(p)}</div><div class="phoneType">${i===0?'Primary':i===1?'Mobile':'Alternate'}</div>${blocked?'<div class="callBlockedNote">Compliance review required</div>':''}</div></a>`).join('')||'<div class="muted">No phone numbers on this account.</div>';
 }
@@ -9460,11 +9455,7 @@ function norm(s){return String(s||'').toLowerCase().replace(/[^a-z0-9]/g,'')}con
  phone3:['3rdphone','3rd phone','thirdphone','third phone','phones','phone_numbers','phonenumbers','phone numbers','allphones','all phones','altphone','alt phone','alternatephone','alternate phone','workphone','work phone','custom11','phone3','phone 3'],
  phone4:['4thphone','4th phone','fourthphone','fourth phone','custom12','phone4','phone 4','phone04','phone 04'],
  phone5:['5thphone','5th phone','fifthphone','fifth phone','custom13','phone5','phone 5','phone05','phone 05'],
- phone6:['6thphone','6th phone','sixthphone','sixth phone','custom14','phone6','phone 6','phone06','phone 06'],
- phone7:['7thphone','7th phone','seventhphone','seventh phone','phone7','phone 7','phone07','phone 07'],
- phone8:['8thphone','8th phone','eighthphone','eighth phone','phone8','phone 8','phone08','phone 08'],
- phone9:['9thphone','9th phone','ninthphone','ninth phone','phone9','phone 9','phone09','phone 09'],
- phone10:['10thphone','10th phone','tenthphone','tenth phone','phone10','phone 10']
+ phone6:['6thphone','6th phone','sixthphone','sixth phone','custom14','phone6','phone 6','phone06','phone 06']
 }
 let pendingImport={fileName:'',headers:[],rows:[]};
 const MANUAL_FIELDS=[["portfolio", "Portfolio / File Name"], ["issuerName", "Issuer Name / Lender"], ["accountDescription", "Account Description / Product"], ["originalCreditor", "Original Creditor"], ["accountNumber", "Account Number"], ["fileNumber", "File / Case Number"], ["clientAccountNumber", "Client Account Number"], ["accountId", "Account ID"], ["typeOfDebt", "Type of Debt / Account Type"], ["fullName", "Full Name / Borrower Name"], ["firstName", "First Name"], ["middleName", "Middle Name"], ["lastName", "Last Name"], ["ssn", "SSN"], ["dob", "DOB / Birthdate"], ["address", "Address 1"], ["address2", "Address 2"], ["city", "City"], ["state", "State"], ["zip", "Zip / Postal"], ["employer", "Employer"], ["occupation", "Occupation"], ["description", "Description"], ["email", "Email"], ["originalBalance", "Original Balance"], ["principal", "Principal / COPrincipal"], ["currentBalance", "Current Balance / CurBalance"], ["openDate", "Open Date"], ["dateAccountOpened", "Date Account Opened"], ["accountReceiveDate", "Account Receive Date"], ["delinquencyDate", "Delinquency Date"], ["chargeOffDate", "Charge Off Date"], ["origLastPmtDate", "Issuer/Original Last Payment Date"], ["lastPaymentDate", "Last Payment Date"], ["lastPaymentAmount", "Last Payment Amount"], ["paidToDate", "Paid To Date"], ["chargedOffPrincipal", "Charged Off Principal"], ["originalPrincipal", "Original Principal"], ["statuteOfLimDate", "Statute of Limitations Date"], ["loanLocation", "Loan Location"], ["brickOrOnline", "Brick or Online"], ["custom2", "Custom 2"], ["custom3", "Custom 3"], ["custom57", "Custom 57"], ["custom58", "Custom 58"], ["custom60", "Custom 60"], ["bankRoutingNumber", "Bank Routing Number"], ["bankAccountNumber", "Bank Account Number"], ["origEmployer", "Original Employer"], ["origStoreName", "Original Store Name"], ["origStoreCity", "Original Store City"], ["origStoreState", "Original Store State"], ["origBankName", "Original Bank Name"], ["origBankAcctLast4Digits", "Original Bank Acct Last 4"], ["origPrincipalBalance", "Original Principal Balance"], ["origOriginalLoanAmount", "Original Loan Amount"], ["origChargeOffBalance", "Original Chargeoff Balance"], ["origLoanType", "Original Loan Type"], ["origPrincipalLoanAmount", "Original Principal Loan Amount"], ["origInterestAmount", "Original Interest Amount"], ["origReturnFee", "Original Return Fee"], ["phone1", "Phone 1"], ["phone1Type", "Phone 1 Type"], ["phone1LineType", "Phone 1 Line Type"], ["phone1Source", "Phone 1 Source"], ["phone1Note", "Phone 1 Note"], ["phone1Status", "Phone 1 Status"], ["phone2", "Phone 2"], ["phone2Type", "Phone 2 Type"], ["phone2LineType", "Phone 2 Line Type"], ["phone2Source", "Phone 2 Source"], ["phone2Note", "Phone 2 Note"], ["phone2Status", "Phone 2 Status"], ["phone3", "Phone 3"], ["phone3Type", "Phone 3 Type"], ["phone3LineType", "Phone 3 Line Type"], ["phone3Source", "Phone 3 Source"], ["phone3Note", "Phone 3 Note"], ["phone3Status", "Phone 3 Status"], ["phone4", "Phone 4"], ["phone4Type", "Phone 4 Type"], ["phone4LineType", "Phone 4 Line Type"], ["phone4Source", "Phone 4 Source"], ["phone4Note", "Phone 4 Note"], ["phone4Status", "Phone 4 Status"], ["phone5", "Phone 5"], ["phone5Type", "Phone 5 Type"], ["phone5LineType", "Phone 5 Line Type"], ["phone5Source", "Phone 5 Source"], ["phone5Note", "Phone 5 Note"], ["phone5Status", "Phone 5 Status"], ["phone6", "Phone 6"], ["phone6Type", "Phone 6 Type"], ["phone6LineType", "Phone 6 Line Type"], ["phone6Source", "Phone 6 Source"], ["phone6Note", "Phone 6 Note"], ["phone6Status", "Phone 6 Status"], ["phone7", "Phone 7"], ["phone7Type", "Phone 7 Type"], ["phone7LineType", "Phone 7 Line Type"], ["phone7Source", "Phone 7 Source"], ["phone7Note", "Phone 7 Note"], ["phone7Status", "Phone 7 Status"], ["phone8", "Phone 8"], ["phone8Type", "Phone 8 Type"], ["phone8LineType", "Phone 8 Line Type"], ["phone8Source", "Phone 8 Source"], ["phone8Note", "Phone 8 Note"], ["phone8Status", "Phone 8 Status"], ["phone9", "Phone 9"], ["phone9Type", "Phone 9 Type"], ["phone9LineType", "Phone 9 Line Type"], ["phone9Source", "Phone 9 Source"], ["phone9Note", "Phone 9 Note"], ["phone9Status", "Phone 9 Status"], ["phone10", "Phone 10"], ["phone10Type", "Phone 10 Type"], ["phone10LineType", "Phone 10 Line Type"], ["phone10Source", "Phone 10 Source"], ["phone10Note", "Phone 10 Note"], ["phone10Status", "Phone 10 Status"]];
@@ -9502,14 +9493,6 @@ function applyMappingPreset(type){
    for(let field in MAP){
      let idx=pendingImport.headers.map(norm).findIndex(h=>MAP[field].map(norm).includes(h));
      let sel=document.getElementById('map_'+field); if(sel && idx>=0)sel.value=String(idx);
-   }
-   // Common lender export: "Bank name | account number | routing" uses the second account-number column for bank data.
-   let nh=pendingImport.headers.map(norm),bankIdx=nh.findIndex(h=>h==='bankname'||h==='bank');
-   if(bankIdx>=0){
-     let bankAcctIdx=nh.findIndex((h,i)=>i>bankIdx&&(h==='accountnumber'||h==='bankaccountnumber'));
-     let routingIdx=nh.findIndex((h,i)=>i>bankIdx&&(h==='routing'||h==='routingnumber'));
-     if(bankAcctIdx>=0){let s=document.getElementById('map_bankAccountNumber');if(s)s.value=String(bankAcctIdx)}
-     if(routingIdx>=0){let s=document.getElementById('map_bankRoutingNumber');if(s)s.value=String(routingIdx)}
    }
  }else{
    let preset=PRESETS[type]||{};
@@ -9636,7 +9619,7 @@ async function importMappedCSV(){
    importBatch.importedRows=mapped.length;
    importBatch.goodRows=mapped.length;
    importBatch.skippedRows=skipped;
-   importBatch.missingPhoneRows=mapped.filter(r=>!(r.phone1||r.phone2||r.phone3||r.phone4||r.phone5||r.phone6||r.phone7||r.phone8||r.phone9||r.phone10)).length;
+   importBatch.missingPhoneRows=mapped.filter(r=>!(r.phone1||r.phone2||r.phone3||r.phone4||r.phone5||r.phone6)).length;
    importBatch.missingSsnRows=mapped.filter(r=>!String(r.ssn||'').replace(/\D/g,'')).length;
    importBatch.missingDobRows=mapped.filter(r=>!String(r.dob||'').trim()).length;
    importBatch.duplicateRows=(typeof coPilotDuplicateRowsForImport==='function')?coPilotDuplicateRowsForImport(mapped):0;
@@ -14656,11 +14639,10 @@ function exportContactIntelligenceCSV(){let calls=filteredContactCalls();let row
 .detailCarouselTitle{text-align:center;display:flex;flex-direction:column;gap:2px;color:#172033}
 .detailCarouselTitle b{font-size:13px}
 .detailCarouselTitle span{font-size:10px;color:#64748b;font-weight:800}
-.detailCarouselPair{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;align-items:start}
 .detailGroupSolo{width:100%!important;margin:0!important}
-.detailGroupSolo .detailGroupTitle{display:flex!important}
-.detailGroupSolo .detailGroupGrid{grid-template-columns:1fr!important}
-@media(max-width:850px){.detailCarouselPair{grid-template-columns:1fr!important}.detailGroupSolo .detailGroupGrid{grid-template-columns:1fr!important}}
+.detailGroupSolo .detailGroupTitle{display:none!important}
+.detailGroupSolo .detailGroupGrid{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+@media(max-width:850px){.detailGroupSolo .detailGroupGrid{grid-template-columns:1fr!important}}
 </style>
 </body>
 </html>
