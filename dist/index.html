@@ -7100,7 +7100,7 @@ function monitorEmployees(){
  });
  accounts.forEach(a=>{let e=(a.assignedToEmail||'').toLowerCase();if(e)set.add(e)});
  monitorData.activities.forEach(a=>{let e=(a.createdByEmail||'').toLowerCase();if(e)set.add(e)});
- monitorData.calls.forEach(c=>{let e=(c.createdByEmail||c.created_by_email||'').toLowerCase();if(e)set.add(e)});
+ monitorData.calls.forEach(c=>{let e=(c.employeeEmail||c.employee_email||c.createdByEmail||c.created_by_email||'').toLowerCase();if(e)set.add(e)});
  monitorData.notes.forEach(n=>{let e=(n.createdByEmail||'').toLowerCase();if(e)set.add(e)});
  return [...set].filter(Boolean).sort();
 }
@@ -7133,7 +7133,7 @@ function monitorBuildRows(){
    let acts=monitorData.activities.filter(a=>actEmail(a)===email);
    let notes=monitorData.notes.filter(n=>noteEmail(n)===email);
    let plans=monitorData.plans.filter(p=>planEmail(p)===email || assigned.some(a=>a.id===p.accountId));
-   let calls=monitorData.calls.filter(c=>(c.createdByEmail||c.created_by_email||'').toLowerCase()===email);
+   let calls=monitorData.calls.filter(c=>(c.employeeEmail||c.employee_email||c.createdByEmail||c.created_by_email||'').toLowerCase()===email);
    let statusActs=acts.filter(isStatusActivity);
    let statusCounts={};
    assigned.forEach(a=>{let s=accountStatus(a);statusCounts[s]=(statusCounts[s]||0)+1});
