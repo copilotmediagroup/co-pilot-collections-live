@@ -7180,7 +7180,7 @@ function renderEmployeeMonitor(){
    return `<tr>
      <td><div class="monitorEmployee monitorClick" onclick="showMonitorEmployee('${esc(r.email)}')">${esc(r.email)}</div><div class="monitorSub">${r.touchedCount} account(s) touched</div></td>
      <td><b>${r.assignedCount}</b><div class="monitorBar"><div class="monitorBarFill" style="width:${Math.min(100,(r.assignedCount/maxAssigned)*100)}%"></div></div></td>
-     <td><b>${r.calls.length}</b><div class="monitorSub">${callRate}% call/account ratio</div></td>
+     <td><button class="monitorStatusBtn" onclick="showMonitorCalls('${esc(r.email)}')"><b>${r.calls.length}</b> calls</button><div class="monitorSub">${callRate}% call/account ratio</div></td>
      <td><b>${r.statusActs.length}</b></td>
      <td><b>${r.notes.length}</b></td>
      <td><b>${r.plans.length}</b></td>
@@ -7208,6 +7208,40 @@ function monitorAccountCard(a){
      </div>
    </div>
  </div>`;
+}
+function monitorPhoneKey(v){let d=normPhone(v);return d.length>10?d.slice(-10):d}
+function monitorCallAccountMatches(c){
+ let dialed=monitorPhoneKey(c.toNumber||c.to_number||'');
+ if(!dialed)return [];
+ return accounts.filter(a=>phones(a).some(p=>monitorPhoneKey(p)===dialed));
+}
+function openMonitorCalledAccount(id){
+ if(!id)return;
+ setCurrent(id);
+ closeEmployeeMonitorModal();
+ setTimeout(()=>document.getElementById('accountWorkspace')?.scrollIntoView({behavior:'smooth',block:'start'}),50);
+}
+function monitorCallCard(c){
+ let when=new Date(c.startTime||c.start_time||'');
+ let matches=monitorCallAccountMatches(c),dialed=c.toNumber||c.to_number||'',dur=Number(c.durationSeconds||c.duration_seconds||0);
+ let result=c.result||c.telephonyStatus||c.telephony_status||'—';
+ let accountHtml='';
+ if(matches.length===1){
+   let a=matches[0];
+   accountHtml=`<div class="monitorAccountCard" style="margin-top:8px"><div class="monitorAccountTop"><div><div class="monitorAccountName">${esc(nameOf(a))}</div><div class="monitorAccountMeta">Account: ${esc(acctNo(a))} · Balance: ${money(accountBalance(a))}<br>Creditor: ${esc(creditor(a)||'—')} · Status: ${esc(accountStatus(a))}</div></div><button class="monitorStatusBtn" onclick="openMonitorCalledAccount('${esc(a.id)}')">Open Account</button></div></div>`;
+ }else if(matches.length>1){
+   accountHtml=`<div class="monitorSub" style="margin-top:7px">Multiple accounts match this number. Choose the correct account:</div>`+matches.map(a=>`<button class="monitorStatusBtn" style="margin:5px 5px 0 0" onclick="openMonitorCalledAccount('${esc(a.id)}')">${esc(nameOf(a))} · ${esc(acctNo(a))}</button>`).join('');
+ }else accountHtml='<div class="monitorSub" style="margin-top:7px">No debtor account currently matches this dialed number.</div>';
+ return `<div class="monitorAccountCard"><div class="monitorAccountTop"><div><div class="monitorAccountName">${esc(fmtPhone(dialed)||dialed||'Unknown number')}</div><div class="monitorAccountMeta">${isNaN(when)?'—':when.toLocaleString()} · ${dur}s · ${esc(result)}<br>RingCentral employee: ${esc(c.employeeName||c.employee_name||c.employeeEmail||c.employee_email||'—')}</div></div><span class="monitorBadge">${matches.length===1?'MATCHED':matches.length>1?'MULTIPLE MATCHES':'UNMATCHED'}</span></div>${accountHtml}</div>`;
+}
+function showMonitorCalls(email){
+ let r=monitorBuildRows().find(x=>x.email===email);
+ let list=(r?.calls||[]).slice().sort((a,b)=>new Date(b.startTime||b.start_time||0)-new Date(a.startTime||a.start_time||0));
+ document.getElementById('monitorDetailTitle').textContent='Called accounts — '+email;
+ let body=document.getElementById('monitorDetailBody');
+ if(!list.length){body.className='monitorEmpty';body.textContent='No RingCentral outbound calls in this date range.';return}
+ body.className='';
+ body.innerHTML=list.map(monitorCallCard).join('');
 }
 function showMonitorEmployee(email){
  let r=monitorBuildRows().find(x=>x.email===email);
