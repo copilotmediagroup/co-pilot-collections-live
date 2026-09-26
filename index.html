@@ -4439,9 +4439,9 @@ header.topbar{height:58px!important;padding:0 12px!important;grid-template-colum
         <div>
           <label>Date Range</label>
           <select id="monitorRange" onchange="loadEmployeeMonitor()">
-            <option value="today">Today</option>
+            <option value="today" selected>Today</option>
             <option value="7">Last 7 days</option>
-            <option value="30" selected>Last 30 days</option>
+            <option value="30">Last 30 days</option>
             <option value="all">All time</option>
           </select>
         </div>
@@ -4470,7 +4470,7 @@ header.topbar{height:58px!important;padding:0 12px!important;grid-template-colum
     <div class="monitorStats">
       <div class="monitorStat"><div class="monitorStatLabel">Employees</div><div class="monitorStatValue" id="monEmployees">0</div></div>
       <div class="monitorStat"><div class="monitorStatLabel">Assigned Accounts</div><div class="monitorStatValue" id="monAssigned">0</div></div>
-      <div class="monitorStat"><div class="monitorStatLabel">Calls Made</div><div class="monitorStatValue" id="monCalls">0</div></div>
+      <div class="monitorStat"><div class="monitorStatLabel">Calls Made <span style="color:#16a34a;font-size:9px">● LIVE</span></div><div class="monitorStatValue" id="monCalls">0</div></div>
       <div class="monitorStat"><div class="monitorStatLabel">Status Updates</div><div class="monitorStatValue" id="monStatused">0</div></div>
       <div class="monitorStat"><div class="monitorStatLabel">Notes Added</div><div class="monitorStatValue" id="monNotes">0</div></div>
       <div class="monitorStat"><div class="monitorStatLabel">Assigned Balance</div><div class="monitorStatValue" id="monBalance">$0.00</div></div>
@@ -7048,32 +7048,40 @@ async function removeEmployeeFromSoftware(email){
 
 
 
-let monitorData={activities:[],notes:[],plans:[],rows:[],lastRows:[]};
+let monitorData={activities:[],calls:[],notes:[],plans:[],rows:[],lastRows:[]};
 
 function monitorRangeStart(){
- let r=document.getElementById('monitorRange')?.value||'30';
+ let r=document.getElementById('monitorRange')?.value||'today';
  if(r==='all')return '';
  let d=new Date();
  if(r==='today'){d.setHours(0,0,0,0);return d.toISOString()}
  d.setDate(d.getDate()-Number(r||30));
  return d.toISOString();
 }
+let employeeMonitorLiveBusy=false;
 async function openEmployeeMonitorModal(){
  if(!currentUser.isAdmin)return alert('Admin only');
  document.getElementById('employeeMonitorModal').classList.add('open');
  await loadEmployeeMonitor();
 }
+setInterval(async function(){
+ if(document.hidden||!currentUser?.isAdmin||!document.getElementById('employeeMonitorModal')?.classList.contains('open')||employeeMonitorLiveBusy)return;
+ employeeMonitorLiveBusy=true;
+ try{await loadEmployeeMonitor()}finally{employeeMonitorLiveBusy=false}
+},5000);
 async function loadEmployeeMonitor(){
  if(!currentUser.isAdmin)return;
  await loadAppUsers().catch(()=>{});
  if(!accounts.length)await loadAccounts();
  let start=monitorRangeStart();
  let suffix=start?'&created_at=gte.'+encodeURIComponent(start):'';
- let acts=[],notes=[],plans=[];
+ let acts=[],calls=[],notes=[],plans=[];
  try{acts=await dbFetch('/activity_logs?select=*&order=created_at.desc&limit=50000'+suffix)}catch(e){console.warn('monitor activity load failed',e)}
+ try{calls=await dbFetch('/call_results?select=id,account_id,created_by_email,created_at,dialed_at,attempt_id,attempt_status,event_type,phone_number,call_result,direction,duration_seconds&order=created_at.desc&limit=50000'+suffix)}catch(e){console.warn('monitor call load failed',e)}
  try{notes=await dbFetch('/account_notes?select=*&order=created_at.desc&limit=50000'+suffix)}catch(e){console.warn('monitor notes load failed',e)}
  try{plans=await dbFetch('/payment_plans?select=*&order=created_at.desc&limit=50000'+suffix)}catch(e){plans=[]}
  monitorData.activities=(acts||[]).map(toCamel);
+ monitorData.calls=(calls||[]).map(toCamel);
  monitorData.notes=(notes||[]).map(toCamel);
  monitorData.plans=(plans||[]).map(toCamel);
  fillMonitorFilters();
@@ -7083,11 +7091,12 @@ function monitorEmployees(){
  let set=new Set();
  appUsers.forEach(u=>{
    let email=(u.email||'').toLowerCase();
-   if(email&&!isAdminEmail(email)&&u.role!=='admin')set.add(email);
+   if(email)set.add(email);
  });
  accounts.forEach(a=>{let e=(a.assignedToEmail||'').toLowerCase();if(e)set.add(e)});
- monitorData.activities.forEach(a=>{let e=(a.createdByEmail||'').toLowerCase();if(e&&!isAdminEmail(e))set.add(e)});
- monitorData.notes.forEach(n=>{let e=(n.createdByEmail||'').toLowerCase();if(e&&!isAdminEmail(e))set.add(e)});
+ monitorData.activities.forEach(a=>{let e=(a.createdByEmail||'').toLowerCase();if(e)set.add(e)});
+ monitorData.calls.forEach(c=>{let e=(c.createdByEmail||c.created_by_email||'').toLowerCase();if(e)set.add(e)});
+ monitorData.notes.forEach(n=>{let e=(n.createdByEmail||'').toLowerCase();if(e)set.add(e)});
  return [...set].filter(Boolean).sort();
 }
 function fillMonitorFilters(){
@@ -7119,7 +7128,7 @@ function monitorBuildRows(){
    let acts=monitorData.activities.filter(a=>actEmail(a)===email);
    let notes=monitorData.notes.filter(n=>noteEmail(n)===email);
    let plans=monitorData.plans.filter(p=>planEmail(p)===email || assigned.some(a=>a.id===p.accountId));
-   let calls=acts.filter(isCallActivity);
+   let calls=monitorData.calls.filter(c=>(c.createdByEmail||c.created_by_email||'').toLowerCase()===email);
    let statusActs=acts.filter(isStatusActivity);
    let statusCounts={};
    assigned.forEach(a=>{let s=accountStatus(a);statusCounts[s]=(statusCounts[s]||0)+1});
