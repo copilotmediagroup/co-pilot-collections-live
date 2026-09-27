@@ -7059,9 +7059,20 @@ function monitorRangeStart(){
  return d.toISOString();
 }
 let employeeMonitorLiveBusy=false;
+async function activateRingCentralInbound(){
+ try{
+  if(typeof ensureFreshToken==='function')await ensureFreshToken();
+  const res=await fetch(url()+'/functions/v1/ringcentral-webhook-bootstrap',{method:'POST',headers:{'Content-Type':'application/json','apikey':pubKey(),'Authorization':'Bearer '+token()},body:'{}'});
+  const data=await res.json().catch(()=>({}));
+  if(!res.ok||!data.ok)throw new Error(data.error||('Webhook activation returned '+res.status));
+  console.info('RingCentral inbound webhook active',data.existing?'existing':'created');
+  return true;
+ }catch(e){console.warn('RingCentral inbound webhook activation failed',e);return false}
+}
 async function openEmployeeMonitorModal(){
  if(!currentUser.isAdmin)return alert('Admin only');
  document.getElementById('employeeMonitorModal').classList.add('open');
+ await activateRingCentralInbound();
  await loadEmployeeMonitor();
 }
 setInterval(async function(){
