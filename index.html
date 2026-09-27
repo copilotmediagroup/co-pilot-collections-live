@@ -7069,6 +7069,22 @@ setInterval(async function(){
  employeeMonitorLiveBusy=true;
  try{await loadEmployeeMonitor()}finally{employeeMonitorLiveBusy=false}
 },5000);
+let ringCentralMonitorSyncAt=0,ringCentralMonitorSyncPromise=null;
+async function syncRingCentralMonitor(){
+ const now=Date.now();
+ if(ringCentralMonitorSyncPromise)return ringCentralMonitorSyncPromise;
+ if(now-ringCentralMonitorSyncAt<60000)return;
+ ringCentralMonitorSyncAt=now;
+ ringCentralMonitorSyncPromise=(async()=>{
+  try{
+   if(typeof ensureFreshToken==='function')await ensureFreshToken();
+   const syncRes=await fetch(url()+'/functions/v1/ringcentral-call-sync',{method:'POST',headers:{'Content-Type':'application/json','apikey':pubKey(),'Authorization':'Bearer '+token()},body:'{}'});
+   if(!syncRes.ok)throw new Error('RingCentral sync returned '+syncRes.status);
+  }catch(e){console.warn('RingCentral live sync failed',e)}
+  finally{ringCentralMonitorSyncPromise=null}
+ })();
+ return ringCentralMonitorSyncPromise;
+}
 async function loadEmployeeMonitor(){
  if(!currentUser.isAdmin)return;
  await loadAppUsers().catch(()=>{});
@@ -7077,10 +7093,7 @@ async function loadEmployeeMonitor(){
  let suffix=start?'&created_at=gte.'+encodeURIComponent(start):'';
  let callSuffix=start?'&start_time=gte.'+encodeURIComponent(start):'';
  let acts=[],calls=[],notes=[],plans=[];
- try{
-   if(typeof ensureFreshToken==='function')await ensureFreshToken();
-   let syncRes=await fetch(url()+'/functions/v1/ringcentral-call-sync',{method:'POST',headers:{'Content-Type':'application/json','apikey':pubKey(),'Authorization':'Bearer '+token()},body:'{}'}); if(!syncRes.ok)throw new Error('RingCentral sync returned '+syncRes.status);
- }catch(e){console.warn('RingCentral live sync failed',e)}
+ await syncRingCentralMonitor();
  try{acts=await dbFetch('/activity_logs?select=*&order=created_at.desc&limit=50000'+suffix)}catch(e){console.warn('monitor activity load failed',e)}
  try{calls=await dbFetch('/ringcentral_call_records?select=*&direction=eq.Outbound&order=start_time.desc&limit=50000'+callSuffix)}catch(e){console.warn('RingCentral call monitor load failed',e)}
  try{notes=await dbFetch('/account_notes?select=*&order=created_at.desc&limit=50000'+suffix)}catch(e){console.warn('monitor notes load failed',e)}
