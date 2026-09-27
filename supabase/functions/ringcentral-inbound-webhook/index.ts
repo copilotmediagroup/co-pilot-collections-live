@@ -5,12 +5,15 @@ const ok=(token?:string|null)=>new Response("",{status:200,headers:{...H,...(tok
 function serviceKey(){const k=Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");if(k)return k;const r=Deno.env.get("SUPABASE_SECRET_KEYS")||"";try{const p=JSON.parse(r);return p.default||Object.values(p)[0]||""}catch{return r}}
 Deno.serve(async(req)=>{
  const validation=req.headers.get("Validation-Token");
- if(validation&&req.headers.get("content-length")==="0")return ok(validation);
  if(req.method!=="POST")return new Response("Method not allowed",{status:405,headers:H});
+ const raw=await req.text();
+ // RingCentral validates subscriptions with an empty POST. Echo the exact
+ // request token; do not depend on Content-Length being present.
+ if(validation&&!raw.trim())return ok(validation);
  const expected=(Deno.env.get("RINGCENTRAL_WEBHOOK_TOKEN")||"").trim();
  if(!expected||validation!==expected)return new Response("Unauthorized",{status:401,headers:H});
  try{
-  const payload=await req.json(),body=payload?.body||{},parties=Array.isArray(body.parties)?body.parties:[];
+  const payload=JSON.parse(raw),body=payload?.body||{},parties=Array.isArray(body.parties)?body.parties:[];
   const admin=createClient(Deno.env.get("SUPABASE_URL")!,serviceKey(),{auth:{persistSession:false}});
   const inbound=parties.filter((p:any)=>p?.direction==="Inbound"&&["Setup","Proceeding","Answered"].includes(String(p?.status?.code||"")));
   for(const party of inbound){
