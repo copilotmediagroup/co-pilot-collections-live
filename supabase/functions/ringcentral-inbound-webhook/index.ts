@@ -10,8 +10,7 @@ Deno.serve(async(req)=>{
  // RingCentral validates subscriptions with an empty POST. Echo the exact
  // request token; do not depend on Content-Length being present.
  if(validation&&!raw.trim())return ok(validation);
- const expected=(Deno.env.get("RINGCENTRAL_WEBHOOK_TOKEN")||"").trim();
- if(!expected||validation!==expected)return new Response("Unauthorized",{status:401,headers:H});
+ // RingCentral uses Validation-Token for subscription validation, but normal\n // telephony event deliveries are authenticated by the unguessable webhook URL/subscription.\n // Do not require the validation header on event POSTs; RingCentral does not send it reliably.
  try{
   const payload=JSON.parse(raw),body=payload?.body||{},parties=Array.isArray(body.parties)?body.parties:[];
   const admin=createClient(Deno.env.get("SUPABASE_URL")!,serviceKey(),{auth:{persistSession:false}});
