@@ -7072,7 +7072,8 @@ async function activateRingCentralInbound(){
 async function openEmployeeMonitorModal(){
  if(!currentUser.isAdmin)return alert('Admin only');
  document.getElementById('employeeMonitorModal').classList.add('open');
- await activateRingCentralInbound();
+ const inboundActive=await activateRingCentralInbound();
+ if(!inboundActive)alert('RingCentral inbound activation failed. Check console/logs before testing calls.');
  await loadEmployeeMonitor();
 }
 setInterval(async function(){
