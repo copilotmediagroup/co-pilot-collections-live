@@ -7217,9 +7217,20 @@ function monitorCallAccountMatches(c){
 }
 function openMonitorCalledAccount(id){
  if(!id)return;
- setCurrent(id);
- closeEmployeeMonitorModal();
- setTimeout(()=>document.getElementById('accountWorkspace')?.scrollIntoView({behavior:'smooth',block:'start'}),50);
+ let target=accounts.find(a=>String(a.id)===String(id));
+ if(!target)return alert('That account is no longer available in the active portfolio.');
+ // Monitor can match an account that is outside the collector's current queue filters.
+ // Clear those view-only filters before selecting it so getCurrent()/render() cannot snap back.
+ let search=document.getElementById('search'); if(search)search.value='';
+ let portfolio=document.getElementById('portfolioFilter'); if(portfolio)portfolio.value='';
+ let status=document.getElementById('statusFilter'); if(status)status.value='';
+ let region=document.getElementById('callRegionFilter'); if(region)region.value='';
+ setCurrent(target.id);
+ closeModal('employeeMonitorModal');
+ setTimeout(()=>{
+   setCurrent(target.id);
+   document.querySelector('.center')?.scrollTo?.({top:0,behavior:'smooth'});
+ },50);
 }
 function monitorCallCard(c){
  let when=new Date(c.startTime||c.start_time||'');
