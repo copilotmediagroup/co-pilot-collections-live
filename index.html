@@ -7064,10 +7064,10 @@ async function activateRingCentralInbound(){
   if(typeof ensureFreshToken==='function')await ensureFreshToken();
   const res=await fetch(url()+'/functions/v1/ringcentral-webhook-bootstrap',{method:'POST',headers:{'Content-Type':'application/json','apikey':pubKey(),'Authorization':'Bearer '+token()},body:'{}'});
   const data=await res.json().catch(()=>({}));
-  if(!res.ok||!data.ok)throw new Error(data.error||('Webhook activation returned '+res.status));
+  if(!res.ok||!data.ok)throw new Error((data.error||data.message||data.code||('Webhook activation returned '+res.status))+' [HTTP '+res.status+']');
   console.info('RingCentral inbound webhook active',data.existing?'existing':'created');
   return true;
- }catch(e){console.warn('RingCentral inbound webhook activation failed',e);return false}
+ }catch(e){const msg=String(e?.message||e);console.warn('RingCentral inbound webhook activation failed',msg);alert('RingCentral activation error: '+msg);return false}
 }
 async function openEmployeeMonitorModal(){
  if(!currentUser.isAdmin)return alert('Admin only');
