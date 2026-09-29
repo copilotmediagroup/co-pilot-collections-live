@@ -66,7 +66,7 @@ serve(async (req) => {
     let body: Record<string, unknown> = {};
     try { body = await req.json(); } catch { /* health is the safe default */ }
     const action = typeof body.action === "string" ? body.action : "health";
-    const adminOnlyActions = new Set(["manual_test", "collector_sandbox", "sandbox_result", "prepare_real_call", "authorize_real_call", "real_call_dry_run"]);
+    const adminOnlyActions = new Set(["manual_test", "collector_sandbox", "sandbox_result", "prepare_real_call", "authorize_real_call", "real_call_dry_run", "real_call_send"]);
     if (adminOnlyActions.has(action) && authEmail !== "afinch2678@gmail.com") {
       return json({ error: "Admin authorization required" }, 403);
     }
@@ -214,6 +214,16 @@ serve(async (req) => {
       const patch=await fetch(`${supabaseUrl}/rest/v1/ai_real_call_attempts?id=eq.${encodeURIComponent(attemptId)}`,{method:"PATCH",headers:{...hr,"Content-Type":"application/json"},body:JSON.stringify({updated_at:new Date().toISOString()})});
       if(!patch.ok)return json({error:"Dry-run audit touch failed"},500);
       return json({ok:true,dry_run:true,attempt_id:attemptId,provider:"bland",provider_send_enabled:false,request:redacted,message:"Dry run only. No request was sent to Bland."});
+    }
+
+    if (action === "real_call_send") {
+      const serviceKey=Deno.env.get("SUPABASE_SERVICE_ROLE_KEY"),attemptId=String(body.attempt_id??"").trim();
+      if(!serviceKey||!/^[0-9a-f-]{36}$/i.test(attemptId))return json({error:"Valid authorized attempt is required"},400);
+      const hr={apikey:serviceKey,Authorization:`Bearer ${serviceKey}`};
+      const cfg=await fetch(`${supabaseUrl}/rest/v1/ai_call_runtime_config?id=eq.true&select=real_provider_send_enabled&limit=1`,{headers:hr});
+      const cfgRows=await cfg.json().catch(()=>[]),enabled=cfg.ok&&Array.isArray(cfgRows)&&cfgRows[0]?.real_provider_send_enabled===true;
+      if(!enabled)return json({ok:false,sent:false,provider_send_enabled:false,error:"Real provider send is disabled by the server kill switch"},423);
+      return json({ok:false,sent:false,provider_send_enabled:false,error:"Provider send implementation is intentionally locked pending verified callback/status contract"},423);
     }
 
     if (action === "sandbox_result") {
