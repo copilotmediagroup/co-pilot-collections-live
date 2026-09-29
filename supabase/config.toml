@@ -15,3 +15,6 @@ verify_jwt = false
 
 [functions.bland-ai]
 verify_jwt = false
+
+[functions.bland-call-status]
+verify_jwt = false
