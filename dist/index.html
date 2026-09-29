@@ -7059,6 +7059,19 @@ function monitorRangeStart(){
  return d.toISOString();
 }
 let blandSandboxLastCallId='';
+function classifyBlandSandboxTranscript(data){
+ const t=String((data?.transcript||'')+' '+(data?.summary||'')).toLowerCase();
+ const hits=[];
+ const add=(key,label,patterns)=>{if(patterns.some(x=>t.includes(x)))hits.push({key,label})};
+ add('wrong_number','Wrong Number',['wrong number','not the person','you have the wrong']);
+ add('dnc','Do Not Call Request',['do not call','stop calling','don\'t call','remove me from']);
+ add('dispute','Dispute',['dispute','not my debt','do not owe','don\'t owe']);
+ add('settlement','Settlement Request',['settle','settlement','pay less','reduced amount']);
+ add('payment_plan','Payment Plan Interest',['payment plan','monthly payment','installment','payments']);
+ add('callback','Callback Request',['call me back','call back','another time']);
+ add('human_transfer','Human Review / Transfer',['representative','human','manager','supervisor','agent']);
+ return hits;
+}
 async function reviewBlandSandboxResult(){
  if(!currentUser?.isAdmin)return alert('Admin only');
  const callId=blandSandboxLastCallId||prompt('Bland sandbox Call ID:','');
@@ -7068,8 +7081,10 @@ async function reviewBlandSandboxResult(){
   const res=await fetch(url()+'/functions/v1/bland-ai',{method:'POST',headers:{'Content-Type':'application/json','apikey':pubKey(),'Authorization':'Bearer '+token()},body:JSON.stringify({action:'sandbox_result',call_id:callId})});
   const data=await res.json().catch(()=>({}));
   if(!res.ok||!data.ok)throw new Error(data.error||('Sandbox lookup returned '+res.status));
-  await dbFetch('/ai_call_qa?provider_call_id=eq.'+encodeURIComponent(callId),{method:'PATCH',body:JSON.stringify({status:data.status||null,completed:!!data.completed,answered_by:data.answered_by||null,duration_minutes:data.call_length==null?null:Number(data.call_length),price:data.price==null?null:Number(data.price),summary:data.summary||'',transcript:data.transcript||'',updated_at:new Date().toISOString()})}).catch(()=>{});
-  const report='AI COLLECTOR SANDBOX QA\n\nStatus: '+(data.status||'—')+'\nCompleted: '+(data.completed?'Yes':'No')+'\nAnswered by: '+(data.answered_by||'—')+'\nLength: '+(data.call_length??'—')+' minutes\nCost: '+(data.price==null?'—':'$'+data.price)+'\n\nSUMMARY\n'+(data.summary||'No summary yet.')+'\n\nTRANSCRIPT\n'+(data.transcript||'Transcript not available yet.');
+  const suggestions=classifyBlandSandboxTranscript(data);
+  await dbFetch('/ai_call_qa?provider_call_id=eq.'+encodeURIComponent(callId),{method:'PATCH',body:JSON.stringify({status:data.status||null,completed:!!data.completed,answered_by:data.answered_by||null,duration_minutes:data.call_length==null?null:Number(data.call_length),price:data.price==null?null:Number(data.price),summary:data.summary||'',transcript:data.transcript||'',suggested_dispositions:suggestions,updated_at:new Date().toISOString()})}).catch(()=>{});
+  const suggestedText=suggestions.length?suggestions.map(x=>'• '+x.label).join('\n'):'• No special disposition detected';
+  const report='AI COLLECTOR SANDBOX QA\n\nSUGGESTED DISPOSITIONS — REVIEW ONLY\n'+suggestedText+'\n\nNo account flags were changed.\n\nStatus: '+(data.status||'—')+'\nCompleted: '+(data.completed?'Yes':'No')+'\nAnswered by: '+(data.answered_by||'—')+'\nLength: '+(data.call_length??'—')+' minutes\nCost: '+(data.price==null?'—':'$'+data.price)+'\n\nSUMMARY\n'+(data.summary||'No summary yet.')+'\n\nTRANSCRIPT\n'+(data.transcript||'Transcript not available yet.');
   alert(report.slice(0,15000));
   return data;
  }catch(e){alert('AI Collector QA lookup failed: '+String(e?.message||e));return false}
