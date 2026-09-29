@@ -7068,6 +7068,7 @@ async function reviewBlandSandboxResult(){
   const res=await fetch(url()+'/functions/v1/bland-ai',{method:'POST',headers:{'Content-Type':'application/json','apikey':pubKey(),'Authorization':'Bearer '+token()},body:JSON.stringify({action:'sandbox_result',call_id:callId})});
   const data=await res.json().catch(()=>({}));
   if(!res.ok||!data.ok)throw new Error(data.error||('Sandbox lookup returned '+res.status));
+  await dbFetch('/ai_call_qa?provider_call_id=eq.'+encodeURIComponent(callId),{method:'PATCH',body:JSON.stringify({status:data.status||null,completed:!!data.completed,answered_by:data.answered_by||null,duration_minutes:data.call_length==null?null:Number(data.call_length),price:data.price==null?null:Number(data.price),summary:data.summary||'',transcript:data.transcript||'',updated_at:new Date().toISOString()})}).catch(()=>{});
   const report='AI COLLECTOR SANDBOX QA\n\nStatus: '+(data.status||'—')+'\nCompleted: '+(data.completed?'Yes':'No')+'\nAnswered by: '+(data.answered_by||'—')+'\nLength: '+(data.call_length??'—')+' minutes\nCost: '+(data.price==null?'—':'$'+data.price)+'\n\nSUMMARY\n'+(data.summary||'No summary yet.')+'\n\nTRANSCRIPT\n'+(data.transcript||'Transcript not available yet.');
   alert(report.slice(0,15000));
   return data;
@@ -7091,6 +7092,8 @@ async function runBlandCollectorSandbox(){
   const res=await fetch(url()+'/functions/v1/bland-ai',{method:'POST',headers:{'Content-Type':'application/json','apikey':pubKey(),'Authorization':'Bearer '+token()},body:JSON.stringify({action:'collector_sandbox',account_id:a.id,phone_number:'3322590894'})});
   const data=await res.json().catch(()=>({}));
   if(!res.ok||!data.ok)throw new Error((data.error||('Collector sandbox returned '+res.status))+(data.reasons?.length?' — '+data.reasons.join(', '):''));
+  blandSandboxLastCallId=data.call_id||'';
+  if(data.call_id)await dbFetch('/ai_call_qa',{method:'POST',body:JSON.stringify([{account_id:a.id,provider:'bland',provider_call_id:data.call_id,mode:'collector_sandbox',destination_last4:'0894',observed_caller_id:'4707069719',status:data.status||'queued',completed:false,created_by_email:currentUser.email}])}).catch(()=>{});
   await insertAudit('AI Collector Sandbox','Synthetic Bland sandbox launched; no debtor data sent. Call ID '+(data.call_id||'pending'),'account',a.id).catch(()=>{});
   alert('AI Collector sandbox queued to (332) 259-0894 only.\n\nSynthetic debt data only.\nCall ID: '+(data.call_id||'pending'));
   return true;
