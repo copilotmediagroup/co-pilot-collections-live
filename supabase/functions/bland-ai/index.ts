@@ -66,7 +66,7 @@ serve(async (req) => {
     let body: Record<string, unknown> = {};
     try { body = await req.json(); } catch { /* health is the safe default */ }
     const action = typeof body.action === "string" ? body.action : "health";
-    const adminOnlyActions = new Set(["manual_test", "collector_sandbox", "sandbox_result"]);
+    const adminOnlyActions = new Set(["manual_test", "collector_sandbox", "sandbox_result", "prepare_real_call"]);
     if (adminOnlyActions.has(action) && authEmail !== "afinch2678@gmail.com") {
       return json({ error: "Admin authorization required" }, 403);
     }
@@ -122,6 +122,41 @@ serve(async (req) => {
       else if(!String(script.identity_prompt||"").trim()||!String(script.initial_disclosure||"").trim()||!String(script.subsequent_disclosure||"").trim())reasons.push("Approved AI script is missing required identity/disclosure fields");
       if(reasons.length)return json({ok:false,allowed:false,reasons:[...new Set(reasons)]},409);
       return json({ok:true,allowed:true,account_id:accountId,phone_last4:requested.slice(-4),phone_slot:slot,max_calls_per_day:max,communication_type:communicationType,validation_notice:{sent_at:comm.validation_notice_sent_at,method:comm.validation_notice_method||null,source:comm.validation_notice_source||null},script_profile:{id:script.id,name:script.profile_name,version:script.version,disclosure_type:communicationType}});
+    }
+
+    if (action === "prepare_real_call") {
+      const serviceKey=Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+      if(!serviceKey)return json({error:"Server preparation unavailable"},500);
+      const accountId=String(body.account_id??"").trim(), requested=digits10(body.phone_number);
+      if(!accountId||requested.length!==10)return json({error:"Account and valid phone are required"},400);
+      const select="id,first_name,original_creditor,type_of_debt,current_balance,state,status,disposition,do_not_call,cease_and_desist,disputed_flag,bankruptcy_flag,deceased_flag,attorney_represented,wrong_number_flag,needs_manager_review,compliance_call_start,compliance_call_end,max_calls_per_day,compliance_time_zone,phone1,phone1_status,phone2,phone2_status,phone3,phone3_status,phone4,phone4_status,phone5,phone5_status,phone6,phone6_status,phone7,phone7_status,phone8,phone8_status,phone9,phone9_status,phone10,phone10_status";
+      const ar=await fetch(`${supabaseUrl}/rest/v1/accounts?id=eq.${encodeURIComponent(accountId)}&select=${select}&limit=1`,{headers:{apikey:serviceKey,Authorization:`Bearer ${serviceKey}`}});
+      const rows=await ar.json().catch(()=>[]),a=Array.isArray(rows)?rows[0]:null;if(!ar.ok||!a)return json({error:"Selected account could not be verified"},404);
+      const reasons:string[]=[];
+      [[a.do_not_call,"Do Not Call"],[a.cease_and_desist,"Cease & Desist"],[a.disputed_flag,"Disputed / Frozen"],[a.bankruptcy_flag,"Bankruptcy"],[a.deceased_flag,"Deceased"],[a.attorney_represented,"Attorney Represented"],[a.wrong_number_flag,"Wrong Number"]].forEach(([v,l])=>{if(v===true)reasons.push(String(l))});
+      if(a.needs_manager_review===true)reasons.push("Manager review required");
+      if(["dnc","bad number","disputed"].includes(String(a.disposition||a.status||"").toLowerCase()))reasons.push("Blocked account disposition");
+      let slot=0;for(let i=1;i<=10;i++)if(digits10(a["phone"+i])===requested){slot=i;break}
+      if(!slot)reasons.push("Phone does not belong to selected account");else if(/bad|wrong|invalid|dnc|do not call/i.test(String(a["phone"+slot+"_status"]??"")))reasons.push("Selected phone status is blocked");
+      const zones=String(a.compliance_time_zone??"").trim()?[String(a.compliance_time_zone).trim()]:(stateZones[String(a.state??"").trim().toUpperCase()]||[]);
+      const start=Math.max(480,timeMinutes(a.compliance_call_start,480)),end=Math.min(1260,timeMinutes(a.compliance_call_end,1260));
+      if(!zones.length)reasons.push("Compliance timezone is unknown");else if(start>=end||zones.some(z=>{try{const n=minuteInZone(z);return n<start||n>=end}catch{return true}}))reasons.push("Outside permitted call window");
+      const max=Math.max(1,Number(a.max_calls_per_day||2)),since=new Date(Date.now()-86400000).toISOString();
+      const cr=await fetch(`${supabaseUrl}/rest/v1/call_results?account_id=eq.${encodeURIComponent(accountId)}&direction=eq.outbound&created_at=gte.${encodeURIComponent(since)}&select=id`,{headers:{apikey:serviceKey,Authorization:`Bearer ${serviceKey}`}});
+      const calls=await cr.json().catch(()=>[]);if(!cr.ok)reasons.push("Daily call history could not be verified");else if(Array.isArray(calls)&&calls.length>=max)reasons.push(`Daily call limit reached (${calls.length}/${max})`);
+      const cmr=await fetch(`${supabaseUrl}/rest/v1/account_communication_compliance?account_id=eq.${encodeURIComponent(accountId)}&select=first_debt_communication_at,validation_notice_sent_at,validation_notice_method,validation_notice_source&limit=1`,{headers:{apikey:serviceKey,Authorization:`Bearer ${serviceKey}`}});
+      const cmRows=await cmr.json().catch(()=>[]),comm=Array.isArray(cmRows)?cmRows[0]:null;if(!cmr.ok)reasons.push("Communication compliance history could not be verified");else if(!comm)reasons.push("First-contact / validation-notice state is unknown");else if(!comm.validation_notice_sent_at)reasons.push("Validation notice is not recorded as sent");
+      const communicationType=comm?.first_debt_communication_at?"subsequent":"initial";
+      const sr=await fetch(`${supabaseUrl}/rest/v1/ai_collector_script_profiles?approved_for_real_calls=eq.true&select=*&order=updated_at.desc&limit=1`,{headers:{apikey:serviceKey,Authorization:`Bearer ${serviceKey}`}});
+      const scripts=await sr.json().catch(()=>[]),script=Array.isArray(scripts)?scripts[0]:null;if(!sr.ok||!script)reasons.push("No approved AI collector script is available");
+      if(reasons.length)return json({ok:false,prepared:false,reasons:[...new Set(reasons)]},409);
+      const payload={first_name:String(a.first_name||""),original_creditor:String(a.original_creditor||""),debt_type:String(a.type_of_debt||""),current_balance:Number(a.current_balance??0),destination_phone:"+1"+requested};
+      const scriptSnapshot={profile_id:script.id,profile_name:script.profile_name,version:script.version,identity_prompt:script.identity_prompt,disclosure:communicationType==="initial"?script.initial_disclosure:script.subsequent_disclosure,dispute_instruction:script.dispute_instruction,dnc_instruction:script.dnc_instruction,settlement_instruction:script.settlement_instruction,payment_instruction:script.payment_instruction,human_escalation_instruction:script.human_escalation_instruction};
+      const preflight={checked_at:new Date().toISOString(),phone_slot:slot,phone_last4:requested.slice(-4),communication_type:communicationType,validation_notice_sent_at:comm.validation_notice_sent_at,validation_notice_method:comm.validation_notice_method||null,validation_notice_source:comm.validation_notice_source||null,max_calls_per_day:max,rolling_24h_outbound_count:Array.isArray(calls)?calls.length:null};
+      const ir=await fetch(`${supabaseUrl}/rest/v1/ai_real_call_attempts`,{method:"POST",headers:{apikey:serviceKey,Authorization:`Bearer ${serviceKey}`,"Content-Type":"application/json",Prefer:"return=representation"},body:JSON.stringify([{account_id:accountId,requested_phone_last4:requested.slice(-4),phone_slot:slot,communication_type:communicationType,script_profile_id:script.id,script_profile_name:script.profile_name,script_version:script.version,script_snapshot:scriptSnapshot,payload_snapshot:payload,preflight_snapshot:preflight,status:"prepared",created_by_email:authEmail}])});
+      const ins=await ir.json().catch(()=>[]),attempt=Array.isArray(ins)?ins[0]:null;if(!ir.ok||!attempt)return json({error:"Prepared attempt could not be recorded"},500);
+      const safePayload={...payload,destination_phone:"***-***-"+requested.slice(-4)};
+      return json({ok:true,prepared:true,attempt_id:attempt.id,status:"prepared",payload:safePayload,script:{name:script.profile_name,version:script.version,communication_type:communicationType,disclosure:scriptSnapshot.disclosure},message:"Prepared only. No Bland outbound request was made."});
     }
 
     if (action === "sandbox_result") {
