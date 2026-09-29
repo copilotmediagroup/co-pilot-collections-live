@@ -38,6 +38,30 @@ serve(async (req) => {
     const action = typeof body.action === "string" ? body.action : "health";
 
     const allowedTestNumber = "+13322590894";
+    if (action === "sandbox_result") {
+      const callId = String(body.call_id ?? "").trim();
+      if (!/^[a-zA-Z0-9_-]{8,100}$/.test(callId)) return json({ error: "Valid call ID required" }, 400);
+      const response = await fetch("https://api.bland.ai/v1/calls/" + encodeURIComponent(callId), {
+        headers: { authorization: apiKey },
+      });
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) return json({ ok: false, error: data?.message || "Bland call lookup failed", status: response.status }, 502);
+      const transcript = String(data?.concatenated_transcript ?? "").slice(0, 12000);
+      const summary = String(data?.summary ?? "").slice(0, 4000);
+      return json({
+        ok: true,
+        call_id: data?.call_id ?? callId,
+        status: data?.status ?? null,
+        completed: data?.completed === true,
+        answered_by: data?.answered_by ?? null,
+        call_length: data?.call_length ?? null,
+        summary,
+        transcript,
+        recording_available: Boolean(data?.recording_url),
+        price: data?.price ?? null,
+      });
+    }
+
     if (action === "collector_sandbox") {
       const requested = String(body.phone_number ?? "").replace(/\D/g, "");
       if (requested !== "13322590894" && requested !== "3322590894") return json({ error: "Sandbox number not authorized" }, 403);
