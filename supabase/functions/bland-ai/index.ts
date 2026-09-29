@@ -37,12 +37,31 @@ serve(async (req) => {
     try { body = await req.json(); } catch { /* health is the safe default */ }
     const action = typeof body.action === "string" ? body.action : "health";
 
-    if (action !== "health") {
-      return json({
-        error: "Action not enabled",
-        message: "Only the non-dialing Bland connection check is enabled at this gate.",
-      }, 403);
+    const allowedTestNumber = "+13322590894";
+    if (action === "manual_test") {
+      const requested = String(body.phone_number ?? "").replace(/\D/g, "");
+      if (requested !== "13322590894" && requested !== "3322590894") {
+        return json({ error: "Test number not authorized" }, 403);
+      }
+      const response = await fetch("https://api.bland.ai/v1/calls", {
+        method: "POST",
+        headers: { authorization: apiKey, "Content-Type": "application/json" },
+        body: JSON.stringify({
+          phone_number: allowedTestNumber,
+          task: "This is a private Co Pilot Collections Manager integration test. Confirm you reached the authorized test phone, briefly explain that this is a Bland AI test call, answer simple questions about the test, and do not discuss or attempt to collect any debt.",
+          first_sentence: "Hello, this is the authorized Co Pilot Bland AI test call.",
+          wait_for_greeting: true,
+          max_duration: 2,
+          record: false,
+          metadata: { source: "cpcm_manual_test_gate" }
+        }),
+      });
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) return json({ ok: false, error: data?.message || "Bland test call failed", status: response.status }, 502);
+      return json({ ok: true, provider: "bland", call_id: data?.call_id ?? null, status: data?.status ?? "queued", message: data?.message ?? "Test call queued." });
     }
+
+    if (action !== "health") return json({ error: "Action not enabled" }, 403);
 
     const response = await fetch("https://api.bland.ai/v1/me", {
       method: "GET",

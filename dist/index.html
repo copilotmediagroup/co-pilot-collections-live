@@ -7069,8 +7069,13 @@ async function checkBlandAIConnection(){
   });
   const data=await res.json().catch(()=>({}));
   if(!res.ok||!data.connected)throw new Error(data.error||('Bland health check returned '+res.status));
-  alert('Bland AI connected. Dialing remains disabled until the manual test-call gate.');
+  const run=confirm('Bland AI connected.\n\nManual test gate is ready for (332) 259-0894 only.\n\nPress OK to place ONE AI test call to that authorized number. Press Cancel to exit without calling.');
   console.info('Bland AI health check passed',{provider:data.provider,mode:data.mode,dialing_enabled:data.dialing_enabled});
+  if(!run)return true;
+  const callRes=await fetch(url()+'/functions/v1/bland-ai',{method:'POST',headers:{'Content-Type':'application/json','apikey':pubKey(),'Authorization':'Bearer '+token()},body:JSON.stringify({action:'manual_test',phone_number:'3322590894'})});
+  const callData=await callRes.json().catch(()=>({}));
+  if(!callRes.ok||!callData.ok)throw new Error(callData.error||('Bland test call returned '+callRes.status));
+  alert('Bland test call queued to (332) 259-0894 only. Call ID: '+(callData.call_id||'pending'));
   return true;
  }catch(e){
   const msg=String(e?.message||e);
