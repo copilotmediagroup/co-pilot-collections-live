@@ -12,6 +12,34 @@ const json = (body: unknown, status = 200) =>
     headers: { ...corsHeaders, "Content-Type": "application/json" },
   });
 
+const digits10 = (v: unknown) => {
+  const d = String(v ?? "").replace(/\D/g, "");
+  return d.length === 11 && d.startsWith("1") ? d.slice(1) : d;
+};
+const stateZones: Record<string, string[]> = {
+  FL:["America/New_York","America/Chicago"], IN:["America/New_York","America/Chicago"], KY:["America/New_York","America/Chicago"],
+  TN:["America/New_York","America/Chicago"], MI:["America/New_York","America/Chicago"], ID:["America/Denver","America/Los_Angeles"],
+  OR:["America/Los_Angeles","America/Denver"], ND:["America/Chicago","America/Denver"], SD:["America/Chicago","America/Denver"],
+  NE:["America/Chicago","America/Denver"], KS:["America/Chicago","America/Denver"], TX:["America/Chicago","America/Denver"],
+  AK:["America/Anchorage"], HI:["Pacific/Honolulu"], AZ:["America/Phoenix"],
+  CT:["America/New_York"], DE:["America/New_York"], DC:["America/New_York"], GA:["America/New_York"], ME:["America/New_York"],
+  MD:["America/New_York"], MA:["America/New_York"], NH:["America/New_York"], NJ:["America/New_York"], NY:["America/New_York"],
+  NC:["America/New_York"], OH:["America/New_York"], PA:["America/New_York"], RI:["America/New_York"], SC:["America/New_York"],
+  VT:["America/New_York"], VA:["America/New_York"], WV:["America/New_York"],
+  AL:["America/Chicago"], AR:["America/Chicago"], IL:["America/Chicago"], IA:["America/Chicago"], LA:["America/Chicago"],
+  MN:["America/Chicago"], MS:["America/Chicago"], MO:["America/Chicago"], OK:["America/Chicago"], WI:["America/Chicago"],
+  CO:["America/Denver"], MT:["America/Denver"], NM:["America/Denver"], UT:["America/Denver"], WY:["America/Denver"],
+  CA:["America/Los_Angeles"], NV:["America/Los_Angeles"], WA:["America/Los_Angeles"]
+};
+const minuteInZone = (zone: string) => {
+  const parts = new Intl.DateTimeFormat("en-US",{timeZone:zone,hour:"2-digit",minute:"2-digit",hourCycle:"h23"}).formatToParts(new Date());
+  const h=Number(parts.find(x=>x.type==="hour")?.value ?? -1), m=Number(parts.find(x=>x.type==="minute")?.value ?? -1);
+  return h*60+m;
+};
+const timeMinutes = (v: unknown, fallback: number) => {
+  const m=String(v ?? "").match(/^(\d{1,2}):(\d{2})/); return m ? Number(m[1])*60+Number(m[2]) : fallback;
+};
+
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
   if (req.method !== "POST") return json({ error: "Method not allowed" }, 405);
@@ -29,6 +57,8 @@ serve(async (req) => {
       headers: { Authorization: authHeader, apikey: anonKey },
     });
     if (!userResponse.ok) return json({ error: "Unauthorized" }, 401);
+    const authUser = await userResponse.json().catch(() => ({}));
+    const authEmail = String(authUser?.email ?? "").trim().toLowerCase();
 
     const apiKey = Deno.env.get("BLAND_API_KEY");
     if (!apiKey) return json({ connected: false, error: "BLAND_API_KEY is not configured" }, 503);
@@ -36,8 +66,52 @@ serve(async (req) => {
     let body: Record<string, unknown> = {};
     try { body = await req.json(); } catch { /* health is the safe default */ }
     const action = typeof body.action === "string" ? body.action : "health";
+    const adminOnlyActions = new Set(["manual_test", "collector_sandbox", "sandbox_result"]);
+    if (adminOnlyActions.has(action) && authEmail !== "afinch2678@gmail.com") {
+      return json({ error: "Admin authorization required" }, 403);
+    }
 
     const allowedTestNumber = "+13322590894";
+
+    // Future real-account calling must pass this server-side preflight. No real dial action is enabled yet.
+    if (action === "real_call_preflight") {
+      if (authEmail !== "afinch2678@gmail.com") return json({ error: "Admin authorization required" }, 403);
+      const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+      if (!serviceKey) return json({ error: "Server account lookup unavailable" }, 500);
+      const accountId=String(body.account_id ?? "").trim(), requested=digits10(body.phone_number);
+      if (!accountId || requested.length!==10) return json({ error: "Account and valid phone are required" }, 400);
+      const select="id,state,status,disposition,do_not_call,cease_and_desist,disputed_flag,bankruptcy_flag,deceased_flag,attorney_represented,wrong_number_flag,needs_manager_review,compliance_call_start,compliance_call_end,max_calls_per_day,compliance_time_zone,phone1,phone1_status,phone2,phone2_status,phone3,phone3_status,phone4,phone4_status,phone5,phone5_status,phone6,phone6_status,phone7,phone7_status,phone8,phone8_status,phone9,phone9_status,phone10,phone10_status";
+      const ar=await fetch(`${supabaseUrl}/rest/v1/accounts?id=eq.${encodeURIComponent(accountId)}&select=${select}&limit=1`,{headers:{apikey:serviceKey,Authorization:`Bearer ${serviceKey}`}});
+      const rows=await ar.json().catch(()=>[]), a=Array.isArray(rows)?rows[0]:null;
+      if(!ar.ok||!a)return json({error:"Selected account could not be verified"},404);
+      const reasons:string[]=[];
+      const blocked=[[a.do_not_call,"Do Not Call"],[a.cease_and_desist,"Cease & Desist"],[a.disputed_flag,"Disputed / Frozen"],[a.bankruptcy_flag,"Bankruptcy"],[a.deceased_flag,"Deceased"],[a.attorney_represented,"Attorney Represented"],[a.wrong_number_flag,"Wrong Number"]];
+      blocked.forEach(([v,l])=>{if(v===true)reasons.push(String(l))});
+      const st=String(a.disposition||a.status||"").toLowerCase();
+      if(["dnc","bad number","disputed"].includes(st))reasons.push("Blocked account disposition");
+      if(a.needs_manager_review===true)reasons.push("Manager review required");
+      let slot=0;
+      for(let i=1;i<=10;i++)if(digits10(a["phone"+i])===requested){slot=i;break}
+      if(!slot)reasons.push("Phone does not belong to selected account");
+      else if(/bad|wrong|invalid|dnc|do not call/i.test(String(a["phone"+slot+"_status"]??"")))reasons.push("Selected phone status is blocked");
+      const explicit=String(a.compliance_time_zone??"").trim();
+      const zones=explicit?[explicit]:(stateZones[String(a.state??"").trim().toUpperCase()]||[]);
+      if(!zones.length)reasons.push("Compliance timezone is unknown");
+      else {
+        const start=Math.max(8*60,timeMinutes(a.compliance_call_start,8*60));
+        const end=Math.min(21*60,timeMinutes(a.compliance_call_end,21*60));
+        if(start>=end||zones.some(z=>{try{const n=minuteInZone(z);return n<start||n>=end}catch{return true}}))reasons.push("Outside permitted call window");
+      }
+      const max=Math.max(1,Number(a.max_calls_per_day||2));
+      const since=new Date(Date.now()-24*60*60*1000).toISOString();
+      const cr=await fetch(`${supabaseUrl}/rest/v1/call_results?account_id=eq.${encodeURIComponent(accountId)}&direction=eq.outbound&created_at=gte.${encodeURIComponent(since)}&select=id`,{headers:{apikey:serviceKey,Authorization:`Bearer ${serviceKey}`}});
+      const calls=await cr.json().catch(()=>[]);
+      if(!cr.ok)reasons.push("Daily call history could not be verified");
+      else if(Array.isArray(calls)&&calls.length>=max)reasons.push(`Daily call limit reached (${calls.length}/${max})`);
+      if(reasons.length)return json({ok:false,allowed:false,reasons:[...new Set(reasons)]},409);
+      return json({ok:true,allowed:true,account_id:accountId,phone_last4:requested.slice(-4),phone_slot:slot,max_calls_per_day:max});
+    }
+
     if (action === "sandbox_result") {
       const callId = String(body.call_id ?? "").trim();
       if (!/^[a-zA-Z0-9_-]{8,100}$/.test(callId)) return json({ error: "Valid call ID required" }, 400);
