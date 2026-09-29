@@ -3829,7 +3829,7 @@ header.topbar{height:58px!important;padding:0 12px!important;grid-template-colum
         <button onclick="openComplianceGuard()">Compliance Guard</button><button onclick="openDocumentGenerator()">Letters</button><button class="adminOnly hidden" onclick="openLetterBodyEditor()">Letter Bodies</button><button class="adminOnly hidden qaBtn" onclick="openQaHealthModal()">QA Health</button><button class="adminOnly hidden" onclick="openAuditLog()">Audit Log</button>
       </div></div>
       <div class="topMenu adminOnly hidden"><button class="gray topMenuMain">Admin ▾</button><div class="topMenuDrop">
-        <button onclick="openEmployeeAdminModal()">Staff</button><button onclick="openJobApplicationsAdmin()">Job Applications</button><button onclick="openCommissionAdmin()">Employee Compensation</button><button onclick="openPermissionsModal()">Permissions</button><button onclick="openEmployeeMonitorModal()">Monitor</button><button onclick="checkBlandAIConnection()">AI Connection</button><button onclick="runBlandCollectorSandbox()">AI Collector Sandbox</button><button onclick="reviewBlandSandboxResult()">Review AI QA</button><button onclick="prepareBlandRealCall()">AI Real-Call Prep</button><button onclick="openReportsPageStable()">Reports</button><button onclick="openBrandingSettingsModal()">Branding</button><button onclick="openAssignModal()">Assign Accounts</button><button onclick="openImportHistoryPage()">Portfolio Manager</button><button onclick="openDataCleanupDashboard()">Cleanup</button><label class="topMenuFile">Import CSV<input type="file" accept=".csv" onchange="importCSV(event)"></label><button onclick="downloadTemplate()">Download Template</button><button onclick="exportCSV()">Export CSV</button><button onclick="openArchivedAccounts()">Archived Accounts</button><button class="dangerItem" onclick="permanentlyDeleteArchivedPortfolio()">Delete Archived Portfolio</button><button class="dangerItem" onclick="clearAllAccounts()">Archive Active Accounts</button>
+        <button onclick="openEmployeeAdminModal()">Staff</button><button onclick="openJobApplicationsAdmin()">Job Applications</button><button onclick="openCommissionAdmin()">Employee Compensation</button><button onclick="openPermissionsModal()">Permissions</button><button onclick="openEmployeeMonitorModal()">Monitor</button><button onclick="checkBlandAIConnection()">AI Connection</button><button onclick="runBlandCollectorSandbox()">AI Collector Sandbox</button><button onclick="reviewBlandSandboxResult()">Review AI QA</button><button onclick="editAiCollectorScript()">AI Call Script</button><button onclick="prepareBlandRealCall()">AI Real-Call Prep</button><button onclick="openReportsPageStable()">Reports</button><button onclick="openBrandingSettingsModal()">Branding</button><button onclick="openAssignModal()">Assign Accounts</button><button onclick="openImportHistoryPage()">Portfolio Manager</button><button onclick="openDataCleanupDashboard()">Cleanup</button><label class="topMenuFile">Import CSV<input type="file" accept=".csv" onchange="importCSV(event)"></label><button onclick="downloadTemplate()">Download Template</button><button onclick="exportCSV()">Export CSV</button><button onclick="openArchivedAccounts()">Archived Accounts</button><button class="dangerItem" onclick="permanentlyDeleteArchivedPortfolio()">Delete Archived Portfolio</button><button class="dangerItem" onclick="clearAllAccounts()">Archive Active Accounts</button>
       </div></div>
       <div class="topMenu"><button class="gray topMenuMain">System ▾</button><div class="topMenuDrop topMenuDropRight">
         <button id="cpcmNoDialerStaticTopBtn" onclick="openNoDialerSafeMode()">Safe Mode</button><button onclick="openHelpModal()">Help</button><button class="dangerItem" onclick="logout()">Logout</button>
@@ -7112,6 +7112,27 @@ async function reviewBlandSandboxResult(){
   if(suggestions.some(x=>['wrong_number','dnc','dispute','callback','payment_plan'].includes(x.key))&&confirm('Review and apply one detected disposition to the selected account?'))await approveAiQaDisposition(callId,suggestions,qaAccountId);
   return data;
  }catch(e){alert('AI Collector QA lookup failed: '+String(e?.message||e));return false}
+}
+async function editAiCollectorScript(){
+ if(!currentUser?.isAdmin)return alert('Admin only');
+ let rows=await dbFetch('/ai_collector_script_profiles?profile_name=eq.Default%20AI%20Collector&limit=1').catch(()=>[]);
+ let s=rows?.[0]; if(!s)return alert('AI script profile is unavailable.');
+ const ask=(label,value)=>prompt(label,value??'');
+ const identity=ask('IDENTITY VERIFICATION\n\nDo not include debt details here. Edit the instruction:',s.identity_prompt); if(identity===null)return;
+ const initial=ask('INITIAL-COMMUNICATION DISCLOSURE\n\nEnter the approved/legal-reviewed telephone disclosure:',s.initial_disclosure); if(initial===null)return;
+ const subsequent=ask('SUBSEQUENT-COMMUNICATION DISCLOSURE\n\nEnter the approved/legal-reviewed telephone disclosure:',s.subsequent_disclosure); if(subsequent===null)return;
+ const dispute=ask('DISPUTE HANDLING',s.dispute_instruction); if(dispute===null)return;
+ const dnc=ask('DO-NOT-CALL HANDLING',s.dnc_instruction); if(dnc===null)return;
+ const settlement=ask('SETTLEMENT BOUNDARY',s.settlement_instruction); if(settlement===null)return;
+ const payment=ask('PAYMENT-CREDENTIAL BOUNDARY',s.payment_instruction); if(payment===null)return;
+ const human=ask('HUMAN ESCALATION',s.human_escalation_instruction); if(human===null)return;
+ const complete=[identity,initial,subsequent,dispute,dnc,settlement,payment,human].every(x=>String(x||'').trim());
+ let approve=false;
+ if(complete)approve=confirm('Approve this script profile for REAL AI CALL PREFLIGHT?\n\nThis does not enable real dialing. It only allows the preflight gate to pass.\n\nOnly approve language that you have reviewed for your operation.');
+ const body={identity_prompt:identity,initial_disclosure:initial,subsequent_disclosure:subsequent,dispute_instruction:dispute,dnc_instruction:dnc,settlement_instruction:settlement,payment_instruction:payment,human_escalation_instruction:human,approved_for_real_calls:approve,approved_by_email:approve?currentUser.email:null,approved_at:approve?new Date().toISOString():null,version:Number(s.version||1)+1,updated_at:new Date().toISOString()};
+ await dbFetch('/ai_collector_script_profiles?id=eq.'+encodeURIComponent(s.id),{method:'PATCH',body:JSON.stringify(body)});
+ await insertAudit('AI Collector Script Updated','AI script profile version '+body.version+' saved. Approved for preflight: '+(approve?'Yes':'No'),'system',s.id).catch(()=>{});
+ alert('AI collector script version '+body.version+' saved.\n\nApproved for real-call preflight: '+(approve?'YES':'NO')+'\nReal AI dialing remains disabled.');
 }
 async function prepareBlandRealCall(){
  if(!currentUser?.isAdmin)return alert('Admin only');

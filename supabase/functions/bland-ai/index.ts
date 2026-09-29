@@ -108,8 +108,13 @@ serve(async (req) => {
       const calls=await cr.json().catch(()=>[]);
       if(!cr.ok)reasons.push("Daily call history could not be verified");
       else if(Array.isArray(calls)&&calls.length>=max)reasons.push(`Daily call limit reached (${calls.length}/${max})`);
+      const sr=await fetch(`${supabaseUrl}/rest/v1/ai_collector_script_profiles?approved_for_real_calls=eq.true&select=id,profile_name,version,identity_prompt,initial_disclosure,subsequent_disclosure,dispute_instruction,dnc_instruction,settlement_instruction,payment_instruction,human_escalation_instruction&order=updated_at.desc&limit=1`,{headers:{apikey:serviceKey,Authorization:`Bearer ${serviceKey}`}});
+      const scripts=await sr.json().catch(()=>[]), script=Array.isArray(scripts)?scripts[0]:null;
+      if(!sr.ok)reasons.push("AI script approval could not be verified");
+      else if(!script)reasons.push("No AI collector script is approved for real calls");
+      else if(!String(script.identity_prompt||"").trim()||!String(script.initial_disclosure||"").trim()||!String(script.subsequent_disclosure||"").trim())reasons.push("Approved AI script is missing required identity/disclosure fields");
       if(reasons.length)return json({ok:false,allowed:false,reasons:[...new Set(reasons)]},409);
-      return json({ok:true,allowed:true,account_id:accountId,phone_last4:requested.slice(-4),phone_slot:slot,max_calls_per_day:max});
+      return json({ok:true,allowed:true,account_id:accountId,phone_last4:requested.slice(-4),phone_slot:slot,max_calls_per_day:max,script_profile:{id:script.id,name:script.profile_name,version:script.version}});
     }
 
     if (action === "sandbox_result") {
