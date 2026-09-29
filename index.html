@@ -3829,7 +3829,7 @@ header.topbar{height:58px!important;padding:0 12px!important;grid-template-colum
         <button onclick="openComplianceGuard()">Compliance Guard</button><button onclick="openDocumentGenerator()">Letters</button><button class="adminOnly hidden" onclick="openLetterBodyEditor()">Letter Bodies</button><button class="adminOnly hidden qaBtn" onclick="openQaHealthModal()">QA Health</button><button class="adminOnly hidden" onclick="openAuditLog()">Audit Log</button>
       </div></div>
       <div class="topMenu adminOnly hidden"><button class="gray topMenuMain">Admin ▾</button><div class="topMenuDrop">
-        <button onclick="openEmployeeAdminModal()">Staff</button><button onclick="openJobApplicationsAdmin()">Job Applications</button><button onclick="openCommissionAdmin()">Employee Compensation</button><button onclick="openPermissionsModal()">Permissions</button><button onclick="openEmployeeMonitorModal()">Monitor</button><button onclick="checkBlandAIConnection()">AI Calling</button><button onclick="openReportsPageStable()">Reports</button><button onclick="openBrandingSettingsModal()">Branding</button><button onclick="openAssignModal()">Assign Accounts</button><button onclick="openImportHistoryPage()">Portfolio Manager</button><button onclick="openDataCleanupDashboard()">Cleanup</button><label class="topMenuFile">Import CSV<input type="file" accept=".csv" onchange="importCSV(event)"></label><button onclick="downloadTemplate()">Download Template</button><button onclick="exportCSV()">Export CSV</button><button onclick="openArchivedAccounts()">Archived Accounts</button><button class="dangerItem" onclick="permanentlyDeleteArchivedPortfolio()">Delete Archived Portfolio</button><button class="dangerItem" onclick="clearAllAccounts()">Archive Active Accounts</button>
+        <button onclick="openEmployeeAdminModal()">Staff</button><button onclick="openJobApplicationsAdmin()">Job Applications</button><button onclick="openCommissionAdmin()">Employee Compensation</button><button onclick="openPermissionsModal()">Permissions</button><button onclick="openEmployeeMonitorModal()">Monitor</button><button onclick="checkBlandAIConnection()">AI Connection</button><button onclick="runBlandCollectorSandbox()">AI Collector Sandbox</button><button onclick="openReportsPageStable()">Reports</button><button onclick="openBrandingSettingsModal()">Branding</button><button onclick="openAssignModal()">Assign Accounts</button><button onclick="openImportHistoryPage()">Portfolio Manager</button><button onclick="openDataCleanupDashboard()">Cleanup</button><label class="topMenuFile">Import CSV<input type="file" accept=".csv" onchange="importCSV(event)"></label><button onclick="downloadTemplate()">Download Template</button><button onclick="exportCSV()">Export CSV</button><button onclick="openArchivedAccounts()">Archived Accounts</button><button class="dangerItem" onclick="permanentlyDeleteArchivedPortfolio()">Delete Archived Portfolio</button><button class="dangerItem" onclick="clearAllAccounts()">Archive Active Accounts</button>
       </div></div>
       <div class="topMenu"><button class="gray topMenuMain">System ▾</button><div class="topMenuDrop topMenuDropRight">
         <button id="cpcmNoDialerStaticTopBtn" onclick="openNoDialerSafeMode()">Safe Mode</button><button onclick="openHelpModal()">Help</button><button class="dangerItem" onclick="logout()">Logout</button>
@@ -7057,6 +7057,29 @@ function monitorRangeStart(){
  if(r==='today'){d.setHours(0,0,0,0);return d.toISOString()}
  d.setDate(d.getDate()-Number(r||30));
  return d.toISOString();
+}
+async function runBlandCollectorSandbox(){
+ if(!currentUser?.isAdmin)return alert('Admin only');
+ const a=getCurrent();
+ if(!a)return alert('Select one account first.');
+ const rules=complianceRules(a);
+ const calls=await todayCallCountForAccount(a.id);
+ const issues=[...rules.hard,...rules.warn];
+ if(calls>=rules.maxCalls)issues.push({label:'Daily call limit reached ('+calls+'/'+rules.maxCalls+')',type:'block'});
+ if(issues.length){
+  alert('AI Collector preflight blocked/requires review for '+nameOf(a)+':\n\n'+issues.map(x=>'• '+x.label).join('\n')+'\n\nNo call was placed.');
+  return false;
+ }
+ if(!confirm('AI COLLECTOR SANDBOX\n\nSelected account: '+nameOf(a)+' · '+(acctNo(a)||'—')+'\nCompliance preflight: CLEAR\n\nThe call will go ONLY to (332) 259-0894 and will use SYNTHETIC debt information. No debtor PII, account number, bank data, SSN, DOB, creditor, balance, or debtor phone will be sent to Bland.\n\nPress OK to run one sandbox conversation.'))return false;
+ try{
+  if(typeof ensureFreshToken==='function')await ensureFreshToken();
+  const res=await fetch(url()+'/functions/v1/bland-ai',{method:'POST',headers:{'Content-Type':'application/json','apikey':pubKey(),'Authorization':'Bearer '+token()},body:JSON.stringify({action:'collector_sandbox',account_id:a.id,phone_number:'3322590894'})});
+  const data=await res.json().catch(()=>({}));
+  if(!res.ok||!data.ok)throw new Error((data.error||('Collector sandbox returned '+res.status))+(data.reasons?.length?' — '+data.reasons.join(', '):''));
+  await insertAudit('AI Collector Sandbox','Synthetic Bland sandbox launched; no debtor data sent. Call ID '+(data.call_id||'pending'),'account',a.id).catch(()=>{});
+  alert('AI Collector sandbox queued to (332) 259-0894 only.\n\nSynthetic debt data only.\nCall ID: '+(data.call_id||'pending'));
+  return true;
+ }catch(e){alert('AI Collector sandbox failed: '+String(e?.message||e));return false}
 }
 async function checkBlandAIConnection(){
  if(!currentUser?.isAdmin)return alert('Admin only');
