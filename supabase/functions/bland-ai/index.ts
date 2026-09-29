@@ -66,7 +66,7 @@ serve(async (req) => {
     let body: Record<string, unknown> = {};
     try { body = await req.json(); } catch { /* health is the safe default */ }
     const action = typeof body.action === "string" ? body.action : "health";
-    const adminOnlyActions = new Set(["manual_test", "collector_sandbox", "sandbox_result", "prepare_real_call", "authorize_real_call"]);
+    const adminOnlyActions = new Set(["manual_test", "collector_sandbox", "sandbox_result", "prepare_real_call", "authorize_real_call", "real_call_dry_run"]);
     if (adminOnlyActions.has(action) && authEmail !== "afinch2678@gmail.com") {
       return json({ error: "Admin authorization required" }, 403);
     }
@@ -181,6 +181,39 @@ serve(async (req) => {
       const rpc=await fetch(`${supabaseUrl}/rest/v1/rpc/cpcm_authorize_ai_call_attempt`,{method:"POST",headers:{...hr,"Content-Type":"application/json"},body:JSON.stringify({p_attempt_id:attemptId,p_admin_email:authEmail})});
       const out=await rpc.json().catch(()=>[]),row=Array.isArray(out)?out[0]:null;if(!rpc.ok||!row)return json({error:"Atomic authorization failed"},500);
       return json({ok:true,authorized:true,attempt_id:attemptId,call_result_id:row.call_result_id,status:"authorized",provider_send_enabled:false,message:"Authorized and reserved. Bland outbound send remains disabled."});
+    }
+
+    if (action === "real_call_dry_run") {
+      const serviceKey=Deno.env.get("SUPABASE_SERVICE_ROLE_KEY"),attemptId=String(body.attempt_id??"").trim();
+      if(!serviceKey||!/^[0-9a-f-]{36}$/i.test(attemptId))return json({error:"Valid authorized attempt is required"},400);
+      const hr={apikey:serviceKey,Authorization:`Bearer ${serviceKey}`};
+      const rr=await fetch(`${supabaseUrl}/rest/v1/ai_real_call_attempts?id=eq.${encodeURIComponent(attemptId)}&select=*&limit=1`,{headers:hr});
+      const rows=await rr.json().catch(()=>[]),attempt=Array.isArray(rows)?rows[0]:null;if(!rr.ok||!attempt)return json({error:"Authorized attempt not found"},404);
+      if(String(attempt.status)!=="authorized")return json({error:"Attempt must be authorized before dry run",status:attempt.status},409);
+      const vr=await fetch(`${supabaseUrl}/rest/v1/call_results?attempt_id=eq.${encodeURIComponent(attemptId)}&attempt_status=eq.authorized&select=id&limit=1`,{headers:hr});
+      const vrows=await vr.json().catch(()=>[]);if(!vr.ok||!Array.isArray(vrows)||!vrows[0])return json({error:"Atomic authorization reservation is missing"},409);
+      const p=attempt.payload_snapshot||{},s=attempt.script_snapshot||{};
+      const firstName=String(p.first_name||"").trim(),creditor=String(p.original_creditor||"").trim(),debtType=String(p.debt_type||"").trim(),balance=Number(p.current_balance||0),destination=String(p.destination_phone||"");
+      if(digits10(destination).length!==10)return json({error:"Snapshot destination is invalid"},409);
+      if(!String(s.identity_prompt||"").trim()||!String(s.disclosure||"").trim())return json({error:"Snapshot identity/disclosure instructions are incomplete"},409);
+      const task=[
+        "You are an AI collections assistant operating under a locked, admin-approved script snapshot.",
+        "IDENTITY GATE: "+String(s.identity_prompt),
+        "Before identity is verified, do not reveal the creditor, debt type, balance, account existence, or any other debt-specific information.",
+        "After identity is verified, state this approved disclosure exactly: "+String(s.disclosure),
+        `Verified-consumer account context: first name ${firstName||"[not provided]"}; original creditor ${creditor||"[not provided]"}; debt type ${debtType||"[not provided]"}; current balance $${balance.toFixed(2)}.`,
+        "DISPUTE: "+String(s.dispute_instruction||"Stop collection discussion and route for human review."),
+        "DO NOT CALL: "+String(s.dnc_instruction||"Acknowledge the request and end the collection discussion."),
+        "SETTLEMENT: "+String(s.settlement_instruction||"Do not approve an unapproved settlement; route for manager review."),
+        "PAYMENT SECURITY: "+String(s.payment_instruction||"Do not collect payment credentials in this call."),
+        "HUMAN ESCALATION: "+String(s.human_escalation_instruction||"Route to human review when requested or uncertain."),
+        "Never request or repeat SSN, date of birth, bank account number, routing number, card number, or other payment credentials."
+      ].join("\n\n");
+      const providerPayload={phone_number:destination,task,first_sentence:`Hello, may I speak with ${firstName||"the intended consumer"}?`,wait_for_greeting:true,max_duration:4,record:false,metadata:{source:"cpcm_real_call",attempt_id:attemptId,account_id:attempt.account_id,script_profile_id:attempt.script_profile_id,script_version:attempt.script_version,communication_type:attempt.communication_type}};
+      const redacted={...providerPayload,phone_number:"***-***-"+digits10(destination).slice(-4),metadata:{...providerPayload.metadata,account_id:"[server-held]"}};
+      const patch=await fetch(`${supabaseUrl}/rest/v1/ai_real_call_attempts?id=eq.${encodeURIComponent(attemptId)}`,{method:"PATCH",headers:{...hr,"Content-Type":"application/json"},body:JSON.stringify({updated_at:new Date().toISOString()})});
+      if(!patch.ok)return json({error:"Dry-run audit touch failed"},500);
+      return json({ok:true,dry_run:true,attempt_id:attemptId,provider:"bland",provider_send_enabled:false,request:redacted,message:"Dry run only. No request was sent to Bland."});
     }
 
     if (action === "sandbox_result") {

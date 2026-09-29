@@ -7187,6 +7187,13 @@ async function prepareBlandRealCall(){
     const auth=await authRes.json().catch(()=>({}));
     if(!authRes.ok||!auth.authorized){alert('AUTHORIZATION BLOCKED\n\n'+(auth.reasons||[auth.error||'Authorization failed']).map(x=>'• '+x).join('\n')+'\n\nNo call was placed.');return false}
     alert('AI CALL AUTHORIZED + RESERVED\n\nAttempt ID: '+auth.attempt_id+'\nCall Result ID: '+auth.call_result_id+'\nStatus: AUTHORIZED\nProvider send enabled: NO\n\nNo call was placed.');
+    if(confirm('Inspect the exact REDACTED Bland request dry run now?\n\nThis does NOT contact Bland.')){
+     const dryRes=await fetch(url()+'/functions/v1/bland-ai',{method:'POST',headers:{'Content-Type':'application/json','apikey':pubKey(),'Authorization':'Bearer '+token()},body:JSON.stringify({action:'real_call_dry_run',attempt_id:auth.attempt_id})});
+     const dry=await dryRes.json().catch(()=>({}));
+     if(!dryRes.ok||!dry.dry_run){alert('DRY RUN FAILED\n\n'+(dry.error||'Unable to build request.')+'\n\nNo call was placed.');return false}
+     const q=dry.request||{};
+     alert(('BLAND REQUEST — DRY RUN ONLY\n\nProvider send enabled: NO\nDestination: '+(q.phone_number||'—')+'\nFirst sentence: '+(q.first_sentence||'—')+'\nWait for greeting: '+String(q.wait_for_greeting)+'\nMax duration: '+String(q.max_duration)+'\nRecord: '+String(q.record)+'\n\nTASK / SYSTEM INSTRUCTIONS\n\n'+(q.task||'—')+'\n\nMETADATA\n'+JSON.stringify(q.metadata||{},null,2)+'\n\nNO REQUEST WAS SENT TO BLAND.').slice(0,15000));
+    }
    }
   }
   return true;
