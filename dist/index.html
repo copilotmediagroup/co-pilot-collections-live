@@ -7072,6 +7072,27 @@ function classifyBlandSandboxTranscript(data){
  add('human_transfer','Human Review / Transfer',['representative','human','manager','supervisor','agent']);
  return hits;
 }
+async function approveAiQaDisposition(callId,suggestions,qaAccountId){
+ if(!currentUser?.isAdmin||!Array.isArray(suggestions)||!suggestions.length)return false;
+ const actionable=suggestions.filter(x=>['wrong_number','dnc','dispute','callback','payment_plan'].includes(x.key));
+ if(!actionable.length)return false;
+ const a=getCurrent();
+ if(!a){alert('Select the account associated with this QA record before applying a disposition.');return false}
+ if(!qaAccountId||String(a.id)!==String(qaAccountId)){alert('Safety stop: the selected account does not match this AI QA record. No account change was made.');return false}
+ const choices=actionable.map((x,i)=>(i+1)+'. '+x.label).join('\n');
+ const pick=prompt('ADMIN REVIEW — APPLY ONE DISPOSITION\n\n'+choices+'\n\nEnter the number to apply, or Cancel.\n\nThis changes the selected account using Co Pilot’s existing disposition workflow.','');
+ if(!pick)return false;
+ const item=actionable[Number(pick)-1];
+ if(!item)return alert('Invalid selection.');
+ const map={wrong_number:'Bad Number',dnc:'DNC',dispute:'Disputed',callback:'Callback',payment_plan:'Promise to Pay'};
+ const dispo=map[item.key];
+ if(!confirm('Apply '+dispo+' to '+nameOf(a)+'?\n\nThis is an admin-approved account change.'))return false;
+ await selectDisposition(dispo);
+ await dbFetch('/ai_call_qa?provider_call_id=eq.'+encodeURIComponent(callId),{method:'PATCH',body:JSON.stringify({classification_reviewed:true,classification_reviewed_at:new Date().toISOString(),updated_at:new Date().toISOString()})}).catch(()=>{});
+ await insertAudit('AI QA Disposition Approved','Admin approved '+dispo+' from AI QA call '+callId,'account',a.id).catch(()=>{});
+ alert('Applied: '+dispo+'\n\nCo Pilot’s existing account workflow handled the change.');
+ return true;
+}
 async function reviewBlandSandboxResult(){
  if(!currentUser?.isAdmin)return alert('Admin only');
  const callId=blandSandboxLastCallId||prompt('Bland sandbox Call ID:','');
@@ -7082,10 +7103,13 @@ async function reviewBlandSandboxResult(){
   const data=await res.json().catch(()=>({}));
   if(!res.ok||!data.ok)throw new Error(data.error||('Sandbox lookup returned '+res.status));
   const suggestions=classifyBlandSandboxTranscript(data);
+  const qaRows=await dbFetch('/ai_call_qa?provider_call_id=eq.'+encodeURIComponent(callId)+'&select=account_id&limit=1').catch(()=>[]);
+  const qaAccountId=qaRows?.[0]?.account_id||null;
   await dbFetch('/ai_call_qa?provider_call_id=eq.'+encodeURIComponent(callId),{method:'PATCH',body:JSON.stringify({status:data.status||null,completed:!!data.completed,answered_by:data.answered_by||null,duration_minutes:data.call_length==null?null:Number(data.call_length),price:data.price==null?null:Number(data.price),summary:data.summary||'',transcript:data.transcript||'',suggested_dispositions:suggestions,updated_at:new Date().toISOString()})}).catch(()=>{});
   const suggestedText=suggestions.length?suggestions.map(x=>'• '+x.label).join('\n'):'• No special disposition detected';
   const report='AI COLLECTOR SANDBOX QA\n\nSUGGESTED DISPOSITIONS — REVIEW ONLY\n'+suggestedText+'\n\nNo account flags were changed.\n\nStatus: '+(data.status||'—')+'\nCompleted: '+(data.completed?'Yes':'No')+'\nAnswered by: '+(data.answered_by||'—')+'\nLength: '+(data.call_length??'—')+' minutes\nCost: '+(data.price==null?'—':'$'+data.price)+'\n\nSUMMARY\n'+(data.summary||'No summary yet.')+'\n\nTRANSCRIPT\n'+(data.transcript||'Transcript not available yet.');
   alert(report.slice(0,15000));
+  if(suggestions.some(x=>['wrong_number','dnc','dispute','callback','payment_plan'].includes(x.key))&&confirm('Review and apply one detected disposition to the selected account?'))await approveAiQaDisposition(callId,suggestions,qaAccountId);
   return data;
  }catch(e){alert('AI Collector QA lookup failed: '+String(e?.message||e));return false}
 }
