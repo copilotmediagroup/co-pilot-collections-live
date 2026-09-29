@@ -3829,7 +3829,7 @@ header.topbar{height:58px!important;padding:0 12px!important;grid-template-colum
         <button onclick="openComplianceGuard()">Compliance Guard</button><button onclick="openDocumentGenerator()">Letters</button><button class="adminOnly hidden" onclick="openLetterBodyEditor()">Letter Bodies</button><button class="adminOnly hidden qaBtn" onclick="openQaHealthModal()">QA Health</button><button class="adminOnly hidden" onclick="openAuditLog()">Audit Log</button>
       </div></div>
       <div class="topMenu adminOnly hidden"><button class="gray topMenuMain">Admin ▾</button><div class="topMenuDrop">
-        <button onclick="openEmployeeAdminModal()">Staff</button><button onclick="openJobApplicationsAdmin()">Job Applications</button><button onclick="openCommissionAdmin()">Employee Compensation</button><button onclick="openPermissionsModal()">Permissions</button><button onclick="openEmployeeMonitorModal()">Monitor</button><button onclick="openReportsPageStable()">Reports</button><button onclick="openBrandingSettingsModal()">Branding</button><button onclick="openAssignModal()">Assign Accounts</button><button onclick="openImportHistoryPage()">Portfolio Manager</button><button onclick="openDataCleanupDashboard()">Cleanup</button><label class="topMenuFile">Import CSV<input type="file" accept=".csv" onchange="importCSV(event)"></label><button onclick="downloadTemplate()">Download Template</button><button onclick="exportCSV()">Export CSV</button><button onclick="openArchivedAccounts()">Archived Accounts</button><button class="dangerItem" onclick="permanentlyDeleteArchivedPortfolio()">Delete Archived Portfolio</button><button class="dangerItem" onclick="clearAllAccounts()">Archive Active Accounts</button>
+        <button onclick="openEmployeeAdminModal()">Staff</button><button onclick="openJobApplicationsAdmin()">Job Applications</button><button onclick="openCommissionAdmin()">Employee Compensation</button><button onclick="openPermissionsModal()">Permissions</button><button onclick="openEmployeeMonitorModal()">Monitor</button><button onclick="checkBlandAIConnection()">AI Calling</button><button onclick="openReportsPageStable()">Reports</button><button onclick="openBrandingSettingsModal()">Branding</button><button onclick="openAssignModal()">Assign Accounts</button><button onclick="openImportHistoryPage()">Portfolio Manager</button><button onclick="openDataCleanupDashboard()">Cleanup</button><label class="topMenuFile">Import CSV<input type="file" accept=".csv" onchange="importCSV(event)"></label><button onclick="downloadTemplate()">Download Template</button><button onclick="exportCSV()">Export CSV</button><button onclick="openArchivedAccounts()">Archived Accounts</button><button class="dangerItem" onclick="permanentlyDeleteArchivedPortfolio()">Delete Archived Portfolio</button><button class="dangerItem" onclick="clearAllAccounts()">Archive Active Accounts</button>
       </div></div>
       <div class="topMenu"><button class="gray topMenuMain">System ▾</button><div class="topMenuDrop topMenuDropRight">
         <button id="cpcmNoDialerStaticTopBtn" onclick="openNoDialerSafeMode()">Safe Mode</button><button onclick="openHelpModal()">Help</button><button class="dangerItem" onclick="logout()">Logout</button>
@@ -7057,6 +7057,27 @@ function monitorRangeStart(){
  if(r==='today'){d.setHours(0,0,0,0);return d.toISOString()}
  d.setDate(d.getDate()-Number(r||30));
  return d.toISOString();
+}
+async function checkBlandAIConnection(){
+ if(!currentUser?.isAdmin)return alert('Admin only');
+ try{
+  if(typeof ensureFreshToken==='function')await ensureFreshToken();
+  const res=await fetch(url()+'/functions/v1/bland-ai',{
+   method:'POST',
+   headers:{'Content-Type':'application/json','apikey':pubKey(),'Authorization':'Bearer '+token()},
+   body:JSON.stringify({action:'health'})
+  });
+  const data=await res.json().catch(()=>({}));
+  if(!res.ok||!data.connected)throw new Error(data.error||('Bland health check returned '+res.status));
+  alert('Bland AI connected. Dialing remains disabled until the manual test-call gate.');
+  console.info('Bland AI health check passed',{provider:data.provider,mode:data.mode,dialing_enabled:data.dialing_enabled});
+  return true;
+ }catch(e){
+  const msg=String(e?.message||e);
+  console.warn('Bland AI health check failed',msg);
+  alert('Bland AI connection failed: '+msg);
+  return false;
+ }
 }
 let employeeMonitorLiveBusy=false;
 async function activateRingCentralInbound(){

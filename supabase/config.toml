@@ -12,3 +12,6 @@ verify_jwt = false
 
 [functions.dialer-gateway]
 verify_jwt = false
+
+[functions.bland-ai]
+verify_jwt = false
