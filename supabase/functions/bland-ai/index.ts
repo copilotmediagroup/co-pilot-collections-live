@@ -66,7 +66,7 @@ serve(async (req) => {
     let body: Record<string, unknown> = {};
     try { body = await req.json(); } catch { /* health is the safe default */ }
     const action = typeof body.action === "string" ? body.action : "health";
-    const adminOnlyActions = new Set(["manual_test", "collector_sandbox", "sandbox_result", "prepare_real_call"]);
+    const adminOnlyActions = new Set(["manual_test", "collector_sandbox", "sandbox_result", "prepare_real_call", "authorize_real_call"]);
     if (adminOnlyActions.has(action) && authEmail !== "afinch2678@gmail.com") {
       return json({ error: "Admin authorization required" }, 403);
     }
@@ -157,6 +157,30 @@ serve(async (req) => {
       const ins=await ir.json().catch(()=>[]),attempt=Array.isArray(ins)?ins[0]:null;if(!ir.ok||!attempt)return json({error:"Prepared attempt could not be recorded"},500);
       const safePayload={...payload,destination_phone:"***-***-"+requested.slice(-4)};
       return json({ok:true,prepared:true,attempt_id:attempt.id,status:"prepared",payload:safePayload,script:{name:script.profile_name,version:script.version,communication_type:communicationType,disclosure:scriptSnapshot.disclosure},message:"Prepared only. No Bland outbound request was made."});
+    }
+
+    if (action === "authorize_real_call") {
+      const serviceKey=Deno.env.get("SUPABASE_SERVICE_ROLE_KEY"),attemptId=String(body.attempt_id??"").trim();
+      if(!serviceKey||!/^[0-9a-f-]{36}$/i.test(attemptId))return json({error:"Valid prepared attempt is required"},400);
+      const hr={apikey:serviceKey,Authorization:`Bearer ${serviceKey}`};
+      const rr=await fetch(`${supabaseUrl}/rest/v1/ai_real_call_attempts?id=eq.${encodeURIComponent(attemptId)}&select=*&limit=1`,{headers:hr});
+      const rws=await rr.json().catch(()=>[]),attempt=Array.isArray(rws)?rws[0]:null;if(!rr.ok||!attempt)return json({error:"Prepared attempt not found"},404);
+      if(!["prepared","authorized"].includes(String(attempt.status)))return json({error:"Attempt is not authorizable",status:attempt.status},409);
+      const ar=await fetch(`${supabaseUrl}/rest/v1/accounts?id=eq.${encodeURIComponent(attempt.account_id)}&select=id,state,status,disposition,do_not_call,cease_and_desist,disputed_flag,bankruptcy_flag,deceased_flag,attorney_represented,wrong_number_flag,needs_manager_review,compliance_call_start,compliance_call_end,max_calls_per_day,compliance_time_zone,phone1,phone1_status,phone2,phone2_status,phone3,phone3_status,phone4,phone4_status,phone5,phone5_status,phone6,phone6_status,phone7,phone7_status,phone8,phone8_status,phone9,phone9_status,phone10,phone10_status&limit=1`,{headers:hr});
+      const ars=await ar.json().catch(()=>[]),acct=Array.isArray(ars)?ars[0]:null;if(!ar.ok||!acct)return json({error:"Account revalidation failed"},409);
+      const reasons:string[]=[];[[acct.do_not_call,"Do Not Call"],[acct.cease_and_desist,"Cease & Desist"],[acct.disputed_flag,"Disputed / Frozen"],[acct.bankruptcy_flag,"Bankruptcy"],[acct.deceased_flag,"Deceased"],[acct.attorney_represented,"Attorney Represented"],[acct.wrong_number_flag,"Wrong Number"]].forEach(([v,l])=>{if(v===true)reasons.push(String(l))});
+      if(acct.needs_manager_review===true)reasons.push("Manager review required");if(["dnc","bad number","disputed"].includes(String(acct.disposition||acct.status||"").toLowerCase()))reasons.push("Blocked account disposition");
+      const slot=Number(attempt.phone_slot||0),dest=digits10(attempt.payload_snapshot?.destination_phone);if(!slot||digits10(acct["phone"+slot])!==dest)reasons.push("Prepared phone no longer matches account");else if(/bad|wrong|invalid|dnc|do not call/i.test(String(acct["phone"+slot+"_status"]??"")))reasons.push("Prepared phone is now blocked");
+      const zones=String(acct.compliance_time_zone??"").trim()?[String(acct.compliance_time_zone).trim()]:(stateZones[String(acct.state??"").trim().toUpperCase()]||[]),start=Math.max(480,timeMinutes(acct.compliance_call_start,480)),end=Math.min(1260,timeMinutes(acct.compliance_call_end,1260));
+      if(!zones.length||start>=end||zones.some(z=>{try{const n=minuteInZone(z);return n<start||n>=end}catch{return true}}))reasons.push("Outside permitted call window");
+      const max=Math.max(1,Number(acct.max_calls_per_day||2)),since=new Date(Date.now()-86400000).toISOString();
+      const cr=await fetch(`${supabaseUrl}/rest/v1/call_results?account_id=eq.${encodeURIComponent(attempt.account_id)}&direction=eq.Outbound&created_at=gte.${encodeURIComponent(since)}&select=id,attempt_id`,{headers:hr});const calls=await cr.json().catch(()=>[]);
+      const otherCalls=Array.isArray(calls)?calls.filter((x:any)=>String(x.attempt_id||"")!==attemptId):[];if(!cr.ok)reasons.push("Daily call history could not be revalidated");else if(otherCalls.length>=max)reasons.push(`Daily call limit reached (${otherCalls.length}/${max})`);
+      const sr=await fetch(`${supabaseUrl}/rest/v1/ai_collector_script_profiles?id=eq.${encodeURIComponent(attempt.script_profile_id)}&approved_for_real_calls=eq.true&select=id,version&limit=1`,{headers:hr});const ss=await sr.json().catch(()=>[]),script=Array.isArray(ss)?ss[0]:null;if(!sr.ok||!script||Number(script.version)!==Number(attempt.script_version))reasons.push("Prepared script version is no longer approved/current");
+      if(reasons.length)return json({ok:false,authorized:false,reasons:[...new Set(reasons)]},409);
+      const rpc=await fetch(`${supabaseUrl}/rest/v1/rpc/cpcm_authorize_ai_call_attempt`,{method:"POST",headers:{...hr,"Content-Type":"application/json"},body:JSON.stringify({p_attempt_id:attemptId,p_admin_email:authEmail})});
+      const out=await rpc.json().catch(()=>[]),row=Array.isArray(out)?out[0]:null;if(!rpc.ok||!row)return json({error:"Atomic authorization failed"},500);
+      return json({ok:true,authorized:true,attempt_id:attemptId,call_result_id:row.call_result_id,status:"authorized",provider_send_enabled:false,message:"Authorized and reserved. Bland outbound send remains disabled."});
     }
 
     if (action === "sandbox_result") {

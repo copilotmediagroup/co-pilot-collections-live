@@ -7182,6 +7182,12 @@ async function prepareBlandRealCall(){
    const prep=await prepRes.json().catch(()=>({}));
    if(!prepRes.ok||!prep.prepared){alert('PREPARATION BLOCKED\n\n'+(prep.reasons||[prep.error||'Preparation failed']).map(x=>'• '+x).join('\n')+'\n\nNo call was placed.');return false}
    alert('REAL-CALL ATTEMPT PREPARED\n\nAttempt ID: '+prep.attempt_id+'\nStatus: '+String(prep.status||'prepared').toUpperCase()+'\nScript: '+(prep.script?.name||'—')+' v'+(prep.script?.version||'—')+'\nCommunication: '+String(prep.script?.communication_type||'—').toUpperCase()+'\nDestination: '+(prep.payload?.destination_phone||'—')+'\n\nSERVER PAYLOAD SNAPSHOT\n• First name: '+(prep.payload?.first_name||'—')+'\n• Original creditor: '+(prep.payload?.original_creditor||'—')+'\n• Debt type: '+(prep.payload?.debt_type||'—')+'\n• Current balance: '+money(prep.payload?.current_balance||0)+'\n\nNO BLAND OUTBOUND REQUEST WAS MADE.');
+   if(confirm('AUTHORIZE this prepared attempt?\n\nThe server will re-check compliance and reserve one call_results attempt atomically.\n\nBLAND SEND IS STILL DISABLED — authorization will NOT place a call.')){
+    const authRes=await fetch(url()+'/functions/v1/bland-ai',{method:'POST',headers:{'Content-Type':'application/json','apikey':pubKey(),'Authorization':'Bearer '+token()},body:JSON.stringify({action:'authorize_real_call',attempt_id:prep.attempt_id})});
+    const auth=await authRes.json().catch(()=>({}));
+    if(!authRes.ok||!auth.authorized){alert('AUTHORIZATION BLOCKED\n\n'+(auth.reasons||[auth.error||'Authorization failed']).map(x=>'• '+x).join('\n')+'\n\nNo call was placed.');return false}
+    alert('AI CALL AUTHORIZED + RESERVED\n\nAttempt ID: '+auth.attempt_id+'\nCall Result ID: '+auth.call_result_id+'\nStatus: AUTHORIZED\nProvider send enabled: NO\n\nNo call was placed.');
+   }
   }
   return true;
  }catch(e){alert('AI real-call preparation failed: '+String(e?.message||e)+'\n\nNo call was placed.');return false}
