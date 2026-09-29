@@ -223,7 +223,26 @@ serve(async (req) => {
       const cfg=await fetch(`${supabaseUrl}/rest/v1/ai_call_runtime_config?id=eq.true&select=real_provider_send_enabled&limit=1`,{headers:hr});
       const cfgRows=await cfg.json().catch(()=>[]),enabled=cfg.ok&&Array.isArray(cfgRows)&&cfgRows[0]?.real_provider_send_enabled===true;
       if(!enabled)return json({ok:false,sent:false,provider_send_enabled:false,error:"Real provider send is disabled by the server kill switch"},423);
-      return json({ok:false,sent:false,provider_send_enabled:false,error:"Provider send implementation is intentionally locked pending verified callback/status contract"},423);
+      const rr=await fetch(`${supabaseUrl}/rest/v1/ai_real_call_attempts?id=eq.${encodeURIComponent(attemptId)}&select=*&limit=1`,{headers:hr});
+      const rows=await rr.json().catch(()=>[]),attempt=Array.isArray(rows)?rows[0]:null;if(!rr.ok||!attempt)return json({error:"Authorized attempt not found"},404);
+      if(String(attempt.status)==="sent"&&attempt.provider_call_id)return json({ok:true,sent:true,idempotent:true,attempt_id:attemptId,provider_call_id:attempt.provider_call_id});
+      if(String(attempt.status)!=="authorized")return json({error:"Attempt is not sendable",status:attempt.status},409);
+      const claim=await fetch(`${supabaseUrl}/rest/v1/rpc/cpcm_claim_ai_call_send`,{method:"POST",headers:{...hr,"Content-Type":"application/json"},body:JSON.stringify({p_attempt_id:attemptId,p_admin_email:authEmail})});
+      if(!claim.ok)return json({error:"Atomic send claim failed"},409);
+      const p=attempt.payload_snapshot||{},s=attempt.script_snapshot||{},destination=String(p.destination_phone||""),firstName=String(p.first_name||"").trim(),balance=Number(p.current_balance||0);
+      const task=["You are an AI collections assistant operating under a locked, admin-approved script snapshot.","IDENTITY GATE: "+String(s.identity_prompt||""),"Before identity is verified, do not reveal the creditor, debt type, balance, account existence, or any other debt-specific information.","After identity is verified, state this approved disclosure exactly: "+String(s.disclosure||""),`Verified-consumer account context: first name ${firstName||"[not provided]"}; original creditor ${String(p.original_creditor||"")||"[not provided]"}; debt type ${String(p.debt_type||"")||"[not provided]"}; current balance $${balance.toFixed(2)}.`,"DISPUTE: "+String(s.dispute_instruction||""),"DO NOT CALL: "+String(s.dnc_instruction||""),"SETTLEMENT: "+String(s.settlement_instruction||""),"PAYMENT SECURITY: "+String(s.payment_instruction||""),"HUMAN ESCALATION: "+String(s.human_escalation_instruction||""),"Never request or repeat SSN, date of birth, bank account number, routing number, card number, or other payment credentials."].join("\n\n");
+      const webhook=`${supabaseUrl}/functions/v1/bland-call-status`;
+      const providerPayload={phone_number:destination,task,first_sentence:`Hello, may I speak with ${firstName||"the intended consumer"}?`,wait_for_greeting:true,max_duration:4,record:false,webhook,metadata:{source:"cpcm_real_call",attempt_id:attemptId,account_id:attempt.account_id,script_profile_id:attempt.script_profile_id,script_version:attempt.script_version,communication_type:attempt.communication_type}};
+      const br=await fetch("https://api.bland.ai/v1/calls",{method:"POST",headers:{authorization:apiKey,"Content-Type":"application/json"},body:JSON.stringify(providerPayload)});
+      const bd=await br.json().catch(()=>({})),callId=String(bd?.call_id??"").trim();
+      if(!br.ok||!callId){
+        await fetch(`${supabaseUrl}/rest/v1/rpc/cpcm_fail_ai_call_send`,{method:"POST",headers:{...hr,"Content-Type":"application/json"},body:JSON.stringify({p_attempt_id:attemptId,p_error:String(bd?.message||`Bland queue failed (${br.status})`),p_response:{status:br.status,message:bd?.message||null}})});
+        return json({ok:false,sent:false,error:bd?.message||"Bland did not queue the call"},502);
+      }
+      const safeResponse={call_id:callId,status:bd?.status??null,message:bd?.message??null};
+      const fin=await fetch(`${supabaseUrl}/rest/v1/rpc/cpcm_finalize_ai_call_send`,{method:"POST",headers:{...hr,"Content-Type":"application/json"},body:JSON.stringify({p_attempt_id:attemptId,p_call_id:callId,p_response:safeResponse})});
+      if(!fin.ok){await fetch(`${supabaseUrl}/rest/v1/rpc/cpcm_recover_ai_queued_call`,{method:"POST",headers:{...hr,"Content-Type":"application/json"},body:JSON.stringify({p_attempt_id:attemptId,p_call_id:callId,p_response:safeResponse})});return json({ok:false,sent:false,error:"Provider queued call but CRM finalization requires recovery",provider_call_id:callId},500);}
+      return json({ok:true,sent:true,attempt_id:attemptId,provider_call_id:callId,status:"sent",provider_send_enabled:true});
     }
 
     if (action === "sandbox_result") {
