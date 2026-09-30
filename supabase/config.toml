@@ -18,3 +18,6 @@ verify_jwt = false
 
 [functions.bland-call-status]
 verify_jwt = false
+
+[functions.bland-test-status]
+verify_jwt = false

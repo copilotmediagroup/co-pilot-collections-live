@@ -66,7 +66,7 @@ serve(async (req) => {
     let body: Record<string, unknown> = {};
     try { body = await req.json(); } catch { /* health is the safe default */ }
     const action = typeof body.action === "string" ? body.action : "health";
-    const adminOnlyActions = new Set(["manual_test", "collector_sandbox", "sandbox_result", "prepare_real_call", "authorize_real_call", "real_call_dry_run", "real_call_send"]);
+    const adminOnlyActions = new Set(["manual_test", "collector_sandbox", "sandbox_result", "prepare_real_call", "authorize_real_call", "real_call_dry_run", "real_call_send", "pipeline_test"]);
     if (adminOnlyActions.has(action) && authEmail !== "afinch2678@gmail.com") {
       return json({ error: "Admin authorization required" }, 403);
     }
@@ -267,6 +267,22 @@ serve(async (req) => {
         recording_available: Boolean(data?.recording_url),
         price: data?.price ?? null,
       });
+    }
+
+    if (action === "pipeline_test") {
+      const requested=String(body.phone_number??"").replace(/\D/g,"");
+      if(requested!=="3322590894"&&requested!=="13322590894")return json({error:"Pipeline test destination is not authorized"},403);
+      const serviceKey=Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");if(!serviceKey)return json({error:"Service configuration unavailable"},503);
+      const hr={apikey:serviceKey,Authorization:`Bearer ${serviceKey}`};
+      const qa=await fetch(`${supabaseUrl}/rest/v1/ai_call_qa`,{method:"POST",headers:{...hr,"Content-Type":"application/json","Prefer":"return=representation"},body:JSON.stringify({provider:"bland",mode:"pipeline_test",destination_last4:"0894",status:"preparing",completed:false,created_by_email:authEmail})});
+      const qrows=await qa.json().catch(()=>[]),q=Array.isArray(qrows)?qrows[0]:null;if(!qa.ok||!q)return json({error:"Could not create pipeline QA record"},500);
+      const webhook=`${supabaseUrl}/functions/v1/bland-test-status`;
+      const providerPayload={phone_number:allowedTestNumber,task:"This is a private Co Pilot integration pipeline test to an authorized test phone. State clearly that this is a system test. Do not discuss any real debt, consumer, creditor, balance, payment, settlement, or collection activity. Ask the recipient to say a short test phrase, acknowledge it, then end the call.",first_sentence:"Hello, this is the authorized Co Pilot AI pipeline test.",wait_for_greeting:true,max_duration:2,record:false,webhook,metadata:{source:"cpcm_pipeline_test",qa_id:q.id}};
+      const br=await fetch("https://api.bland.ai/v1/calls",{method:"POST",headers:{authorization:apiKey,"Content-Type":"application/json"},body:JSON.stringify(providerPayload)});
+      const bd=await br.json().catch(()=>({})),callId=String(bd?.call_id??"").trim();
+      if(!br.ok||!callId){await fetch(`${supabaseUrl}/rest/v1/ai_call_qa?id=eq.${encodeURIComponent(q.id)}`,{method:"PATCH",headers:{...hr,"Content-Type":"application/json"},body:JSON.stringify({status:"failed",summary:String(bd?.message||"Pipeline test queue failed").slice(0,4000),updated_at:new Date().toISOString()})});return json({ok:false,error:bd?.message||"Bland did not queue pipeline test"},502)}
+      await fetch(`${supabaseUrl}/rest/v1/ai_call_qa?id=eq.${encodeURIComponent(q.id)}`,{method:"PATCH",headers:{...hr,"Content-Type":"application/json"},body:JSON.stringify({provider_call_id:callId,status:String(bd?.status||"queued"),updated_at:new Date().toISOString()})});
+      return json({ok:true,provider:"bland",mode:"pipeline_test",qa_id:q.id,call_id:callId,status:bd?.status??"queued",destination:"***-***-0894"});
     }
 
     if (action === "collector_sandbox") {
