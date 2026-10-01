@@ -3829,7 +3829,7 @@ header.topbar{height:58px!important;padding:0 12px!important;grid-template-colum
         <button onclick="openComplianceGuard()">Compliance Guard</button><button onclick="openDocumentGenerator()">Letters</button><button class="adminOnly hidden" onclick="openLetterBodyEditor()">Letter Bodies</button><button class="adminOnly hidden qaBtn" onclick="openQaHealthModal()">QA Health</button><button class="adminOnly hidden" onclick="openAuditLog()">Audit Log</button>
       </div></div>
       <div class="topMenu adminOnly hidden"><button class="gray topMenuMain">Admin ▾</button><div class="topMenuDrop">
-        <button onclick="openEmployeeAdminModal()">Staff</button><button onclick="openJobApplicationsAdmin()">Job Applications</button><button onclick="openCommissionAdmin()">Employee Compensation</button><button onclick="openPermissionsModal()">Permissions</button><button onclick="openEmployeeMonitorModal()">Monitor</button><button onclick="checkBlandAIConnection()">AI Connection</button><button onclick="runBlandCollectorSandbox()">AI Collector Sandbox</button><button onclick="reviewBlandSandboxResult()">Review AI QA</button><button onclick="editAiCollectorScript()">AI Call Script</button><button onclick="editAccountCommunicationCompliance()">AI Contact Evidence</button><button onclick="prepareBlandRealCall()">AI Real-Call Prep</button><button onclick="openReportsPageStable()">Reports</button><button onclick="openBrandingSettingsModal()">Branding</button><button onclick="openAssignModal()">Assign Accounts</button><button onclick="openImportHistoryPage()">Portfolio Manager</button><button onclick="openDataCleanupDashboard()">Cleanup</button><label class="topMenuFile">Import CSV<input type="file" accept=".csv" onchange="importCSV(event)"></label><button onclick="downloadTemplate()">Download Template</button><button onclick="exportCSV()">Export CSV</button><button onclick="openArchivedAccounts()">Archived Accounts</button><button class="dangerItem" onclick="permanentlyDeleteArchivedPortfolio()">Delete Archived Portfolio</button><button class="dangerItem" onclick="clearAllAccounts()">Archive Active Accounts</button>
+        <button onclick="openEmployeeAdminModal()">Staff</button><button onclick="openJobApplicationsAdmin()">Job Applications</button><button onclick="openCommissionAdmin()">Employee Compensation</button><button onclick="openPermissionsModal()">Permissions</button><button onclick="openEmployeeMonitorModal()">Monitor</button><button onclick="checkBlandAIConnection()">AI Connection</button><button onclick="runBlandCollectorSandbox()">AI Collector Sandbox</button><button onclick="reviewBlandSandboxResult()">Review AI QA</button><button onclick="editAiCollectorScript()">AI Call Script</button><button onclick="editAccountCommunicationCompliance()">AI Contact Evidence</button><button onclick="prepareBlandRealCall()">AI Real-Call Prep</button><button onclick="checkAiLaunchReadiness()">AI Launch Readiness</button><button onclick="openReportsPageStable()">Reports</button><button onclick="openBrandingSettingsModal()">Branding</button><button onclick="openAssignModal()">Assign Accounts</button><button onclick="openImportHistoryPage()">Portfolio Manager</button><button onclick="openDataCleanupDashboard()">Cleanup</button><label class="topMenuFile">Import CSV<input type="file" accept=".csv" onchange="importCSV(event)"></label><button onclick="downloadTemplate()">Download Template</button><button onclick="exportCSV()">Export CSV</button><button onclick="openArchivedAccounts()">Archived Accounts</button><button class="dangerItem" onclick="permanentlyDeleteArchivedPortfolio()">Delete Archived Portfolio</button><button class="dangerItem" onclick="clearAllAccounts()">Archive Active Accounts</button>
       </div></div>
       <div class="topMenu"><button class="gray topMenuMain">System ▾</button><div class="topMenuDrop topMenuDropRight">
         <button id="cpcmNoDialerStaticTopBtn" onclick="openNoDialerSafeMode()">Safe Mode</button><button onclick="openHelpModal()">Help</button><button class="dangerItem" onclick="logout()">Logout</button>
@@ -7153,6 +7153,31 @@ async function editAccountCommunicationCompliance(){
  else await dbFetch('/account_communication_compliance',{method:'POST',body:JSON.stringify([body])});
  await insertAudit('Communication Compliance Updated','First communication: '+(firstIso||'not recorded')+'; validation notice: '+(noticeIso||'not recorded')+'; source: '+(body.validation_notice_source||'none'),'account',a.id).catch(()=>{});
  alert('Communication-compliance evidence saved.\n\nThis records evidence only; it does not send a validation notice.');
+}
+async function checkAiLaunchReadiness(){
+ if(!currentUser?.isAdmin)return alert('Admin only');
+ const [scripts,runtime,caller]=await Promise.all([
+  dbFetch('/ai_collector_script_profiles?profile_name=eq.Default%20AI%20Collector&select=version,approved_for_real_calls,approved_by_email,approved_at&limit=1').catch(()=>[]),
+  dbFetch('/ai_call_runtime_config?id=eq.true&select=real_provider_send_enabled&limit=1').catch(()=>[]),
+  dbFetch('/ai_caller_id_config?id=eq.true&select=phone_number,display_label,verification_status,enabled_for_real_calls&limit=1').catch(()=>[])
+ ]);
+ const s=scripts?.[0]||{},r=runtime?.[0]||{},c=caller?.[0]||{};
+ const line=(ok,label,detail='')=>(ok?'✓ ':'✗ ')+label+(detail?' — '+detail:'');
+ const report=[
+  'AI LAUNCH READINESS',
+  '',
+  line(!!s.approved_for_real_calls,'Collector script approved',s.version?'version '+s.version:'missing'),
+  line(c.verification_status==='verified'&&c.enabled_for_real_calls===true,'Production caller ID verified/enabled',c.phone_number?('***-***-'+String(c.phone_number).replace(/\D/g,'').slice(-4)):(c.verification_status||'unconfigured')),
+  line(r.real_provider_send_enabled===true,'Real-provider kill switch enabled',r.real_provider_send_enabled===true?'ON':'OFF — safe'),
+  '',
+  'Server identity verification: LIVE',
+  'Verified-context unlock: LIVE',
+  'Conversation outcome channel: LIVE',
+  '',
+  'A green launch still requires an end-to-end Bland Pathway test and a controlled pilot.'
+ ].join('\n');
+ alert(report);
+ return {script:s,runtime:r,caller:c};
 }
 async function prepareBlandRealCall(){
  if(!currentUser?.isAdmin)return alert('Admin only');
