@@ -27,3 +27,6 @@ verify_jwt = false
 
 [functions.bland-verified-context]
 verify_jwt = false
+
+[functions.bland-conversation-outcome]
+verify_jwt = false
