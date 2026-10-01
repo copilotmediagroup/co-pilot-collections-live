@@ -3829,7 +3829,7 @@ header.topbar{height:58px!important;padding:0 12px!important;grid-template-colum
         <button onclick="openComplianceGuard()">Compliance Guard</button><button onclick="openDocumentGenerator()">Letters</button><button class="adminOnly hidden" onclick="openLetterBodyEditor()">Letter Bodies</button><button class="adminOnly hidden qaBtn" onclick="openQaHealthModal()">QA Health</button><button class="adminOnly hidden" onclick="openAuditLog()">Audit Log</button>
       </div></div>
       <div class="topMenu adminOnly hidden"><button class="gray topMenuMain">Admin ▾</button><div class="topMenuDrop">
-        <button onclick="openEmployeeAdminModal()">Staff</button><button onclick="openJobApplicationsAdmin()">Job Applications</button><button onclick="openCommissionAdmin()">Employee Compensation</button><button onclick="openPermissionsModal()">Permissions</button><button onclick="openEmployeeMonitorModal()">Monitor</button><button onclick="checkBlandAIConnection()">AI Connection</button><button onclick="runBlandCollectorSandbox()">AI Collector Sandbox</button><button onclick="reviewBlandSandboxResult()">Review AI QA</button><button onclick="editAiCollectorScript()">AI Call Script</button><button onclick="editAccountCommunicationCompliance()">AI Contact Evidence</button><button onclick="prepareBlandRealCall()">AI Real-Call Prep</button><button onclick="checkAiLaunchReadiness()">AI Launch Readiness</button><button onclick="openReportsPageStable()">Reports</button><button onclick="openBrandingSettingsModal()">Branding</button><button onclick="openAssignModal()">Assign Accounts</button><button onclick="openImportHistoryPage()">Portfolio Manager</button><button onclick="openDataCleanupDashboard()">Cleanup</button><label class="topMenuFile">Import CSV<input type="file" accept=".csv" onchange="importCSV(event)"></label><button onclick="downloadTemplate()">Download Template</button><button onclick="exportCSV()">Export CSV</button><button onclick="openArchivedAccounts()">Archived Accounts</button><button class="dangerItem" onclick="permanentlyDeleteArchivedPortfolio()">Delete Archived Portfolio</button><button class="dangerItem" onclick="clearAllAccounts()">Archive Active Accounts</button>
+        <button onclick="openEmployeeAdminModal()">Staff</button><button onclick="openJobApplicationsAdmin()">Job Applications</button><button onclick="openCommissionAdmin()">Employee Compensation</button><button onclick="openPermissionsModal()">Permissions</button><button onclick="openEmployeeMonitorModal()">Monitor</button><button onclick="checkBlandAIConnection()">AI Connection</button><button onclick="runBlandCollectorSandbox()">AI Collector Sandbox</button><button onclick="reviewBlandSandboxResult()">Review AI QA</button><button onclick="editAiCollectorScript()">AI Call Script</button><button onclick="editAccountCommunicationCompliance()">AI Contact Evidence</button><button onclick="prepareBlandRealCall()">AI Real-Call Prep</button><button onclick="checkAiLaunchReadiness()">AI Launch Readiness</button><button onclick="configureAiProvider()">AI Provider Setup</button><button onclick="openReportsPageStable()">Reports</button><button onclick="openBrandingSettingsModal()">Branding</button><button onclick="openAssignModal()">Assign Accounts</button><button onclick="openImportHistoryPage()">Portfolio Manager</button><button onclick="openDataCleanupDashboard()">Cleanup</button><label class="topMenuFile">Import CSV<input type="file" accept=".csv" onchange="importCSV(event)"></label><button onclick="downloadTemplate()">Download Template</button><button onclick="exportCSV()">Export CSV</button><button onclick="openArchivedAccounts()">Archived Accounts</button><button class="dangerItem" onclick="permanentlyDeleteArchivedPortfolio()">Delete Archived Portfolio</button><button class="dangerItem" onclick="clearAllAccounts()">Archive Active Accounts</button>
       </div></div>
       <div class="topMenu"><button class="gray topMenuMain">System ▾</button><div class="topMenuDrop topMenuDropRight">
         <button id="cpcmNoDialerStaticTopBtn" onclick="openNoDialerSafeMode()">Safe Mode</button><button onclick="openHelpModal()">Help</button><button class="dangerItem" onclick="logout()">Logout</button>
@@ -7153,6 +7153,28 @@ async function editAccountCommunicationCompliance(){
  else await dbFetch('/account_communication_compliance',{method:'POST',body:JSON.stringify([body])});
  await insertAudit('Communication Compliance Updated','First communication: '+(firstIso||'not recorded')+'; validation notice: '+(noticeIso||'not recorded')+'; source: '+(body.validation_notice_source||'none'),'account',a.id).catch(()=>{});
  alert('Communication-compliance evidence saved.\n\nThis records evidence only; it does not send a validation notice.');
+}
+async function configureAiProvider(){
+ if(!currentUser?.isAdmin)return alert('Admin only');
+ const [callerRows,pathRows]=await Promise.all([
+  dbFetch('/ai_caller_id_config?id=eq.true&limit=1').catch(()=>[]),
+  dbFetch('/ai_bland_pathway_config?id=eq.true&limit=1').catch(()=>[])
+ ]);
+ const c=callerRows?.[0]||{},p=pathRows?.[0]||{};
+ const caller=prompt('PRODUCTION CALLER ID\n\nEnter the Bland-owned/verified production number when available. Saving it here does NOT verify or enable it.\n\nLeave blank to keep unconfigured:',c.verification_status==='verified'?(c.phone_number||''):'');
+ if(caller===null)return;
+ const pathway=prompt('BLAND COLLECTOR PATHWAY ID\n\nEnter the provider Pathway ID after the V1 Pathway is created in Bland. Saving it here does NOT verify or enable it:',p.pathway_id||'');
+ if(pathway===null)return;
+ const callerDigits=String(caller||'').replace(/\D/g,'');
+ if(callerDigits&&callerDigits.length!==10&&callerDigits.length!==11)return alert('Caller ID must be a valid US phone number.');
+ const callerBody={phone_number:callerDigits?('+1'+callerDigits.slice(-10)):null,display_label:callerDigits?'Configured production caller ID':null,verification_status:callerDigits?'observed_unverified':'unconfigured',enabled_for_real_calls:false,verified_by_email:null,verified_at:null,updated_at:new Date().toISOString()};
+ const pathBody={pathway_id:String(pathway||'').trim()||null,pathway_version:'v1',verification_status:String(pathway||'').trim()?'configured_unverified':'unconfigured',enabled_for_real_calls:false,verified_by_email:null,verified_at:null,updated_at:new Date().toISOString()};
+ await Promise.all([
+  dbFetch('/ai_caller_id_config?id=eq.true',{method:'PATCH',body:JSON.stringify(callerBody)}),
+  dbFetch('/ai_bland_pathway_config?id=eq.true',{method:'PATCH',body:JSON.stringify(pathBody)})
+ ]);
+ await insertAudit('AI Provider Configuration Updated','Caller ID and Bland Pathway configuration saved unverified. No calling was enabled.','system','ai-provider').catch(()=>{});
+ alert('AI provider configuration saved.\n\nCaller ID: UNVERIFIED / DISABLED\nPathway: UNVERIFIED / DISABLED\nReal calling remains disabled.');
 }
 async function checkAiLaunchReadiness(){
  if(!currentUser?.isAdmin)return alert('Admin only');
