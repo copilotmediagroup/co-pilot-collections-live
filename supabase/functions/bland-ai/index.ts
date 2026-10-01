@@ -87,8 +87,9 @@ serve(async (req) => {
       const reasons:string[]=[];
       const blocked=[[a.do_not_call,"Do Not Call"],[a.cease_and_desist,"Cease & Desist"],[a.disputed_flag,"Disputed / Frozen"],[a.bankruptcy_flag,"Bankruptcy"],[a.deceased_flag,"Deceased"],[a.attorney_represented,"Attorney Represented"],[a.wrong_number_flag,"Wrong Number"]];
       blocked.forEach(([v,l])=>{if(v===true)reasons.push(String(l))});
-      const st=String(a.disposition||a.status||"").toLowerCase();
-      if(["dnc","bad number","disputed"].includes(st))reasons.push("Blocked account disposition");
+      const disposition=String(a.disposition||"").toLowerCase(),accountStatus=String(a.status||"").toLowerCase();
+      if(["dnc","bad number","disputed"].includes(disposition))reasons.push("Blocked account disposition");
+      if(["dnc","bad number","disputed"].includes(accountStatus))reasons.push("Blocked account status");
       if(a.needs_manager_review===true)reasons.push("Manager review required");
       let slot=0;
       for(let i=1;i<=10;i++)if(digits10(a["phone"+i])===requested){slot=i;break}
@@ -104,7 +105,7 @@ serve(async (req) => {
       }
       const max=Math.max(1,Number(a.max_calls_per_day||2));
       const since=new Date(Date.now()-24*60*60*1000).toISOString();
-      const cr=await fetch(`${supabaseUrl}/rest/v1/call_results?account_id=eq.${encodeURIComponent(accountId)}&direction=eq.outbound&created_at=gte.${encodeURIComponent(since)}&select=id`,{headers:{apikey:serviceKey,Authorization:`Bearer ${serviceKey}`}});
+      const cr=await fetch(`${supabaseUrl}/rest/v1/call_results?account_id=eq.${encodeURIComponent(accountId)}&direction=eq.outbound&dialed_at=not.is.null&created_at=gte.${encodeURIComponent(since)}&select=id`,{headers:{apikey:serviceKey,Authorization:`Bearer ${serviceKey}`}});
       const calls=await cr.json().catch(()=>[]);
       if(!cr.ok)reasons.push("Daily call history could not be verified");
       else if(Array.isArray(calls)&&calls.length>=max)reasons.push(`Daily call limit reached (${calls.length}/${max})`);
@@ -135,14 +136,15 @@ serve(async (req) => {
       const reasons:string[]=[];
       [[a.do_not_call,"Do Not Call"],[a.cease_and_desist,"Cease & Desist"],[a.disputed_flag,"Disputed / Frozen"],[a.bankruptcy_flag,"Bankruptcy"],[a.deceased_flag,"Deceased"],[a.attorney_represented,"Attorney Represented"],[a.wrong_number_flag,"Wrong Number"]].forEach(([v,l])=>{if(v===true)reasons.push(String(l))});
       if(a.needs_manager_review===true)reasons.push("Manager review required");
-      if(["dnc","bad number","disputed"].includes(String(a.disposition||a.status||"").toLowerCase()))reasons.push("Blocked account disposition");
+      if(["dnc","bad number","disputed"].includes(String(a.disposition||"").toLowerCase()))reasons.push("Blocked account disposition");
+      if(["dnc","bad number","disputed"].includes(String(a.status||"").toLowerCase()))reasons.push("Blocked account status");
       let slot=0;for(let i=1;i<=10;i++)if(digits10(a["phone"+i])===requested){slot=i;break}
       if(!slot)reasons.push("Phone does not belong to selected account");else if(/bad|wrong|invalid|dnc|do not call/i.test(String(a["phone"+slot+"_status"]??"")))reasons.push("Selected phone status is blocked");
       const zones=String(a.compliance_time_zone??"").trim()?[String(a.compliance_time_zone).trim()]:(stateZones[String(a.state??"").trim().toUpperCase()]||[]);
       const start=Math.max(480,timeMinutes(a.compliance_call_start,480)),end=Math.min(1260,timeMinutes(a.compliance_call_end,1260));
       if(!zones.length)reasons.push("Compliance timezone is unknown");else if(start>=end||zones.some(z=>{try{const n=minuteInZone(z);return n<start||n>=end}catch{return true}}))reasons.push("Outside permitted call window");
       const max=Math.max(1,Number(a.max_calls_per_day||2)),since=new Date(Date.now()-86400000).toISOString();
-      const cr=await fetch(`${supabaseUrl}/rest/v1/call_results?account_id=eq.${encodeURIComponent(accountId)}&direction=eq.outbound&created_at=gte.${encodeURIComponent(since)}&select=id`,{headers:{apikey:serviceKey,Authorization:`Bearer ${serviceKey}`}});
+      const cr=await fetch(`${supabaseUrl}/rest/v1/call_results?account_id=eq.${encodeURIComponent(accountId)}&direction=eq.outbound&dialed_at=not.is.null&created_at=gte.${encodeURIComponent(since)}&select=id`,{headers:{apikey:serviceKey,Authorization:`Bearer ${serviceKey}`}});
       const calls=await cr.json().catch(()=>[]);if(!cr.ok)reasons.push("Daily call history could not be verified");else if(Array.isArray(calls)&&calls.length>=max)reasons.push(`Daily call limit reached (${calls.length}/${max})`);
       const cmr=await fetch(`${supabaseUrl}/rest/v1/account_communication_compliance?account_id=eq.${encodeURIComponent(accountId)}&select=first_debt_communication_at,validation_notice_sent_at,validation_notice_method,validation_notice_source&limit=1`,{headers:{apikey:serviceKey,Authorization:`Bearer ${serviceKey}`}});
       const cmRows=await cmr.json().catch(()=>[]),comm=Array.isArray(cmRows)?cmRows[0]:null;if(!cmr.ok)reasons.push("Communication compliance history could not be verified");else if(!comm)reasons.push("First-contact / validation-notice state is unknown");else if(!comm.validation_notice_sent_at)reasons.push("Validation notice is not recorded as sent");
@@ -170,7 +172,9 @@ serve(async (req) => {
       const ar=await fetch(`${supabaseUrl}/rest/v1/accounts?id=eq.${encodeURIComponent(attempt.account_id)}&select=id,state,status,disposition,do_not_call,cease_and_desist,disputed_flag,bankruptcy_flag,deceased_flag,attorney_represented,wrong_number_flag,needs_manager_review,compliance_call_start,compliance_call_end,max_calls_per_day,compliance_time_zone,phone1,phone1_status,phone2,phone2_status,phone3,phone3_status,phone4,phone4_status,phone5,phone5_status,phone6,phone6_status,phone7,phone7_status,phone8,phone8_status,phone9,phone9_status,phone10,phone10_status&limit=1`,{headers:hr});
       const ars=await ar.json().catch(()=>[]),acct=Array.isArray(ars)?ars[0]:null;if(!ar.ok||!acct)return json({error:"Account revalidation failed"},409);
       const reasons:string[]=[];[[acct.do_not_call,"Do Not Call"],[acct.cease_and_desist,"Cease & Desist"],[acct.disputed_flag,"Disputed / Frozen"],[acct.bankruptcy_flag,"Bankruptcy"],[acct.deceased_flag,"Deceased"],[acct.attorney_represented,"Attorney Represented"],[acct.wrong_number_flag,"Wrong Number"]].forEach(([v,l])=>{if(v===true)reasons.push(String(l))});
-      if(acct.needs_manager_review===true)reasons.push("Manager review required");if(["dnc","bad number","disputed"].includes(String(acct.disposition||acct.status||"").toLowerCase()))reasons.push("Blocked account disposition");
+      if(acct.needs_manager_review===true)reasons.push("Manager review required");
+      if(["dnc","bad number","disputed"].includes(String(acct.disposition||"").toLowerCase()))reasons.push("Blocked account disposition");
+      if(["dnc","bad number","disputed"].includes(String(acct.status||"").toLowerCase()))reasons.push("Blocked account status");
       const slot=Number(attempt.phone_slot||0),dest=digits10(attempt.payload_snapshot?.destination_phone);if(!slot||digits10(acct["phone"+slot])!==dest)reasons.push("Prepared phone no longer matches account");else if(/bad|wrong|invalid|dnc|do not call/i.test(String(acct["phone"+slot+"_status"]??"")))reasons.push("Prepared phone is now blocked");
       const zones=String(acct.compliance_time_zone??"").trim()?[String(acct.compliance_time_zone).trim()]:(stateZones[String(acct.state??"").trim().toUpperCase()]||[]),start=Math.max(480,timeMinutes(acct.compliance_call_start,480)),end=Math.min(1260,timeMinutes(acct.compliance_call_end,1260));
       if(!zones.length||start>=end||zones.some(z=>{try{const n=minuteInZone(z);return n<start||n>=end}catch{return true}}))reasons.push("Outside permitted call window");
@@ -211,8 +215,8 @@ serve(async (req) => {
         "CONVERSATION POLICY: "+JSON.stringify(s.conversation_policy||{}),
         "Never request or repeat SSN, date of birth, bank account number, routing number, card number, or other payment credentials."
       ].join("\n\n");
-      const providerPayload={phone_number:destination,task,first_sentence:`Hello, may I speak with ${firstName||"the intended consumer"}?`,wait_for_greeting:true,max_duration:4,record:false,metadata:{source:"cpcm_real_call",attempt_id:attemptId,account_id:attempt.account_id,script_profile_id:attempt.script_profile_id,script_version:attempt.script_version,communication_type:attempt.communication_type}};
-      const redacted={...providerPayload,phone_number:"***-***-"+digits10(destination).slice(-4),metadata:{...providerPayload.metadata,account_id:"[server-held]"}};
+      const providerPayload={phone_number:destination,task,first_sentence:`Hello, may I speak with ${firstName||"the intended consumer"}?`,wait_for_greeting:true,max_duration:4,record:false,metadata:{source:"cpcm_real_call",attempt_id:attemptId,script_profile_id:attempt.script_profile_id,script_version:attempt.script_version,communication_type:attempt.communication_type}};
+      const redacted={...providerPayload,phone_number:"***-***-"+digits10(destination).slice(-4)};
       const patch=await fetch(`${supabaseUrl}/rest/v1/ai_real_call_attempts?id=eq.${encodeURIComponent(attemptId)}`,{method:"PATCH",headers:{...hr,"Content-Type":"application/json"},body:JSON.stringify({updated_at:new Date().toISOString()})});
       if(!patch.ok)return json({error:"Dry-run audit touch failed"},500);
       return json({ok:true,dry_run:true,attempt_id:attemptId,provider:"bland",provider_send_enabled:false,request:redacted,message:"Dry run only. No request was sent to Bland."});
@@ -229,12 +233,36 @@ serve(async (req) => {
       const rows=await rr.json().catch(()=>[]),attempt=Array.isArray(rows)?rows[0]:null;if(!rr.ok||!attempt)return json({error:"Authorized attempt not found"},404);
       if(String(attempt.status)==="sent"&&attempt.provider_call_id)return json({ok:true,sent:true,idempotent:true,attempt_id:attemptId,provider_call_id:attempt.provider_call_id});
       if(String(attempt.status)!=="authorized")return json({error:"Attempt is not sendable",status:attempt.status},409);
+      const sendReasons:string[]=[];
+      const sar=await fetch(`${supabaseUrl}/rest/v1/accounts?id=eq.${encodeURIComponent(attempt.account_id)}&select=id,state,status,disposition,do_not_call,cease_and_desist,disputed_flag,bankruptcy_flag,deceased_flag,attorney_represented,wrong_number_flag,needs_manager_review,compliance_call_start,compliance_call_end,max_calls_per_day,compliance_time_zone,phone1,phone1_status,phone2,phone2_status,phone3,phone3_status,phone4,phone4_status,phone5,phone5_status,phone6,phone6_status,phone7,phone7_status,phone8,phone8_status,phone9,phone9_status,phone10,phone10_status&limit=1`,{headers:hr});
+      const sars=await sar.json().catch(()=>[]),current=Array.isArray(sars)?sars[0]:null;
+      if(!sar.ok||!current)sendReasons.push("Account could not be revalidated immediately before send");
+      if(current){
+        [[current.do_not_call,"Do Not Call"],[current.cease_and_desist,"Cease & Desist"],[current.disputed_flag,"Disputed / Frozen"],[current.bankruptcy_flag,"Bankruptcy"],[current.deceased_flag,"Deceased"],[current.attorney_represented,"Attorney Represented"],[current.wrong_number_flag,"Wrong Number"]].forEach(([v,l])=>{if(v===true)sendReasons.push(String(l))});
+        if(current.needs_manager_review===true)sendReasons.push("Manager review required");
+        if(["dnc","bad number","disputed"].includes(String(current.disposition||"").toLowerCase()))sendReasons.push("Blocked account disposition");
+        if(["dnc","bad number","disputed"].includes(String(current.status||"").toLowerCase()))sendReasons.push("Blocked account status");
+        const slot=Number(attempt.phone_slot||0),dest=digits10(attempt.payload_snapshot?.destination_phone);
+        if(!slot||digits10(current["phone"+slot])!==dest)sendReasons.push("Prepared phone no longer matches account");
+        else if(/bad|wrong|invalid|dnc|do not call/i.test(String(current["phone"+slot+"_status"]??"")))sendReasons.push("Prepared phone is now blocked");
+        const zones=String(current.compliance_time_zone??"").trim()?[String(current.compliance_time_zone).trim()]:(stateZones[String(current.state??"").trim().toUpperCase()]||[]);
+        const start=Math.max(480,timeMinutes(current.compliance_call_start,480)),end=Math.min(1260,timeMinutes(current.compliance_call_end,1260));
+        if(!zones.length||start>=end||zones.some(z=>{try{const n=minuteInZone(z);return n<start||n>=end}catch{return true}}))sendReasons.push("Outside permitted call window");
+        const max=Math.max(1,Number(current.max_calls_per_day||2)),since=new Date(Date.now()-86400000).toISOString();
+        const scr=await fetch(`${supabaseUrl}/rest/v1/call_results?account_id=eq.${encodeURIComponent(attempt.account_id)}&direction=eq.Outbound&dialed_at=not.is.null&created_at=gte.${encodeURIComponent(since)}&select=id,attempt_id`,{headers:hr});
+        const scalls=await scr.json().catch(()=>[]),other=Array.isArray(scalls)?scalls.filter((x:any)=>String(x.attempt_id||"")!==attemptId):[];
+        if(!scr.ok)sendReasons.push("Daily call history could not be revalidated immediately before send");else if(other.length>=max)sendReasons.push(`Daily call limit reached (${other.length}/${max})`);
+      }
+      const ssr=await fetch(`${supabaseUrl}/rest/v1/ai_collector_script_profiles?id=eq.${encodeURIComponent(attempt.script_profile_id)}&approved_for_real_calls=eq.true&select=id,version&limit=1`,{headers:hr});
+      const ssrows=await ssr.json().catch(()=>[]),currentScript=Array.isArray(ssrows)?ssrows[0]:null;
+      if(!ssr.ok||!currentScript||Number(currentScript.version)!==Number(attempt.script_version))sendReasons.push("Prepared script version is no longer approved/current");
+      if(sendReasons.length)return json({ok:false,sent:false,reasons:[...new Set(sendReasons)]},409);
       const claim=await fetch(`${supabaseUrl}/rest/v1/rpc/cpcm_claim_ai_call_send`,{method:"POST",headers:{...hr,"Content-Type":"application/json"},body:JSON.stringify({p_attempt_id:attemptId,p_admin_email:authEmail})});
       if(!claim.ok)return json({error:"Atomic send claim failed"},409);
       const p=attempt.payload_snapshot||{},s=attempt.script_snapshot||{},destination=String(p.destination_phone||""),firstName=String(p.first_name||"").trim(),balance=Number(p.current_balance||0);
       const task=["You are an AI collections assistant operating under a locked, admin-approved script snapshot.","IDENTITY GATE: "+String(s.identity_prompt||""),"Before identity is verified, do not reveal the creditor, debt type, balance, account existence, or any other debt-specific information.","After identity is verified, state this approved disclosure exactly: "+String(s.disclosure||""),`Verified-consumer account context: first name ${firstName||"[not provided]"}; original creditor ${String(p.original_creditor||"")||"[not provided]"}; debt type ${String(p.debt_type||"")||"[not provided]"}; current balance $${balance.toFixed(2)}.`,"DISPUTE: "+String(s.dispute_instruction||""),"DO NOT CALL: "+String(s.dnc_instruction||""),"SETTLEMENT: "+String(s.settlement_instruction||""),"PAYMENT SECURITY: "+String(s.payment_instruction||""),"HUMAN ESCALATION: "+String(s.human_escalation_instruction||""),"CONVERSATION POLICY: "+JSON.stringify(s.conversation_policy||{}),"Never request or repeat SSN, date of birth, bank account number, routing number, card number, or other payment credentials."].join("\n\n");
       const webhook=`${supabaseUrl}/functions/v1/bland-call-status`;
-      const providerPayload={phone_number:destination,task,first_sentence:`Hello, may I speak with ${firstName||"the intended consumer"}?`,wait_for_greeting:true,max_duration:4,record:false,webhook,metadata:{source:"cpcm_real_call",attempt_id:attemptId,account_id:attempt.account_id,script_profile_id:attempt.script_profile_id,script_version:attempt.script_version,communication_type:attempt.communication_type}};
+      const providerPayload={phone_number:destination,task,first_sentence:`Hello, may I speak with ${firstName||"the intended consumer"}?`,wait_for_greeting:true,max_duration:4,record:false,webhook,metadata:{source:"cpcm_real_call",attempt_id:attemptId,script_profile_id:attempt.script_profile_id,script_version:attempt.script_version,communication_type:attempt.communication_type}};
       const br=await fetch("https://api.bland.ai/v1/calls",{method:"POST",headers:{authorization:apiKey,"Content-Type":"application/json"},body:JSON.stringify(providerPayload)});
       const bd=await br.json().catch(()=>({})),callId=String(bd?.call_id??"").trim();
       if(!br.ok||!callId){
