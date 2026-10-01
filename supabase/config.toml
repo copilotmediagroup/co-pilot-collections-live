@@ -24,3 +24,6 @@ verify_jwt = false
 
 [functions.bland-verify-identity]
 verify_jwt = false
+
+[functions.bland-verified-context]
+verify_jwt = false
