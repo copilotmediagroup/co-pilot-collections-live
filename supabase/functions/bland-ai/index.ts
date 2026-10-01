@@ -233,6 +233,10 @@ serve(async (req) => {
       const cidRows=await cidr.json().catch(()=>[]),callerCfg=Array.isArray(cidRows)?cidRows[0]:null;
       if(!cidr.ok||!callerCfg||callerCfg.verification_status!=="verified"||callerCfg.enabled_for_real_calls!==true||digits10(callerCfg.phone_number).length!==10)return json({ok:false,sent:false,error:"Verified production caller ID is not enabled"},423);
       const callerId=String(callerCfg.phone_number);
+      const pcr=await fetch(`${supabaseUrl}/rest/v1/ai_bland_pathway_config?id=eq.true&select=pathway_id,verification_status,enabled_for_real_calls&limit=1`,{headers:hr});
+      const pcRows=await pcr.json().catch(()=>[]),pathwayCfg=Array.isArray(pcRows)?pcRows[0]:null;
+      if(!pcr.ok||!pathwayCfg||pathwayCfg.verification_status!=="synthetic_verified"||pathwayCfg.enabled_for_real_calls!==true||!String(pathwayCfg.pathway_id||"").trim())return json({ok:false,sent:false,error:"Verified Bland collector Pathway is not enabled"},423);
+      return json({ok:false,sent:false,error:"Legacy static-task real-call send is permanently blocked. Pathway invocation must replace it before production calling."},423);
       const rr=await fetch(`${supabaseUrl}/rest/v1/ai_real_call_attempts?id=eq.${encodeURIComponent(attemptId)}&select=*&limit=1`,{headers:hr});
       const rows=await rr.json().catch(()=>[]),attempt=Array.isArray(rows)?rows[0]:null;if(!rr.ok||!attempt)return json({error:"Authorized attempt not found"},404);
       if(String(attempt.status)==="sent"&&attempt.provider_call_id)return json({ok:true,sent:true,idempotent:true,attempt_id:attemptId,provider_call_id:attempt.provider_call_id});

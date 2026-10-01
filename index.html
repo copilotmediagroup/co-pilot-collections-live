@@ -7156,18 +7156,20 @@ async function editAccountCommunicationCompliance(){
 }
 async function checkAiLaunchReadiness(){
  if(!currentUser?.isAdmin)return alert('Admin only');
- const [scripts,runtime,caller]=await Promise.all([
+ const [scripts,runtime,caller,pathway]=await Promise.all([
   dbFetch('/ai_collector_script_profiles?profile_name=eq.Default%20AI%20Collector&select=version,approved_for_real_calls,approved_by_email,approved_at&limit=1').catch(()=>[]),
   dbFetch('/ai_call_runtime_config?id=eq.true&select=real_provider_send_enabled&limit=1').catch(()=>[]),
-  dbFetch('/ai_caller_id_config?id=eq.true&select=phone_number,display_label,verification_status,enabled_for_real_calls&limit=1').catch(()=>[])
+  dbFetch('/ai_caller_id_config?id=eq.true&select=phone_number,display_label,verification_status,enabled_for_real_calls&limit=1').catch(()=>[]),
+  dbFetch('/ai_bland_pathway_config?id=eq.true&select=pathway_id,pathway_version,verification_status,enabled_for_real_calls&limit=1').catch(()=>[])
  ]);
- const s=scripts?.[0]||{},r=runtime?.[0]||{},c=caller?.[0]||{};
+ const s=scripts?.[0]||{},r=runtime?.[0]||{},c=caller?.[0]||{},p=pathway?.[0]||{};
  const line=(ok,label,detail='')=>(ok?'✓ ':'✗ ')+label+(detail?' — '+detail:'');
  const report=[
   'AI LAUNCH READINESS',
   '',
   line(!!s.approved_for_real_calls,'Collector script approved',s.version?'version '+s.version:'missing'),
   line(c.verification_status==='verified'&&c.enabled_for_real_calls===true,'Production caller ID verified/enabled',c.phone_number?('***-***-'+String(c.phone_number).replace(/\D/g,'').slice(-4)):(c.verification_status||'unconfigured')),
+  line(p.verification_status==='synthetic_verified'&&p.enabled_for_real_calls===true,'Bland collector Pathway synthetic-verified',p.pathway_id?('configured '+String(p.pathway_version||'')):(p.verification_status||'unconfigured')),
   line(r.real_provider_send_enabled===true,'Real-provider kill switch enabled',r.real_provider_send_enabled===true?'ON':'OFF — safe'),
   '',
   'Server identity verification: LIVE',
