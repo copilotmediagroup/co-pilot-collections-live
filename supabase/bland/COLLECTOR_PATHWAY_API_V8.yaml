@@ -1,4 +1,4 @@
-name: Co Pilot Collector API V7
+name: Co Pilot Collector API V7 - Qualified Transfer
 description: Identity-gated synthetic collector pathway. Debt context is unavailable until server verification succeeds.
 nodes:
   Confirm Intended Person:
@@ -193,20 +193,25 @@ nodes:
       x: 300
       y: 1150
     type: Default
-    prompt: "Before discussing any account information, check the conversation history. If {{disclosure}} has not yet been
-      spoken in full since entering this authorized collector stage, your entire next response must be exactly
-      {{disclosure}} and nothing else. Only after that disclosure has been spoken may you discuss the verified server
-      context: creditor {{original_creditor}}, debt type {{debt_type}}, and current balance {{current_balance}}. Follow
-      {{conversation_policy}} and {{collector_instructions}} exactly. Do not invent settlement or payment terms. Do not
-      threaten legal action, arrest, credit consequences, or other outcomes. Never collect payment credentials. If the
-      consumer disputes, asks to stop calling, says already paid/cannot pay/wrong number, asks for a callback, payment
-      plan, settlement, or human, capture that outcome for human review."
-    condition: Met immediately when conversation_outcome has one allowed outcome value. Once captured, stop the conversation and transition to Record Outcome.
+    prompt: >-
+      Before discussing any account information, check the conversation history. If {{disclosure}} has not yet been spoken
+      in full since entering this authorized collector stage, your entire next response must be exactly {{disclosure}} and
+      nothing else. Only after that disclosure has been spoken may you discuss the verified server context: creditor
+      {{original_creditor}}, debt type {{debt_type}}, and current balance {{current_balance}}. Then use a short, respectful
+      resolution pitch: explain that the purpose of the call is to see whether there may be a workable way to resolve the
+      account, and ask whether the consumer is open to discussing options. Do not pressure, threaten, shame, claim urgency,
+      invent consequences, or promise any particular settlement or payment terms. If the consumer shows interest in a
+      payment arrangement, payoff, settlement discussion, or other resolution, ask: Would you like me to connect you with
+      a resolution specialist who can discuss the available options with you? If they say yes, treat that as
+      human_requested and initiate the configured live transfer. Never collect card, bank, routing, or other payment
+      credentials. Follow {{conversation_policy}} and {{collector_instructions}} exactly. A dispute, stop-calling request,
+      wrong number, already-paid claim, bankruptcy/attorney statement, or uncertainty must not be pitched or transferred
+      as a sales lead; capture the appropriate outcome for human review and stop collection discussion.
+    condition: Met when conversation_outcome has one allowed outcome value. For positive resolution interest, ask permission to transfer before setting human_requested.
     extract_variables:
       - name: conversation_outcome
         type: string
-        description: One of dispute, stop_calling, callback_request, payment_plan_interest, settlement_request, already_paid,
-          cannot_pay, human_requested, wrong_number, conversation_note.
+        description: One of dispute, stop_calling, callback_request, payment_plan_interest, settlement_request, already_paid, cannot_pay, human_requested, wrong_number, conversation_note. Use human_requested only after the consumer explicitly agrees to speak with a resolution specialist or directly asks for a human.
       - name: outcome_detail
         type: string
         description: Minimal non-sensitive detail needed for human review; never payment credentials or identity secrets.
