@@ -66,7 +66,7 @@ serve(async (req) => {
     let body: Record<string, unknown> = {};
     try { body = await req.json(); } catch { /* health is the safe default */ }
     const action = typeof body.action === "string" ? body.action : "health";
-    const adminOnlyActions = new Set(["manual_test", "collector_sandbox", "sandbox_result", "prepare_real_call", "authorize_real_call", "real_call_dry_run", "real_call_send", "pipeline_test"]);
+    const adminOnlyActions = new Set(["manual_test", "collector_sandbox", "sandbox_result", "prepare_real_call", "authorize_real_call", "real_call_dry_run", "real_call_send", "pipeline_test", "pathway_probe"]);
     if (adminOnlyActions.has(action) && authEmail !== "afinch2678@gmail.com") {
       return json({ error: "Admin authorization required" }, 403);
     }
@@ -392,6 +392,25 @@ serve(async (req) => {
       const data = await response.json().catch(() => ({}));
       if (!response.ok) return json({ ok: false, error: data?.message || "Bland test call failed", status: response.status }, 502);
       return json({ ok: true, provider: "bland", call_id: data?.call_id ?? null, status: data?.status ?? "queued", message: data?.message ?? "Test call queued." });
+    }
+
+    if (action === "pathway_probe") {
+      const pathwayId = String(body.pathway_id ?? "").trim();
+      if (!/^[0-9a-f-]{36}$/i.test(pathwayId)) return json({ ok: false, error: "Valid Bland Pathway ID required" }, 400);
+      const response = await fetch("https://api.bland.ai/v1/pathway/" + encodeURIComponent(pathwayId) + "/versions", {
+        method: "GET",
+        headers: { authorization: apiKey },
+      });
+      const data = await response.json().catch(() => null);
+      if (!response.ok) return json({ ok: false, exists: false, status: response.status, error: "Bland Pathway lookup failed" }, 502);
+      const versions = Array.isArray(data) ? data.map((v: any) => ({
+        id: String(v?.id ?? ""),
+        version_number: Number(v?.version_number ?? 0),
+        created_at: v?.created_at ?? null,
+        name: v?.name ?? null,
+        is_latest: v?.is_latest === true,
+      })) : [];
+      return json({ ok: true, exists: true, pathway_id: pathwayId, versions });
     }
 
     if (action !== "health") return json({ error: "Action not enabled" }, 403);
