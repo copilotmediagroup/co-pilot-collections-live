@@ -324,51 +324,27 @@ serve(async (req) => {
     }
 
     if (action === "collector_sandbox") {
-      const requested = String(body.phone_number ?? "").replace(/\D/g, "");
-      if (requested !== "13322590894" && requested !== "3322590894") return json({ error: "Sandbox number not authorized" }, 403);
-      const accountId = String(body.account_id ?? "").trim();
-      if (!accountId) return json({ error: "Selected account is required" }, 400);
-
-      const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
-      if (!serviceKey) return json({ error: "Server account lookup unavailable" }, 500);
-      const accountResponse = await fetch(`${supabaseUrl}/rest/v1/accounts?id=eq.${encodeURIComponent(accountId)}&select=id,state,status,disposition,do_not_call,cease_and_desist,disputed_flag,bankruptcy_flag,deceased_flag,attorney_represented,wrong_number_flag,needs_manager_review,compliance_call_start,compliance_call_end,max_calls_per_day,compliance_time_zone&limit=1`, {
-        headers: { apikey: serviceKey, Authorization: `Bearer ${serviceKey}` },
-      });
-      const rows = await accountResponse.json().catch(() => []);
-      const a = Array.isArray(rows) ? rows[0] : null;
-      if (!accountResponse.ok || !a) return json({ error: "Selected account could not be verified" }, 404);
-
-      const blocked = [
-        [a.do_not_call, "Do Not Call"], [a.cease_and_desist, "Cease & Desist"],
-        [a.disputed_flag, "Disputed / Frozen"], [a.bankruptcy_flag, "Bankruptcy"],
-        [a.deceased_flag, "Deceased"], [a.attorney_represented, "Attorney Represented"],
-        [a.wrong_number_flag, "Wrong Number"]
-      ].filter(([v]) => v === true).map(([, label]) => label);
-      const status = String(a.disposition || a.status || "").toLowerCase();
-      if (status === "dnc") blocked.push("Do Not Call");
-      if (status === "bad number") blocked.push("Wrong Number");
-      if (status === "disputed") blocked.push("Disputed / Frozen");
-      if (blocked.length) return json({ error: "Compliance preflight blocked", reasons: [...new Set(blocked)] }, 409);
-      if (a.needs_manager_review === true) return json({ error: "Manager review required before AI calling" }, 409);
-
-      // This sandbox deliberately does not send debtor PII, account number, SSN, DOB,
-      // bank data, creditor, balance, or debtor phone to Bland.
-      const response = await fetch("https://api.bland.ai/v1/calls", {
-        method: "POST",
-        headers: { authorization: apiKey, "Content-Type": "application/json" },
-        body: JSON.stringify({
-          phone_number: allowedTestNumber,
-          task: "You are testing a collections-assistant workflow using synthetic data only. Say this is a Co Pilot AI collector sandbox. Ask whether you are speaking with the intended test consumer. Do not reveal any debt information before the person confirms they are the intended test consumer. After confirmation, state that this is an attempt to collect a debt and any information obtained will be used for that purpose. Then say the synthetic test account has a balance of $500 with Sample Creditor. Ask whether they want to discuss resolving the sample account. You may discuss a hypothetical payment plan, but you may not take card or bank information, approve a settlement, threaten legal action, misrepresent consequences, or claim a payment has been processed. If asked to dispute, stop collection discussion and say the dispute would be routed for human review. If asked for a settlement, say a human manager must approve it. If asked to stop calls or says wrong number, acknowledge it and end the call. If uncertain, offer human review.",
-          first_sentence: "Hello, this is the Co Pilot AI collector sandbox calling with synthetic test information only.",
-          wait_for_greeting: true,
-          max_duration: 4,
-          record: false,
-          metadata: { source: "cpcm_collector_sandbox", account_id: accountId }
-        }),
-      });
-      const data = await response.json().catch(() => ({}));
-      if (!response.ok) return json({ ok: false, error: data?.message || "Bland collector sandbox failed", status: response.status }, 502);
-      return json({ ok: true, provider: "bland", call_id: data?.call_id ?? null, status: data?.status ?? "queued", mode: "collector_sandbox_synthetic" });
+      const requested=String(body.phone_number??"").replace(/\D/g,"");
+      if(requested!=="3322590894"&&requested!=="13322590894")return json({error:"Sandbox number not authorized"},403);
+      const serviceKey=Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");if(!serviceKey)return json({error:"Service configuration unavailable"},503);
+      const hr={apikey:serviceKey,Authorization:`Bearer ${serviceKey}`};
+      const pc=await fetch(`${supabaseUrl}/rest/v1/ai_bland_pathway_config?id=eq.true&select=pathway_id,verification_status&limit=1`,{headers:hr});
+      const pcs=await pc.json().catch(()=>[]),cfg=Array.isArray(pcs)?pcs[0]:null;
+      if(!pc.ok||!cfg||cfg.verification_status!=="configured_unverified"||!/^[0-9a-f-]{36}$/i.test(String(cfg.pathway_id||"")))return json({error:"Configured Bland collector Pathway is unavailable for synthetic verification"},423);
+      const token=crypto.randomUUID();
+      const pr=await fetch(`${supabaseUrl}/rest/v1/ai_collector_script_profiles`,{method:"POST",headers:{...hr,"Content-Type":"application/json",Prefer:"return=representation"},body:JSON.stringify([{profile_name:"SYNTHETIC_PHONE_PATHWAY_TEST",identity_prompt:"Synthetic identity test only.",initial_disclosure:"This is a synthetic test disclosure.",subsequent_disclosure:"Synthetic subsequent disclosure.",dispute_instruction:"Route dispute to human review.",dnc_instruction:"Stop calling and route human review.",settlement_instruction:"No autonomous settlement approval.",payment_instruction:"Do not collect payment credentials.",human_escalation_instruction:"Route to human review.",approved_for_real_calls:true,approved_by_email:authEmail,approved_at:new Date().toISOString(),version:1,conversation_policy:{synthetic:true},identity_verification_policy:{required:true,name_confirmation_alone_sufficient:false,allowed_factors:["mailing_zip_code"],max_failed_attempts:2}}])});
+      const ps=await pr.json().catch(()=>[]),profile=Array.isArray(ps)?ps[0]:null;if(!pr.ok||!profile)return json({error:"Could not create synthetic script profile"},500);
+      const ar=await fetch(`${supabaseUrl}/rest/v1/accounts`,{method:"POST",headers:{...hr,"Content-Type":"application/json",Prefer:"return=representation"},body:JSON.stringify([{first_name:"Jordan",last_name:"Synthetic",full_name:"Jordan Synthetic",zip:"33601",original_creditor:"Synthetic Creditor",type_of_debt:"Synthetic Debt",current_balance:500,status:"New",created_by_email:authEmail,test_phone_override:allowedTestNumber}])});
+      const as=await ar.json().catch(()=>[]),acct=Array.isArray(as)?as[0]:null;if(!ar.ok||!acct){await fetch(`${supabaseUrl}/rest/v1/ai_collector_script_profiles?id=eq.${profile.id}`,{method:"DELETE",headers:hr});return json({error:"Could not create synthetic account"},500)}
+      const attemptId=crypto.randomUUID(),scriptSnapshot={disclosure:"This is a synthetic test disclosure.",dispute_instruction:"Route dispute to human review.",dnc_instruction:"Stop calling and route human review.",settlement_instruction:"No autonomous settlement approval.",payment_instruction:"Do not collect payment credentials.",human_escalation_instruction:"Route to human review.",conversation_policy:{synthetic:true},identity_verification_policy:{required:true,name_confirmation_alone_sufficient:false,allowed_factors:["mailing_zip_code"],max_failed_attempts:2}};
+      const ir=await fetch(`${supabaseUrl}/rest/v1/ai_real_call_attempts`,{method:"POST",headers:{...hr,"Content-Type":"application/json"},body:JSON.stringify([{id:attemptId,account_id:acct.id,requested_phone_last4:"0894",communication_type:"initial",script_profile_id:profile.id,script_profile_name:profile.profile_name,script_version:1,script_snapshot:scriptSnapshot,payload_snapshot:{first_name:"Jordan",original_creditor:"Synthetic Creditor",debt_type:"Synthetic Debt",current_balance:500},preflight_snapshot:{identity_verification_token:token},status:"authorized",provider:"bland",created_by_email:authEmail,authorized_at:new Date().toISOString()}])});
+      if(!ir.ok)return json({error:"Could not create synthetic Pathway attempt"},500);
+      const providerPayload={phone_number:allowedTestNumber,pathway_id:String(cfg.pathway_id),request_data:{first_name:"Jordan",attempt_id:attemptId,verification_token:token},max_duration:5,record:false,metadata:{source:"cpcm_pathway_synthetic_test",attempt_id:attemptId,synthetic:true}};
+      const br=await fetch("https://api.bland.ai/v1/calls",{method:"POST",headers:{authorization:apiKey,"Content-Type":"application/json"},body:JSON.stringify(providerPayload)});
+      const bd=await br.json().catch(()=>({})),callId=String(bd?.call_id??"").trim();
+      if(!br.ok||!callId)return json({ok:false,error:bd?.message||"Bland Pathway test did not queue",attempt_id:attemptId},502);
+      await fetch(`${supabaseUrl}/rest/v1/ai_real_call_attempts?id=eq.${attemptId}`,{method:"PATCH",headers:{...hr,"Content-Type":"application/json"},body:JSON.stringify({provider_call_id:callId,status:"sent",sent_at:new Date().toISOString()})});
+      return json({ok:true,provider:"bland",mode:"pathway_synthetic_test",call_id:callId,attempt_id:attemptId,status:bd?.status??"queued",destination:"***-***-0894",test_identity:{first_name:"Jordan",mailing_zip_code:"33601"}});
     }
 
     if (action === "manual_test") {

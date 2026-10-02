@@ -7250,28 +7250,17 @@ async function prepareBlandRealCall(){
 }
 async function runBlandCollectorSandbox(){
  if(!currentUser?.isAdmin)return alert('Admin only');
- const a=getCurrent();
- if(!a)return alert('Select one account first.');
- const rules=complianceRules(a);
- const calls=await todayCallCountForAccount(a.id);
- const issues=[...rules.hard,...rules.warn];
- if(calls>=rules.maxCalls)issues.push({label:'Daily call limit reached ('+calls+'/'+rules.maxCalls+')',type:'block'});
- if(issues.length){
-  alert('AI Collector preflight blocked/requires review for '+nameOf(a)+':\n\n'+issues.map(x=>'• '+x.label).join('\n')+'\n\nNo call was placed.');
-  return false;
- }
- if(!confirm('AI COLLECTOR SANDBOX\n\nSelected account: '+nameOf(a)+' · '+(acctNo(a)||'—')+'\nCompliance preflight: CLEAR\n\nThe call will go ONLY to (332) 259-0894 and will use SYNTHETIC debt information. No debtor PII, account number, bank data, SSN, DOB, creditor, balance, or debtor phone will be sent to Bland.\n\nPress OK to run one sandbox conversation.'))return false;
+ if(!confirm('AI PATHWAY SYNTHETIC TEST\n\nThis calls ONLY (332) 259-0894 using Pathway V7.\n\nSynthetic identity: Jordan\nSynthetic mailing ZIP: 33601\nSynthetic creditor/balance only after server verification.\nRecording: OFF\nReal debtor calling: OFF\n\nPress OK to queue one Pathway test call.'))return false;
  try{
   if(typeof ensureFreshToken==='function')await ensureFreshToken();
-  const res=await fetch(url()+'/functions/v1/bland-ai',{method:'POST',headers:{'Content-Type':'application/json','apikey':pubKey(),'Authorization':'Bearer '+token()},body:JSON.stringify({action:'collector_sandbox',account_id:a.id,phone_number:'3322590894'})});
+  const res=await fetch(url()+'/functions/v1/bland-ai',{method:'POST',headers:{'Content-Type':'application/json','apikey':pubKey(),'Authorization':'Bearer '+token()},body:JSON.stringify({action:'collector_sandbox',phone_number:'3322590894'})});
   const data=await res.json().catch(()=>({}));
   if(!res.ok||!data.ok)throw new Error((data.error||('Collector sandbox returned '+res.status))+(data.reasons?.length?' — '+data.reasons.join(', '):''));
   blandSandboxLastCallId=data.call_id||'';
-  if(data.call_id)await dbFetch('/ai_call_qa',{method:'POST',body:JSON.stringify([{account_id:a.id,provider:'bland',provider_call_id:data.call_id,mode:'collector_sandbox',destination_last4:'0894',observed_caller_id:'4707069719',status:data.status||'queued',completed:false,created_by_email:currentUser.email}])}).catch(()=>{});
-  await insertAudit('AI Collector Sandbox','Synthetic Bland sandbox launched; no debtor data sent. Call ID '+(data.call_id||'pending'),'account',a.id).catch(()=>{});
-  alert('AI Collector sandbox queued to (332) 259-0894 only.\n\nSynthetic debt data only.\nCall ID: '+(data.call_id||'pending'));
+    await insertAudit('AI Pathway Synthetic Test','Identity-gated Bland Pathway synthetic test queued. Call ID '+(data.call_id||'pending'),'system','bland').catch(()=>{});
+  alert('AI Pathway synthetic test queued to (332) 259-0894.\n\nConfirm: Jordan\nZIP: 33601\nRecording: OFF\nCall ID: '+(data.call_id||'pending'));
   return true;
- }catch(e){alert('AI Collector sandbox failed: '+String(e?.message||e));return false}
+ }catch(e){alert('AI Pathway synthetic test failed: '+String(e?.message||e));return false}
 }
 async function checkBlandAIConnection(){
  if(!currentUser?.isAdmin)return alert('Admin only');
