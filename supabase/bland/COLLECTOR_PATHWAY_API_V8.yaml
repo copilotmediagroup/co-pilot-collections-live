@@ -13,8 +13,24 @@ nodes:
       address, phone, bank/card data, passwords, PINs, or security answers. Once exactly five ZIP digits are provided,
       stop speaking so the pathway can perform server verification. If they do not clearly confirm they are
       {{first_name}}, end safely.
-    condition: Met when the intended person has confirmed and exactly five mailing ZIP digits have been collected, or when
-      the speaker does not clearly confirm they are {{first_name}}.
+    condition: The condition is met after you receive the caller response containing the requested mailing ZIP code.
+    condition_examples:
+      - user: "33601"
+        matches: true
+        reasoning: The caller provided the requested 5-digit mailing ZIP code.
+      - user: "Three three six zero one"
+        matches: true
+        reasoning: The caller provided the requested 5-digit mailing ZIP code verbally.
+      - user: "Yes, this is Jordan"
+        matches: false
+        reasoning: Identity was confirmed but the requested mailing ZIP has not been provided yet.
+    pathway_examples:
+      - user: "33601"
+        target: Collect Mailing ZIP
+        reasoning: The caller provided the requested mailing ZIP and verification must run now.
+      - user: "Three three six zero one"
+        target: Collect Mailing ZIP
+        reasoning: The caller provided the requested mailing ZIP verbally and verification must run now.
     extract_variables:
       - name: mailing_zip_code
         type: string
