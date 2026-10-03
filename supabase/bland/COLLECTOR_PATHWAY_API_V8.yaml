@@ -23,10 +23,16 @@ nodes:
       - target: Collect Mailing ZIP
         id: reactflow__edge-023e1913-021a-4e92-adfd-a12e4f5c3004-Collect Mailing ZIP
         label: Intended person confirmed and ZIP collected
+        passthrough:
+          data:
+            label: "Intended person confirmed and ZIP collected"
         description: The speaker confirmed they are {{first_name}} and provided exactly five mailing ZIP digits.
       - target: Safe End
         id: reactflow__edge-023e1913-021a-4e92-adfd-a12e4f5c3004-Safe End
         label: Identity not confirmed
+        passthrough:
+          data:
+            label: "Identity not confirmed"
         description: The speaker did not clearly confirm they are {{first_name}}.
   Collect Mailing ZIP:
     id: 625b9e3f-b722-456a-82de-a5bf796c407e
@@ -69,12 +75,21 @@ nodes:
       - target: Retry Mailing ZIP
         id: reactflow__edge-625b9e3f-b722-456a-82de-a5bf796c407e-Retry Mailing ZIP
         label: Verification failed but retry allowed
+        passthrough:
+          data:
+            label: "Verification failed but retry allowed"
       - target: Safe End
         id: reactflow__edge-625b9e3f-b722-456a-82de-a5bf796c407e-Safe End
         label: Verification locked or failed closed
+        passthrough:
+          data:
+            label: "Verification locked or failed closed"
       - target: Get Verified Context
         id: reactflow__edge-625b9e3f-b722-456a-82de-a5bf796c407e-Get Verified Context
         label: Identity verified
+        passthrough:
+          data:
+            label: "Identity verified"
         description: Select this path only when identity_verified is true.
   Retry Mailing ZIP:
     id: 27af0488-ba45-4445-8b12-fbf8c87d01dd
@@ -94,6 +109,9 @@ nodes:
       - target: Verify Retry Identity
         id: reactflow__edge-27af0488-ba45-4445-8b12-fbf8c87d01dd-Verify Retry Identity
         label: Final ZIP collected
+        passthrough:
+          data:
+            label: "Final ZIP collected"
         description: Exactly five digits were provided for the one allowed retry.
   Verify Retry Identity:
     id: 14d98bb9-660a-4c60-bb48-863508d7ab20
@@ -136,9 +154,15 @@ nodes:
       - target: Safe End
         id: reactflow__edge-14d98bb9-660a-4c60-bb48-863508d7ab20-Safe End
         label: Final verification failed or did not explicitly pass
+        passthrough:
+          data:
+            label: "Final verification failed or did not explicitly pass"
       - target: Get Verified Context
         id: reactflow__edge-14d98bb9-660a-4c60-bb48-863508d7ab20-Get Verified Context
         label: Final identity verification passed
+        passthrough:
+          data:
+            label: "Final identity verification passed"
         description: Select this path only when identity_verified is true.
   Get Verified Context:
     id: fc4035ab-e5e4-4324-8219-e7e7e0926504
@@ -183,9 +207,15 @@ nodes:
       - target: Safe End
         id: reactflow__edge-fc4035ab-e5e4-4324-8219-e7e7e0926504-Safe End
         label: Context not explicitly authorized
+        passthrough:
+          data:
+            label: "Context not explicitly authorized"
       - target: Collector Conversation
         id: reactflow__edge-fc4035ab-e5e4-4324-8219-e7e7e0926504-Collector Conversation
         label: Context authorized
+        passthrough:
+          data:
+            label: "Context authorized"
         description: Select this path only when context_authorized is true and disclosure was returned by the server.
   Collector Conversation:
     id: 084863c4-cd08-4a03-89b7-7db7a04019af
@@ -219,6 +249,9 @@ nodes:
       - target: Record Outcome
         id: reactflow__edge-084863c4-cd08-4a03-89b7-7db7a04019af-Record Outcome
         label: Outcome captured
+        passthrough:
+          data:
+            label: "Outcome captured"
         description: Select this path immediately when conversation_outcome contains one of the allowed outcome values.
   Record Outcome:
     id: bdc98372-c868-4eb1-b98a-b70041062d80
@@ -246,6 +279,9 @@ nodes:
       - target: Safe End
         id: reactflow__edge-bdc98372-c868-4eb1-b98a-b70041062d80-Safe End
         label: Outcome recorded or failed closed
+        passthrough:
+          data:
+            label: "Outcome recorded or failed closed"
   Safe End:
     id: ed11db0a-c92e-4d71-bec4-b54c74d5fcbb
     position:
