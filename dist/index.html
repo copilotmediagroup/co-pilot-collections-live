@@ -15153,3 +15153,26 @@ window.openAdminRecruiterDashboard=function(){
 window.closeAdminRecruiterDashboard=function(){let d=document.getElementById('recruiterDashboard');if(d){d.classList.remove('open','rdAdminPreview');d.style.display='none'}let app=document.querySelector('.app');if(app)app.style.display='grid'};
 })();
 </script>
+<!-- CPCM_RECRUITER_ADMIN_DATA_FIX_V5 -->
+<script>
+(function(){'use strict';
+function recruiterAdminMode(){return !!(currentUser?.isAdmin&&document.getElementById('recruiterDashboard')?.classList.contains('rdAdminPreview'))}
+const prevRefresh=window.refreshRecruiterDashboard;
+window.refreshRecruiterDashboard=async function(){
+ if(!recruiterAdminMode())return prevRefresh.apply(this,arguments);
+ ensureDashboard();let box=document.getElementById('rdApplicants');if(box)box.innerHTML='<div class="rdEmpty">Loading applications…</div>';
+ try{
+  recruiterRows=await dbFetch('/job_applications?select=*&order=created_at.desc&limit=500');
+  let rows=[];try{rows=await dbFetch('/recruiter_candidate_profiles?select=*')}catch(e){console.warn('Recruiter profiles unavailable to admin',e)}
+  if(typeof profiles!=='undefined'){profiles={};(rows||[]).forEach(x=>profiles[x.application_id]=x)}
+  if(typeof lifeProfiles!=='undefined'){lifeProfiles={};(rows||[]).forEach(x=>lifeProfiles[x.application_id]=x)}
+  renderRecruiter();if(typeof renderLife==='function')renderLife();
+ }catch(e){if(box)box.innerHTML='<div class="rdError">Could not load recruiting data: '+esc(e.message||String(e))+'</div>'}
+};
+const prevMove=window.recruiterMoveCandidate;
+window.recruiterMoveCandidate=async function(id,status){
+ if(!recruiterAdminMode())return prevMove.apply(this,arguments);if(!status)return;
+ try{await dbFetch('/job_applications?id=eq.'+encodeURIComponent(id),{method:'PATCH',body:JSON.stringify({status,reviewed_at:new Date().toISOString(),reviewed_by_email:currentUser.email,updated_at:new Date().toISOString()})});await window.refreshRecruiterDashboard()}catch(e){alert('Could not update candidate: '+(e.message||e))}
+};
+})();
+</script>
