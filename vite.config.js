@@ -1,4 +1,5 @@
 import { defineConfig } from 'vite';
+import { resolve } from 'node:path';
 
 export default defineConfig({
   publicDir: 'public',
@@ -12,6 +13,12 @@ export default defineConfig({
   },
   build: {
     outDir: 'dist',
-    emptyOutDir: true
+    emptyOutDir: true,
+    rollupOptions: {
+      input: {
+        main: resolve(process.cwd(), 'index.html'),
+        changePassword: resolve(process.cwd(), 'change-password.html')
+      }
+    }
   }
 });
