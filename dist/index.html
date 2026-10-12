@@ -15243,3 +15243,28 @@ const oldOpenAdmin=window.openAdminRecruiterDashboard;
 window.openAdminRecruiterDashboard=function(){oldOpenAdmin();setTimeout(()=>{if(adminRecruiterOpen())window.loadJobApplicationsAdmin()},0)};
 })();
 </script>
+<!-- CPCM_RECRUITER_ADMIN_RENDER_GATE_FIX_V8 -->
+<script>
+(function(){'use strict';
+// The base renderer intentionally rejects non-recruiter roles. Admin Oversight needs its own renderer.
+function adminRecruiterOpen(){return !!(currentUser?.isAdmin&&document.getElementById('recruiterDashboard')?.classList.contains('rdAdminPreview'))}
+function adminCount(s){return (recruiterRows||[]).filter(r=>String(r.status||'new').toLowerCase()===s).length}
+window.renderAdminRecruiterPipeline=function(){
+ if(!adminRecruiterOpen())return;
+ let set=(id,v)=>{let x=document.getElementById(id);if(x)x.textContent=v};
+ set('rdNew',adminCount('new'));set('rdReviewing',adminCount('reviewing'));set('rdInterview',adminCount('interview'));set('rdHired',adminCount('hired'));set('rdTotal',(recruiterRows||[]).filter(r=>String(r.status||'new').toLowerCase()!=='rejected').length);
+ let filters=[['all','All'],['new','New'],['reviewing','Reviewing'],['interview','Interview'],['hired','Hired'],['rejected','Rejected']],f=document.getElementById('rdFilters');
+ if(f)f.innerHTML=filters.map(x=>`<button class="rdFilter ${recruiterFilter===x[0]?'active':''}" onclick="recruiterFilter='${x[0]}';renderAdminRecruiterPipeline()">${x[1]} (${x[0]==='all'?(recruiterRows||[]).length:adminCount(x[0])})</button>`).join('');
+ let rows=recruiterFilter==='all'?(recruiterRows||[]):recruiterRows.filter(r=>String(r.status||'new').toLowerCase()===recruiterFilter),box=document.getElementById('rdApplicants');
+ if(box)box.innerHTML=rows.length?rows.map(r=>`<div class="rdApplicant" onclick="openRecruiterCandidate('${r.id}')"><div><div class="rdName">${esc(r.full_name||'Applicant')}</div><div class="rdSub">${esc(r.email||'')} · ${esc(r.phone||'')} · ${esc(r.city||'')}</div></div><div><b>${Number(r.years_experience||0)} yrs</b><div class="rdSub">${esc(r.debt_types||'Collections')}</div></div><div><span class="rdStatus">${esc(r.status||'new')}</span><div class="rdSub">Applied ${r.created_at?new Date(r.created_at).toLocaleDateString():'—'}</div></div><select class="rdSelect" onclick="event.stopPropagation()" onchange="event.stopPropagation();recruiterMoveCandidate('${r.id}',this.value);this.value=''"><option value="">Move to…</option><option value="reviewing">Reviewing</option><option value="interview">Interview</option><option value="hired">Hired</option><option value="rejected">Rejected</option></select></div>`).join(''):'<div class="rdEmpty">No candidates in this stage.</div>';
+ let attention=(recruiterRows||[]).filter(r=>['new','interview'].includes(String(r.status||'new').toLowerCase())).slice(0,8),a=document.getElementById('rdAttention');if(a)a.innerHTML=attention.length?attention.map(r=>`<div onclick="openRecruiterCandidate('${r.id}')"><b>${esc(r.full_name||'Applicant')}</b><span>${String(r.status||'new').toLowerCase()==='new'?'New application needs review':'Candidate is ready for interview follow-up'}</span></div>`).join(''):'<div class="rdEmpty">You are caught up.</div>';
+};
+const priorRefresh=window.refreshRecruiterDashboard;
+window.refreshRecruiterDashboard=async function(){
+ if(!adminRecruiterOpen())return priorRefresh.apply(this,arguments);
+ let box=document.getElementById('rdApplicants');if(box)box.innerHTML='<div class="rdEmpty">Loading applications…</div>';
+ try{recruiterRows=await dbFetch('/job_applications?select=*&order=created_at.desc&limit=500');window.renderAdminRecruiterPipeline();}
+ catch(e){if(box)box.innerHTML='<div class="rdError">Could not load applications: '+esc(e.message||String(e))+'</div>';console.error('Admin recruiter load failed',e)}
+};
+})();
+</script>
