@@ -15121,3 +15121,15 @@ window.openRecruiterCandidate=function(id){priorOpen(id);let p=lifeProfiles[id]|
 window.setRecruiterMilestone=async function(id,key){let p=lifeProfiles[id]||{},payload={updated_at:new Date().toISOString()};payload[key]=p[key]?null:new Date().toISOString();try{await dbFetch('/recruiter_candidate_profiles?application_id=eq.'+encodeURIComponent(id),{method:'PATCH',body:JSON.stringify(payload)});p[key]=payload[key];lifeProfiles[id]=p;renderLife();openRecruiterCandidate(id)}catch(e){alert('Could not update milestone: '+(e.message||e))}};
 window.CPCM_RECRUITER_BUILD='CPCM_RECRUITER_LIFECYCLE_V4';})();
 </script>
+<!-- CPCM_RECRUITER_ADMIN_NAV_FIX_V2 -->
+<script>
+(function(){'use strict';
+function installRecruiterAdminNav(){if(!currentUser?.isAdmin)return;
+  let adminMenu=Array.from(document.querySelectorAll('.topMenu.adminOnly .topMenuDrop')).find(m=>m.querySelector('button[onclick="openEmployeeAdminModal()"]'));
+  if(adminMenu&&!document.getElementById('recruiterAdminMenuBtn')){let b=document.createElement('button');b.id='recruiterAdminMenuBtn';b.textContent='Recruiter Dashboard';b.onclick=window.openAdminRecruiterDashboard;let jobs=adminMenu.querySelector('button[onclick="openJobApplicationsAdmin()"]');jobs?jobs.insertAdjacentElement('afterend',b):adminMenu.prepend(b)}
+  let rail=document.querySelector('.navRail');if(rail&&!document.getElementById('recruiterAdminNavBtn')){let b=document.createElement('button');b.id='recruiterAdminNavBtn';b.className='navIcon dark adminOnly';b.title='Recruiter Dashboard';b.innerHTML='<span class="navEmoji">👥</span>';b.onclick=window.openAdminRecruiterDashboard;let spacer=rail.querySelector('.navSpacer');spacer?rail.insertBefore(b,spacer):rail.appendChild(b)}
+}
+const p=window.applyRoleUI;window.applyRoleUI=function(){let r=p&&p.apply(this,arguments);setTimeout(installRecruiterAdminNav,30);return r};
+window.addEventListener('load',()=>setTimeout(installRecruiterAdminNav,300));setTimeout(installRecruiterAdminNav,500);
+})();
+</script>
