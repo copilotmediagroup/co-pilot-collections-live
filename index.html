@@ -15268,3 +15268,29 @@ window.refreshRecruiterDashboard=async function(){
 };
 })();
 </script>
+<!-- CPCM_RECRUITER_SCOPE_FIX_V9 -->
+<script>
+(function(){'use strict';
+// recruiterRows/recruiterFilter are lexical bindings inside the original recruiter IIFE.
+// Admin Oversight must keep its own state instead of referencing those inaccessible bindings.
+let adminRecruiterRows=[],adminRecruiterFilter='all';
+function isOpen(){return !!(currentUser?.isAdmin&&document.getElementById('recruiterDashboard')?.classList.contains('rdAdminPreview'))}
+function cnt(s){return adminRecruiterRows.filter(r=>String(r.status||'new').toLowerCase()===s).length}
+window.renderAdminRecruiterPipeline=function(){
+ if(!isOpen())return;let set=(id,v)=>{let x=document.getElementById(id);if(x)x.textContent=v};
+ set('rdNew',cnt('new'));set('rdReviewing',cnt('reviewing'));set('rdInterview',cnt('interview'));set('rdHired',cnt('hired'));set('rdTotal',adminRecruiterRows.filter(r=>String(r.status||'new').toLowerCase()!=='rejected').length);
+ let filters=[['all','All'],['new','New'],['reviewing','Reviewing'],['interview','Interview'],['hired','Hired'],['rejected','Rejected']],f=document.getElementById('rdFilters');
+ if(f)f.innerHTML=filters.map(x=>`<button class="rdFilter ${adminRecruiterFilter===x[0]?'active':''}" onclick="window.setAdminRecruiterFilter('${x[0]}')">${x[1]} (${x[0]==='all'?adminRecruiterRows.length:cnt(x[0])})</button>`).join('');
+ let rows=adminRecruiterFilter==='all'?adminRecruiterRows:adminRecruiterRows.filter(r=>String(r.status||'new').toLowerCase()===adminRecruiterFilter),box=document.getElementById('rdApplicants');
+ if(box)box.innerHTML=rows.length?rows.map(r=>`<div class="rdApplicant"><div onclick="openRecruiterCandidate('${r.id}')"><div class="rdName">${esc(r.full_name||'Applicant')}</div><div class="rdSub">${esc(r.email||'')} · ${esc(r.phone||'')} · ${esc(r.city||'')}</div></div><div><b>${Number(r.years_experience||0)} yrs</b><div class="rdSub">${esc(r.debt_types||'Collections')}</div></div><div><span class="rdStatus">${esc(r.status||'new')}</span><div class="rdSub">Applied ${r.created_at?new Date(r.created_at).toLocaleDateString():'—'}</div></div><select class="rdSelect" onchange="recruiterMoveCandidate('${r.id}',this.value);this.value=''"><option value="">Move to…</option><option value="reviewing">Reviewing</option><option value="interview">Interview</option><option value="hired">Hired</option><option value="rejected">Rejected</option></select></div>`).join(''):'<div class="rdEmpty">No candidates in this stage.</div>';
+ let attention=adminRecruiterRows.filter(r=>['new','interview'].includes(String(r.status||'new').toLowerCase())).slice(0,8),a=document.getElementById('rdAttention');if(a)a.innerHTML=attention.length?attention.map(r=>`<div><b>${esc(r.full_name||'Applicant')}</b><span>${String(r.status||'new').toLowerCase()==='new'?'New application needs review':'Candidate is ready for interview follow-up'}</span></div>`).join(''):'<div class="rdEmpty">You are caught up.</div>';
+};
+window.setAdminRecruiterFilter=function(v){adminRecruiterFilter=v;window.renderAdminRecruiterPipeline()};
+const before=window.refreshRecruiterDashboard;
+window.refreshRecruiterDashboard=async function(){
+ if(!isOpen())return before.apply(this,arguments);let box=document.getElementById('rdApplicants');if(box)box.innerHTML='<div class="rdEmpty">Loading applications…</div>';
+ try{adminRecruiterRows=await dbFetch('/job_applications?select=*&order=created_at.desc&limit=500')||[];window.renderAdminRecruiterPipeline()}
+ catch(e){if(box)box.innerHTML='<div class="rdError">Could not load applications: '+esc(e.message||String(e))+'</div>';console.error(e)}
+};
+})();
+</script>
