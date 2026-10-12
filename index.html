@@ -15176,3 +15176,32 @@ window.recruiterMoveCandidate=async function(id,status){
 };
 })();
 </script>
+<!-- CPCM_RECRUITER_FILTERS_MILESTONES_V6 -->
+<script>
+(function(){'use strict';
+function adminRecruiter(){return !!(currentUser?.isAdmin&&document.getElementById('recruiterDashboard')?.classList.contains('rdAdminPreview'))}
+const priorSet=window.setRecruiterFilter;
+window.setRecruiterFilter=function(v){
+ recruiterFilter=v;
+ if(v==='onboarding'||v==='active'){
+  let ids=new Set(Object.values(lifeProfiles||{}).filter(p=>v==='onboarding'?(p.hired_at&&!p.activated_at):!!p.activated_at).map(p=>String(p.application_id)));
+  let original=recruiterRows;recruiterRows=original.filter(r=>ids.has(String(r.id)));let old=recruiterFilter;recruiterFilter='all';renderRecruiter();recruiterFilter=old;recruiterRows=original;return;
+ }
+ return priorSet(v);
+};
+const priorMilestone=window.setRecruiterMilestone;
+window.setRecruiterMilestone=async function(id,key){
+ let p=lifeProfiles[id];
+ if(!p){
+  try{let now=new Date().toISOString(),payload={application_id:id,recruiter_email:currentUser.email,updated_at:now,onboarding:{account_created:false,email_verified:false,agreement_signed:false,training_complete:false,compliance_ack:false,dialer_ready:false,headset_tested:false,assessment_complete:false}};payload[key]=now;let rows=await dbFetch('/recruiter_candidate_profiles',{method:'POST',body:JSON.stringify(payload)});lifeProfiles[id]=(Array.isArray(rows)&&rows[0])||payload;renderLife();openRecruiterCandidate(id);return}catch(e){alert('Could not create candidate lifecycle: '+(e.message||e));return}
+ }
+ return priorMilestone(id,key);
+};
+const priorSave=window.saveRecruiterCandidate;
+window.saveRecruiterCandidate=async function(id){
+ if(!adminRecruiter())return priorSave.apply(this,arguments);
+ let keys=['communication','collection_knowledge','negotiation','professionalism','remote_readiness'],p=lifeProfiles[id]||{},payload={application_id:id,recruiter_email:p.recruiter_email||currentUser.email,interview_notes:document.getElementById('rdInterviewNotes')?.value||'',updated_at:new Date().toISOString(),onboarding:{}};keys.forEach((k,i)=>{let v=Number(document.getElementById('rdScore'+i)?.value||0);payload[k]=v||null});document.querySelectorAll('#rdCandidateBody [data-ob]').forEach(x=>payload.onboarding[x.dataset.ob]=x.checked);
+ try{let exists=!!p.application_id,path=exists?'/recruiter_candidate_profiles?application_id=eq.'+encodeURIComponent(id):'/recruiter_candidate_profiles',body=Object.assign({},payload);if(exists)delete body.application_id;let rows=await dbFetch(path,{method:exists?'PATCH':'POST',body:JSON.stringify(body)});lifeProfiles[id]=Object.assign({},p,(Array.isArray(rows)&&rows[0])||payload);alert('Candidate interview and onboarding saved.')}catch(e){alert('Could not save candidate: '+(e.message||e))}
+};
+})();
+</script>
