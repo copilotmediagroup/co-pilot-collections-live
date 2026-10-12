@@ -15222,3 +15222,24 @@ window.adminOpenApplicant=function(id){let r=adminRows.find(x=>String(x.id)===St
 window.openAdminRecruiterDashboard=async function(){if(!currentUser?.isAdmin)return alert('Admin access required.');let d=e('recruiterDashboard');if(!d)return alert('Recruiter dashboard is not initialized. Please refresh once.');let app=document.querySelector('.app');if(app)app.style.display='none';d.classList.add('open','rdAdminPreview');d.style.display='block';let u=e('rdUser');if(u)u.textContent=(currentUser.email||'Admin')+' · Admin Oversight';let actions=d.querySelector('.rdTopActions');if(actions&&!e('rdAdminExit'))actions.insertAdjacentHTML('beforeend','<button id="rdAdminExit" class="rdAdminExit" style="display:inline-block" onclick="closeAdminRecruiterDashboard()">Back to Admin</button>');let box=e('rdApplicants');if(box)box.innerHTML='<div class="rdEmpty">Loading applications…</div>';try{let rows=await dbFetch('/job_applications?select=*&order=created_at.desc&limit=500');adminRows=Array.isArray(rows)?rows:[];renderAdminPipeline('all')}catch(err){if(box)box.innerHTML='<div class="rdError">Could not load applicants: '+safe(err.message||err)+'</div>'}};
 })();
 </script>
+<!-- CPCM_RECRUITER_ADMIN_PIPELINE_BRIDGE_V8 -->
+<script>
+(function(){'use strict';
+function adminRecruiterOpen(){return !!(currentUser?.isAdmin&&document.getElementById('recruiterDashboard')?.classList.contains('rdAdminPreview'))}
+function renderAdminRecruiterRows(rows){
+ recruiterRows=Array.isArray(rows)?rows:[];
+ let set=(id,n)=>{let x=document.getElementById(id);if(x)x.textContent=n},count=s=>recruiterRows.filter(r=>String(r.status||'new').toLowerCase()===s).length;
+ set('rdNew',count('new'));set('rdReviewing',count('reviewing'));set('rdInterview',count('interview'));set('rdHired',count('hired'));set('rdTotal',recruiterRows.filter(r=>String(r.status||'')!=='rejected').length;
+ let filters=[['all','All'],['new','New'],['reviewing','Reviewing'],['interview','Interview'],['hired','Hired'],['rejected','Rejected']],f=document.getElementById('rdFilters');if(f)f.innerHTML=filters.map(x=>'<button class="rdFilter '+(recruiterFilter===x[0]?'active':'')+'" onclick="setRecruiterFilter(\''+x[0]+'\')">'+x[1]+' ('+(x[0]==='all'?recruiterRows.length:count(x[0]))+')</button>').join('');
+ let visible=recruiterFilter==='all'?recruiterRows:recruiterRows.filter(r=>String(r.status||'new').toLowerCase()===recruiterFilter),box=document.getElementById('rdApplicants');if(box)box.innerHTML=visible.length?visible.map(r=>'<div class="rdApplicant" onclick="openRecruiterCandidate(\''+r.id+'\')"><div><div class="rdName">'+esc(r.full_name||'Applicant')+'</div><div class="rdSub">'+esc(r.email||'')+' · '+esc(r.phone||'')+' · '+esc(r.city||'')+'</div></div><div><b>'+Number(r.years_experience||0)+' yrs</b><div class="rdSub">'+esc(r.debt_types||'Collections')+'</div></div><div><span class="rdStatus">'+esc(r.status||'new')+'</span><div class="rdSub">Applied '+new Date(r.created_at).toLocaleDateString()+'</div></div><select class="rdSelect" onclick="event.stopPropagation()" onchange="event.stopPropagation();recruiterMoveCandidate(\''+r.id+'\',this.value);this.value=\'\'"><option value="">Move to…</option><option value="reviewing">Reviewing</option><option value="interview">Interview</option><option value="hired">Hired</option><option value="rejected">Rejected</option></select></div>').join(''):'<div class="rdEmpty">No candidates in this stage.</div>';
+}
+const oldLoad=window.loadJobApplicationsAdmin||loadJobApplicationsAdmin;
+window.loadJobApplicationsAdmin=async function(){
+ if(!adminRecruiterOpen())return oldLoad.apply(this,arguments);
+ try{let rows=await dbFetch('/job_applications?select=*&order=created_at.desc&limit=500');renderAdminRecruiterRows(rows);return rows}catch(e){let box=document.getElementById('rdApplicants');if(box)box.innerHTML='<div class="rdError">Could not load applications: '+esc(e.message||String(e))+'</div>';throw e}
+};
+window.refreshRecruiterDashboard=async function(){if(adminRecruiterOpen())return window.loadJobApplicationsAdmin();return Promise.resolve()};
+const oldOpenAdmin=window.openAdminRecruiterDashboard;
+window.openAdminRecruiterDashboard=function(){oldOpenAdmin();setTimeout(()=>{if(adminRecruiterOpen())window.loadJobApplicationsAdmin()},0)};
+})();
+</script>
