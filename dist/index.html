@@ -15133,3 +15133,23 @@ const p=window.applyRoleUI;window.applyRoleUI=function(){let r=p&&p.apply(this,a
 window.addEventListener('load',()=>setTimeout(installRecruiterAdminNav,300));setTimeout(installRecruiterAdminNav,500);
 })();
 </script>
+<!-- CPCM_RECRUITER_ADMIN_OPEN_FIX_V3 -->
+<script>
+(function(){'use strict';
+window.openAdminRecruiterDashboard=function(){
+  if(!currentUser?.isAdmin){alert('Admin access required.');return;}
+  try{
+    if(typeof ensureDashboard==='function') ensureDashboard();
+    let d=document.getElementById('recruiterDashboard');
+    if(!d){alert('Recruiter dashboard could not initialize.');return;}
+    document.querySelectorAll('body > section.open, body > div.open').forEach(x=>{if(x!==d)x.classList.remove('open')});
+    let app=document.querySelector('.app');if(app)app.style.display='none';
+    d.classList.add('open','rdAdminPreview');d.style.display='block';
+    let u=document.getElementById('rdUser');if(u)u.textContent=(currentUser.email||'Admin')+' · Admin Oversight';
+    let actions=d.querySelector('.rdTopActions');if(actions&&!document.getElementById('rdAdminExit'))actions.insertAdjacentHTML('beforeend','<button id="rdAdminExit" class="rdAdminExit" style="display:inline-block" onclick="closeAdminRecruiterDashboard()">Back to Admin</button>');
+    if(typeof refreshRecruiterDashboard==='function') refreshRecruiterDashboard();
+  }catch(e){console.error('Recruiter admin open failed',e);alert('Could not open Recruiter Dashboard: '+(e.message||e));}
+};
+window.closeAdminRecruiterDashboard=function(){let d=document.getElementById('recruiterDashboard');if(d){d.classList.remove('open','rdAdminPreview');d.style.display='none'}let app=document.querySelector('.app');if(app)app.style.display='grid'};
+})();
+</script>
