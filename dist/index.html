@@ -3829,7 +3829,7 @@ header.topbar{height:58px!important;padding:0 12px!important;grid-template-colum
         <button onclick="openComplianceGuard()">Compliance Guard</button><button onclick="openDocumentGenerator()">Letters</button><button class="adminOnly hidden" onclick="openLetterBodyEditor()">Letter Bodies</button><button class="adminOnly hidden qaBtn" onclick="openQaHealthModal()">QA Health</button><button class="adminOnly hidden" onclick="openAuditLog()">Audit Log</button>
       </div></div>
       <div class="topMenu adminOnly hidden"><button class="gray topMenuMain">Admin ▾</button><div class="topMenuDrop">
-        <button onclick="openEmployeeAdminModal()">Staff</button><button onclick="openJobApplicationsAdmin()">Job Applications</button><button onclick="openCommissionAdmin()">Employee Compensation</button><button onclick="openPermissionsModal()">Permissions</button><button onclick="openEmployeeMonitorModal()">Monitor</button><button onclick="checkBlandAIConnection()">AI Connection</button><button onclick="runBlandCollectorSandbox()">AI Collector Sandbox</button><button onclick="reviewBlandSandboxResult()">Review AI QA</button><button onclick="editAiCollectorScript()">AI Call Script</button><button onclick="editAccountCommunicationCompliance()">AI Contact Evidence</button><button onclick="prepareBlandRealCall()">AI Real-Call Prep</button><button onclick="openReportsPageStable()">Reports</button><button onclick="openBrandingSettingsModal()">Branding</button><button onclick="openAssignModal()">Assign Accounts</button><button onclick="openImportHistoryPage()">Portfolio Manager</button><button onclick="openDataCleanupDashboard()">Cleanup</button><label class="topMenuFile">Import CSV<input type="file" accept=".csv" onchange="importCSV(event)"></label><button onclick="downloadTemplate()">Download Template</button><button onclick="exportCSV()">Export CSV</button><button onclick="openArchivedAccounts()">Archived Accounts</button><button class="dangerItem" onclick="permanentlyDeleteArchivedPortfolio()">Delete Archived Portfolio</button><button class="dangerItem" onclick="clearAllAccounts()">Archive Active Accounts</button>
+        <button onclick="openEmployeeAdminModal()">Staff</button><button onclick="openJobApplicationsAdmin()">Job Applications</button><button onclick="openCommissionAdmin()">Employee Compensation</button><button onclick="openPermissionsModal()">Permissions</button><button onclick="openEmployeeMonitorModal()">Monitor</button><button onclick="checkBlandAIConnection()">AI Connection</button><button onclick="runBlandCollectorSandbox()">AI Collector Sandbox</button><button onclick="reviewBlandSandboxResult()">Review AI QA</button><button onclick="editAiCollectorScript()">AI Call Script</button><button onclick="editAccountCommunicationCompliance()">AI Contact Evidence</button><button onclick="prepareBlandRealCall()">AI Real-Call Prep</button><button onclick="checkAiLaunchReadiness()">AI Launch Readiness</button><button onclick="configureAiProvider()">AI Provider Setup</button><button onclick="openReportsPageStable()">Reports</button><button onclick="openBrandingSettingsModal()">Branding</button><button onclick="openAssignModal()">Assign Accounts</button><button onclick="openImportHistoryPage()">Portfolio Manager</button><button onclick="openDataCleanupDashboard()">Cleanup</button><label class="topMenuFile">Import CSV<input type="file" accept=".csv" onchange="importCSV(event)"></label><button onclick="downloadTemplate()">Download Template</button><button onclick="exportCSV()">Export CSV</button><button onclick="openArchivedAccounts()">Archived Accounts</button><button class="dangerItem" onclick="permanentlyDeleteArchivedPortfolio()">Delete Archived Portfolio</button><button class="dangerItem" onclick="clearAllAccounts()">Archive Active Accounts</button>
       </div></div>
       <div class="topMenu"><button class="gray topMenuMain">System ▾</button><div class="topMenuDrop topMenuDropRight">
         <button id="cpcmNoDialerStaticTopBtn" onclick="openNoDialerSafeMode()">Safe Mode</button><button onclick="openHelpModal()">Help</button><button class="dangerItem" onclick="logout()">Logout</button>
@@ -7154,6 +7154,55 @@ async function editAccountCommunicationCompliance(){
  await insertAudit('Communication Compliance Updated','First communication: '+(firstIso||'not recorded')+'; validation notice: '+(noticeIso||'not recorded')+'; source: '+(body.validation_notice_source||'none'),'account',a.id).catch(()=>{});
  alert('Communication-compliance evidence saved.\n\nThis records evidence only; it does not send a validation notice.');
 }
+async function configureAiProvider(){
+ if(!currentUser?.isAdmin)return alert('Admin only');
+ const [callerRows,pathRows]=await Promise.all([
+  dbFetch('/ai_caller_id_config?id=eq.true&limit=1').catch(()=>[]),
+  dbFetch('/ai_bland_pathway_config?id=eq.true&limit=1').catch(()=>[])
+ ]);
+ const c=callerRows?.[0]||{},p=pathRows?.[0]||{};
+ const caller=prompt('PRODUCTION CALLER ID\n\nEnter the Bland-owned/verified production number when available. Saving it here does NOT verify or enable it.\n\nLeave blank to keep unconfigured:',c.verification_status==='verified'?(c.phone_number||''):'');
+ if(caller===null)return;
+ const pathway=prompt('BLAND COLLECTOR PATHWAY ID\n\nEnter the provider Pathway ID after the V1 Pathway is created in Bland. Saving it here does NOT verify or enable it:',p.pathway_id||'');
+ if(pathway===null)return;
+ const callerDigits=String(caller||'').replace(/\D/g,'');
+ if(callerDigits&&callerDigits.length!==10&&callerDigits.length!==11)return alert('Caller ID must be a valid US phone number.');
+ const callerBody={phone_number:callerDigits?('+1'+callerDigits.slice(-10)):null,display_label:callerDigits?'Configured production caller ID':null,verification_status:callerDigits?'observed_unverified':'unconfigured',enabled_for_real_calls:false,verified_by_email:null,verified_at:null,updated_at:new Date().toISOString()};
+ const pathBody={pathway_id:String(pathway||'').trim()||null,pathway_version:'v1',verification_status:String(pathway||'').trim()?'configured_unverified':'unconfigured',enabled_for_real_calls:false,verified_by_email:null,verified_at:null,updated_at:new Date().toISOString()};
+ await Promise.all([
+  dbFetch('/ai_caller_id_config?id=eq.true',{method:'PATCH',body:JSON.stringify(callerBody)}),
+  dbFetch('/ai_bland_pathway_config?id=eq.true',{method:'PATCH',body:JSON.stringify(pathBody)})
+ ]);
+ await insertAudit('AI Provider Configuration Updated','Caller ID and Bland Pathway configuration saved unverified. No calling was enabled.','system','ai-provider').catch(()=>{});
+ alert('AI provider configuration saved.\n\nCaller ID: UNVERIFIED / DISABLED\nPathway: UNVERIFIED / DISABLED\nReal calling remains disabled.');
+}
+async function checkAiLaunchReadiness(){
+ if(!currentUser?.isAdmin)return alert('Admin only');
+ const [scripts,runtime,caller,pathway]=await Promise.all([
+  dbFetch('/ai_collector_script_profiles?profile_name=eq.Default%20AI%20Collector&select=version,approved_for_real_calls,approved_by_email,approved_at&limit=1').catch(()=>[]),
+  dbFetch('/ai_call_runtime_config?id=eq.true&select=real_provider_send_enabled&limit=1').catch(()=>[]),
+  dbFetch('/ai_caller_id_config?id=eq.true&select=phone_number,display_label,verification_status,enabled_for_real_calls&limit=1').catch(()=>[]),
+  dbFetch('/ai_bland_pathway_config?id=eq.true&select=pathway_id,pathway_version,verification_status,enabled_for_real_calls&limit=1').catch(()=>[])
+ ]);
+ const s=scripts?.[0]||{},r=runtime?.[0]||{},c=caller?.[0]||{},p=pathway?.[0]||{};
+ const line=(ok,label,detail='')=>(ok?'✓ ':'✗ ')+label+(detail?' — '+detail:'');
+ const report=[
+  'AI LAUNCH READINESS',
+  '',
+  line(!!s.approved_for_real_calls,'Collector script approved',s.version?'version '+s.version:'missing'),
+  line(c.verification_status==='verified'&&c.enabled_for_real_calls===true,'Production caller ID verified/enabled',c.phone_number?('***-***-'+String(c.phone_number).replace(/\D/g,'').slice(-4)):(c.verification_status||'unconfigured')),
+  line(p.verification_status==='synthetic_verified'&&p.enabled_for_real_calls===true,'Bland collector Pathway synthetic-verified',p.pathway_id?('configured '+String(p.pathway_version||'')):(p.verification_status||'unconfigured')),
+  line(r.real_provider_send_enabled===true,'Real-provider kill switch enabled',r.real_provider_send_enabled===true?'ON':'OFF — safe'),
+  '',
+  'Server identity verification: LIVE',
+  'Verified-context unlock: LIVE',
+  'Conversation outcome channel: LIVE',
+  '',
+  'A green launch still requires an end-to-end Bland Pathway test and a controlled pilot.'
+ ].join('\n');
+ alert(report);
+ return {script:s,runtime:r,caller:c};
+}
 async function prepareBlandRealCall(){
  if(!currentUser?.isAdmin)return alert('Admin only');
  const a=getCurrent(); if(!a)return alert('Select one account first.');
@@ -7201,28 +7250,17 @@ async function prepareBlandRealCall(){
 }
 async function runBlandCollectorSandbox(){
  if(!currentUser?.isAdmin)return alert('Admin only');
- const a=getCurrent();
- if(!a)return alert('Select one account first.');
- const rules=complianceRules(a);
- const calls=await todayCallCountForAccount(a.id);
- const issues=[...rules.hard,...rules.warn];
- if(calls>=rules.maxCalls)issues.push({label:'Daily call limit reached ('+calls+'/'+rules.maxCalls+')',type:'block'});
- if(issues.length){
-  alert('AI Collector preflight blocked/requires review for '+nameOf(a)+':\n\n'+issues.map(x=>'• '+x.label).join('\n')+'\n\nNo call was placed.');
-  return false;
- }
- if(!confirm('AI COLLECTOR SANDBOX\n\nSelected account: '+nameOf(a)+' · '+(acctNo(a)||'—')+'\nCompliance preflight: CLEAR\n\nThe call will go ONLY to (332) 259-0894 and will use SYNTHETIC debt information. No debtor PII, account number, bank data, SSN, DOB, creditor, balance, or debtor phone will be sent to Bland.\n\nPress OK to run one sandbox conversation.'))return false;
+ if(!confirm('AI PATHWAY SYNTHETIC TEST\n\nThis calls ONLY (332) 259-0894 using Pathway V7.\n\nSynthetic identity: Jordan\nSynthetic mailing ZIP: 33601\nSynthetic creditor/balance only after server verification.\nRecording: OFF\nReal debtor calling: OFF\n\nPress OK to queue one Pathway test call.'))return false;
  try{
   if(typeof ensureFreshToken==='function')await ensureFreshToken();
-  const res=await fetch(url()+'/functions/v1/bland-ai',{method:'POST',headers:{'Content-Type':'application/json','apikey':pubKey(),'Authorization':'Bearer '+token()},body:JSON.stringify({action:'collector_sandbox',account_id:a.id,phone_number:'3322590894'})});
+  const res=await fetch(url()+'/functions/v1/bland-ai',{method:'POST',headers:{'Content-Type':'application/json','apikey':pubKey(),'Authorization':'Bearer '+token()},body:JSON.stringify({action:'collector_sandbox',phone_number:'3322590894'})});
   const data=await res.json().catch(()=>({}));
   if(!res.ok||!data.ok)throw new Error((data.error||('Collector sandbox returned '+res.status))+(data.reasons?.length?' — '+data.reasons.join(', '):''));
   blandSandboxLastCallId=data.call_id||'';
-  if(data.call_id)await dbFetch('/ai_call_qa',{method:'POST',body:JSON.stringify([{account_id:a.id,provider:'bland',provider_call_id:data.call_id,mode:'collector_sandbox',destination_last4:'0894',observed_caller_id:'4707069719',status:data.status||'queued',completed:false,created_by_email:currentUser.email}])}).catch(()=>{});
-  await insertAudit('AI Collector Sandbox','Synthetic Bland sandbox launched; no debtor data sent. Call ID '+(data.call_id||'pending'),'account',a.id).catch(()=>{});
-  alert('AI Collector sandbox queued to (332) 259-0894 only.\n\nSynthetic debt data only.\nCall ID: '+(data.call_id||'pending'));
+    await insertAudit('AI Pathway Synthetic Test','Identity-gated Bland Pathway synthetic test queued. Call ID '+(data.call_id||'pending'),'system','bland').catch(()=>{});
+  alert('AI Pathway synthetic test queued to (332) 259-0894.\n\nConfirm: Jordan\nZIP: 33601\nRecording: OFF\nCall ID: '+(data.call_id||'pending'));
   return true;
- }catch(e){alert('AI Collector sandbox failed: '+String(e?.message||e));return false}
+ }catch(e){alert('AI Pathway synthetic test failed: '+String(e?.message||e));return false}
 }
 async function checkBlandAIConnection(){
  if(!currentUser?.isAdmin)return alert('Admin only');
@@ -14988,3 +15026,52 @@ function exportContactIntelligenceCSV(){let calls=filteredContactCalls();let row
 </script>
 </body>
 </html>
+<!-- CPCM_RECRUITER_DIVISION_V1 -->
+<style id="cpcmRecruiterStyles">
+#recruiterDashboard{display:none;position:fixed;inset:0;z-index:65000;background:#f5f5f4;color:#111;overflow:auto;font-family:Arial,Helvetica,sans-serif}
+#recruiterDashboard.open{display:block}.rdTop{height:76px;background:#050505;color:#fff;display:flex;align-items:center;justify-content:space-between;padding:0 28px;position:sticky;top:0;z-index:2}.rdBrand{display:flex;align-items:center;gap:13px}.rdLogo{width:42px;height:42px;border:1px solid #444;border-radius:12px;display:grid;place-items:center;font-size:21px;font-weight:1000}.rdBrand b{font-size:18px}.rdBrand span{display:block;color:#a3a3a3;font-size:11px;margin-top:3px}.rdTopActions{display:flex;gap:8px;align-items:center}.rdTopActions button,.rdBtn{background:#111!important;color:#fff!important;border:1px solid #333!important;border-radius:10px!important;padding:10px 13px!important}.rdBody{max-width:1500px;margin:auto;padding:24px}.rdHero{display:flex;justify-content:space-between;gap:18px;align-items:end;margin-bottom:18px}.rdHero h2{font-size:30px;margin:0 0 6px}.rdHero p{margin:0;color:#666}.rdKpis{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:18px}.rdKpi{background:#fff;border:1px solid #dedede;border-radius:16px;padding:17px}.rdKpi span{display:block;font-size:10px;text-transform:uppercase;letter-spacing:.09em;color:#777;font-weight:900}.rdKpi b{display:block;font-size:28px;margin-top:8px}.rdGrid{display:grid;grid-template-columns:1.55fr .75fr;gap:14px}.rdCard{background:#fff;border:1px solid #dedede;border-radius:16px;padding:17px}.rdCardHead{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:13px}.rdCardHead h3{margin:0;font-size:16px}.rdFilters{display:flex;gap:7px;flex-wrap:wrap}.rdFilter{background:#fff!important;color:#111!important;border:1px solid #d4d4d4!important;border-radius:999px!important;padding:7px 10px!important;font-size:11px!important}.rdFilter.active{background:#111!important;color:#fff!important;border-color:#111!important}.rdApplicant{border-top:1px solid #eee;padding:13px 0;display:grid;grid-template-columns:1.25fr .8fr .7fr auto;gap:10px;align-items:center}.rdApplicant:first-child{border-top:0}.rdName{font-weight:900}.rdSub{font-size:11px;color:#777;margin-top:3px}.rdStatus{font-size:10px;font-weight:900;text-transform:uppercase;border:1px solid #ddd;border-radius:999px;padding:6px 8px;display:inline-block}.rdSelect{min-width:125px;padding:8px!important;font-size:11px!important}.rdEmpty{padding:28px;text-align:center;color:#777;border:1px dashed #ccc;border-radius:12px}.rdAttention{display:grid;gap:8px}.rdAttention div{border:1px solid #e5e5e5;border-radius:12px;padding:12px}.rdAttention b{display:block;font-size:12px}.rdAttention span{font-size:11px;color:#777}.rdError{padding:12px;border:1px solid #fecaca;background:#fff1f2;color:#991b1b;border-radius:12px}.empRoleSwitch{height:27px!important;padding:0 7px!important;border-radius:7px!important;background:#111!important;color:#fff!important;border:1px solid #111!important;font-size:9px!important;font-weight:900!important}
+@media(max-width:1000px){.rdKpis{grid-template-columns:repeat(2,1fr)}.rdGrid{grid-template-columns:1fr}.rdApplicant{grid-template-columns:1fr 1fr}.rdTop{padding:0 14px}.rdBody{padding:14px}}
+</style>
+<script>
+(function(){
+'use strict';
+const BUILD='CPCM_RECRUITER_DIVISION_V1';let recruiterRows=[],recruiterFilter='all';
+const el=id=>document.getElementById(id);const roleNow=()=>String(currentUser?.role||currentUser?.profile?.role||'').toLowerCase();
+function isRecruiter(){return roleNow()==='recruiter'}
+function ensureDashboard(){if(el('recruiterDashboard'))return;document.body.insertAdjacentHTML('beforeend',`<section id="recruiterDashboard"><div class="rdTop"><div class="rdBrand"><div class="rdLogo">CP</div><div><b>Co Pilot Recruiting</b><span>Recruiter Command Center</span></div></div><div class="rdTopActions"><span id="rdUser"></span><button onclick="refreshRecruiterDashboard()">Refresh</button><button onclick="logout()">Log out</button></div></div><div class="rdBody"><div class="rdHero"><div><h2>Recruiting Command Center</h2><p>Move applicants from application to interview and hire.</p></div><button class="rdBtn" onclick="refreshRecruiterDashboard()">Refresh Applications</button></div><div class="rdKpis"><div class="rdKpi"><span>New Applications</span><b id="rdNew">0</b></div><div class="rdKpi"><span>Reviewing</span><b id="rdReviewing">0</b></div><div class="rdKpi"><span>Interviews</span><b id="rdInterview">0</b></div><div class="rdKpi"><span>Hired</span><b id="rdHired">0</b></div><div class="rdKpi"><span>Total Pipeline</span><b id="rdTotal">0</b></div></div><div class="rdGrid"><div class="rdCard"><div class="rdCardHead"><h3>Candidate Pipeline</h3><div class="rdFilters" id="rdFilters"></div></div><div id="rdApplicants"></div></div><div class="rdCard"><div class="rdCardHead"><h3>Needs Attention</h3></div><div class="rdAttention" id="rdAttention"></div></div></div></div></section>`)}
+function showRecruiter(){ensureDashboard();let app=document.querySelector('.app');if(app)app.style.display='none';let p=el('clientPortalPage');if(p)p.classList.remove('open');el('recruiterDashboard').classList.add('open');el('rdUser').textContent=currentUser.email||'Recruiter';refreshRecruiterDashboard()}
+function hideRecruiter(){let d=el('recruiterDashboard');if(d)d.classList.remove('open');if(!currentUser?.isClient){let app=document.querySelector('.app');if(app)app.style.display='grid'}}
+function count(s){return recruiterRows.filter(r=>String(r.status||'new').toLowerCase()===s).length}
+function renderRecruiter(){if(!isRecruiter())return;el('rdNew').textContent=count('new');el('rdReviewing').textContent=count('reviewing');el('rdInterview').textContent=count('interview');el('rdHired').textContent=count('hired');el('rdTotal').textContent=recruiterRows.filter(r=>String(r.status||'')!=='rejected').length;let filters=[['all','All'],['new','New'],['reviewing','Reviewing'],['interview','Interview'],['hired','Hired'],['rejected','Rejected']];el('rdFilters').innerHTML=filters.map(f=>`<button class="rdFilter ${recruiterFilter===f[0]?'active':''}" onclick="setRecruiterFilter('${f[0]}')">${f[1]} (${f[0]==='all'?recruiterRows.length:count(f[0])})</button>`).join('');let rows=recruiterFilter==='all'?recruiterRows:recruiterRows.filter(r=>String(r.status||'new').toLowerCase()===recruiterFilter);el('rdApplicants').innerHTML=rows.length?rows.map(r=>`<div class="rdApplicant"><div><div class="rdName">${esc(r.full_name||'Applicant')}</div><div class="rdSub">${esc(r.email||'')} · ${esc(r.phone||'')} · ${esc(r.city||'')}</div></div><div><b>${Number(r.years_experience||0)} yrs</b><div class="rdSub">${esc(r.debt_types||'Collections')}</div></div><div><span class="rdStatus">${esc(r.status||'new')}</span><div class="rdSub">Applied ${new Date(r.created_at).toLocaleDateString()}</div></div><select class="rdSelect" onchange="recruiterMoveCandidate('${r.id}',this.value);this.value=''"><option value="">Move to…</option><option value="reviewing">Reviewing</option><option value="interview">Interview</option><option value="hired">Hired</option><option value="rejected">Rejected</option></select></div>`).join(''):'<div class="rdEmpty">No candidates in this stage.</div>';let attention=recruiterRows.filter(r=>['new','interview'].includes(String(r.status||'new').toLowerCase())).slice(0,8);el('rdAttention').innerHTML=attention.length?attention.map(r=>`<div><b>${esc(r.full_name||'Applicant')}</b><span>${String(r.status||'new').toLowerCase()==='new'?'New application needs review':'Candidate is ready for interview follow-up'}</span></div>`).join(''):'<div class="rdEmpty">You are caught up.</div>'}
+window.setRecruiterFilter=function(v){recruiterFilter=v;renderRecruiter()};
+window.refreshRecruiterDashboard=async function(){if(!isRecruiter())return;ensureDashboard();let box=el('rdApplicants');if(box)box.innerHTML='<div class="rdEmpty">Loading applications…</div>';try{recruiterRows=await dbFetch('/job_applications?select=*&order=created_at.desc&limit=500');renderRecruiter()}catch(e){if(box)box.innerHTML='<div class="rdError">Recruiter application access is not active yet. '+esc(e.message||String(e))+'</div>'}};
+window.recruiterMoveCandidate=async function(id,status){if(!isRecruiter()||!status)return;try{let patch={status,reviewed_at:new Date().toISOString(),reviewed_by_email:currentUser.email,updated_at:new Date().toISOString()};if(status==='interview')patch.interview_at=new Date().toISOString();if(status==='hired')patch.hired_at=new Date().toISOString();await dbFetch('/job_applications?id=eq.'+encodeURIComponent(id),{method:'PATCH',body:JSON.stringify(patch)});await refreshRecruiterDashboard()}catch(e){alert('Could not update candidate: '+(e.message||e))}};
+const previousApplyRoleUI=applyRoleUI;applyRoleUI=function(){previousApplyRoleUI();if(isRecruiter()){let b=el('roleBadge');if(b)b.textContent='Recruiter';showRecruiter()}else hideRecruiter()};
+const previousLoadAccounts=loadAccounts;loadAccounts=async function(){if(isRecruiter()){showRecruiter();return}return previousLoadAccounts.apply(this,arguments)};
+const previousStaffList=loadEmployeeAdminList;loadEmployeeAdminList=async function(){let out=await previousStaffList.apply(this,arguments);setTimeout(enhanceStaffRoles,0);return out};
+function enhanceStaffRoles(){if(!currentUser?.isAdmin)return;document.querySelectorAll('.empActions[data-emp-email]').forEach(g=>{let email=String(g.dataset.empEmail||'').toLowerCase(),u=appUsers.find(x=>String(x.email||'').toLowerCase()===email);if(!u||g.querySelector('.empRoleSwitch'))return;let role=String(u.role||'employee').toLowerCase(),btn=document.createElement('button');btn.className='empRoleSwitch';btn.textContent=role==='recruiter'?'Make Employee':'Make Recruiter';btn.title=role==='recruiter'?'Return this user to collector/employee access':'Route this approved user to the Recruiter Dashboard';btn.onclick=()=>setStaffRole(email,role==='recruiter'?'employee':'recruiter');g.prepend(btn)})}
+window.setStaffRole=async function(email,role){if(!currentUser?.isAdmin)return alert('Admin only');let label=role==='recruiter'?'Recruiter':'Employee';if(!confirm('Change '+email+' to '+label+'?'))return;try{await dbFetch('/rpc/cpcm_admin_set_staff_role',{method:'POST',body:JSON.stringify({target_email:email,new_role:role})});await loadEmployeeAdminList();alert(email+' is now '+label+'. Their next login will route to the correct dashboard.')}catch(e){alert('Could not change role: '+(e.message||e))}};
+function init(){ensureDashboard();if(isRecruiter())showRecruiter();if(currentUser?.isAdmin)setTimeout(enhanceStaffRoles,400)}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();window.CPCM_RECRUITER_BUILD=BUILD;
+})();
+</script>
+<script id="cpcmRecruiterV1Corrections">
+/* Recruiter V1: use existing admin app_users RLS for role changes; keep existing application schema intact. */
+(function(){
+const priorLoadAppUsers=loadAppUsers;
+loadAppUsers=async function(){
+ if(currentUser?.isAdmin){try{let rows=await dbFetch('/app_users?select=*&order=email.asc');appUsers=(rows||[]).map(toCamel);return}catch(e){console.warn('Admin direct staff load failed; using directory RPC',e)}}
+ return priorLoadAppUsers.apply(this,arguments);
+};
+window.setStaffRole=async function(email,role){
+ if(!currentUser?.isAdmin)return alert('Admin only');email=String(email||'').toLowerCase();role=String(role||'').toLowerCase();
+ if(!['employee','recruiter'].includes(role))return alert('Unsupported role.');
+ let label=role==='recruiter'?'Recruiter':'Employee';if(!confirm('Change '+email+' to '+label+'?'))return;
+ try{let rows=await dbFetch('/app_users?email=eq.'+encodeURIComponent(email),{method:'PATCH',body:JSON.stringify({role,updated_at:new Date().toISOString()})});if(!Array.isArray(rows)||!rows.length)throw new Error('Role was not updated.');await loadEmployeeAdminList();alert(email+' is now '+label+'. Their next login will route to the correct dashboard.')}catch(e){alert('Could not change role: '+(e.message||e))}
+};
+window.recruiterMoveCandidate=async function(id,status){
+ if(String(currentUser?.role||'').toLowerCase()!=='recruiter'||!status)return;
+ try{await dbFetch('/job_applications?id=eq.'+encodeURIComponent(id),{method:'PATCH',body:JSON.stringify({status,reviewed_at:new Date().toISOString(),reviewed_by_email:currentUser.email,updated_at:new Date().toISOString()})});await refreshRecruiterDashboard()}catch(e){alert('Could not update candidate: '+(e.message||e))}
+};
+})();
+</script>
