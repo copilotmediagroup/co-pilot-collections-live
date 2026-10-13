@@ -4252,7 +4252,7 @@ header.topbar{height:58px!important;padding:0 12px!important;grid-template-colum
     <div style="display:flex;gap:10px;justify-content:flex-end;align-items:center;margin:12px 0;flex-wrap:wrap">
       <button class="outline" onclick="previewAssignment()">Preview Assignment</button>
       <button class="green" onclick="saveSmartAssignment()">Assign Accounts</button>
-      <button class="red" onclick="clearAssignmentsForFiltered()">Clear Assignments For Preview</button>
+      <button class="red" onclick="unassignFilteredAccounts()">Unassign Accounts</button>
     </div>
 
     <div class="assignPreview" id="assignPreview"></div>
@@ -6914,26 +6914,32 @@ async function saveSmartAssignment(){
  closeModal('assignModal');
  await loadAccounts();
 }
-async function clearAssignmentsForFiltered(){
+async function unassignFilteredAccounts(){
  if(!currentUser.isAdmin)return alert('Admin only');
- let built=buildAssignments();
- let ids=built.assignments.map(x=>x.account.id);
- if(!ids.length){
-   ids=assignmentBaseRows().slice(0,Math.max(1,parseInt(document.getElementById('assignCount')?.value||'1',10))).map(a=>a.id);
- }
- if(!ids.length)return alert('No accounts to clear.');
- let ok=confirm('Clear assignment from '+ids.length+' account(s)?');
- if(!ok)return;
+ let only=document.getElementById('assignOnlyUnassigned'),replace=document.getElementById('assignReplaceExisting');
+ let oldOnly=only?.checked,oldReplace=replace?.checked;
+ if(only)only.checked=false;if(replace)replace.checked=true;
+ let rows=assignmentBaseRows().filter(a=>!!assignedEmail(a));
+ if(only)only.checked=oldOnly;if(replace)replace.checked=oldReplace;
+ let selected=parseAssignEmails();
+ if(selected.length)rows=rows.filter(a=>selected.includes(assignedEmail(a)));
+ let count=Math.max(1,parseInt(document.getElementById('assignCount')?.value||'1',10));
+ let mode=document.getElementById('assignCountMode')?.value||'total';
+ let limit=mode==='perEmployee'&&selected.length?count*selected.length:count;
+ rows=rows.slice(0,limit);
+ if(!rows.length)return alert(selected.length?'No assigned accounts match these filters for the selected employee(s).':'No assigned accounts match the current filters.');
+ let who=selected.length?' from '+selected.join(', '):'';
+ if(!confirm('Unassign '+rows.length+' account(s)'+who+' and return them to the unassigned queue?'))return;
+ let ids=rows.map(a=>a.id);
  for(let i=0;i<ids.length;i+=100){
    let chunk=ids.slice(i,i+100);
-   await dbFetch(`/accounts?id=in.(${chunk.join(',')})`,{method:'PATCH',body:JSON.stringify({
-     assigned_to_email:null,assigned_by_email:null,assigned_at:null,assignment_method:null,assignment_group_id:null,updated_at:new Date().toISOString()
-   })});
+   await dbFetch(`/accounts?id=in.(${chunk.join(',')})`,{method:'PATCH',body:JSON.stringify({assigned_to_email:null,assigned_by_email:null,assigned_at:null,assignment_method:null,assignment_group_id:null,updated_at:new Date().toISOString()})});
  }
- alert('Assignments cleared for '+ids.length+' account(s).');
- await loadAccounts();
- previewAssignment();
+ for(let a of rows.slice(0,100))await insertActivity(a.id,'Unassigned','Unassigned by '+currentUser.email).catch(()=>{});
+ alert('Unassigned '+rows.length+' account(s). They are back in the unassigned queue.');
+ await loadAccounts();previewAssignment();
 }
+async function clearAssignmentsForFiltered(){return unassignFilteredAccounts()}
 
 
 async function openEmployeeAdminModal(){
