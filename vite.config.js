@@ -19,7 +19,8 @@ export default defineConfig({
         main: resolve(process.cwd(), 'index.html'),
         changePassword: resolve(process.cwd(), 'change-password.html'),
         recruiterApplication: resolve(process.cwd(), 'recruiter-application.html'),
-        recruiterApplicationsAdmin: resolve(process.cwd(), 'recruiter-applications-admin.html')
+        recruiterApplicationsAdmin: resolve(process.cwd(), 'recruiter-applications-admin.html'),
+        recruiterSetup: resolve(process.cwd(), 'recruiter-setup.html')
       }
     }
   }
