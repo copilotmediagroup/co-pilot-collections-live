@@ -15040,8 +15040,6 @@ window.closePasswordSettingsPage=function(){document.getElementById('passwordSet
 window.savePasswordSettings=async function(){var current=document.getElementById('pwCurrent').value,newPassword=document.getElementById('pwNew').value,confirmPassword=document.getElementById('pwConfirm').value,msg=document.getElementById('pwSettingsMsg');msg.className='pwSettingsMsg';if(!current||!newPassword||!confirmPassword){msg.textContent='Complete all three password fields.';msg.classList.add('error');return}if(newPassword.length<8){msg.textContent='New password must be at least 8 characters.';msg.classList.add('error');return}if(newPassword!==confirmPassword){msg.textContent='New passwords do not match.';msg.classList.add('error');return}try{var email=String(currentUser&&currentUser.email||'').trim().toLowerCase();if(!email)throw Error('Signed-in account could not be identified.');var verified=await authFetch('/auth/v1/token?grant_type=password',{email:email,password:current});var r=await fetch(url()+'/auth/v1/user',{method:'PUT',headers:{apikey:pubKey(),'Authorization':'Bearer '+verified.access_token,'Content-Type':'application/json'},body:JSON.stringify({password:newPassword})});var d=await r.json().catch(function(){return {}});if(!r.ok)throw Error(d.msg||d.message||d.error_description||'Could not change password.');storeSession(verified);msg.textContent='Password changed successfully.';msg.classList.add('ok');document.getElementById('pwCurrent').value='';document.getElementById('pwNew').value='';document.getElementById('pwConfirm').value=''}catch(e){var t=e.message||String(e);msg.textContent=t.toLowerCase().indexOf('invalid login')>=0?'Current password is incorrect.':t;msg.classList.add('error')}};
 </script>
 
-</body>
-</html>
 <!-- CPCM_RECRUITER_DIVISION_V1 -->
 <style id="cpcmRecruiterStyles">
 #recruiterDashboard{display:none;position:fixed;inset:0;z-index:65000;background:#f5f5f4;color:#111;overflow:auto;font-family:Arial,Helvetica,sans-serif}
@@ -15367,3 +15365,5 @@ const oldInstall=window.installAdmin;setTimeout(()=>{if(adminOK())ensureRecruite
 window.CPCM_RECRUITER_APPLICATIONS_DASHBOARD='V10';
 })();
 </script>
+</body>
+</html>
