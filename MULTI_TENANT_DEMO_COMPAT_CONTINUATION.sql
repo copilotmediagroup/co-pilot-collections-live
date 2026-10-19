@@ -1232,9 +1232,9 @@ grant execute on function public.admin_clear_accounts() to authenticated;
 
 -- DEMO compatibility: this older demo schema never received the current_app_email helper.
 create or replace function public.current_app_email()
-returns text language sql stable security invoker set search_path='' as $
+returns text language sql stable security invoker set search_path='' as $cpcm$
   select lower(coalesce(auth.jwt() ->> 'email', ''));
-$;
+$cpcm$;
 revoke all on function public.current_app_email() from public,anon;
 grant execute on function public.current_app_email() to authenticated;
 
