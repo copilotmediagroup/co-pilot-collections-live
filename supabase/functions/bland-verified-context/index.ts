@@ -6,10 +6,10 @@ Deno.serve(async(req)=>{
  const attemptId=String(b?.attempt_id??"").trim(),token=String(b?.verification_token??"").trim();
  if(!/^[0-9a-f-]{36}$/i.test(attemptId)||!/^[0-9a-f-]{36}$/i.test(token))return json({authorized:false},200);
  const h={apikey:sk,Authorization:`Bearer ${sk}`};
- const ar=await fetch(`${u}/rest/v1/ai_real_call_attempts?id=eq.${encodeURIComponent(attemptId)}&status=in.(authorized,sending,sent)&select=id,account_id,communication_type,script_profile_id,script_version,script_snapshot,payload_snapshot,preflight_snapshot,identity_verified_at,identity_verification_locked_at&limit=1`,{headers:h});
+ const ar=await fetch(`${u}/rest/v1/ai_real_call_attempts?id=eq.${encodeURIComponent(attemptId)}&status=in.(authorized,sending,sent)&select=id,account_id,organization_id,communication_type,script_profile_id,script_version,script_snapshot,payload_snapshot,preflight_snapshot,identity_verified_at,identity_verification_locked_at&limit=1`,{headers:h});
  const rows=await ar.json().catch(()=>[]),a=Array.isArray(rows)?rows[0]:null;
  if(!ar.ok||!a||!a.identity_verified_at||a.identity_verification_locked_at||String(a?.preflight_snapshot?.identity_verification_token||"")!==token)return json({authorized:false},200);
- const sr=await fetch(`${u}/rest/v1/ai_collector_script_profiles?id=eq.${encodeURIComponent(a.script_profile_id)}&approved_for_real_calls=eq.true&select=id,version&limit=1`,{headers:h});
+ const sr=await fetch(`${u}/rest/v1/ai_collector_script_profiles?id=eq.${encodeURIComponent(a.script_profile_id)}&organization_id=eq.${encodeURIComponent(a.organization_id)}&approved_for_real_calls=eq.true&select=id,version&limit=1`,{headers:h});
  const ss=await sr.json().catch(()=>[]),current=Array.isArray(ss)?ss[0]:null;
  if(!sr.ok||!current||Number(current.version)!==Number(a.script_version))return json({authorized:false},200);
  const p=a.payload_snapshot||{},s=a.script_snapshot||{};

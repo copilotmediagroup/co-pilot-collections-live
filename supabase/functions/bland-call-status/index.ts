@@ -9,8 +9,8 @@ Deno.serve(async(req)=>{
  const callId=String(body?.call_id??body?.callId??body?.id??"").trim();
  if(!/^[a-zA-Z0-9_-]{8,100}$/.test(callId))return json({error:"Valid call_id required"},400);
  const hr={apikey:serviceKey,Authorization:`Bearer ${serviceKey}`};
- const mr=await fetch(`${supabaseUrl}/rest/v1/ai_real_call_attempts?provider_call_id=eq.${encodeURIComponent(callId)}&select=id,status&limit=1`,{headers:hr});
- const matches=await mr.json().catch(()=>[]);if(!mr.ok||!Array.isArray(matches)||!matches[0])return json({error:"Unknown provider call"},404);
+ const mr=await fetch(`${supabaseUrl}/rest/v1/ai_real_call_attempts?provider_call_id=eq.${encodeURIComponent(callId)}&select=id,status,organization_id&limit=2`,{headers:hr});
+ const matches=await mr.json().catch(()=>[]);if(!mr.ok||!Array.isArray(matches)||matches.length!==1||!matches[0]?.organization_id)return json({error:"Unknown or ambiguous provider call"},404);
  const br=await fetch("https://api.bland.ai/v1/calls/"+encodeURIComponent(callId),{headers:{authorization:blandKey}});
  const data=await br.json().catch(()=>({}));if(!br.ok)return json({error:"Provider verification failed"},502);
  const safe={call_id:callId,status:data?.status??null,completed:data?.completed===true,answered_by:data?.answered_by??null,call_length:data?.call_length??null,summary:String(data?.summary??"").slice(0,4000),concatenated_transcript:String(data?.concatenated_transcript??"").slice(0,12000),price:data?.price??null,disposition_tag:data?.disposition_tag??null,message:data?.message??null};
