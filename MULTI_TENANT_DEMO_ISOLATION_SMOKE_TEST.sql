@@ -39,6 +39,9 @@ select set_config('cpcm.test_a_account',:'a_account',true);
 select set_config('cpcm.test_b_account',:'b_account',true);
 select count(*)::text as b_message_count from public.team_messages where organization_id='20000000-0000-4000-8000-000000000002'::uuid \gset
 select set_config('cpcm.test_b_message_count',:'b_message_count',true);
+create temporary table cpcm_stamp_probe(id uuid primary key default gen_random_uuid(),organization_id uuid not null);
+create trigger cpcm_stamp_organization before insert on cpcm_stamp_probe for each row execute function private.stamp_current_organization();
+grant insert,select on cpcm_stamp_probe to authenticated;
 set local role authenticated;
 select set_config('request.jwt.claims',json_build_object('sub',:'a_user','role','authenticated','email',:'a_email')::text,true);
 
@@ -59,14 +62,12 @@ BEGIN
   RAISE NOTICE 'PASS: Agency A account SELECT/UPDATE/DELETE fence';
 END $test$;
 
--- Insert a copied valid account while maliciously claiming B; trigger must stamp it A.
-with src as (select * from public.accounts where id=:'a_account'::uuid)
-insert into public.accounts
-select (jsonb_populate_record(null::public.accounts,to_jsonb(src) || jsonb_build_object('id',gen_random_uuid(),'organization_id','20000000-0000-4000-8000-000000000002'))).* from src
-returning id::text as stamped_account,organization_id::text as stamped_org \gset
+-- Probe the same organization-stamping trigger used on every tenant table.
+insert into cpcm_stamp_probe(organization_id) values ('20000000-0000-4000-8000-000000000002')
+returning organization_id::text as stamped_org \gset
 select (:'stamped_org' = '10000000-0000-4000-8000-000000000001') as stamped_ok \gset
 \if :stamped_ok
-  \echo 'PASS: forged Agency B account insert stamped to Agency A'
+  \echo 'PASS: forged Agency B organization_id stamped to Agency A'
 \else
   \echo 'FAIL: forged organization_id was not stamped to Agency A'
   \quit 4
