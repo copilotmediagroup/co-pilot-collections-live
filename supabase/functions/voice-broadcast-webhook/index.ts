@@ -221,7 +221,9 @@ async function finalizeOutcome(admin: any, callRow: any, campaign: any, result: 
 async function context(admin: any, callRowId: string) {
   const { data: callRow } = await admin.from("voice_broadcast_calls").select("*").eq("id", callRowId).maybeSingle();
   if (!callRow) throw new Error("Voice broadcast call record was not found.");
-  const { data: campaign } = await admin.from("voice_broadcast_campaigns").select("*").eq("id", callRow.campaign_id).maybeSingle();
+  if (!callRow.organization_id) throw new Error("Voice broadcast call has no tenant ownership.");
+  const { data: campaign } = await admin.from("voice_broadcast_campaigns").select("*").eq("id", callRow.campaign_id).eq("organization_id", callRow.organization_id).maybeSingle();
+  if (campaign && campaign.organization_id !== callRow.organization_id) throw new Error("Voice broadcast tenant mismatch.");
   if (!campaign) throw new Error("Voice broadcast campaign was not found.");
   return { callRow, campaign };
 }

@@ -17,11 +17,11 @@ Deno.serve(async(req)=>{
   const inbound=parties.filter((p:any)=>p?.direction==="Inbound"&&["Setup","Proceeding","Answered"].includes(String(p?.status?.code||"")));
   for(const party of inbound){
    const extId=String(party.extensionId||party.to?.extensionId||""); if(!extId)continue;
-   const {data:m}=await admin.from("ringcentral_user_mappings").select("employee_email").eq("ringcentral_extension_id",extId).eq("enabled",true).maybeSingle();
-   const caller=party.from?.phoneNumber||""; if(!m?.employee_email||!caller)continue;
+   const {data:m}=await admin.from("ringcentral_user_mappings").select("employee_email,organization_id").eq("ringcentral_extension_id",extId).eq("enabled",true).maybeSingle();
+   const caller=party.from?.phoneNumber||""; if(!m?.employee_email||!m?.organization_id||!caller)continue;
    const session=String(body.telephonySessionId||body.sessionId||payload.uuid||""); if(!session)continue;
-   const row={rc_call_id:"inbound:"+session+":"+extId,session_id:session,extension_id:extId,employee_email:String(m.employee_email).toLowerCase(),employee_name:party.to?.name||null,direction:"Inbound",action:"Phone Call",result:party.status?.code||"Ringing",from_number:caller,to_number:party.to?.phoneNumber||null,start_time:body.eventTime||payload.timestamp||new Date().toISOString(),duration_seconds:0,telephony_status:party.status?.code||"Ringing",raw:payload,synced_at:new Date().toISOString()};
-   const {error}=await admin.from("ringcentral_call_records").upsert(row,{onConflict:"rc_call_id"}); if(error)throw error;
+   const row={rc_call_id:"inbound:"+session+":"+extId,session_id:session,extension_id:extId,employee_email:String(m.employee_email).toLowerCase(),employee_name:party.to?.name||null,direction:"Inbound",action:"Phone Call",result:party.status?.code||"Ringing",from_number:caller,to_number:party.to?.phoneNumber||null,start_time:body.eventTime||payload.timestamp||new Date().toISOString(),duration_seconds:0,telephony_status:party.status?.code||"Ringing",raw:payload,synced_at:new Date().toISOString(),organization_id:m.organization_id};
+   const {error}=await admin.from("ringcentral_call_records").upsert(row,{onConflict:"organization_id,rc_call_id"}); if(error)throw error;
   }
   return ok();
  }catch(e){console.error("RingCentral inbound webhook failed",e);return new Response("Webhook error",{status:500,headers:H})}
