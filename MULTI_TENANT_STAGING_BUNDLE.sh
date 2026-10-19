@@ -1,0 +1,27 @@
+#!/bin/sh
+set -eu
+OUT="MULTI_TENANT_STAGING_BUNDLE.sql"
+: > "$OUT"
+for f in \
+ MULTI_TENANT_PHASE1_FOUNDATION.sql \
+ MULTI_TENANT_PHASE3_TENANT_KEYS_AND_TEST_HARNESS.sql \
+ MULTI_TENANT_PHASE4_SINGLETON_CONFIG_KEYS.sql \
+ MULTI_TENANT_PHASE5_RPC_TENANT_BINDING.sql \
+ MULTI_TENANT_PHASE6_RINGCENTRAL_TENANT_OWNERSHIP.sql \
+ MULTI_TENANT_PHASE9_RPC_GUARDRAILS.sql \
+ MULTI_TENANT_PHASE10_CLIENT_PORTAL_RPCS.sql \
+ MULTI_TENANT_PHASE11_STAFF_ADMIN_RPC.sql \
+ MULTI_TENANT_PHASE12_REMITTANCE_RPCS.sql \
+ MULTI_TENANT_PHASE13_COMMISSIONS_PAYMENT_APPROVALS.sql \
+ MULTI_TENANT_PHASE2_TENANT_FENCE_DRAFT.sql \
+ MULTI_TENANT_PHASE14_LEGACY_POLICY_CLEANUP.sql \
+ MULTI_TENANT_PHASE15_RECRUITING_CLASSIFICATION.sql \
+ MULTI_TENANT_PHASE16_STAGING_READINESS.sql \
+ MULTI_TENANT_PHASE7_ISOLATION_ASSERTIONS.sql
+do
+  test -s "$f" || { echo "Missing $f" >&2; exit 1; }
+  printf '\n-- ============================================================================\n-- BEGIN %s\n-- ============================================================================\n' "$f" >> "$OUT"
+  cat "$f" >> "$OUT"
+  printf '\n-- END %s\n' "$f" >> "$OUT"
+done
+printf '%s\n' "Built $OUT"
