@@ -20,8 +20,8 @@ insert into public.organization_members(organization_id,auth_user_id,role,is_act
 ('10000000-0000-4000-8000-000000000001',:'a_user'::uuid,'agency_admin',true),
 ('20000000-0000-4000-8000-000000000002',:'b_user'::uuid,'agency_admin',true)
 on conflict(organization_id,auth_user_id) do update set role='agency_admin',is_active=true;
-update public.app_users set organization_id='10000000-0000-4000-8000-000000000001'::uuid where user_id=:'a_user'::uuid;
-update public.app_users set organization_id='20000000-0000-4000-8000-000000000002'::uuid where user_id=:'b_user'::uuid;
+update public.app_users set organization_id='10000000-0000-4000-8000-000000000001'::uuid where lower(email)=lower(:'a_email');
+update public.app_users set organization_id='20000000-0000-4000-8000-000000000002'::uuid where lower(email)=lower(:'b_email');
 
 -- Put two existing fake DEMO accounts into A and B for the duration of the test.
 with r as (select id,row_number() over(order by id) rn from public.accounts limit 2)
