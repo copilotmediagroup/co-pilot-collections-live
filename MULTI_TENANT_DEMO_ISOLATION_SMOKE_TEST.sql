@@ -1,8 +1,8 @@
 \set ON_ERROR_STOP on
 BEGIN;
 -- Entire test is rolled back. It leaves DEMO data and memberships unchanged.
-select id::text as a_user from auth.users order by created_at,id limit 1 \gset
-select id::text as b_user from auth.users where id <> :'a_user'::uuid order by created_at,id limit 1 \gset
+select id::text as a_user,coalesce(email,'') as a_email from auth.users order by created_at,id limit 1 \gset
+select id::text as b_user,coalesce(email,'') as b_email from auth.users where id <> :'a_user'::uuid order by created_at,id limit 1 \gset
 \if :{?b_user}
 \else
   \echo 'DEMO ISOLATION TEST BLOCKED: requires two auth users'
@@ -20,6 +20,8 @@ insert into public.organization_members(organization_id,auth_user_id,role,is_act
 ('10000000-0000-4000-8000-000000000001',:'a_user'::uuid,'agency_admin',true),
 ('20000000-0000-4000-8000-000000000002',:'b_user'::uuid,'agency_admin',true)
 on conflict(organization_id,auth_user_id) do update set role='agency_admin',is_active=true;
+update public.app_users set organization_id='10000000-0000-4000-8000-000000000001'::uuid where user_id=:'a_user'::uuid;
+update public.app_users set organization_id='20000000-0000-4000-8000-000000000002'::uuid where user_id=:'b_user'::uuid;
 
 -- Put two existing fake DEMO accounts into A and B for the duration of the test.
 with r as (select id,row_number() over(order by id) rn from public.accounts limit 2)
@@ -38,7 +40,7 @@ select set_config('cpcm.test_b_account',:'b_account',true);
 select count(*)::text as b_message_count from public.team_messages where organization_id='20000000-0000-4000-8000-000000000002'::uuid \gset
 select set_config('cpcm.test_b_message_count',:'b_message_count',true);
 set local role authenticated;
-select set_config('request.jwt.claims',json_build_object('sub',:'a_user','role','authenticated','email','agency-a-isolation@example.invalid')::text,true);
+select set_config('request.jwt.claims',json_build_object('sub',:'a_user','role','authenticated','email',:'a_email')::text,true);
 
 DO $test$
 DECLARE n int; oid uuid;
