@@ -83,7 +83,34 @@ BEGIN
   RAISE NOTICE 'PASS: Agency A team_messages tenant fence';
 END $test$;
 
+-- Reciprocal B -> A account fence.
+select set_config('request.jwt.claims',json_build_object('sub',:'b_user','role','authenticated','email',:'b_email')::text,true);
+DO $test$
+DECLARE n int;
+BEGIN
+  IF private.current_organization_id() <> '20000000-0000-4000-8000-000000000002'::uuid THEN RAISE EXCEPTION 'B tenant resolution failed'; END IF;
+  select count(*) into n from public.accounts where id=current_setting('cpcm.test_a_account')::uuid;
+  IF n<>0 THEN RAISE EXCEPTION 'FAIL: Agency B can SELECT Agency A account'; END IF;
+  select count(*) into n from public.accounts where id=current_setting('cpcm.test_b_account')::uuid;
+  IF n<>1 THEN RAISE EXCEPTION 'FAIL: Agency B cannot see its own test account'; END IF;
+  RAISE NOTICE 'PASS: Agency B reciprocal account fence';
+END $test$;
+
+-- Platform admin must be able to inspect both tenants.
+reset role;
+insert into private.platform_admins(auth_user_id) values (:'a_user'::uuid) on conflict do nothing;
+set local role authenticated;
+select set_config('request.jwt.claims',json_build_object('sub',:'a_user','role','authenticated','email',:'a_email')::text,true);
+DO $test$
+DECLARE n int;
+BEGIN
+  IF NOT private.is_platform_admin() THEN RAISE EXCEPTION 'FAIL: platform admin resolution'; END IF;
+  select count(*) into n from public.accounts where id in (current_setting('cpcm.test_a_account')::uuid,current_setting('cpcm.test_b_account')::uuid);
+  IF n<>2 THEN RAISE EXCEPTION 'FAIL: platform admin cannot inspect both tenant accounts'; END IF;
+  RAISE NOTICE 'PASS: platform admin can inspect both tenant accounts';
+END $test$;
+
 reset role;
 select set_config('request.jwt.claims','{}',true);
 ROLLBACK;
-\echo 'DEMO ISOLATION SMOKE TEST PASSED; all test mutations rolled back.'
+\echo 'DEMO ISOLATION SMOKE TEST PASSED; A/B reciprocal + stamping + platform-admin checks rolled back.'
