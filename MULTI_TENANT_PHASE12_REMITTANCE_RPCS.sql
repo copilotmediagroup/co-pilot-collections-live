@@ -211,11 +211,11 @@ begin
   number_value:='REM-'||to_char(current_date,'YYYYMMDD')||'-'||upper(substr(replace(gen_random_uuid()::text,'-',''),1,6));
 
   insert into public.client_remittance_batches(
-    batch_number,client_email,client_company_name,portfolio_name,period_start,period_end,payment_count,
+    organization_id,batch_number,client_email,client_company_name,portfolio_name,period_start,period_end,payment_count,
     gross_collections,reversals,net_collections,agency_fee_percent,agency_fee_amount,processor_fees,
     processor_fee_payer,adjustments,net_remittance,status,due_date,notes,created_by_email,updated_at
   ) values(
-    number_value,lower(trim(target_client_email)),company_name,trim(target_portfolio_name),period_start_date,period_end_date,
+    oid,number_value,lower(trim(target_client_email)),company_name,trim(target_portfolio_name),period_start_date,period_end_date,
     (preview->>'payment_count')::integer,(preview->>'gross_collections')::numeric,(preview->>'reversals')::numeric,
     (preview->>'net_collections')::numeric,(preview->>'agency_fee_percent')::numeric,(preview->>'agency_fee_amount')::numeric,
     (preview->>'processor_fees')::numeric,preview->>'processor_fee_payer',(preview->>'adjustments')::numeric,
@@ -225,10 +225,10 @@ begin
 
   for item_record in select value item from jsonb_array_elements(preview->'items') loop
     insert into public.client_remittance_items(
-      batch_id,payment_ledger_id,account_id,consumer_name,account_number,payment_date,payment_type,payment_method,
+      organization_id,batch_id,payment_ledger_id,account_id,consumer_name,account_number,payment_date,payment_type,payment_method,
       gross_amount,signed_amount,processor_fee,released
     ) values(
-      new_batch.id,item_record.item->>'payment_ledger_id',item_record.item->>'account_id',item_record.item->>'consumer_name',
+      oid,new_batch.id,item_record.item->>'payment_ledger_id',item_record.item->>'account_id',item_record.item->>'consumer_name',
       item_record.item->>'account_number',(item_record.item->>'payment_date')::date,item_record.item->>'payment_type',
       item_record.item->>'payment_method',(item_record.item->>'gross_amount')::numeric,(item_record.item->>'signed_amount')::numeric,
       (item_record.item->>'processor_fee')::numeric,false
