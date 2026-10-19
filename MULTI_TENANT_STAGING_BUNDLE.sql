@@ -2048,6 +2048,62 @@ end; $$;
 -- END MULTI_TENANT_PHASE20_PAYMENT_PROMISE_RPCS.sql
 
 -- ============================================================================
+-- BEGIN MULTI_TENANT_PHASE21_PAYMENT_PLAN_LEDGER_RPCS.sql
+-- ============================================================================
+-- Co Pilot Collections — Multi-Tenant SaaS Conversion, Phase 21
+-- Tenant-bind payment-plan creation, scheduled payment transitions, and manual ledger posting.
+
+create or replace function public.cpcm_mark_scheduled_plan_payment_paid(target_payment_id uuid,actor_email text default null)
+returns jsonb language plpgsql security invoker set search_path=public as $$
+declare oid uuid:=private.current_organization_id(); p public.payment_plan_payments%rowtype; a public.accounts%rowtype; pl public.payment_plans%rowtype; amt numeric; before_bal numeric; after_bal numeric; receipt text; ledger_id uuid; pid uuid;
+begin
+ if oid is null then raise exception 'No active organization'; end if;
+ select * into p from public.payment_plan_payments where organization_id=oid and id=target_payment_id for update; if not found then raise exception 'Scheduled payment not found'; end if; perform private.assert_account_in_current_organization(p.account_id);
+ if lower(coalesce(p.status,''))='paid' or coalesce(p.amount_paid,0)>=coalesce(p.amount_due,p.payment_amount,p.amount,0) then select id into ledger_id from public.payments_ledger where organization_id=oid and receipt_number='PLANPAY-'||target_payment_id::text limit 1; return jsonb_build_object('ok',true,'already_paid',true,'ledger_id',ledger_id,'account_id',p.account_id); end if;
+ if p.account_id is null then raise exception 'Scheduled payment has no account'; end if; select * into a from public.accounts where organization_id=oid and id=p.account_id for update; if not found then raise exception 'Account not found'; end if;
+ pid:=coalesce(p.plan_id,p.payment_plan_id); if pid is not null then select * into pl from public.payment_plans where organization_id=oid and id=pid for update; end if;
+ amt:=greatest(coalesce(p.amount_due,p.payment_amount,p.amount,0),0); if amt<=0 then raise exception 'Payment amount must be greater than zero'; end if; before_bal:=greatest(coalesce(a.current_balance,0),0); after_bal:=greatest(before_bal-amt,0); receipt:='PLANPAY-'||target_payment_id::text;
+ insert into public.payments_ledger(organization_id,account_id,payment_plan_id,amount,payment_amount,payment_date,paid_at,payment_method,status,notes,created_by_email,payment_type,receipt_number,balance_before,balance_after,plan_payment_id,idempotency_key) values(oid,p.account_id,pid,amt,amt,current_date,now(),coalesce(p.payment_method,'Other'),'Completed','Marked paid from Promise Dashboard',coalesce(actor_email,p.created_by_email,'system'),'Payment',receipt,before_bal,after_bal,target_payment_id,receipt) on conflict (receipt_number) where receipt_number is not null and btrim(receipt_number)<>'' do nothing returning id into ledger_id;
+ if ledger_id is null then select id into ledger_id from public.payments_ledger where organization_id=oid and receipt_number=receipt limit 1; return jsonb_build_object('ok',true,'already_paid',true,'ledger_id',ledger_id,'account_id',p.account_id); end if;
+ update public.accounts set current_balance=after_bal,status=case when after_bal<=0 then 'Settled' else status end,disposition=case when after_bal<=0 then 'Settled' else disposition end,updated_at=now() where organization_id=oid and id=p.account_id;
+ update public.payment_plan_payments set amount_paid=amt,paid_date=current_date,payment_date=current_date,paid_at=now(),status='Paid',updated_at=now() where organization_id=oid and id=target_payment_id;
+ if pid is not null then update public.payment_plans set remaining_amount=greatest(coalesce(remaining_amount,total_amount,balance,0)-amt,0),status=case when greatest(coalesce(remaining_amount,total_amount,balance,0)-amt,0)<=0 then 'Paid' else status end,updated_at=now() where organization_id=oid and id=pid; end if;
+ return jsonb_build_object('ok',true,'already_paid',false,'ledger_id',ledger_id,'account_id',p.account_id,'amount',amt,'balance_before',before_bal,'balance_after',after_bal);
+end; $$;
+
+create or replace function public.cpcm_post_manual_ledger_payment(target_account_id uuid,payment_amount numeric,payment_type_text text,payment_method_text text,payment_status_text text,payment_date_value date,receipt_text text,processor_fee_value numeric default 0,notes_text text default null,actor_email text default null)
+returns jsonb language plpgsql security invoker set search_path=public as $$
+declare oid uuid:=private.assert_account_in_current_organization(target_account_id); a public.accounts%rowtype; amt numeric; before_bal numeric; after_bal numeric; ledger_id uuid; effect numeric:=0;
+begin
+ if not private.is_organization_admin(oid) then raise exception 'agency admin only'; end if;
+ if receipt_text is null or btrim(receipt_text)='' then raise exception 'Receipt number required'; end if;
+ select * into a from public.accounts where organization_id=oid and id=target_account_id for update; if not found then raise exception 'Account not found'; end if;
+ select id into ledger_id from public.payments_ledger where organization_id=oid and receipt_number=receipt_text limit 1; if ledger_id is not null then return jsonb_build_object('ok',true,'already_posted',true,'ledger_id',ledger_id,'account_id',target_account_id); end if;
+ amt:=greatest(coalesce(payment_amount,0),0); if amt<=0 then raise exception 'Payment amount must be greater than zero'; end if; before_bal:=greatest(coalesce(a.current_balance,0),0);
+ if lower(coalesce(payment_status_text,''))='completed' then if lower(coalesce(payment_type_text,'')) in ('payment','adjustment credit') then effect:=-amt; elsif lower(coalesce(payment_type_text,'')) in ('reversal','adjustment debit') then effect:=amt; end if; end if;
+ if effect<0 and amt>before_bal+0.01 then raise exception 'Payment exceeds current balance'; end if; after_bal:=greatest(before_bal+effect,0);
+ insert into public.payments_ledger(organization_id,account_id,payment_date,amount,payment_amount,payment_type,payment_method,processor_fee,status,receipt_number,balance_before,balance_after,notes,created_by_email,idempotency_key) values(oid,target_account_id,coalesce(payment_date_value,current_date),amt,amt,coalesce(payment_type_text,'Payment'),coalesce(payment_method_text,'Other'),coalesce(processor_fee_value,0),coalesce(payment_status_text,'Completed'),receipt_text,before_bal,after_bal,notes_text,coalesce(actor_email,'system'),receipt_text) on conflict (receipt_number) where receipt_number is not null and btrim(receipt_number)<>'' do nothing returning id into ledger_id;
+ if ledger_id is null then select id into ledger_id from public.payments_ledger where organization_id=oid and receipt_number=receipt_text limit 1; return jsonb_build_object('ok',true,'already_posted',true,'ledger_id',ledger_id,'account_id',target_account_id); end if;
+ if lower(coalesce(payment_status_text,''))='completed' and effect<>0 then update public.accounts set current_balance=after_bal,status=case when after_bal<=0 then 'Settled' else status end,disposition=case when after_bal<=0 then 'Settled' else disposition end,updated_at=now() where organization_id=oid and id=target_account_id; end if;
+ return jsonb_build_object('ok',true,'already_posted',false,'ledger_id',ledger_id,'account_id',target_account_id,'amount',amt,'balance_before',before_bal,'balance_after',after_bal);
+end; $$;
+
+create or replace function public.cpcm_create_payment_plan(target_account_id uuid,plan_total numeric,plan_frequency text,plan_status text,plan_notes text,plan_start_date date,plan_next_due_date date,regular_payment_amount numeric,schedule jsonb,actor_email text default null)
+returns jsonb language plpgsql security invoker set search_path=public as $$
+declare oid uuid:=private.assert_account_in_current_organization(target_account_id); a public.accounts%rowtype; old_id uuid; pid uuid; item jsonb; due numeric; paid numeric; sched_total numeric:=0; paid_total numeric:=0; remaining numeric; d date; st text;
+begin
+ select * into a from public.accounts where organization_id=oid and id=target_account_id for update; if not found then raise exception 'Account not found'; end if; if coalesce(plan_total,0)<=0 then raise exception 'Plan total must be greater than zero'; end if; if plan_total>coalesce(a.current_balance,0)+0.01 then raise exception 'Plan total exceeds current account balance'; end if; if schedule is null or jsonb_typeof(schedule)<>'array' or jsonb_array_length(schedule)=0 then raise exception 'Payment schedule required'; end if;
+ for item in select * from jsonb_array_elements(schedule) loop due:=greatest(coalesce((item->>'amount_due')::numeric,0),0); paid:=greatest(coalesce((item->>'amount_paid')::numeric,0),0); if paid>due+0.01 then raise exception 'Scheduled payment paid amount exceeds due amount'; end if; sched_total:=sched_total+due; paid_total:=paid_total+paid; end loop; if sched_total>plan_total+0.01 then raise exception 'Scheduled payments exceed plan total'; end if; remaining:=greatest(plan_total-paid_total,0);
+ select id into old_id from public.payment_plans where organization_id=oid and account_id=target_account_id and lower(coalesce(status,'')) not in ('paid','cancelled','replaced') order by created_at desc limit 1 for update; if old_id is not null then update public.payment_plans set status='Replaced',updated_at=now() where organization_id=oid and id=old_id; end if;
+ insert into public.payment_plans(organization_id,account_id,total_amount,starting_balance,remaining_amount,balance,payment_amount,frequency,start_date,next_due_date,status,notes,created_by_email,updated_at) values(oid,target_account_id,plan_total,coalesce(a.current_balance,0),remaining,remaining,coalesce(regular_payment_amount,0),coalesce(plan_frequency,'Custom'),plan_start_date,plan_next_due_date,coalesce(plan_status,'Active'),plan_notes,coalesce(actor_email,'system'),now()) returning id into pid;
+ for item in select * from jsonb_array_elements(schedule) loop due:=greatest(coalesce((item->>'amount_due')::numeric,0),0); paid:=greatest(coalesce((item->>'amount_paid')::numeric,0),0); d:=coalesce((item->>'due_date')::date,current_date); st:=coalesce(nullif(item->>'status',''),case when paid+0.01>=due and due>0 then 'Paid' when paid>0 then 'Partial' else 'Scheduled' end); insert into public.payment_plan_payments(organization_id,plan_id,payment_plan_id,account_id,due_date,scheduled_date,amount_due,amount,payment_amount,amount_paid,paid_date,payment_date,paid_at,status,notes,created_by_email,updated_at) values(oid,pid,pid,target_account_id,d,d,due,due,due,paid,case when paid>0 then coalesce((item->>'paid_date')::date,d) end,case when paid>0 then coalesce((item->>'paid_date')::date,d) end,case when paid>0 then now() end,st,plan_notes,coalesce(actor_email,'system'),now()); end loop;
+ update public.accounts set current_balance=remaining,status=case when lower(coalesce(plan_status,''))='active' then 'Promise to Pay' else status end,disposition='Promise to Pay',updated_at=now() where organization_id=oid and id=target_account_id;
+ return jsonb_build_object('ok',true,'plan_id',pid,'replaced_plan_id',old_id,'remaining_amount',remaining);
+end; $$;
+
+-- END MULTI_TENANT_PHASE21_PAYMENT_PLAN_LEDGER_RPCS.sql
+
+-- ============================================================================
 -- BEGIN MULTI_TENANT_PHASE16_STAGING_READINESS.sql
 -- ============================================================================
 -- Phase 16: staging readiness / fail-closed checks.
