@@ -1230,6 +1230,14 @@ end; $$;
 revoke all on function public.admin_clear_accounts() from public,anon;
 grant execute on function public.admin_clear_accounts() to authenticated;
 
+-- DEMO compatibility: this older demo schema never received the current_app_email helper.
+create or replace function public.current_app_email()
+returns text language sql stable security invoker set search_path='' as $
+  select lower(coalesce(auth.jwt() ->> 'email', ''));
+$;
+revoke all on function public.current_app_email() from public,anon;
+grant execute on function public.current_app_email() to authenticated;
+
 -- SOURCE: MULTI_TENANT_PHASE23_LEGACY_AUTH_HELPERS.sql
 -- Co Pilot Collections — Multi-Tenant SaaS Conversion, Phase 23
 -- Replace legacy owner-email authorization helpers used by older RLS policies.
