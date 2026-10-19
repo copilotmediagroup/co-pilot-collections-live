@@ -143,8 +143,7 @@ declare
     'nmi_transactions','payment_approval_requests','nmi_plan_allocations','nmi_webhook_events',
     'team_messages','team_typing_status','team_presence','ringcentral_call_records','employee_commission_earnings',
     'voice_broadcast_settings','voice_broadcast_campaigns','voice_broadcast_campaign_accounts',
-    'voice_broadcast_calls','voice_broadcast_live_transfers','job_applications','recruiter_applications',
-    'recruiter_candidate_profiles','ai_call_qa','ai_collector_script_profiles','account_communication_compliance',
+    'voice_broadcast_calls','voice_broadcast_live_transfers','ai_call_qa','ai_collector_script_profiles','account_communication_compliance',
     'ai_call_runtime_config','ai_real_call_attempts','ai_conversation_events','ai_caller_id_config','ai_bland_pathway_config'
   ];
 begin
