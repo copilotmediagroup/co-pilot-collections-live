@@ -13,3 +13,8 @@ Example after obtaining a STAGING connection string:
 ```
 
 Never point the staging bundle at LIVE (`bwvufgzbkaymffwxuuzr`). Phase 8 remains a post-isolation cutover step.
+
+## Safe staging execution wrapper
+`CPCM_STAGING_CONNECT.sh` uses the repo-local psql client. It refuses the known LIVE Collections, Usecurity, and Datamarkethouse project refs. By default it only verifies connectivity. Applying the staging bundle additionally requires `CPCM_APPLY_STAGING_BUNDLE=YES`.
+
+For Supabase, copy the exact Session pooler connection string from the staging project's **Connect** panel and replace the password placeholder. Session mode is useful when the Mac/network cannot use the project's direct IPv6 endpoint.
