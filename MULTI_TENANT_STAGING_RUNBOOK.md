@@ -17,10 +17,11 @@
 12. `MULTI_TENANT_PHASE2_TENANT_FENCE_DRAFT.sql`
 13. `MULTI_TENANT_PHASE14_LEGACY_POLICY_CLEANUP.sql`
 14. `MULTI_TENANT_PHASE15_RECRUITING_CLASSIFICATION.sql`
-15. `MULTI_TENANT_PHASE16_STAGING_READINESS.sql`
-16. `MULTI_TENANT_PHASE7_ISOLATION_ASSERTIONS.sql`
-17. Perform JWT/REST Agency A vs Agency B attack tests.
-18. Only after all tests pass: `MULTI_TENANT_PHASE8_REMOVE_LEGACY_DEFAULTS.sql`.
+15. `MULTI_TENANT_PHASE17_MESSENGER_STAFF_RPCS.sql`
+16. `MULTI_TENANT_PHASE16_STAGING_READINESS.sql`
+17. `MULTI_TENANT_PHASE7_ISOLATION_ASSERTIONS.sql`
+18. Perform JWT/REST Agency A vs Agency B attack tests.
+19. Only after all tests pass: `MULTI_TENANT_PHASE8_REMOVE_LEGACY_DEFAULTS.sql`.
 
 ## Hard stop conditions
 Stop immediately on any SQL error, duplicate/ambiguous active membership, missing tenant policy, cross-tenant row visibility, forged organization ownership, broken client portfolio restriction, broken collector restriction, or public recruiting data visible to an agency.
