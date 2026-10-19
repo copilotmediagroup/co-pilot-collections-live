@@ -66,7 +66,17 @@ Deno.serve(async (req: Request) => {
     const supabaseUrl = Deno.env.get("SUPABASE_URL");
     if (!supabaseUrl) throw new Error("SUPABASE_URL is unavailable.");
     const admin = createClient(supabaseUrl, envSecretKey(), { auth: { persistSession: false, autoRefreshToken: false } });
+    let eventOrganizationId: string | null = null;
+    let matchedTx: any = null;
+    if (gatewayTransactionId) {
+      const { data: candidates, error: txLookupError } = await admin.from("nmi_transactions").select("*").eq("gateway_transaction_id", gatewayTransactionId).order("created_at", { ascending: false }).limit(2);
+      if (txLookupError) throw txLookupError;
+      if ((candidates || []).length > 1) return json({ error: "Ambiguous NMI transaction ownership." }, 409);
+      matchedTx = (candidates || [])[0] || null;
+      eventOrganizationId = matchedTx?.organization_id || null;
+    }
     const { data: saved, error: saveError } = await admin.from("nmi_webhook_events").insert({
+      organization_id: eventOrganizationId,
       event_id: eventId,
       event_type: eventType,
       gateway_transaction_id: gatewayTransactionId || null,
@@ -81,7 +91,7 @@ Deno.serve(async (req: Request) => {
     let processingError = "";
     try {
       if (gatewayTransactionId && isSuccessEvent(eventType, body)) {
-        const { data: tx } = await admin.from("nmi_transactions").select("*").eq("gateway_transaction_id", gatewayTransactionId).order("created_at", { ascending: false }).limit(1).maybeSingle();
+        const tx = matchedTx;
         if (tx && !tx.ledger_id && ["gateway_approved", "gateway_approved_needs_reconciliation", "processing", "pending"].includes(tx.status)) {
           if (tx.action === "sale") {
             const { data: finalized, error } = await admin.rpc("cpcm_nmi_finalize_sale", {
@@ -104,7 +114,7 @@ Deno.serve(async (req: Request) => {
                 gateway_transaction_id: gatewayTransactionId,
                 decision_notes: "Reconciled from verified NMI webhook.",
                 updated_at: new Date().toISOString(),
-              }).eq("id", tx.approval_request_id);
+              }).eq("organization_id", tx.organization_id).eq("id", tx.approval_request_id);
             }
             processingStatus = "sale_reconciled";
           } else if (tx.action === "refund" || tx.action === "void") {
@@ -134,7 +144,7 @@ Deno.serve(async (req: Request) => {
       processing_status: processingStatus,
       processing_error: processingError || null,
       processed_at: new Date().toISOString(),
-    }).eq("id", saved.id);
+    }).eq("organization_id", saved.organization_id).eq("id", saved.id);
 
     return json({ received: true, eventId, processingStatus });
   } catch (error) {
