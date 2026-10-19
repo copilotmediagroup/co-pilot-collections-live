@@ -6,8 +6,8 @@ update public.organization_members set is_active=false where auth_user_id=:'a_us
 insert into public.organization_members(organization_id,auth_user_id,role,is_active) values ('10000000-0000-4000-8000-000000000001',:'a_user'::uuid,'collector',true) on conflict(organization_id,auth_user_id) do update set role='collector',is_active=true;
 update public.app_users set organization_id='10000000-0000-4000-8000-000000000001'::uuid,role='employee',is_active=true,is_approved=true,approval_status='approved' where lower(email)=lower(:'a_email');
 with r as (select id,row_number() over(order by id) rn from public.accounts limit 2) update public.accounts a set organization_id='10000000-0000-4000-8000-000000000001'::uuid,assigned_to_email=case when r.rn=1 then :'a_email' else 'other-collector@example.invalid' end from r where a.id=r.id;
-select id::text assigned_account from public.accounts where lower(assigned_to_email)=lower(:'a_email') limit 1 \gset
-select id::text other_account from public.accounts where assigned_to_email='other-collector@example.invalid' limit 1 \gset
+select id::text assigned_account from public.accounts where organization_id='10000000-0000-4000-8000-000000000001'::uuid and lower(assigned_to_email)=lower(:'a_email') limit 1 \gset
+select id::text other_account from public.accounts where organization_id='10000000-0000-4000-8000-000000000001'::uuid and assigned_to_email='other-collector@example.invalid' limit 1 \gset
 select set_config('cpcm.test_assigned',:'assigned_account',true),set_config('cpcm.test_other',:'other_account',true);
 set local role authenticated;
 select set_config('request.jwt.claims',json_build_object('sub',:'a_user','role','authenticated','email',:'a_email')::text,true);
