@@ -60,6 +60,16 @@ serve(async (req) => {
     const authUser = await userResponse.json().catch(() => ({}));
     const authEmail = String(authUser?.email ?? "").trim().toLowerCase();
 
+    // Resolve tenant from the validated auth user. Never trust organization_id supplied by the client.
+    const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+    if (!serviceRoleKey) return json({ error: "Server tenant lookup unavailable" }, 500);
+    const serviceHeaders={apikey:serviceRoleKey,Authorization:`Bearer ${serviceRoleKey}`};
+    const memberResponse=await fetch(`${supabaseUrl}/rest/v1/organization_members?auth_user_id=eq.${encodeURIComponent(String(authUser?.id||""))}&is_active=eq.true&select=organization_id,role&limit=2`,{headers:serviceHeaders});
+    const memberRows=await memberResponse.json().catch(()=>[]);
+    if(!memberResponse.ok||!Array.isArray(memberRows)||memberRows.length!==1||!memberRows[0]?.organization_id)return json({error:"Active organization membership required"},403);
+    const organizationId=String(memberRows[0].organization_id);
+    const orgFilter=`organization_id=eq.${encodeURIComponent(organizationId)}`;
+
     const apiKey = Deno.env.get("BLAND_API_KEY");
     if (!apiKey) return json({ connected: false, error: "BLAND_API_KEY is not configured" }, 503);
 
@@ -67,21 +77,23 @@ serve(async (req) => {
     try { body = await req.json(); } catch { /* health is the safe default */ }
     const action = typeof body.action === "string" ? body.action : "health";
     const adminOnlyActions = new Set(["manual_test", "collector_sandbox", "sandbox_result", "prepare_real_call", "authorize_real_call", "real_call_dry_run", "real_call_send", "pipeline_test", "pathway_probe"]);
-    if (adminOnlyActions.has(action) && authEmail !== "afinch2678@gmail.com") {
-      return json({ error: "Admin authorization required" }, 403);
+    const memberRole=String(memberRows[0]?.role||"");
+    const isTenantAdmin=memberRole==="agency_admin"||memberRole==="admin";
+    if (adminOnlyActions.has(action) && !isTenantAdmin) {
+      return json({ error: "Agency admin authorization required" }, 403);
     }
 
     const allowedTestNumber = "+13322590894";
 
     // Future real-account calling must pass this server-side preflight. No real dial action is enabled yet.
     if (action === "real_call_preflight") {
-      if (authEmail !== "afinch2678@gmail.com") return json({ error: "Admin authorization required" }, 403);
+      if (!isTenantAdmin) return json({ error: "Agency admin authorization required" }, 403);
       const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
       if (!serviceKey) return json({ error: "Server account lookup unavailable" }, 500);
       const accountId=String(body.account_id ?? "").trim(), requested=digits10(body.phone_number);
       if (!accountId || requested.length!==10) return json({ error: "Account and valid phone are required" }, 400);
       const select="id,state,status,disposition,do_not_call,cease_and_desist,disputed_flag,bankruptcy_flag,deceased_flag,attorney_represented,wrong_number_flag,needs_manager_review,compliance_call_start,compliance_call_end,max_calls_per_day,compliance_time_zone,phone1,phone1_status,phone2,phone2_status,phone3,phone3_status,phone4,phone4_status,phone5,phone5_status,phone6,phone6_status,phone7,phone7_status,phone8,phone8_status,phone9,phone9_status,phone10,phone10_status";
-      const ar=await fetch(`${supabaseUrl}/rest/v1/accounts?id=eq.${encodeURIComponent(accountId)}&select=${select}&limit=1`,{headers:{apikey:serviceKey,Authorization:`Bearer ${serviceKey}`}});
+      const ar=await fetch(`${supabaseUrl}/rest/v1/accounts?id=eq.${encodeURIComponent(accountId)}&${orgFilter}&select=${select}&limit=1`,{headers:{apikey:serviceKey,Authorization:`Bearer ${serviceKey}`}});
       const rows=await ar.json().catch(()=>[]), a=Array.isArray(rows)?rows[0]:null;
       if(!ar.ok||!a)return json({error:"Selected account could not be verified"},404);
       const reasons:string[]=[];
@@ -105,18 +117,18 @@ serve(async (req) => {
       }
       const max=Math.max(1,Number(a.max_calls_per_day||2));
       const since=new Date(Date.now()-24*60*60*1000).toISOString();
-      const cr=await fetch(`${supabaseUrl}/rest/v1/call_results?account_id=eq.${encodeURIComponent(accountId)}&direction=eq.outbound&dialed_at=not.is.null&created_at=gte.${encodeURIComponent(since)}&select=id`,{headers:{apikey:serviceKey,Authorization:`Bearer ${serviceKey}`}});
+      const cr=await fetch(`${supabaseUrl}/rest/v1/call_results?account_id=eq.${encodeURIComponent(accountId)}&${orgFilter}&direction=eq.outbound&dialed_at=not.is.null&created_at=gte.${encodeURIComponent(since)}&select=id`,{headers:{apikey:serviceKey,Authorization:`Bearer ${serviceKey}`}});
       const calls=await cr.json().catch(()=>[]);
       if(!cr.ok)reasons.push("Daily call history could not be verified");
       else if(Array.isArray(calls)&&calls.length>=max)reasons.push(`Daily call limit reached (${calls.length}/${max})`);
-      const cmr=await fetch(`${supabaseUrl}/rest/v1/account_communication_compliance?account_id=eq.${encodeURIComponent(accountId)}&select=first_debt_communication_at,validation_notice_sent_at,validation_notice_method,validation_notice_source&limit=1`,{headers:{apikey:serviceKey,Authorization:`Bearer ${serviceKey}`}});
+      const cmr=await fetch(`${supabaseUrl}/rest/v1/account_communication_compliance?account_id=eq.${encodeURIComponent(accountId)}&${orgFilter}&select=first_debt_communication_at,validation_notice_sent_at,validation_notice_method,validation_notice_source&limit=1`,{headers:{apikey:serviceKey,Authorization:`Bearer ${serviceKey}`}});
       const cmRows=await cmr.json().catch(()=>[]), comm=Array.isArray(cmRows)?cmRows[0]:null;
       if(!cmr.ok)reasons.push("Communication compliance history could not be verified");
       else if(!comm)reasons.push("First-contact / validation-notice state is unknown");
       else if(!comm.validation_notice_sent_at)reasons.push("Validation notice is not recorded as sent");
       const communicationType=comm?.first_debt_communication_at?"subsequent":"initial";
 
-      const sr=await fetch(`${supabaseUrl}/rest/v1/ai_collector_script_profiles?approved_for_real_calls=eq.true&select=id,profile_name,version,identity_prompt,initial_disclosure,subsequent_disclosure,dispute_instruction,dnc_instruction,settlement_instruction,payment_instruction,human_escalation_instruction,conversation_policy&order=updated_at.desc&limit=1`,{headers:{apikey:serviceKey,Authorization:`Bearer ${serviceKey}`}});
+      const sr=await fetch(`${supabaseUrl}/rest/v1/ai_collector_script_profiles?${orgFilter}&approved_for_real_calls=eq.true&select=id,profile_name,version,identity_prompt,initial_disclosure,subsequent_disclosure,dispute_instruction,dnc_instruction,settlement_instruction,payment_instruction,human_escalation_instruction,conversation_policy&order=updated_at.desc&limit=1`,{headers:{apikey:serviceKey,Authorization:`Bearer ${serviceKey}`}});
       const scripts=await sr.json().catch(()=>[]), script=Array.isArray(scripts)?scripts[0]:null;
       if(!sr.ok)reasons.push("AI script approval could not be verified");
       else if(!script)reasons.push("No AI collector script is approved for real calls");
@@ -131,7 +143,7 @@ serve(async (req) => {
       const accountId=String(body.account_id??"").trim(), requested=digits10(body.phone_number);
       if(!accountId||requested.length!==10)return json({error:"Account and valid phone are required"},400);
       const select="id,first_name,original_creditor,type_of_debt,current_balance,state,status,disposition,do_not_call,cease_and_desist,disputed_flag,bankruptcy_flag,deceased_flag,attorney_represented,wrong_number_flag,needs_manager_review,compliance_call_start,compliance_call_end,max_calls_per_day,compliance_time_zone,phone1,phone1_status,phone2,phone2_status,phone3,phone3_status,phone4,phone4_status,phone5,phone5_status,phone6,phone6_status,phone7,phone7_status,phone8,phone8_status,phone9,phone9_status,phone10,phone10_status";
-      const ar=await fetch(`${supabaseUrl}/rest/v1/accounts?id=eq.${encodeURIComponent(accountId)}&select=${select}&limit=1`,{headers:{apikey:serviceKey,Authorization:`Bearer ${serviceKey}`}});
+      const ar=await fetch(`${supabaseUrl}/rest/v1/accounts?id=eq.${encodeURIComponent(accountId)}&${orgFilter}&select=${select}&limit=1`,{headers:{apikey:serviceKey,Authorization:`Bearer ${serviceKey}`}});
       const rows=await ar.json().catch(()=>[]),a=Array.isArray(rows)?rows[0]:null;if(!ar.ok||!a)return json({error:"Selected account could not be verified"},404);
       const reasons:string[]=[];
       [[a.do_not_call,"Do Not Call"],[a.cease_and_desist,"Cease & Desist"],[a.disputed_flag,"Disputed / Frozen"],[a.bankruptcy_flag,"Bankruptcy"],[a.deceased_flag,"Deceased"],[a.attorney_represented,"Attorney Represented"],[a.wrong_number_flag,"Wrong Number"]].forEach(([v,l])=>{if(v===true)reasons.push(String(l))});
@@ -144,12 +156,12 @@ serve(async (req) => {
       const start=Math.max(480,timeMinutes(a.compliance_call_start,480)),end=Math.min(1260,timeMinutes(a.compliance_call_end,1260));
       if(!zones.length)reasons.push("Compliance timezone is unknown");else if(start>=end||zones.some(z=>{try{const n=minuteInZone(z);return n<start||n>=end}catch{return true}}))reasons.push("Outside permitted call window");
       const max=Math.max(1,Number(a.max_calls_per_day||2)),since=new Date(Date.now()-86400000).toISOString();
-      const cr=await fetch(`${supabaseUrl}/rest/v1/call_results?account_id=eq.${encodeURIComponent(accountId)}&direction=eq.outbound&dialed_at=not.is.null&created_at=gte.${encodeURIComponent(since)}&select=id`,{headers:{apikey:serviceKey,Authorization:`Bearer ${serviceKey}`}});
+      const cr=await fetch(`${supabaseUrl}/rest/v1/call_results?account_id=eq.${encodeURIComponent(accountId)}&${orgFilter}&direction=eq.outbound&dialed_at=not.is.null&created_at=gte.${encodeURIComponent(since)}&select=id`,{headers:{apikey:serviceKey,Authorization:`Bearer ${serviceKey}`}});
       const calls=await cr.json().catch(()=>[]);if(!cr.ok)reasons.push("Daily call history could not be verified");else if(Array.isArray(calls)&&calls.length>=max)reasons.push(`Daily call limit reached (${calls.length}/${max})`);
-      const cmr=await fetch(`${supabaseUrl}/rest/v1/account_communication_compliance?account_id=eq.${encodeURIComponent(accountId)}&select=first_debt_communication_at,validation_notice_sent_at,validation_notice_method,validation_notice_source&limit=1`,{headers:{apikey:serviceKey,Authorization:`Bearer ${serviceKey}`}});
+      const cmr=await fetch(`${supabaseUrl}/rest/v1/account_communication_compliance?account_id=eq.${encodeURIComponent(accountId)}&${orgFilter}&select=first_debt_communication_at,validation_notice_sent_at,validation_notice_method,validation_notice_source&limit=1`,{headers:{apikey:serviceKey,Authorization:`Bearer ${serviceKey}`}});
       const cmRows=await cmr.json().catch(()=>[]),comm=Array.isArray(cmRows)?cmRows[0]:null;if(!cmr.ok)reasons.push("Communication compliance history could not be verified");else if(!comm)reasons.push("First-contact / validation-notice state is unknown");else if(!comm.validation_notice_sent_at)reasons.push("Validation notice is not recorded as sent");
       const communicationType=comm?.first_debt_communication_at?"subsequent":"initial";
-      const sr=await fetch(`${supabaseUrl}/rest/v1/ai_collector_script_profiles?approved_for_real_calls=eq.true&select=*&order=updated_at.desc&limit=1`,{headers:{apikey:serviceKey,Authorization:`Bearer ${serviceKey}`}});
+      const sr=await fetch(`${supabaseUrl}/rest/v1/ai_collector_script_profiles?${orgFilter}&approved_for_real_calls=eq.true&select=*&order=updated_at.desc&limit=1`,{headers:{apikey:serviceKey,Authorization:`Bearer ${serviceKey}`}});
       const scripts=await sr.json().catch(()=>[]),script=Array.isArray(scripts)?scripts[0]:null;if(!sr.ok||!script)reasons.push("No approved AI collector script is available");
       if(reasons.length)return json({ok:false,prepared:false,reasons:[...new Set(reasons)]},409);
       const identityVerificationToken=crypto.randomUUID();
@@ -166,10 +178,10 @@ serve(async (req) => {
       const serviceKey=Deno.env.get("SUPABASE_SERVICE_ROLE_KEY"),attemptId=String(body.attempt_id??"").trim();
       if(!serviceKey||!/^[0-9a-f-]{36}$/i.test(attemptId))return json({error:"Valid prepared attempt is required"},400);
       const hr={apikey:serviceKey,Authorization:`Bearer ${serviceKey}`};
-      const rr=await fetch(`${supabaseUrl}/rest/v1/ai_real_call_attempts?id=eq.${encodeURIComponent(attemptId)}&select=*&limit=1`,{headers:hr});
+      const rr=await fetch(`${supabaseUrl}/rest/v1/ai_real_call_attempts?id=eq.${encodeURIComponent(attemptId)}&${orgFilter}&select=*&limit=1`,{headers:hr});
       const rws=await rr.json().catch(()=>[]),attempt=Array.isArray(rws)?rws[0]:null;if(!rr.ok||!attempt)return json({error:"Prepared attempt not found"},404);
       if(!["prepared","authorized"].includes(String(attempt.status)))return json({error:"Attempt is not authorizable",status:attempt.status},409);
-      const ar=await fetch(`${supabaseUrl}/rest/v1/accounts?id=eq.${encodeURIComponent(attempt.account_id)}&select=id,state,status,disposition,do_not_call,cease_and_desist,disputed_flag,bankruptcy_flag,deceased_flag,attorney_represented,wrong_number_flag,needs_manager_review,compliance_call_start,compliance_call_end,max_calls_per_day,compliance_time_zone,phone1,phone1_status,phone2,phone2_status,phone3,phone3_status,phone4,phone4_status,phone5,phone5_status,phone6,phone6_status,phone7,phone7_status,phone8,phone8_status,phone9,phone9_status,phone10,phone10_status&limit=1`,{headers:hr});
+      const ar=await fetch(`${supabaseUrl}/rest/v1/accounts?id=eq.${encodeURIComponent(attempt.account_id)}&${orgFilter}&select=id,state,status,disposition,do_not_call,cease_and_desist,disputed_flag,bankruptcy_flag,deceased_flag,attorney_represented,wrong_number_flag,needs_manager_review,compliance_call_start,compliance_call_end,max_calls_per_day,compliance_time_zone,phone1,phone1_status,phone2,phone2_status,phone3,phone3_status,phone4,phone4_status,phone5,phone5_status,phone6,phone6_status,phone7,phone7_status,phone8,phone8_status,phone9,phone9_status,phone10,phone10_status&limit=1`,{headers:hr});
       const ars=await ar.json().catch(()=>[]),acct=Array.isArray(ars)?ars[0]:null;if(!ar.ok||!acct)return json({error:"Account revalidation failed"},409);
       const reasons:string[]=[];[[acct.do_not_call,"Do Not Call"],[acct.cease_and_desist,"Cease & Desist"],[acct.disputed_flag,"Disputed / Frozen"],[acct.bankruptcy_flag,"Bankruptcy"],[acct.deceased_flag,"Deceased"],[acct.attorney_represented,"Attorney Represented"],[acct.wrong_number_flag,"Wrong Number"]].forEach(([v,l])=>{if(v===true)reasons.push(String(l))});
       if(acct.needs_manager_review===true)reasons.push("Manager review required");
@@ -179,9 +191,9 @@ serve(async (req) => {
       const zones=String(acct.compliance_time_zone??"").trim()?[String(acct.compliance_time_zone).trim()]:(stateZones[String(acct.state??"").trim().toUpperCase()]||[]),start=Math.max(480,timeMinutes(acct.compliance_call_start,480)),end=Math.min(1260,timeMinutes(acct.compliance_call_end,1260));
       if(!zones.length||start>=end||zones.some(z=>{try{const n=minuteInZone(z);return n<start||n>=end}catch{return true}}))reasons.push("Outside permitted call window");
       const max=Math.max(1,Number(acct.max_calls_per_day||2)),since=new Date(Date.now()-86400000).toISOString();
-      const cr=await fetch(`${supabaseUrl}/rest/v1/call_results?account_id=eq.${encodeURIComponent(attempt.account_id)}&direction=eq.Outbound&created_at=gte.${encodeURIComponent(since)}&select=id,attempt_id`,{headers:hr});const calls=await cr.json().catch(()=>[]);
+      const cr=await fetch(`${supabaseUrl}/rest/v1/call_results?account_id=eq.${encodeURIComponent(attempt.account_id)}&${orgFilter}&direction=eq.Outbound&created_at=gte.${encodeURIComponent(since)}&select=id,attempt_id`,{headers:hr});const calls=await cr.json().catch(()=>[]);
       const otherCalls=Array.isArray(calls)?calls.filter((x:any)=>String(x.attempt_id||"")!==attemptId):[];if(!cr.ok)reasons.push("Daily call history could not be revalidated");else if(otherCalls.length>=max)reasons.push(`Daily call limit reached (${otherCalls.length}/${max})`);
-      const sr=await fetch(`${supabaseUrl}/rest/v1/ai_collector_script_profiles?id=eq.${encodeURIComponent(attempt.script_profile_id)}&approved_for_real_calls=eq.true&select=id,version&limit=1`,{headers:hr});const ss=await sr.json().catch(()=>[]),script=Array.isArray(ss)?ss[0]:null;if(!sr.ok||!script||Number(script.version)!==Number(attempt.script_version))reasons.push("Prepared script version is no longer approved/current");
+      const sr=await fetch(`${supabaseUrl}/rest/v1/ai_collector_script_profiles?id=eq.${encodeURIComponent(attempt.script_profile_id)}&${orgFilter}&approved_for_real_calls=eq.true&select=id,version&limit=1`,{headers:hr});const ss=await sr.json().catch(()=>[]),script=Array.isArray(ss)?ss[0]:null;if(!sr.ok||!script||Number(script.version)!==Number(attempt.script_version))reasons.push("Prepared script version is no longer approved/current");
       if(reasons.length)return json({ok:false,authorized:false,reasons:[...new Set(reasons)]},409);
       const rpc=await fetch(`${supabaseUrl}/rest/v1/rpc/cpcm_authorize_ai_call_attempt`,{method:"POST",headers:{...hr,"Content-Type":"application/json"},body:JSON.stringify({p_attempt_id:attemptId,p_admin_email:authEmail})});
       const out=await rpc.json().catch(()=>[]),row=Array.isArray(out)?out[0]:null;if(!rpc.ok||!row)return json({error:"Atomic authorization failed"},500);
@@ -192,10 +204,10 @@ serve(async (req) => {
       const serviceKey=Deno.env.get("SUPABASE_SERVICE_ROLE_KEY"),attemptId=String(body.attempt_id??"").trim();
       if(!serviceKey||!/^[0-9a-f-]{36}$/i.test(attemptId))return json({error:"Valid authorized attempt is required"},400);
       const hr={apikey:serviceKey,Authorization:`Bearer ${serviceKey}`};
-      const rr=await fetch(`${supabaseUrl}/rest/v1/ai_real_call_attempts?id=eq.${encodeURIComponent(attemptId)}&select=*&limit=1`,{headers:hr});
+      const rr=await fetch(`${supabaseUrl}/rest/v1/ai_real_call_attempts?id=eq.${encodeURIComponent(attemptId)}&${orgFilter}&select=*&limit=1`,{headers:hr});
       const rows=await rr.json().catch(()=>[]),attempt=Array.isArray(rows)?rows[0]:null;if(!rr.ok||!attempt)return json({error:"Authorized attempt not found"},404);
       if(String(attempt.status)!=="authorized")return json({error:"Attempt must be authorized before dry run",status:attempt.status},409);
-      const vr=await fetch(`${supabaseUrl}/rest/v1/call_results?attempt_id=eq.${encodeURIComponent(attemptId)}&attempt_status=eq.authorized&select=id&limit=1`,{headers:hr});
+      const vr=await fetch(`${supabaseUrl}/rest/v1/call_results?attempt_id=eq.${encodeURIComponent(attemptId)}&${orgFilter}&attempt_status=eq.authorized&select=id&limit=1`,{headers:hr});
       const vrows=await vr.json().catch(()=>[]);if(!vr.ok||!Array.isArray(vrows)||!vrows[0])return json({error:"Atomic authorization reservation is missing"},409);
       const p=attempt.payload_snapshot||{},s=attempt.script_snapshot||{};
       const firstName=String(p.first_name||"").trim(),creditor=String(p.original_creditor||"").trim(),debtType=String(p.debt_type||"").trim(),balance=Number(p.current_balance||0),destination=String(p.destination_phone||"");
@@ -226,23 +238,23 @@ serve(async (req) => {
       const serviceKey=Deno.env.get("SUPABASE_SERVICE_ROLE_KEY"),attemptId=String(body.attempt_id??"").trim();
       if(!serviceKey||!/^[0-9a-f-]{36}$/i.test(attemptId))return json({error:"Valid authorized attempt is required"},400);
       const hr={apikey:serviceKey,Authorization:`Bearer ${serviceKey}`};
-      const cfg=await fetch(`${supabaseUrl}/rest/v1/ai_call_runtime_config?id=eq.true&select=real_provider_send_enabled&limit=1`,{headers:hr});
+      const cfg=await fetch(`${supabaseUrl}/rest/v1/ai_call_runtime_config?id=eq.true&${orgFilter}&select=real_provider_send_enabled&limit=1`,{headers:hr});
       const cfgRows=await cfg.json().catch(()=>[]),enabled=cfg.ok&&Array.isArray(cfgRows)&&cfgRows[0]?.real_provider_send_enabled===true;
       if(!enabled)return json({ok:false,sent:false,provider_send_enabled:false,error:"Real provider send is disabled by the server kill switch"},423);
-      const cidr=await fetch(`${supabaseUrl}/rest/v1/ai_caller_id_config?id=eq.true&select=phone_number,verification_status,enabled_for_real_calls&limit=1`,{headers:hr});
+      const cidr=await fetch(`${supabaseUrl}/rest/v1/ai_caller_id_config?id=eq.true&${orgFilter}&select=phone_number,verification_status,enabled_for_real_calls&limit=1`,{headers:hr});
       const cidRows=await cidr.json().catch(()=>[]),callerCfg=Array.isArray(cidRows)?cidRows[0]:null;
       if(!cidr.ok||!callerCfg||callerCfg.verification_status!=="verified"||callerCfg.enabled_for_real_calls!==true||digits10(callerCfg.phone_number).length!==10)return json({ok:false,sent:false,error:"Verified production caller ID is not enabled"},423);
       const callerId=String(callerCfg.phone_number);
-      const pcr=await fetch(`${supabaseUrl}/rest/v1/ai_bland_pathway_config?id=eq.true&select=pathway_id,verification_status,enabled_for_real_calls&limit=1`,{headers:hr});
+      const pcr=await fetch(`${supabaseUrl}/rest/v1/ai_bland_pathway_config?id=eq.true&${orgFilter}&select=pathway_id,verification_status,enabled_for_real_calls&limit=1`,{headers:hr});
       const pcRows=await pcr.json().catch(()=>[]),pathwayCfg=Array.isArray(pcRows)?pcRows[0]:null;
       if(!pcr.ok||!pathwayCfg||pathwayCfg.verification_status!=="synthetic_verified"||pathwayCfg.enabled_for_real_calls!==true||!String(pathwayCfg.pathway_id||"").trim())return json({ok:false,sent:false,error:"Verified Bland collector Pathway is not enabled"},423);
       return json({ok:false,sent:false,error:"Legacy static-task real-call send is permanently blocked. Pathway invocation must replace it before production calling."},423);
-      const rr=await fetch(`${supabaseUrl}/rest/v1/ai_real_call_attempts?id=eq.${encodeURIComponent(attemptId)}&select=*&limit=1`,{headers:hr});
+      const rr=await fetch(`${supabaseUrl}/rest/v1/ai_real_call_attempts?id=eq.${encodeURIComponent(attemptId)}&${orgFilter}&select=*&limit=1`,{headers:hr});
       const rows=await rr.json().catch(()=>[]),attempt=Array.isArray(rows)?rows[0]:null;if(!rr.ok||!attempt)return json({error:"Authorized attempt not found"},404);
       if(String(attempt.status)==="sent"&&attempt.provider_call_id)return json({ok:true,sent:true,idempotent:true,attempt_id:attemptId,provider_call_id:attempt.provider_call_id});
       if(String(attempt.status)!=="authorized")return json({error:"Attempt is not sendable",status:attempt.status},409);
       const sendReasons:string[]=[];
-      const sar=await fetch(`${supabaseUrl}/rest/v1/accounts?id=eq.${encodeURIComponent(attempt.account_id)}&select=id,state,status,disposition,do_not_call,cease_and_desist,disputed_flag,bankruptcy_flag,deceased_flag,attorney_represented,wrong_number_flag,needs_manager_review,compliance_call_start,compliance_call_end,max_calls_per_day,compliance_time_zone,phone1,phone1_status,phone2,phone2_status,phone3,phone3_status,phone4,phone4_status,phone5,phone5_status,phone6,phone6_status,phone7,phone7_status,phone8,phone8_status,phone9,phone9_status,phone10,phone10_status&limit=1`,{headers:hr});
+      const sar=await fetch(`${supabaseUrl}/rest/v1/accounts?id=eq.${encodeURIComponent(attempt.account_id)}&${orgFilter}&select=id,state,status,disposition,do_not_call,cease_and_desist,disputed_flag,bankruptcy_flag,deceased_flag,attorney_represented,wrong_number_flag,needs_manager_review,compliance_call_start,compliance_call_end,max_calls_per_day,compliance_time_zone,phone1,phone1_status,phone2,phone2_status,phone3,phone3_status,phone4,phone4_status,phone5,phone5_status,phone6,phone6_status,phone7,phone7_status,phone8,phone8_status,phone9,phone9_status,phone10,phone10_status&limit=1`,{headers:hr});
       const sars=await sar.json().catch(()=>[]),current=Array.isArray(sars)?sars[0]:null;
       if(!sar.ok||!current)sendReasons.push("Account could not be revalidated immediately before send");
       if(current){
@@ -257,11 +269,11 @@ serve(async (req) => {
         const start=Math.max(480,timeMinutes(current.compliance_call_start,480)),end=Math.min(1260,timeMinutes(current.compliance_call_end,1260));
         if(!zones.length||start>=end||zones.some(z=>{try{const n=minuteInZone(z);return n<start||n>=end}catch{return true}}))sendReasons.push("Outside permitted call window");
         const max=Math.max(1,Number(current.max_calls_per_day||2)),since=new Date(Date.now()-86400000).toISOString();
-        const scr=await fetch(`${supabaseUrl}/rest/v1/call_results?account_id=eq.${encodeURIComponent(attempt.account_id)}&direction=eq.Outbound&dialed_at=not.is.null&created_at=gte.${encodeURIComponent(since)}&select=id,attempt_id`,{headers:hr});
+        const scr=await fetch(`${supabaseUrl}/rest/v1/call_results?account_id=eq.${encodeURIComponent(attempt.account_id)}&${orgFilter}&direction=eq.Outbound&dialed_at=not.is.null&created_at=gte.${encodeURIComponent(since)}&select=id,attempt_id`,{headers:hr});
         const scalls=await scr.json().catch(()=>[]),other=Array.isArray(scalls)?scalls.filter((x:any)=>String(x.attempt_id||"")!==attemptId):[];
         if(!scr.ok)sendReasons.push("Daily call history could not be revalidated immediately before send");else if(other.length>=max)sendReasons.push(`Daily call limit reached (${other.length}/${max})`);
       }
-      const ssr=await fetch(`${supabaseUrl}/rest/v1/ai_collector_script_profiles?id=eq.${encodeURIComponent(attempt.script_profile_id)}&approved_for_real_calls=eq.true&select=id,version&limit=1`,{headers:hr});
+      const ssr=await fetch(`${supabaseUrl}/rest/v1/ai_collector_script_profiles?id=eq.${encodeURIComponent(attempt.script_profile_id)}&${orgFilter}&approved_for_real_calls=eq.true&select=id,version&limit=1`,{headers:hr});
       const ssrows=await ssr.json().catch(()=>[]),currentScript=Array.isArray(ssrows)?ssrows[0]:null;
       if(!ssr.ok||!currentScript||Number(currentScript.version)!==Number(attempt.script_version))sendReasons.push("Prepared script version is no longer approved/current");
       if(sendReasons.length)return json({ok:false,sent:false,reasons:[...new Set(sendReasons)]},409);
@@ -312,7 +324,7 @@ serve(async (req) => {
       if(requested!=="3322590894"&&requested!=="13322590894")return json({error:"Pipeline test destination is not authorized"},403);
       const serviceKey=Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");if(!serviceKey)return json({error:"Service configuration unavailable"},503);
       const hr={apikey:serviceKey,Authorization:`Bearer ${serviceKey}`};
-      const qa=await fetch(`${supabaseUrl}/rest/v1/ai_call_qa`,{method:"POST",headers:{...hr,"Content-Type":"application/json","Prefer":"return=representation"},body:JSON.stringify({provider:"bland",mode:"pipeline_test",destination_last4:"0894",status:"preparing",completed:false,created_by_email:authEmail})});
+      const qa=await fetch(`${supabaseUrl}/rest/v1/ai_call_qa`,{method:"POST",headers:{...hr,"Content-Type":"application/json","Prefer":"return=representation"},body:JSON.stringify({provider:"bland",mode:"pipeline_test",destination_last4:"0894",status:"preparing",completed:false,created_by_email:authEmail,organization_id:organizationId})});
       const qrows=await qa.json().catch(()=>[]),q=Array.isArray(qrows)?qrows[0]:null;if(!qa.ok||!q)return json({error:"Could not create pipeline QA record"},500);
       const webhook=`${supabaseUrl}/functions/v1/bland-test-status`;
       const providerPayload={phone_number:allowedTestNumber,task:"This is a private Co Pilot integration pipeline test to an authorized test phone. State clearly that this is a system test. Do not discuss any real debt, consumer, creditor, balance, payment, settlement, or collection activity. Ask the recipient to say a short test phrase, acknowledge it, then end the call.",first_sentence:"Hello, this is the authorized Co Pilot AI pipeline test.",wait_for_greeting:true,max_duration:2,record:false,webhook,metadata:{source:"cpcm_pipeline_test",qa_id:q.id}};
@@ -328,18 +340,18 @@ serve(async (req) => {
       if(requested!=="3322590894"&&requested!=="13322590894")return json({error:"Sandbox number not authorized"},403);
       const serviceKey=Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");if(!serviceKey)return json({error:"Service configuration unavailable"},503);
       const hr={apikey:serviceKey,Authorization:`Bearer ${serviceKey}`};
-      const pc=await fetch(`${supabaseUrl}/rest/v1/ai_bland_pathway_config?id=eq.true&select=pathway_id,verification_status&limit=1`,{headers:hr});
+      const pc=await fetch(`${supabaseUrl}/rest/v1/ai_bland_pathway_config?id=eq.true&${orgFilter}&select=pathway_id,verification_status&limit=1`,{headers:hr});
       const pcs=await pc.json().catch(()=>[]),cfg=Array.isArray(pcs)?pcs[0]:null;
       if(!pc.ok||!cfg||cfg.verification_status!=="configured_unverified"||!/^[0-9a-f-]{36}$/i.test(String(cfg.pathway_id||"")))return json({error:"Configured Bland collector Pathway is unavailable for synthetic verification"},423);
       const token=crypto.randomUUID();
-      const pr=await fetch(`${supabaseUrl}/rest/v1/ai_collector_script_profiles?profile_name=eq.SYNTHETIC_PHONE_PATHWAY_TEST&version=eq.1&select=*&limit=1`,{headers:hr});
+      const pr=await fetch(`${supabaseUrl}/rest/v1/ai_collector_script_profiles?${orgFilter}&profile_name=eq.SYNTHETIC_PHONE_PATHWAY_TEST&version=eq.1&select=*&limit=1`,{headers:hr});
       const ps=await pr.json().catch(()=>[]),profile=Array.isArray(ps)?ps[0]:null;if(!pr.ok||!profile)return json({error:"Synthetic script profile is not configured"},500);
-      const ar=await fetch(`${supabaseUrl}/rest/v1/accounts`,{method:"POST",headers:{...hr,"Content-Type":"application/json",Prefer:"return=representation"},body:JSON.stringify([{first_name:"Jordan",last_name:"Synthetic",full_name:"Jordan Synthetic",zip:"33601",original_creditor:"Synthetic Creditor",type_of_debt:"Synthetic Debt",current_balance:500,status:"New",created_by_email:authEmail,test_phone_override:allowedTestNumber}])});
+      const ar=await fetch(`${supabaseUrl}/rest/v1/accounts`,{method:"POST",headers:{...hr,"Content-Type":"application/json",Prefer:"return=representation"},body:JSON.stringify([{first_name:"Jordan",last_name:"Synthetic",full_name:"Jordan Synthetic",zip:"33601",original_creditor:"Synthetic Creditor",type_of_debt:"Synthetic Debt",current_balance:500,status:"New",created_by_email:authEmail,test_phone_override:allowedTestNumber,organization_id:organizationId}])});
       const as=await ar.json().catch(()=>[]),acct=Array.isArray(as)?as[0]:null;if(!ar.ok||!acct)return json({error:"Could not create synthetic account"},500);
       const attemptId=crypto.randomUUID(),scriptSnapshot={disclosure:"This is a synthetic test disclosure.",dispute_instruction:"Route dispute to human review.",dnc_instruction:"Stop calling and route human review.",settlement_instruction:"No autonomous settlement approval.",payment_instruction:"Do not collect payment credentials.",human_escalation_instruction:"Route to human review.",conversation_policy:{synthetic:true},identity_verification_policy:{required:true,name_confirmation_alone_sufficient:false,allowed_factors:["mailing_zip_code"],max_failed_attempts:2}};
-      const ir=await fetch(`${supabaseUrl}/rest/v1/ai_real_call_attempts`,{method:"POST",headers:{...hr,"Content-Type":"application/json"},body:JSON.stringify([{id:attemptId,account_id:acct.id,requested_phone_last4:"0894",communication_type:"initial",script_profile_id:profile.id,script_profile_name:profile.profile_name,script_version:1,script_snapshot:scriptSnapshot,payload_snapshot:{first_name:"Jordan",original_creditor:"Synthetic Creditor",debt_type:"Synthetic Debt",current_balance:500},preflight_snapshot:{identity_verification_token:token},status:"authorized",provider:"bland",created_by_email:authEmail,authorized_at:new Date().toISOString()}])});
+      const ir=await fetch(`${supabaseUrl}/rest/v1/ai_real_call_attempts`,{method:"POST",headers:{...hr,"Content-Type":"application/json"},body:JSON.stringify([{id:attemptId,account_id:acct.id,requested_phone_last4:"0894",communication_type:"initial",script_profile_id:profile.id,script_profile_name:profile.profile_name,script_version:1,script_snapshot:scriptSnapshot,payload_snapshot:{first_name:"Jordan",original_creditor:"Synthetic Creditor",debt_type:"Synthetic Debt",current_balance:500},preflight_snapshot:{identity_verification_token:token},status:"authorized",provider:"bland",created_by_email:authEmail,authorized_at:new Date().toISOString(),organization_id:organizationId}])});
       if(!ir.ok)return json({error:"Could not create synthetic Pathway attempt"},500);
-      const tr=await fetch(`${supabaseUrl}/rest/v1/voice_broadcast_settings?id=eq.default&select=transfer_number&limit=1`,{headers:hr});
+      const tr=await fetch(`${supabaseUrl}/rest/v1/voice_broadcast_settings?id=eq.default&${orgFilter}&select=transfer_number&limit=1`,{headers:hr});
       const trs=await tr.json().catch(()=>[]),transferNumber=Array.isArray(trs)?String(trs[0]?.transfer_number||"").trim():"";
       if(!tr.ok||!/^\+1\d{10}$/.test(transferNumber))return json({error:"RingCentral collector queue is not configured for AI transfer"},423);
       const providerPayload={phone_number:allowedTestNumber,pathway_id:String(cfg.pathway_id),transfer_phone_number:transferNumber,request_data:{first_name:"Jordan",attempt_id:attemptId,verification_token:token},max_duration:5,record:false,metadata:{source:"cpcm_pathway_synthetic_test",attempt_id:attemptId,synthetic:true}};
