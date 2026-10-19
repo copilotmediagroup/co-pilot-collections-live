@@ -36,6 +36,9 @@ create table if not exists public.organization_members (
   unique (organization_id, auth_user_id)
 );
 create index if not exists idx_organization_members_user on public.organization_members(auth_user_id, is_active);
+-- SaaS v1 deliberately supports one active agency membership per login. This makes tenant resolution deterministic.
+create unique index if not exists organization_members_one_active_org_per_user
+  on public.organization_members(auth_user_id) where is_active=true;
 create index if not exists idx_organization_members_org on public.organization_members(organization_id, role, is_active);
 
 -- Platform-owner identities are intentionally outside tenant data.
