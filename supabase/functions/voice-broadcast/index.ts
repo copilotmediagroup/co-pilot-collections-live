@@ -61,8 +61,11 @@ async function authenticateAdmin(req: Request, admin: any) {
   const email = String(data?.user?.email || "").trim().toLowerCase();
   if (error || !email) throw new Response(JSON.stringify({ error: "Invalid or expired login session." }), { status: 401 });
   const { data: profile } = await admin.from("app_users").select("*").ilike("email", email).maybeSingle();
-  if (!isAdminProfile(profile, email)) throw new Response(JSON.stringify({ error: "Administrator access is required for voice broadcast." }), { status: 403 });
-  return { email, profile, isAdmin: true };
+  const { data: memberships, error: membershipError } = await admin.from("organization_members").select("organization_id,role").eq("auth_user_id", data.user.id).eq("is_active", true).limit(2);
+  if (membershipError || !Array.isArray(memberships) || memberships.length !== 1) throw new Response(JSON.stringify({ error: "Exactly one active organization membership is required." }), { status: 403 });
+  const membership=memberships[0];
+  if (!["agency_admin","admin"].includes(String(membership.role||"").toLowerCase())) throw new Response(JSON.stringify({ error: "Agency administrator access is required for voice broadcast." }), { status: 403 });
+  return { email, profile, isAdmin: true, organizationId: String(membership.organization_id) };
 }
 
 function twilioSecrets() {
@@ -203,7 +206,7 @@ async function dispatchBatch(admin: any, actor: any, input: any) {
   const campaignId = firstText(input.campaignId);
   console.log("[voice-broadcast] dispatch_batch received", { campaignId, maxBatch: input.maxBatch || 10, actor: actor?.email || null });
   if (!campaignId) throw new Response(JSON.stringify({ error: "campaignId is required." }), { status: 400 });
-  const { data: campaign } = await admin.from("voice_broadcast_campaigns").select("*").eq("id", campaignId).maybeSingle();
+  const { data: campaign } = await admin.from("voice_broadcast_campaigns").select("*").eq("id", campaignId).eq("organization_id", actor.organizationId).maybeSingle();
   if (!campaign) throw new Response(JSON.stringify({ error: "Voice broadcast campaign was not found." }), { status: 404 });
   console.log("[voice-broadcast] campaign loaded", { campaignId, status: campaign.status, maxConcurrent: campaign.max_concurrent, callsPerMinute: campaign.calls_per_minute });
   if (campaign.status !== "running") return { success: false, idle: true, message: `Campaign is ${campaign.status}.` };
@@ -243,7 +246,7 @@ async function dispatchBatch(admin: any, actor: any, input: any) {
   console.log("[voice-broadcast] queue scan", { campaignId, queuedCount: (queued || []).length, slots, activeCount: Number(activeCount || 0), recentCount: Number(recentCount || 0) });
   for (const candidate of queued || []) {
     if (launched.length >= slots) break;
-    const { data: account } = await admin.from("accounts").select("*").eq("id", candidate.account_id).maybeSingle();
+    const { data: account } = await admin.from("accounts").select("*").eq("id", candidate.account_id).eq("organization_id", actor.organizationId).maybeSingle();
     if (!account) {
       await admin.from("voice_broadcast_campaign_accounts").update({ status: "failed", last_error: "Account not found", updated_at: new Date().toISOString() }).eq("id", candidate.id);
       blocked.push({ id: candidate.id, reason: "Account not found" });
