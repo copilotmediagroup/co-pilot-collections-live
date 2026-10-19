@@ -235,6 +235,21 @@ begin
   end if;
 end $$;
 
+-- client portal assignments: the same client/portfolio pair may exist in different agencies.
+do $$
+declare c record;
+begin
+  if to_regclass('public.client_portfolio_assignments') is not null then
+    for c in
+      select conname from pg_constraint
+      where conrelid='public.client_portfolio_assignments'::regclass and contype='u'
+        and pg_get_constraintdef(oid) ilike '%client_email%portfolio_name%'
+    loop execute format('alter table public.client_portfolio_assignments drop constraint %I',c.conname); end loop;
+    create unique index if not exists uq_client_portfolio_assignments_org_client_portfolio
+      on public.client_portfolio_assignments(organization_id,client_email,portfolio_name);
+  end if;
+end $$;
+
 -- client fee schedule: the same client/portfolio names are valid in different agencies.
 do $$
 declare c record;
@@ -673,7 +688,7 @@ begin
     update public.accounts set
       assigned_to_email=null,assigned_by_email=actor,assigned_at=null,
       assignment_method='employee_removed',assignment_group_id=null,updated_at=now()
-    where lower(coalesce(assigned_to_email,''))=target;
+    where organization_id=oid and lower(coalesce(assigned_to_email,''))=target;
     get diagnostics released_count=row_count;
   else
     raise exception 'unsupported action: %',action_name;

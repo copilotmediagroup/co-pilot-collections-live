@@ -65,7 +65,7 @@ begin
     update public.accounts set
       assigned_to_email=null,assigned_by_email=actor,assigned_at=null,
       assignment_method='employee_removed',assignment_group_id=null,updated_at=now()
-    where lower(coalesce(assigned_to_email,''))=target;
+    where organization_id=oid and lower(coalesce(assigned_to_email,''))=target;
     get diagnostics released_count=row_count;
   else
     raise exception 'unsupported action: %',action_name;

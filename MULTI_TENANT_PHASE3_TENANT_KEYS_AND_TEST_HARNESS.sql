@@ -19,6 +19,21 @@ begin
   end if;
 end $$;
 
+-- client portal assignments: the same client/portfolio pair may exist in different agencies.
+do $$
+declare c record;
+begin
+  if to_regclass('public.client_portfolio_assignments') is not null then
+    for c in
+      select conname from pg_constraint
+      where conrelid='public.client_portfolio_assignments'::regclass and contype='u'
+        and pg_get_constraintdef(oid) ilike '%client_email%portfolio_name%'
+    loop execute format('alter table public.client_portfolio_assignments drop constraint %I',c.conname); end loop;
+    create unique index if not exists uq_client_portfolio_assignments_org_client_portfolio
+      on public.client_portfolio_assignments(organization_id,client_email,portfolio_name);
+  end if;
+end $$;
+
 -- client fee schedule: the same client/portfolio names are valid in different agencies.
 do $$
 declare c record;
