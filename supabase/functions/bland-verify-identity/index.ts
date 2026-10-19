@@ -13,7 +13,7 @@ Deno.serve(async(req)=>{
  const rr=await fetch(`${u}/rest/v1/accounts?id=eq.${encodeURIComponent(a.account_id)}&organization_id=eq.${encodeURIComponent(a.organization_id)}&select=zip&limit=1`,{headers:h});
  const rows=await rr.json().catch(()=>[]),acct=Array.isArray(rows)?rows[0]:null;if(!rr.ok||!acct)return json({verified:false},200);
  const expected=norm(acct.zip),verified=expected.length>=5&&providedZip===expected;
- const rpc=await fetch(`${u}/rest/v1/rpc/cpcm_record_ai_identity_verification`,{method:"POST",headers:{...h,"Content-Type":"application/json"},body:JSON.stringify({p_attempt_id:attemptId,p_verified:verified,p_method:"mailing_zip_code"})});
+ const rpc=await fetch(`${u}/rest/v1/rpc/cpcm_record_ai_identity_verification`,{method:"POST",headers:{...h,"Content-Type":"application/json"},body:JSON.stringify({p_attempt_id:attemptId,p_organization_id:a.organization_id,p_verified:verified,p_method:"mailing_zip_code"})});
  const out=await rpc.json().catch(()=>[]),state=Array.isArray(out)?out[0]:null;
  if(!rpc.ok||!state)return json({verified:false},200);
  const isVerified=state.verified===true,locked=state.locked===true,remaining=Math.max(0,2-Number(state.failed_attempts||0));
