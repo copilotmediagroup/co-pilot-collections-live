@@ -79,3 +79,18 @@ grant execute on function public.cpcm_admin_commission_staff() to authenticated;
 grant execute on function public.cpcm_my_commission_summary() to authenticated;
 revoke all on function public.cpcm_commission_from_approved_payment() from public,anon,authenticated;
 commit;
+
+-- Supplemental override: commission-rate administration.
+create or replace function public.cpcm_set_employee_commission(target_email text,rate_percent numeric)
+returns jsonb language plpgsql security invoker set search_path=public as $$
+declare updated_count integer; oid uuid:=private.current_organization_id();
+begin
+ if not private.is_organization_admin(oid) then raise exception 'agency admin only'; end if;
+ if rate_percent<0 or rate_percent>100 then raise exception 'Commission rate must be between 0 and 100'; end if;
+ update public.app_users set commission_rate=round(rate_percent,4),updated_at=now()
+ where organization_id=oid and lower(email)=lower(target_email) and lower(coalesce(role,''))='employee';
+ get diagnostics updated_count=row_count; if updated_count<>1 then raise exception 'Employee not found in current organization'; end if;
+ return jsonb_build_object('ok',true,'employee_email',lower(target_email),'commission_rate',round(rate_percent,4));
+end $$;
+revoke execute on function public.cpcm_set_employee_commission(text,numeric) from public,anon;
+grant execute on function public.cpcm_set_employee_commission(text,numeric) to authenticated;
