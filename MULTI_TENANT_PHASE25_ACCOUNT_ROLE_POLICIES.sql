@@ -29,6 +29,16 @@ with check (
   and lower(coalesce(assigned_to_email,'')) = public.current_app_email()
 );
 
+-- A client must be able to read its own portfolio-assignment rows so the
+-- restrictive account policy can evaluate that relationship under RLS.
+drop policy if exists cpcm_client_portfolio_assignment_select on public.client_portfolio_assignments;
+create policy cpcm_client_portfolio_assignment_select
+on public.client_portfolio_assignments as permissive for select to authenticated
+using (
+  organization_id = private.current_organization_id()
+  and lower(client_email) = public.current_app_email()
+);
+
 -- Client read path: a client may read only accounts in a portfolio explicitly
 -- assigned to that client inside the current organization. Client write-deny
 -- restrictive policies remain authoritative for INSERT/UPDATE/DELETE.
