@@ -15,11 +15,13 @@ begin
    if target_uid is not null then update public.organization_members set is_active=true,updated_at=now() where organization_id=oid and auth_user_id=target_uid; end if;
  elsif action_name='pending' then
    update public.app_users set approval_status='pending',is_approved=false,is_active=false,client_portal_enabled=case when target_role='client' then false else client_portal_enabled end,removed_at=null,removed_by_email=null,removal_reason=null,updated_at=now() where organization_id=oid and lower(email)=target;
+   if target_uid is not null then update public.organization_members set is_active=false,updated_at=now() where organization_id=oid and auth_user_id=target_uid; end if;
  elsif action_name='rejected' then
    update public.app_users set approval_status='rejected',is_approved=false,is_active=false,client_portal_enabled=case when target_role='client' then false else client_portal_enabled end,removed_at=null,removed_by_email=null,removal_reason=null,updated_at=now() where organization_id=oid and lower(email)=target;
    if target_uid is not null then update public.organization_members set is_active=false,updated_at=now() where organization_id=oid and auth_user_id=target_uid; end if;
  elsif action_name='activate' then
-   update public.app_users set is_active=true,client_portal_enabled=case when target_role='client' and coalesce(is_approved,false) then true else client_portal_enabled end,updated_at=now() where organization_id=oid and lower(email)=target;
+   if not exists(select 1 from public.app_users where organization_id=oid and lower(email)=target and coalesce(is_approved,false)=true and lower(coalesce(approval_status,''))='approved') then raise exception 'user must be approved before activation'; end if;
+   update public.app_users set is_active=true,client_portal_enabled=case when target_role='client' then true else client_portal_enabled end,updated_at=now() where organization_id=oid and lower(email)=target;
    if target_uid is not null then update public.organization_members set is_active=true,updated_at=now() where organization_id=oid and auth_user_id=target_uid; end if;
  elsif action_name='deactivate' then
    update public.app_users set is_active=false,client_portal_enabled=case when target_role='client' then false else client_portal_enabled end,updated_at=now() where organization_id=oid and lower(email)=target;

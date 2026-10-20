@@ -27,8 +27,8 @@ begin
  select lower(trim(u.email::text)) into actor_email from auth.users u where u.id=uid;
  if coalesce(actor_email,'')='' then raise exception 'Authenticated user email required'; end if;
  insert into public.organization_members(organization_id,auth_user_id,role,is_active)
- values(oid,uid,join_role,true)
- on conflict (organization_id,auth_user_id) do update set role=excluded.role,is_active=true,updated_at=now();
+ values(oid,uid,join_role,false)
+ on conflict (organization_id,auth_user_id) do update set role=excluded.role,is_active=false,updated_at=now();
  insert into public.app_users(organization_id,email,role,approval_status,is_approved,is_active,created_at,updated_at,last_seen_at)
  values(oid,actor_email,join_role,'pending',false,false,now(),now(),now())
  on conflict (organization_id,email) do update set updated_at=now(),last_seen_at=now();
