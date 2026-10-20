@@ -7,7 +7,7 @@ begin
  if oid is null or not private.is_organization_admin(oid) then raise exception 'agency admin only'; end if;
  if role_name not in ('employee','client') then raise exception 'join code role must be employee or client'; end if;
  if p_expires_at is not null and p_expires_at<=now() then raise exception 'expiration must be in the future'; end if;
- new_code:=upper(substr(encode(gen_random_bytes(9),'hex'),1,12));
+ new_code:=upper(substr(encode(gen_random_bytes(12),'hex'),1,20));
  insert into public.organization_join_codes(organization_id,code,allowed_role,is_active,expires_at,created_by) values(oid,new_code,role_name,true,p_expires_at,auth.uid());
  return new_code;
 end $$;
