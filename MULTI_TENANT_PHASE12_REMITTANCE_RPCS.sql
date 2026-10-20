@@ -341,13 +341,13 @@ begin
   );
 end $$;
 
-revoke all on function public.cpcm_admin_remittance_snapshot() from public;
-revoke all on function public.cpcm_admin_save_fee_schedule(text,text,numeric,numeric,numeric,text,text,integer) from public;
-revoke all on function public.cpcm_admin_preview_remittance(text,text,date,date,numeric) from public;
-revoke all on function public.cpcm_admin_create_remittance_batch(text,text,date,date,numeric,date,text) from public;
-revoke all on function public.cpcm_admin_update_remittance_batch(uuid,text,text,text) from public;
-revoke all on function public.cpcm_remittance_batch_detail(uuid) from public;
-revoke all on function public.cpcm_client_remittance_snapshot() from public;
+revoke all on function public.cpcm_admin_remittance_snapshot() from public,anon;
+revoke all on function public.cpcm_admin_save_fee_schedule(text,text,numeric,numeric,numeric,text,text,integer) from public,anon;
+revoke all on function public.cpcm_admin_preview_remittance(text,text,date,date,numeric) from public,anon;
+revoke all on function public.cpcm_admin_create_remittance_batch(text,text,date,date,numeric,date,text) from public,anon;
+revoke all on function public.cpcm_admin_update_remittance_batch(uuid,text,text,text) from public,anon;
+revoke all on function public.cpcm_remittance_batch_detail(uuid) from public,anon;
+revoke all on function public.cpcm_client_remittance_snapshot() from public,anon;
 
 grant select on public.client_fee_schedules,public.client_remittance_batches,public.client_remittance_items to authenticated;
 grant execute on function public.cpcm_admin_remittance_snapshot() to authenticated;

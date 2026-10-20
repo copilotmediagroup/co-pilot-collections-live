@@ -81,6 +81,6 @@ begin
 end;
 $$;
 
-revoke all on function public.cpcm_admin_manage_staff_user(text,text,text) from public;
+revoke all on function public.cpcm_admin_manage_staff_user(text,text,text) from public,anon;
 grant execute on function public.cpcm_admin_manage_staff_user(text,text,text) to authenticated;
 notify pgrst,'reload schema';

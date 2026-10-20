@@ -103,6 +103,10 @@ begin
   return result;
 end $$;
 
+revoke all on function public.cpcm_admin_client_portal_snapshot() from public,anon;
+revoke all on function public.cpcm_admin_save_client_portal_access(text,text,text,boolean,text[],boolean,boolean,boolean) from public,anon;
+revoke all on function public.cpcm_admin_disable_client_portal_access(text) from public,anon;
+revoke all on function public.cpcm_client_portal_snapshot() from public,anon;
 grant select on public.client_portfolio_assignments to authenticated;
 grant execute on function public.cpcm_admin_client_portal_snapshot() to authenticated;
 grant execute on function public.cpcm_admin_save_client_portal_access(text,text,text,boolean,text[],boolean,boolean,boolean) to authenticated;
