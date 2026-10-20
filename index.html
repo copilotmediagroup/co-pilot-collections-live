@@ -5785,12 +5785,12 @@ async function getUser(){
 async function upsertCurrentUser(){
  if(!currentUser.email)return null;
  try{
-   let existing=await dbFetch('/app_users?email=eq.'+encodeURIComponent(currentUser.email)+'&select=*').catch(()=>[]);
+   let existing=await dbFetch('/app_users?organization_id=eq.'+encodeURIComponent(currentOrganizationId)+'&email=eq.'+encodeURIComponent(currentUser.email)+'&select=*').catch(()=>[]);
    if(existing&&existing[0]){
      let profile=toCamel(existing[0]);
      if(currentUser.isAdmin || isAdminEmail(currentUser.email)){
        currentUser.isAdmin=true;
-       let rows=await dbFetch('/app_users?email=eq.'+encodeURIComponent(currentUser.email),{
+       let rows=await dbFetch('/app_users?organization_id=eq.'+encodeURIComponent(currentOrganizationId)+'&email=eq.'+encodeURIComponent(currentUser.email),{
          method:'PATCH',
          body:JSON.stringify({role:'admin',approval_status:'approved',is_approved:true,is_active:true,last_seen_at:new Date().toISOString(),updated_at:new Date().toISOString()})
        }).catch(()=>null);
@@ -5810,7 +5810,7 @@ async function upsertCurrentUser(){
      last_seen_at:new Date().toISOString()
    };
    let rows=await dbFetch('/app_users',{method:'POST',body:JSON.stringify([tenantRow(row)])}).catch(async err=>{
-     let retry=await dbFetch('/app_users?email=eq.'+encodeURIComponent(currentUser.email)+'&select=*').catch(()=>[]);
+     let retry=await dbFetch('/app_users?organization_id=eq.'+encodeURIComponent(currentOrganizationId)+'&email=eq.'+encodeURIComponent(currentUser.email)+'&select=*').catch(()=>[]);
      return retry;
    });
    return rows&&rows[0]?toCamel(rows[0]):(currentUser.isAdmin?{email:currentUser.email,approvalStatus:'approved',isApproved:true,isActive:true,role:'admin'}:null);
@@ -10073,7 +10073,7 @@ async function deleteAllRows(table){
 let archivedWorkspaceAccount=null;
 async function restoreArchivedAccount(a){
  let now=new Date().toISOString();
- await dbFetch('/accounts?id=eq.'+encodeURIComponent(a.id),{method:'PATCH',body:JSON.stringify({archived_at:null,archived_by:null,archive_reason:null,updated_at:now})});
+ await dbFetch('/accounts?organization_id=eq.'+encodeURIComponent(currentOrganizationId)+'&id=eq.'+encodeURIComponent(a.id),{method:'PATCH',body:JSON.stringify({archived_at:null,archived_by:null,archive_reason:null,updated_at:now})});
  try{await insertAudit('Account Restored','Restored archived account '+nameOf(a)+' to active queue','account',a.id)}catch(e){}
  archivedWorkspaceAccount=null;await loadAccounts();currentAccountId=a.id;render();
  alert(nameOf(a)+' was restored to the active queue with history intact.');
@@ -10851,7 +10851,7 @@ function startChatPolling(){
 }
 async function chatHeartbeat(){
   if(!currentUser.email)return;
-  await dbFetch('/app_users?email=eq.'+encodeURIComponent(currentUser.email),{
+  await dbFetch('/app_users?organization_id=eq.'+encodeURIComponent(currentOrganizationId)+'&email=eq.'+encodeURIComponent(currentUser.email),{
     method:'PATCH',
     body:JSON.stringify({last_seen_at:new Date().toISOString(),updated_at:new Date().toISOString()})
   }).catch(()=>{});
@@ -11776,9 +11776,9 @@ function exportContactIntelligenceCSV(){let calls=filteredContactCalls();let row
       return window.deletePaymentPlan(String(plan.id), String(a.id));
     }
     try{
-      await window.dbFetch('/payment_plan_payments?plan_id=eq.' + encodeURIComponent(plan.id), {method:'DELETE'}).catch(function(){});
-      await window.dbFetch('/payment_plan_payments?payment_plan_id=eq.' + encodeURIComponent(plan.id), {method:'DELETE'}).catch(function(){});
-      await window.dbFetch('/payment_plans?id=eq.' + encodeURIComponent(plan.id), {method:'DELETE'});
+      await window.dbFetch('/payment_plan_payments?organization_id=eq.' + encodeURIComponent(currentOrganizationId) + '&plan_id=eq.' + encodeURIComponent(plan.id), {method:'DELETE'}).catch(function(){});
+      await window.dbFetch('/payment_plan_payments?organization_id=eq.' + encodeURIComponent(currentOrganizationId) + '&payment_plan_id=eq.' + encodeURIComponent(plan.id), {method:'DELETE'}).catch(function(){});
+      await window.dbFetch('/payment_plans?organization_id=eq.' + encodeURIComponent(currentOrganizationId) + '&id=eq.' + encodeURIComponent(plan.id), {method:'DELETE'});
       if(typeof window.sfInsertActivity === 'function') await window.sfInsertActivity(a.id, 'Payment Plan Deleted', 'Admin deleted payment plan.').catch(function(){});
       if(typeof window.loadAccounts === 'function') await window.loadAccounts().catch(function(){});
       if(typeof window.render === 'function') window.render();
@@ -12684,7 +12684,7 @@ function exportContactIntelligenceCSV(){let calls=filteredContactCalls();let row
     var pct=bal?amt/bal*100:r.settlementPercent;
     var notes=(r.notes||'')+'\nAdmin Approved by '+(currentUser?.email||'Admin')+' on '+new Date().toLocaleString()+(note?': '+note:'');
     await patchSettlement(id,{status:'Approved',settlement_amount:amt,settlement_percent:pct,notes:notes});
-    await dbFetch('/accounts?id=eq.'+encodeURIComponent(r.accountId),{method:'PATCH',body:JSON.stringify({status:'Settlement Approved',disposition:'Settlement Approved',updated_at:new Date().toISOString()})}).catch(function(){});
+    await dbFetch('/accounts?organization_id=eq.'+encodeURIComponent(currentOrganizationId)+'&id=eq.'+encodeURIComponent(r.accountId),{method:'PATCH',body:JSON.stringify({status:'Settlement Approved',disposition:'Settlement Approved',updated_at:new Date().toISOString()})}).catch(function(){});
     await settlementActivity(r.accountId,'Settlement Approved','Approved settlement '+sMoney(amt)+' for '+sName(a));
     await refreshSettlementApprovalPage(); await renderSettlementAccountCard(); alert('Settlement approved.');
   }
@@ -12766,7 +12766,7 @@ function exportContactIntelligenceCSV(){let calls=filteredContactCalls();let row
     var row={account_id:a.id,balance:bal,settlement_percent:pct,settlement_amount:amt,due_date:sVal('settleDueDate')||sAddDays(7),payment_type:sVal('settlePaymentType')||'Lump Sum',manager_approval_required:true,status:'Pending Approval',notes:sVal('settleNotes'),created_by_email:currentUser?.email||'',updated_at:new Date().toISOString()};
     try{
       await dbFetch('/settlements',{method:'POST',body:JSON.stringify([tenantRow(row)])});
-      await dbFetch('/accounts?id=eq.'+encodeURIComponent(a.id),{method:'PATCH',body:JSON.stringify({status:'Settlement Pending',disposition:'Settlement Pending',updated_at:new Date().toISOString()})}).catch(function(){});
+      await dbFetch('/accounts?organization_id=eq.'+encodeURIComponent(currentOrganizationId)+'&id=eq.'+encodeURIComponent(a.id),{method:'PATCH',body:JSON.stringify({status:'Settlement Pending',disposition:'Settlement Pending',updated_at:new Date().toISOString()})}).catch(function(){});
       await settlementActivity(a.id,'Settlement Proposed','Proposed settlement '+sMoney(amt)+' ('+pct.toFixed(2)+'%) due '+row.due_date+' — pending admin approval.');
       try{closeModal('settlementModal')}catch(e){}
       await renderSettlementAccountCard();
@@ -13144,8 +13144,8 @@ function exportContactIntelligenceCSV(){let calls=filteredContactCalls();let row
   window.openTicklerAccount=function(id){try{if(id&&typeof setCurrent==='function')setCurrent(id);closeTicklerCommandCenter()}catch(e){alert('Could not open account.')}};
   window.toggleTicklerNew=function(){var box=document.getElementById('tickNew'), a=cur();if(!box)return;if(box.classList.contains('open')){box.classList.remove('open');box.innerHTML='';return}box.classList.add('open');box.innerHTML='<input id="tickNewAcct" value="'+esc(a?name(a):'No account selected')+'" disabled><select id="tickNewType"><option>Callback</option><option>Promise Follow-Up</option><option>Payment Plan Follow-Up</option><option>Settlement Follow-Up</option><option>Dispute Follow-Up</option><option>General Follow-Up</option></select><input id="tickNewDate" type="date" value="'+today()+'"><input id="tickNewTime" type="time"><input id="tickNewNotes" placeholder="Reason / notes"><input id="tickNewAssigned" value="'+esc((a&&(a.assignedToEmail||a.assigned_to_email))||email())+'"><button class="tickBtn green" onclick="saveTicklerQuickFollowUp()">Save</button><button class="tickBtn gray" onclick="toggleTicklerNew()">Cancel</button>'};
   window.saveTicklerQuickFollowUp=async function(){var a=cur();if(!a)return alert('Select an account first.');var row={account_id:a.id,follow_up_type:document.getElementById('tickNewType').value,due_date:document.getElementById('tickNewDate').value||today(),due_time:document.getElementById('tickNewTime').value||null,status:'Open',assigned_to_email:String(document.getElementById('tickNewAssigned').value||email()).toLowerCase(),reason:document.getElementById('tickNewNotes').value||'',notes:document.getElementById('tickNewNotes').value||'',created_by_email:email()};try{await dbFetch('/follow_ups',{method:'POST',body:JSON.stringify([tenantRow(row)])});if(typeof insertActivity==='function')await insertActivity(a.id,'Follow-Up Scheduled',row.follow_up_type+' scheduled for '+row.due_date+'. '+row.notes).catch(function(){});document.getElementById('tickNew').classList.remove('open');await refreshTicklerCommandCenter()}catch(e){alert('Follow-up save failed: '+(e.message||e))}};
-  window.completeTicklerTask=async function(key){var t=tick.tasks.find(function(x){return x.key===key});if(!t)return;if(t.source==='follow_ups'&&t.sourceId){try{await dbFetch('/follow_ups?id=eq.'+encodeURIComponent(t.sourceId),{method:'PATCH',body:JSON.stringify({status:'Completed',completed_at:new Date().toISOString(),completed_by_email:email(),updated_at:new Date().toISOString()})});if(typeof insertActivity==='function')await insertActivity(t.accountId,'Follow-Up Completed',t.title+' completed from Tickler.').catch(function(){});await refreshTicklerCommandCenter()}catch(e){alert('Could not complete: '+(e.message||e))}}else alert('This is a computed task. Open the account to work it, or Snooze to create a saved follow-up.')};
-  window.snoozeTicklerTask=async function(key){var t=tick.tasks.find(function(x){return x.key===key});if(!t)return;var nd=add(1);try{if(t.source==='follow_ups'&&t.sourceId){await dbFetch('/follow_ups?id=eq.'+encodeURIComponent(t.sourceId),{method:'PATCH',body:JSON.stringify({due_date:nd,status:'Open',updated_at:new Date().toISOString()})})}else{await dbFetch('/follow_ups',{method:'POST',body:JSON.stringify([tenantRow({account_id:t.accountId,follow_up_type:t.type,due_date:nd,status:'Open',assigned_to_email:t.assignedTo||email(),reason:'Snoozed computed task: '+t.title,notes:t.description||'',created_by_email:email()})])})}if(typeof insertActivity==='function')await insertActivity(t.accountId,'Follow-Up Snoozed',t.title+' snoozed to '+nd+'.').catch(function(){});await refreshTicklerCommandCenter()}catch(e){alert('Could not snooze: '+(e.message||e))}};
+  window.completeTicklerTask=async function(key){var t=tick.tasks.find(function(x){return x.key===key});if(!t)return;if(t.source==='follow_ups'&&t.sourceId){try{await dbFetch('/follow_ups?organization_id=eq.'+encodeURIComponent(currentOrganizationId)+'&id=eq.'+encodeURIComponent(t.sourceId),{method:'PATCH',body:JSON.stringify({status:'Completed',completed_at:new Date().toISOString(),completed_by_email:email(),updated_at:new Date().toISOString()})});if(typeof insertActivity==='function')await insertActivity(t.accountId,'Follow-Up Completed',t.title+' completed from Tickler.').catch(function(){});await refreshTicklerCommandCenter()}catch(e){alert('Could not complete: '+(e.message||e))}}else alert('This is a computed task. Open the account to work it, or Snooze to create a saved follow-up.')};
+  window.snoozeTicklerTask=async function(key){var t=tick.tasks.find(function(x){return x.key===key});if(!t)return;var nd=add(1);try{if(t.source==='follow_ups'&&t.sourceId){await dbFetch('/follow_ups?organization_id=eq.'+encodeURIComponent(currentOrganizationId)+'&id=eq.'+encodeURIComponent(t.sourceId),{method:'PATCH',body:JSON.stringify({due_date:nd,status:'Open',updated_at:new Date().toISOString()})})}else{await dbFetch('/follow_ups',{method:'POST',body:JSON.stringify([tenantRow({account_id:t.accountId,follow_up_type:t.type,due_date:nd,status:'Open',assigned_to_email:t.assignedTo||email(),reason:'Snoozed computed task: '+t.title,notes:t.description||'',created_by_email:email()})])})}if(typeof insertActivity==='function')await insertActivity(t.accountId,'Follow-Up Snoozed',t.title+' snoozed to '+nd+'.').catch(function(){});await refreshTicklerCommandCenter()}catch(e){alert('Could not snooze: '+(e.message||e))}};
   window.runTicklerAutomation=async function(){try{if(typeof runPromiseAutomation==='function')await runPromiseAutomation(true,true);await refreshTicklerCommandCenter()}catch(e){alert('Promise check unavailable: '+(e.message||e))}};
   window.exportTicklerCSV=function(){var rows=filtered();var csv=[['Due Date','Bucket','Priority','Type','Title','Account','Account Number','Balance','Amount','Status','Assigned To','Description','Source'].map(function(x){return '"'+String(x).replace(/"/g,'""')+'"'}).join(',')].concat(rows.map(function(t){return [t.dueDate,t.bucket,t.priority,t.type,t.title,t.accountName,t.accountNumber,t.balance,t.amount||'',t.status,t.assignedTo,t.description,t.source].map(function(x){return '"'+String(x==null?'':x).replace(/"/g,'""')+'"'}).join(',')})).join('\n');var a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a.download='co-pilot-tickler-followups.csv';document.body.appendChild(a);a.click();setTimeout(function(){URL.revokeObjectURL(a.href);a.remove()},250)};
   window.refreshTicklerBadge=async function(){await loadTasks();updateBadge()};
@@ -13733,17 +13733,17 @@ function exportContactIntelligenceCSV(){let calls=filteredContactCalls();let row
   upsertCurrentUser=async function(){
     if(!currentUser.email)return null;let requested=String(currentUser.requestedRole||'employee').toLowerCase()==='client'?'client':'employee';
     try{
-      let existing=await dbFetch('/app_users?email=eq.'+encodeURIComponent(currentUser.email)+'&select=*').catch(()=>[]);
+      let existing=await dbFetch('/app_users?organization_id=eq.'+encodeURIComponent(currentOrganizationId)+'&email=eq.'+encodeURIComponent(currentUser.email)+'&select=*').catch(()=>[]);
       if(existing&&existing[0]){
         let profile=toCamel(existing[0]);
-        if(isAdminEmail(currentUser.email)){let rows=await dbFetch('/app_users?email=eq.'+encodeURIComponent(currentUser.email),{method:'PATCH',body:JSON.stringify({role:'admin',approval_status:'approved',is_approved:true,is_active:true,last_seen_at:new Date().toISOString(),updated_at:new Date().toISOString()})}).catch(()=>null);return rows&&rows[0]?toCamel(rows[0]):{...profile,role:'admin',approvalStatus:'approved',isApproved:true,isActive:true};}
+        if(isAdminEmail(currentUser.email)){let rows=await dbFetch('/app_users?organization_id=eq.'+encodeURIComponent(currentOrganizationId)+'&email=eq.'+encodeURIComponent(currentUser.email),{method:'PATCH',body:JSON.stringify({role:'admin',approval_status:'approved',is_approved:true,is_active:true,last_seen_at:new Date().toISOString(),updated_at:new Date().toISOString()})}).catch(()=>null);return rows&&rows[0]?toCamel(rows[0]):{...profile,role:'admin',approvalStatus:'approved',isApproved:true,isActive:true};}
         let pRole=String(profile.role||'').toLowerCase();
-        if(requested==='client'&&(!pRole||pRole==='employee')&&!isUserApproved(profile)){let rows=await dbFetch('/app_users?email=eq.'+encodeURIComponent(currentUser.email),{method:'PATCH',body:JSON.stringify({role:'client',client_portal_enabled:false,last_seen_at:new Date().toISOString(),updated_at:new Date().toISOString()})}).catch(()=>null);if(rows&&rows[0])profile=toCamel(rows[0]);}
-        else dbFetch('/app_users?email=eq.'+encodeURIComponent(currentUser.email),{method:'PATCH',body:JSON.stringify({last_seen_at:new Date().toISOString(),updated_at:new Date().toISOString()})}).catch(()=>{});
+        if(requested==='client'&&(!pRole||pRole==='employee')&&!isUserApproved(profile)){let rows=await dbFetch('/app_users?organization_id=eq.'+encodeURIComponent(currentOrganizationId)+'&email=eq.'+encodeURIComponent(currentUser.email),{method:'PATCH',body:JSON.stringify({role:'client',client_portal_enabled:false,last_seen_at:new Date().toISOString(),updated_at:new Date().toISOString()})}).catch(()=>null);if(rows&&rows[0])profile=toCamel(rows[0]);}
+        else dbFetch('/app_users?organization_id=eq.'+encodeURIComponent(currentOrganizationId)+'&email=eq.'+encodeURIComponent(currentUser.email),{method:'PATCH',body:JSON.stringify({last_seen_at:new Date().toISOString(),updated_at:new Date().toISOString()})}).catch(()=>{});
         return profile;
       }
       let admin=isAdminEmail(currentUser.email),role=admin?'admin':requested,row={email:currentUser.email,role,approval_status:admin?'approved':'pending',is_approved:admin,is_active:admin,client_portal_enabled:false,created_at:new Date().toISOString(),updated_at:new Date().toISOString(),last_seen_at:new Date().toISOString()};
-      let rows=await dbFetch('/app_users',{method:'POST',body:JSON.stringify([tenantRow(row)])}).catch(async()=>await dbFetch('/app_users?email=eq.'+encodeURIComponent(currentUser.email)+'&select=*').catch(()=>[]));return rows&&rows[0]?toCamel(rows[0]):null;
+      let rows=await dbFetch('/app_users',{method:'POST',body:JSON.stringify([tenantRow(row)])}).catch(async()=>await dbFetch('/app_users?organization_id=eq.'+encodeURIComponent(currentOrganizationId)+'&email=eq.'+encodeURIComponent(currentUser.email)+'&select=*').catch(()=>[]));return rows&&rows[0]?toCamel(rows[0]):null;
     }catch(err){console.warn('Client-aware profile upsert failed',err);return isAdminEmail(currentUser.email)?{email:currentUser.email,role:'admin',approvalStatus:'approved',isApproved:true,isActive:true}:null;}
   };
 
@@ -13992,8 +13992,8 @@ function exportContactIntelligenceCSV(){let calls=filteredContactCalls();let row
       inserted=resultObject(await dbFetch('/call_results',{method:'POST',body:JSON.stringify([tenantRow({account_id:a.id,phone_number:phone,call_result:'Call Attempt',disposition:'Pending Outcome',notes:'Phone application launched from Co Pilot Collections Manager.',result_at:startedAt,created_by_email:email()})])}));
     }
     const nextCount=Number(a.callCount||a.call_count||0)+1;
-    try{await dbFetch('/accounts?id=eq.'+encodeURIComponent(a.id),{method:'PATCH',body:JSON.stringify({last_contact_number:phone,last_called_at:startedAt,call_count:nextCount,last_worked_at:startedAt,updated_at:startedAt})})}catch(e){
-      await dbFetch('/accounts?id=eq.'+encodeURIComponent(a.id),{method:'PATCH',body:JSON.stringify({last_contact_number:phone,updated_at:startedAt})}).catch(function(){})
+    try{await dbFetch('/accounts?organization_id=eq.'+encodeURIComponent(currentOrganizationId)+'&id=eq.'+encodeURIComponent(a.id),{method:'PATCH',body:JSON.stringify({last_contact_number:phone,last_called_at:startedAt,call_count:nextCount,last_worked_at:startedAt,updated_at:startedAt})})}catch(e){
+      await dbFetch('/accounts?organization_id=eq.'+encodeURIComponent(currentOrganizationId)+'&id=eq.'+encodeURIComponent(a.id),{method:'PATCH',body:JSON.stringify({last_contact_number:phone,updated_at:startedAt})}).catch(function(){})
     }
     try{await dbFetch('/activity_logs',{method:'POST',body:JSON.stringify([tenantRow({account_id:a.id,action_type:'Call Attempt',action_text:'Outbound call attempt launched to '+(typeof fmtPhone==='function'?fmtPhone(phone):phone),phone_number:phone,created_by_email:email(),event_key:'call-attempt:'+attemptId,metadata:{attempt_id:attemptId,source:'Phone Link'}})])})}catch(e){
       if(typeof insertActivity==='function')await insertActivity(a.id,'Call Attempt','Outbound call attempt launched to '+(typeof fmtPhone==='function'?fmtPhone(phone):phone),phone).catch(function(){})
@@ -14076,8 +14076,8 @@ function exportContactIntelligenceCSV(){let calls=filteredContactCalls();let row
     if(details.result==='DNC')patch.do_not_call=true;
     if(details.result==='Dispute')patch.disputed_flag=true;
     if(details.flags.is_wrong_number)patch.wrong_number_flag=true;
-    try{await dbFetch('/accounts?id=eq.'+encodeURIComponent(a.id),{method:'PATCH',body:JSON.stringify(patch)})}catch(e){
-      await dbFetch('/accounts?id=eq.'+encodeURIComponent(a.id),{method:'PATCH',body:JSON.stringify({status:details.status,disposition:details.status,last_contact_number:details.phone,updated_at:details.attemptAt})}).catch(function(){})
+    try{await dbFetch('/accounts?organization_id=eq.'+encodeURIComponent(currentOrganizationId)+'&id=eq.'+encodeURIComponent(a.id),{method:'PATCH',body:JSON.stringify(patch)})}catch(e){
+      await dbFetch('/accounts?organization_id=eq.'+encodeURIComponent(currentOrganizationId)+'&id=eq.'+encodeURIComponent(a.id),{method:'PATCH',body:JSON.stringify({status:details.status,disposition:details.status,last_contact_number:details.phone,updated_at:details.attemptAt})}).catch(function(){})
     }
     if(typeof insertActivity==='function')await insertActivity(a.id,'Call Result',(details.result+' '+(details.phone?(typeof fmtPhone==='function'?fmtPhone(details.phone):details.phone):'')+(details.duration?' · '+details.duration+'s':'')+'. '+details.notes).trim(),details.phone,a.status||a.disposition,details.status).catch(function(){});
     return {call_result_id:rowId,completed:true,created_without_attempt:!usedPending};

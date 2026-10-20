@@ -51,7 +51,7 @@ function xmlEscape(value: unknown) {
 }
 
 function isAdminProfile(profile: any, email: string) {
-  return email === "afinch2678@gmail.com" || String(profile?.role || "").toLowerCase() === "admin";
+  return String(profile?.role || "").toLowerCase() === "admin";
 }
 
 async function authenticateAdmin(req: Request, admin: any) {
