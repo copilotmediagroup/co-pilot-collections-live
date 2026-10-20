@@ -119,10 +119,11 @@ async function verifyTwilioRequest(req: Request, params: URLSearchParams) {
   return valid;
 }
 
-async function insertActivity(admin: any, accountId: string, type: string, text: string, email: string, phone = "") {
+async function insertActivity(admin: any, accountId: string, organizationId: string, type: string, text: string, email: string, phone = "") {
   try {
     await admin.from("activity_logs").insert({
       account_id: accountId,
+      organization_id: organizationId,
       action_type: type,
       action_text: text,
       phone_number: phone || null,
@@ -131,22 +132,23 @@ async function insertActivity(admin: any, accountId: string, type: string, text:
     });
   } catch {
     try {
-      await admin.from("activity_logs").insert({ account_id: accountId, action_type: type, action_text: text, created_by_email: email });
+      await admin.from("activity_logs").insert({ account_id: accountId, organization_id: organizationId, action_type: type, action_text: text, created_by_email: email });
     } catch { /* do not break call flow */ }
   }
 }
 
-async function maybeCompleteCampaign(admin: any, campaignId: string) {
+async function maybeCompleteCampaign(admin: any, campaignId: string, organizationId: string) {
   const { count } = await admin.from("voice_broadcast_campaign_accounts")
     .select("id", { count: "exact", head: true })
     .eq("campaign_id", campaignId)
+    .eq("organization_id", organizationId)
     .in("status", ["queued", "retry", "initiating", "ringing", "human", "pressed_1", "transferring", "connected"]);
   if (!count) {
     await admin.from("voice_broadcast_campaigns").update({
       status: "completed",
       completed_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
-    }).eq("id", campaignId).eq("status", "running");
+    }).eq("id", campaignId).eq("organization_id", organizationId).eq("status", "running");
   }
 }
 
@@ -172,10 +174,10 @@ async function finalizeOutcome(admin: any, callRow: any, campaign: any, result: 
     finalized_at: now,
     provider_payload: { ...(callRow.provider_payload || {}), ...extra },
     updated_at: now,
-  }).eq("id", callRow.id).is("finalized_at", null).select("*").maybeSingle();
+  }).eq("id", callRow.id).eq("organization_id", callRow.organization_id).is("finalized_at", null).select("*").maybeSingle();
   if (!finalizedCall) return { finalized: false, result };
 
-  const { data: campaignAccount } = await admin.from("voice_broadcast_campaign_accounts").select("*").eq("id", callRow.campaign_account_id).maybeSingle();
+  const { data: campaignAccount } = await admin.from("voice_broadcast_campaign_accounts").select("*").eq("id", callRow.campaign_account_id).eq("organization_id", callRow.organization_id).maybeSingle();
   const attempts = Number(campaignAccount?.attempt_count || 0);
   const retryable = ["no answer", "busy", "failed", "provider error"].includes(result.toLowerCase());
   const shouldRetry = retryable && attempts < Number(campaign.max_attempts || 1) && campaign.status === "running";
@@ -186,9 +188,9 @@ async function finalizeOutcome(admin: any, callRow: any, campaign: any, result: 
     last_error: status === "failed" ? firstText(extra.error, result) : null,
     sort_order: shouldRetry ? Date.now() : campaignAccount?.sort_order,
     updated_at: now,
-  }).eq("id", callRow.campaign_account_id);
+  }).eq("id", callRow.campaign_account_id).eq("organization_id", callRow.organization_id);
 
-  const { data: account } = await admin.from("accounts").select("*").eq("id", callRow.account_id).maybeSingle();
+  const { data: account } = await admin.from("accounts").select("*").eq("id", callRow.account_id).eq("organization_id", callRow.organization_id).maybeSingle();
   if (account) {
     const patch: Record<string, unknown> = {
       last_contact_number: callRow.phone_number,
@@ -200,9 +202,9 @@ async function finalizeOutcome(admin: any, callRow: any, campaign: any, result: 
     if (result === "Left Voicemail") patch.voicemail_count = Number(account.voicemail_count || 0) + 1;
     if (result === "No Answer") patch.no_answer_count = Number(account.no_answer_count || 0) + 1;
     try {
-      await admin.from("accounts").update(patch).eq("id", callRow.account_id);
+      await admin.from("accounts").update(patch).eq("id", callRow.account_id).eq("organization_id", callRow.organization_id);
     } catch {
-      try { await admin.from("accounts").update({ last_contact_number: callRow.phone_number, updated_at: now }).eq("id", callRow.account_id); } catch { /* ignore */ }
+      try { await admin.from("accounts").update({ last_contact_number: callRow.phone_number, updated_at: now }).eq("id", callRow.account_id).eq("organization_id", callRow.organization_id); } catch { /* ignore */ }
     }
   }
 
@@ -211,6 +213,7 @@ async function finalizeOutcome(admin: any, callRow: any, campaign: any, result: 
   try {
     await admin.from("call_results").insert({
       account_id: callRow.account_id,
+      organization_id: callRow.organization_id,
       phone_number: callRow.phone_number,
       call_result: result,
       disposition: result,
@@ -232,6 +235,7 @@ async function finalizeOutcome(admin: any, callRow: any, campaign: any, result: 
     try {
       await admin.from("call_results").insert({
         account_id: callRow.account_id,
+        organization_id: callRow.organization_id,
         phone_number: callRow.phone_number,
         call_result: result,
         disposition: result,
@@ -241,8 +245,8 @@ async function finalizeOutcome(admin: any, callRow: any, campaign: any, result: 
       });
     } catch { /* legacy schema compatibility */ }
   }
-  await insertActivity(admin, callRow.account_id, "Voice Broadcast Result", `${result} — campaign ${campaign.name}.`, campaign.created_by_email, callRow.phone_number);
-  await maybeCompleteCampaign(admin, callRow.campaign_id);
+  await insertActivity(admin, callRow.account_id, callRow.organization_id, "Voice Broadcast Result", `${result} — campaign ${campaign.name}.`, campaign.created_by_email, callRow.phone_number);
+  await maybeCompleteCampaign(admin, callRow.campaign_id, callRow.organization_id);
   return { finalized: true, result, retry: shouldRetry };
 }
 
