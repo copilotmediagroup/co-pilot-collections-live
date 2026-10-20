@@ -5780,23 +5780,15 @@ async function upsertCurrentUser(){
    let existing=await dbFetch('/app_users?organization_id=eq.'+encodeURIComponent(currentOrganizationId)+'&email=eq.'+encodeURIComponent(currentUser.email)+'&select=*').catch(()=>[]);
    if(existing&&existing[0]){
      let profile=toCamel(existing[0]);
-     if(currentUser.isAdmin || isAdminEmail(currentUser.email)){
-       currentUser.isAdmin=true;
-       let rows=await dbFetch('/app_users?organization_id=eq.'+encodeURIComponent(currentOrganizationId)+'&email=eq.'+encodeURIComponent(currentUser.email),{
-         method:'PATCH',
-         body:JSON.stringify({role:'admin',approval_status:'approved',is_approved:true,is_active:true,last_seen_at:new Date().toISOString(),updated_at:new Date().toISOString()})
-       }).catch(()=>null);
-       return rows&&rows[0]?toCamel(rows[0]):{...profile,role:'admin',approvalStatus:'approved',isApproved:true,isActive:true};
-     }
      return profile;
    }
 
    let row={
      email:currentUser.email,
-     role:(currentUser.isAdmin || isAdminEmail(currentUser.email))?'admin':'employee',
-     approval_status:(currentUser.isAdmin || isAdminEmail(currentUser.email))?'approved':'pending',
-     is_approved:(currentUser.isAdmin || isAdminEmail(currentUser.email)),
-     is_active:(currentUser.isAdmin || isAdminEmail(currentUser.email)),
+     role:'employee',
+     approval_status:'pending',
+     is_approved:false,
+     is_active:false,
      created_at:new Date().toISOString(),
      updated_at:new Date().toISOString(),
      last_seen_at:new Date().toISOString()
@@ -13739,7 +13731,6 @@ function exportContactIntelligenceCSV(){let calls=filteredContactCalls();let row
       let existing=await dbFetch('/app_users?organization_id=eq.'+encodeURIComponent(currentOrganizationId)+'&email=eq.'+encodeURIComponent(currentUser.email)+'&select=*').catch(()=>[]);
       if(existing&&existing[0]){
         let profile=toCamel(existing[0]);
-        if(isAdminEmail(currentUser.email)){let rows=await dbFetch('/app_users?organization_id=eq.'+encodeURIComponent(currentOrganizationId)+'&email=eq.'+encodeURIComponent(currentUser.email),{method:'PATCH',body:JSON.stringify({role:'admin',approval_status:'approved',is_approved:true,is_active:true,last_seen_at:new Date().toISOString(),updated_at:new Date().toISOString()})}).catch(()=>null);return rows&&rows[0]?toCamel(rows[0]):{...profile,role:'admin',approvalStatus:'approved',isApproved:true,isActive:true};}
         let pRole=String(profile.role||'').toLowerCase();
         if(requested==='client'&&(!pRole||pRole==='employee')&&!isUserApproved(profile)){let rows=await dbFetch('/app_users?organization_id=eq.'+encodeURIComponent(currentOrganizationId)+'&email=eq.'+encodeURIComponent(currentUser.email),{method:'PATCH',body:JSON.stringify({role:'client',client_portal_enabled:false,last_seen_at:new Date().toISOString(),updated_at:new Date().toISOString()})}).catch(()=>null);if(rows&&rows[0])profile=toCamel(rows[0]);}
         else dbFetch('/app_users?organization_id=eq.'+encodeURIComponent(currentOrganizationId)+'&email=eq.'+encodeURIComponent(currentUser.email),{method:'PATCH',body:JSON.stringify({last_seen_at:new Date().toISOString(),updated_at:new Date().toISOString()})}).catch(()=>{});
