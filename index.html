@@ -10897,7 +10897,7 @@ function buildChatContacts(){
     let approved=(u.isApproved===true || u.is_approved===true || String(u.approvalStatus||u.approval_status||'').toLowerCase()==='approved');
     if(email && active && approved)add(email);
   });
-  if(!currentUser.isAdmin)add('afinch2678@gmail.com');
+  if(!currentUser.isAdmin)
   chatAllMessages.forEach(m=>{
     let from=String(m.fromEmail||'').toLowerCase(), to=String(m.toEmail||'').toLowerCase();
     if(from===me)add(to);
@@ -11128,7 +11128,7 @@ buildChatContacts = function(){
       let role=String(u.role||'').toLowerCase();
       if(email && role==='admin')add(email);
     });
-    add('afinch2678@gmail.com');
+    
   }
 
   (chatAllMessages||[]).forEach(m=>{
@@ -11456,7 +11456,7 @@ buildChatContacts = function(){
       let role=String(u.role||'').toLowerCase();
       if(email && role==='admin')add(email);
     });
-    add('afinch2678@gmail.com');
+    
   }
 
   (chatPresenceData||[]).forEach(p=>{
@@ -14197,7 +14197,7 @@ function exportContactIntelligenceCSV(){let calls=filteredContactCalls();let row
   function uuid(){return (window.crypto&&crypto.randomUUID)?crypto.randomUUID():'nmi-'+Date.now()+'-'+Math.random().toString(36).slice(2)}
   function isAdmin(){
     var u=(typeof currentUser!=='undefined'&&currentUser)?currentUser:null;
-    return !!(u&&(u.isAdmin===true||str(u.role).toLowerCase()==='admin'||str(u.email).toLowerCase()==='afinch2678@gmail.com'));
+    return !!(u&&(u.isAdmin===true||str(u.role).toLowerCase()==='admin'));
   }
 
   function nmiToast(message,type,title,timeout){
@@ -14515,7 +14515,7 @@ function exportContactIntelligenceCSV(){let calls=filteredContactCalls();let row
   function cash(v){return num(v).toLocaleString('en-US',{style:'currency',currency:'USD'})}
   function h(v){return typeof esc==='function'?esc(v):s(v).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
   function actor(){return (typeof currentUser!=='undefined'&&currentUser)?currentUser:{}}
-  function admin(){var u=actor();return !!(u.isAdmin===true||s(u.role).toLowerCase()==='admin'||s(u.email).toLowerCase()==='afinch2678@gmail.com')}
+  function admin(){var u=actor();return !!(u.isAdmin===true||s(u.role).toLowerCase()==='admin')}
   function currentAccount(){return typeof getCurrent==='function'?getCurrent():null}
   function val(id){return el(id)?el(id).value.trim():''}
   function uid(){return (window.crypto&&crypto.randomUUID)?crypto.randomUUID():'cpcm-'+Date.now()+'-'+Math.random().toString(36).slice(2)}
