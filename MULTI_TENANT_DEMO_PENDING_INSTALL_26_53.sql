@@ -1,6 +1,6 @@
 -- DEMO ONLY. Ordered continuation for phases not yet installed on DEMO.
 -- Run only against DEMO project nixqpmgkmrzjsaqhqqew after confirming connection.
-\echo 'Installing pending multi-tenant phases 26-52 on DEMO'
+\echo 'Installing pending multi-tenant phases 26-53 on DEMO'
 \i MULTI_TENANT_PHASE26_TENANT_PROVISIONING_RPC.sql
 \i MULTI_TENANT_PHASE27_PLATFORM_TENANT_ADMIN.sql
 \i MULTI_TENANT_PHASE28_ORGANIZATION_STATUS_ENFORCEMENT.sql
@@ -43,4 +43,6 @@
 \i MULTI_TENANT_PHASE51_APP_USER_INSERT_GUARD.sql
 
 \i MULTI_TENANT_PHASE52_ROLE_CONSISTENCY_GUARD.sql
-\echo 'Pending phases 26-52 installed; run structural gates next.'
+
+\i MULTI_TENANT_PHASE53_CLIENT_MEMBERSHIP_SYNC.sql
+\echo 'Pending phases 26-53 installed; run structural gates next.'
