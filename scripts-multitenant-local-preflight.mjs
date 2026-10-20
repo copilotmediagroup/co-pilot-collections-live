@@ -2,7 +2,7 @@ import fs from 'node:fs';
 import {execFileSync} from 'node:child_process';
 const root=process.cwd(); let failed=false;
 function pass(name,ok,detail=''){console.log(`${ok?'PASS':'FAIL'} ${name}${detail?' — '+detail:''}`);if(!ok)failed=true}
-const install='MULTI_TENANT_DEMO_PENDING_INSTALL_26_39.sql', gates='MULTI_TENANT_DEMO_PENDING_GATES_26_39.sql';
+const install='MULTI_TENANT_DEMO_PENDING_INSTALL_26_40.sql', gates='MULTI_TENANT_DEMO_PENDING_GATES_26_40.sql';
 for(const bundle of [install,gates]){const text=fs.readFileSync(bundle,'utf8');const files=[...text.matchAll(/^\\i\s+(.+)$/gm)].map(m=>m[1].trim());pass(bundle+' references exist',files.every(f=>fs.existsSync(f)),`${files.length} includes`)}
 const app=fs.readFileSync('index.html','utf8');
 pass('no hardcoded owner email',!app.includes('afinch2678@gmail.com'));
