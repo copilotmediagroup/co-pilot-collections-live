@@ -79,7 +79,7 @@
 @media(max-width:1200px){.allFieldsGrid{grid-template-columns:repeat(2,1fr)}}@media(max-width:850px){.allFieldsGrid{grid-template-columns:1fr}}
 
     @media(max-width:1200px){.main{grid-template-columns:270px 1fr}.right{display:none}.phoneGrid,.dispoGrid{grid-template-columns:repeat(2,1fr)}}@media(max-width:850px){body{overflow:auto}.app{height:auto;display:block}.main{display:block}.sidebar,.center,.right{overflow:visible;margin-bottom:14px}.accountCard{grid-template-columns:1fr}.bottom{position:sticky;bottom:0}.grid{grid-template-columns:1fr}.two,.full{grid-column:1}}
-  
+
 /* EXACT MOCKUP LAYOUT FIX */
 :root{--navy:#072b73;--navy2:#0b3fb3;--blue:#1457ff;--bg:#f3f7fc;--card:#ffffff;--line:#d9e3f0;--text:#0f172a;--muted:#64748b;--soft:#f8fbff}
 body{background:var(--bg);font-size:14px}
@@ -4167,7 +4167,7 @@ header.topbar{height:58px!important;padding:0 12px!important;grid-template-colum
         <div class="assignNoManualNotice">Employees must appear here from real signup + admin approval. Manual employee entry is disabled.</div>
         <div id="employeeEmptyNotice" class="employeeEmpty hidden">No approved employees yet. Employees must sign up first, then admin must approve them in Manage Employees.</div>
       </div>
-      
+
 
       <div>
         <label>Assignment Count</label>
@@ -11128,7 +11128,7 @@ buildChatContacts = function(){
       let role=String(u.role||'').toLowerCase();
       if(email && role==='admin')add(email);
     });
-    
+
   }
 
   (chatAllMessages||[]).forEach(m=>{
@@ -11456,7 +11456,7 @@ buildChatContacts = function(){
       let role=String(u.role||'').toLowerCase();
       if(email && role==='admin')add(email);
     });
-    
+
   }
 
   (chatPresenceData||[]).forEach(p=>{
@@ -12530,8 +12530,8 @@ function exportContactIntelligenceCSV(){let calls=filteredContactCalls();let row
       return;
     }
     var status=latest.status||'Pending Approval';
-    panel.innerHTML='<div class="settleTop"><div><div class="settleTitle">Settlement Workflow <span class="settlePill '+sStatusClass(status)+'">'+sEsc(status)+'</span></div><div class="settleSub">Latest offer for '+sEsc(sName(a))+' • Account '+sEsc(sAcct(a)||'—')+'</div></div><div class="settleActions"><button class="green" onclick="openSettlementModal()">New Offer</button><button class="outline" onclick="openSettlementApprovalPage()">Settlement Dashboard</button></div></div>'+ 
-      '<div class="settleMetrics"><div class="settleMetric"><div class="settleLabel">Current Balance</div><div class="settleValue">'+sMoney(sBalance(a))+'</div></div><div class="settleMetric"><div class="settleLabel">Settlement Amount</div><div class="settleValue">'+sMoney(latest.settlementAmount)+'</div></div><div class="settleMetric"><div class="settleLabel">Settlement %</div><div class="settleValue">'+(latest.settlementPercent||0).toFixed(2)+'%</div></div><div class="settleMetric"><div class="settleLabel">Due Date</div><div class="settleValue">'+sEsc(latest.dueDate||'—')+'</div></div><div class="settleMetric"><div class="settleLabel">Proposed By</div><div class="settleValue">'+sEsc(latest.createdByEmail||'—')+'</div></div></div>'+ 
+    panel.innerHTML='<div class="settleTop"><div><div class="settleTitle">Settlement Workflow <span class="settlePill '+sStatusClass(status)+'">'+sEsc(status)+'</span></div><div class="settleSub">Latest offer for '+sEsc(sName(a))+' • Account '+sEsc(sAcct(a)||'—')+'</div></div><div class="settleActions"><button class="green" onclick="openSettlementModal()">New Offer</button><button class="outline" onclick="openSettlementApprovalPage()">Settlement Dashboard</button></div></div>'+
+      '<div class="settleMetrics"><div class="settleMetric"><div class="settleLabel">Current Balance</div><div class="settleValue">'+sMoney(sBalance(a))+'</div></div><div class="settleMetric"><div class="settleLabel">Settlement Amount</div><div class="settleValue">'+sMoney(latest.settlementAmount)+'</div></div><div class="settleMetric"><div class="settleLabel">Settlement %</div><div class="settleValue">'+(latest.settlementPercent||0).toFixed(2)+'%</div></div><div class="settleMetric"><div class="settleLabel">Due Date</div><div class="settleValue">'+sEsc(latest.dueDate||'—')+'</div></div><div class="settleMetric"><div class="settleLabel">Proposed By</div><div class="settleValue">'+sEsc(latest.createdByEmail||'—')+'</div></div></div>'+
       '<div class="settleNote"><b>Notes:</b> '+sEsc(latest.notes||'No notes saved.')+'</div>';
   }
 
@@ -13443,10 +13443,10 @@ function exportContactIntelligenceCSV(){let calls=filteredContactCalls();let row
       let online=c.self?true:onlineEmail(c.email);
       let meta=(c.self?'You • ':'')+safe(staffRole(c.email))+' • <span class="'+(online?'onlineText':'offlineText')+'">'+(online?'Online':'Offline')+'</span>'+(c.lastPreview&&!c.self?' • '+safe(c.lastPreview):'');
       let click=c.self?'onclick="window.cpcmOpenStaffNameModal(\''+safe(c.email)+'\')"':'onclick="selectChatContact(\''+safe(c.email)+'\')"';
-      return '<div class="chatContact '+(c.self?'self':'')+' '+(c.email===chatActiveEmail?'active':'')+' '+(c.unread?'hasUnread':'')+'" '+click+'>'+ 
-        '<div class="chatAvatar">'+safe(window.cpcmStaffInitials(c.email))+'<span class="chatOnlineDot '+(online?'live':'off')+'"></span></div>'+ 
-        '<div class="chatContactMain"><div class="chatContactName">'+safe(window.cpcmStaffDisplayName(c.email))+(c.self?' <span class="chatSelfBadge">You</span>':'')+'</div><div class="chatContactMeta">'+meta+'</div></div>'+ 
-        '<div class="chatContactUnread '+(c.unread?'':'zero')+'">'+(c.unread?(c.unread>99?'99+':c.unread):'')+'</div>'+ 
+      return '<div class="chatContact '+(c.self?'self':'')+' '+(c.email===chatActiveEmail?'active':'')+' '+(c.unread?'hasUnread':'')+'" '+click+'>'+
+        '<div class="chatAvatar">'+safe(window.cpcmStaffInitials(c.email))+'<span class="chatOnlineDot '+(online?'live':'off')+'"></span></div>'+
+        '<div class="chatContactMain"><div class="chatContactName">'+safe(window.cpcmStaffDisplayName(c.email))+(c.self?' <span class="chatSelfBadge">You</span>':'')+'</div><div class="chatContactMeta">'+meta+'</div></div>'+
+        '<div class="chatContactUnread '+(c.unread?'':'zero')+'">'+(c.unread?(c.unread>99?'99+':c.unread):'')+'</div>'+
       '</div>';
     }).join('') || '<div class="tmEmpty">No employees/admin are available yet.</div>';
     renderPresenceBanner();
@@ -13458,8 +13458,8 @@ function exportContactIntelligenceCSV(){let calls=filteredContactCalls();let row
     let seen=mine&&(m.readAt||m.read_at);
     return '<div class="chatBubbleWrap '+(mine?'mine':'theirs')+'">'+
       '<div class="chatSenderName '+(mine?'mine':'theirs')+'">'+safe(window.cpcmStaffDisplayName(from))+'</div>'+
-      '<div class="chatBubble">'+safe(m.body||'')+'</div>'+ 
-      '<div class="chatMetaLine">'+safe(formatChatDate(m.createdAt||m.created_at||Date.now()))+(seen?' • Seen':'')+'</div>'+ 
+      '<div class="chatBubble">'+safe(m.body||'')+'</div>'+
+      '<div class="chatMetaLine">'+safe(formatChatDate(m.createdAt||m.created_at||Date.now()))+(seen?' • Seen':'')+'</div>'+
     '</div>';
   };
 
