@@ -17,7 +17,7 @@ declare
   oid uuid := private.assert_account_in_current_organization(p_account_id);
   v_now timestamptz := now();
   v_call_id uuid;
-  v_email text := lower(coalesce(nullif(auth.jwt()->>'email',''), nullif(p_created_by_email,''), 'unknown'));
+  v_email text := public.current_app_email();
   v_count integer := 0;
   v_inserted boolean := false;
 begin
@@ -107,7 +107,7 @@ declare
   v_now timestamptz := now();
   v_call_id uuid;
   v_existing_status text;
-  v_email text := lower(coalesce(nullif(auth.jwt()->>'email',''), nullif(p_created_by_email,''), 'unknown'));
+  v_email text := public.current_app_email();
   v_new_call boolean := false;
   v_duplicate boolean := false;
 begin
