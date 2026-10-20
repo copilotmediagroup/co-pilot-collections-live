@@ -5809,7 +5809,7 @@ async function upsertCurrentUser(){
      updated_at:new Date().toISOString(),
      last_seen_at:new Date().toISOString()
    };
-   let rows=await dbFetch('/app_users',{method:'POST',body:JSON.stringify([row])}).catch(async err=>{
+   let rows=await dbFetch('/app_users',{method:'POST',body:JSON.stringify([tenantRow(row)])}).catch(async err=>{
      let retry=await dbFetch('/app_users?email=eq.'+encodeURIComponent(currentUser.email)+'&select=*').catch(()=>[]);
      return retry;
    });
@@ -7176,7 +7176,7 @@ async function editAccountCommunicationCompliance(){
  if(noticeIso&&!String(source||'').trim())return alert('Evidence/source is required before a validation notice can be recorded as sent.');
  const body={account_id:a.id,first_debt_communication_at:firstIso,validation_notice_sent_at:noticeIso,validation_notice_method:noticeIso?String(method||'').trim():null,validation_notice_source:noticeIso?String(source||'').trim():null,recorded_by_email:currentUser.email,updated_at:new Date().toISOString()};
  if(rows?.length)await dbFetch('/account_communication_compliance?account_id=eq.'+encodeURIComponent(a.id),{method:'PATCH',body:JSON.stringify(body)});
- else await dbFetch('/account_communication_compliance',{method:'POST',body:JSON.stringify([body])});
+ else await dbFetch('/account_communication_compliance',{method:'POST',body:JSON.stringify([tenantRow(body)])});
  await insertAudit('Communication Compliance Updated','First communication: '+(firstIso||'not recorded')+'; validation notice: '+(noticeIso||'not recorded')+'; source: '+(body.validation_notice_source||'none'),'account',a.id).catch(()=>{});
  alert('Communication-compliance evidence saved.\n\nThis records evidence only; it does not send a validation notice.');
 }
@@ -9979,12 +9979,12 @@ async function insertAccountRows(rows){
    let chunk=rows.slice(i,i+250);
    setImportProgress(Math.max(1,Math.round((done/Math.max(total,1))*100)),'Saving batch '+(Math.floor(i/250)+1),'Saving '+Math.min(i+chunk.length,total)+' of '+total+' rows to database...');
    try{
-     await dbFetch('/accounts',{method:'POST',body:JSON.stringify(mode==='core'?chunk.map(coreAccountRow):chunk)});
+     await dbFetch('/accounts',{method:'POST',body:JSON.stringify((mode==='core'?chunk.map(coreAccountRow):chunk).map(tenantRow))});
    }catch(err){
      let msg=String(err.message||err);
      if(mode==='full' && (msg.toLowerCase().includes('schema cache') || msg.toLowerCase().includes('column') || msg.toLowerCase().includes('could not find'))){
        mode='core';
-       await dbFetch('/accounts',{method:'POST',body:JSON.stringify(chunk.map(coreAccountRow))});
+       await dbFetch('/accounts',{method:'POST',body:JSON.stringify(chunk.map(coreAccountRow).map(tenantRow))});
      }else{
        throw err;
      }
@@ -11033,7 +11033,7 @@ async function setTyping(isTyping){
     if(found&&found[0]){
       await dbFetch('/team_typing_status?id=eq.'+found[0].id,{method:'PATCH',body:JSON.stringify(row)});
     }else{
-      await dbFetch('/team_typing_status',{method:'POST',body:JSON.stringify([row])});
+      await dbFetch('/team_typing_status',{method:'POST',body:JSON.stringify([tenantRow(row)])});
     }
   }catch(e){}
 }
@@ -11724,7 +11724,7 @@ function exportContactIntelligenceCSV(){let calls=filteredContactCalls();let row
         updated_at:new Date().toISOString()
       });
     }
-    await dbFetch('/payment_promises',{method:'POST',body:JSON.stringify(rows)});
+    await dbFetch('/payment_promises',{method:'POST',body:JSON.stringify(rows.map(tenantRow))});
     await dbFetch(`/accounts?id=eq.${a.id}`,{method:'PATCH',body:JSON.stringify({status:'Promise to Pay',disposition:'Promise to Pay',updated_at:new Date().toISOString()})}).catch(()=>{});
     await sfInsertActivity(a.id,'Payment Promise Recorded',`${count} payment promise(s) recorded for ${sfMoney(amount)} each. First due ${due}. Method: ${method}${last4?' ending '+last4:''}. ${notes}`.trim());
     await sfInsertAudit('Payment Promise Recorded',`${count} payment promise(s) for ${sfName(a)} totaling ${sfMoney(amount*count)}`,'account',a.id);
@@ -13743,7 +13743,7 @@ function exportContactIntelligenceCSV(){let calls=filteredContactCalls();let row
         return profile;
       }
       let admin=isAdminEmail(currentUser.email),role=admin?'admin':requested,row={email:currentUser.email,role,approval_status:admin?'approved':'pending',is_approved:admin,is_active:admin,client_portal_enabled:false,created_at:new Date().toISOString(),updated_at:new Date().toISOString(),last_seen_at:new Date().toISOString()};
-      let rows=await dbFetch('/app_users',{method:'POST',body:JSON.stringify([row])}).catch(async()=>await dbFetch('/app_users?email=eq.'+encodeURIComponent(currentUser.email)+'&select=*').catch(()=>[]));return rows&&rows[0]?toCamel(rows[0]):null;
+      let rows=await dbFetch('/app_users',{method:'POST',body:JSON.stringify([tenantRow(row)])}).catch(async()=>await dbFetch('/app_users?email=eq.'+encodeURIComponent(currentUser.email)+'&select=*').catch(()=>[]));return rows&&rows[0]?toCamel(rows[0]):null;
     }catch(err){console.warn('Client-aware profile upsert failed',err);return isAdminEmail(currentUser.email)?{email:currentUser.email,role:'admin',approvalStatus:'approved',isApproved:true,isActive:true}:null;}
   };
 
