@@ -28,8 +28,9 @@ BEGIN
    WHERE n.nspname='public' AND c.relname=ANY(ARRAY[
    'app_users','accounts','account_notes','activity_logs','payment_plans','payment_plan_payments','payment_promises','payments_ledger','account_docs','call_results','follow_ups','disputes','settlements','audit_logs','role_permissions','import_batches','company_settings','collector_alerts','compliance_events','client_portfolio_assignments','client_fee_schedules','client_remittance_batches','client_remittance_items','team_messages','team_typing_status','team_presence'])
    AND c.relkind='r'
-   GROUP BY c.relname
-   HAVING count(*) FILTER (WHERE EXISTS (SELECT 1 FROM pg_policies p WHERE p.schemaname='public' AND p.tablename=c.relname AND p.policyname IN ('cpcm_tenant_select','cpcm_tenant_insert','cpcm_tenant_update','cpcm_tenant_delete'))) < 4
+   AND (SELECT count(DISTINCT p.policyname) FROM pg_policies p
+        WHERE p.schemaname='public' AND p.tablename=c.relname
+          AND p.policyname IN ('cpcm_tenant_select','cpcm_tenant_insert','cpcm_tenant_update','cpcm_tenant_delete')) < 4
  ) x;
  IF missing_fence IS NOT NULL THEN RAISE EXCEPTION 'BROAD POLICY AUDIT FAIL: incomplete cpcm tenant fence on %',array_to_string(missing_fence,', '); END IF;
 
