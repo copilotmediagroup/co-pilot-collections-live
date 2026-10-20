@@ -23,8 +23,8 @@
 - Phase 35: tenant-qualified ledger receipt and idempotency uniqueness.
 - Phase 36: identity-neutral platform-admin bootstrap; no hardcoded owner email.
 - Phase 37: RPC-only join-code secrets with stronger invitation entropy.
-- Ordered DEMO installer: `MULTI_TENANT_DEMO_PENDING_INSTALL_26_33.sql`.
-- Ordered structural/security gates: `MULTI_TENANT_DEMO_PENDING_GATES_26_33.sql`.
+- Ordered DEMO installer: `MULTI_TENANT_DEMO_PENDING_INSTALL_26_37.sql`.
+- Ordered structural/security gates: `MULTI_TENANT_DEMO_PENDING_GATES_26_37.sql`.
 
 ## Remaining before LIVE
 1. With explicit DEMO database authorization, install phases 26-37 and run all bundled structural/security gates.
