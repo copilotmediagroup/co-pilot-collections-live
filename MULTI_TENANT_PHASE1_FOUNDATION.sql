@@ -46,9 +46,7 @@ create table if not exists private.platform_admins (
   auth_user_id uuid primary key references auth.users(id) on delete cascade,
   created_at timestamptz not null default now()
 );
-insert into private.platform_admins(auth_user_id)
-select id from auth.users where lower(email)=lower('afinch2678@gmail.com')
-on conflict do nothing;
+-- Platform admins are intentionally not inferred from email. Grant trusted auth UUIDs explicitly.
 
 -- 2) Authorization helpers. SECURITY DEFINER is limited to private schema and execute is revoked from PUBLIC.
 create or replace function private.current_organization_id()
