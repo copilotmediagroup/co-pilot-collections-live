@@ -35,6 +35,6 @@ end $$;
 -- Commission legacy feature policy: keep employee self-view and agency-admin view, tenant fence still applies.
 drop policy if exists employee_commission_select_own_or_admin on public.employee_commission_earnings;
 create policy employee_commission_select_own_or_admin on public.employee_commission_earnings for select to authenticated
-using(lower(employee_email)=lower(coalesce(auth.jwt()->>'email','')) or private.is_organization_admin(organization_id) or private.is_platform_admin());
+using(lower(employee_email)=public.current_app_email() or private.is_organization_admin(organization_id) or private.is_platform_admin());
 
 commit;
