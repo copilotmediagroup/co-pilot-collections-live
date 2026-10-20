@@ -15,6 +15,6 @@ begin
   new.organization_id:=current_org;
   return new;
 end $cpcm$;
-revoke all on function private.stamp_current_organization() from public;
+revoke all on function private.stamp_current_organization() from public,anon;
 grant execute on function private.stamp_current_organization() to authenticated,service_role;
 commit;

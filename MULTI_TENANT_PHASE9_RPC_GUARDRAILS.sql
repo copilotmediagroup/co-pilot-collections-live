@@ -17,7 +17,7 @@ begin
  if v_org is null then raise exception 'Account not found in current organization' using errcode='42501'; end if;
  return v_org;
 end $$;
-revoke all on function private.assert_account_in_current_organization(uuid) from public;
+revoke all on function private.assert_account_in_current_organization(uuid) from public,anon;
 grant execute on function private.assert_account_in_current_organization(uuid) to authenticated;
 
 -- Tenant-safe phone lookup. SECURITY INVOKER means existing account RLS still applies.

@@ -220,6 +220,8 @@ begin
 end;
 $$;
 
+revoke all on function public.cpcm_record_call_attempt(uuid,text,text,text,text) from public,anon;
 grant execute on function public.cpcm_record_call_attempt(uuid,text,text,text,text) to authenticated;
+revoke all on function public.cpcm_complete_call_attempt(uuid,text,text,text,text,text,text,integer,text,boolean,boolean,boolean,boolean,boolean,timestamptz,numeric,text,text) from public,anon;
 grant execute on function public.cpcm_complete_call_attempt(uuid,text,text,text,text,text,text,integer,text,boolean,boolean,boolean,boolean,boolean,timestamptz,numeric,text,text) to authenticated;
 

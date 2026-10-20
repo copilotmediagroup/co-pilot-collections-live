@@ -101,9 +101,9 @@ as $$
      )
 $$;
 
-revoke all on function private.current_organization_id() from public;
-revoke all on function private.is_platform_admin() from public;
-revoke all on function private.is_organization_admin(uuid) from public;
+revoke all on function private.current_organization_id() from public,anon;
+revoke all on function private.is_platform_admin() from public,anon;
+revoke all on function private.is_organization_admin(uuid) from public,anon;
 grant usage on schema private to authenticated;
 grant execute on function private.current_organization_id() to authenticated;
 grant execute on function private.is_platform_admin() to authenticated;
