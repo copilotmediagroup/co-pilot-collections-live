@@ -5,9 +5,10 @@
   "type": "module",
   "scripts": {
     "dev": "vite --host 0.0.0.0",
-    "build": "vite build",
+    "build": "npm run build:config && vite build",
     "preview": "vite preview --host 0.0.0.0",
-    "start": "vite --host 0.0.0.0"
+    "start": "vite --host 0.0.0.0",
+    "build:config": "node scripts-generate-runtime-config.mjs"
   },
   "devDependencies": {
     "vite": "^5.4.21"
