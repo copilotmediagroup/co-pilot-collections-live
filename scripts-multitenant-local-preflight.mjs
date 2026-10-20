@@ -15,5 +15,10 @@ const p32=fs.readFileSync('MULTI_TENANT_PHASE32_MEMBERSHIP_LIFECYCLE_SYNC.sql','
 pass('activation requires approval',p32.includes('user must be approved before activation'));
 const p37=fs.readFileSync('MULTI_TENANT_PHASE37_JOIN_CODE_TABLE_LOCKDOWN.sql','utf8');
 pass('join code table browser grants revoked',p37.includes('from public,anon,authenticated'));
+const voice=fs.readFileSync('supabase/functions/voice-broadcast/index.ts','utf8');
+pass('voice broadcast writes tenant ownership',voice.includes('organization_id: actor.organizationId'));
+pass('voice broadcast mutations tenant-scoped',voice.includes('.eq(\"organization_id\", actor.organizationId)'));
+const nmi38=fs.readFileSync('MULTI_TENANT_PHASE38_NMI_TENANT_IDEMPOTENCY.sql','utf8');
+pass('NMI idempotency tenant-qualified',nmi38.includes('nmi_transactions(organization_id,idempotency_key)'));
 try{execFileSync('git',['diff','--check'],{stdio:'pipe'});pass('git diff --check',true)}catch(e){pass('git diff --check',false,String(e.stdout||e.message))}
 if(failed)process.exit(1);
