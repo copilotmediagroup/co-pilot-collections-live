@@ -33,8 +33,8 @@ insert into public.payment_plans(account_id,total_amount,starting_balance,remain
 values (:'a_account'::uuid,111.11,111.11,111.11,'Monthly','Active','CPCM SEEDED A',:'a_email') returning id::text as a_plan \gset
 insert into public.payments_ledger(account_id,payment_date,amount,payment_type,payment_method,status,receipt_number,notes,created_by_email)
 values (:'a_account'::uuid,current_date,11.11,'Payment','Test','Completed','CPCM-A-SEEDED','CPCM SEEDED A',:'a_email') returning id::text as a_ledger \gset
-insert into public.account_docs(account_id,doc_title,doc_type,doc_url,notes,created_by_email)
-values (:'a_account'::uuid,'CPCM SEEDED A','test','https://example.invalid/a','CPCM SEEDED A',:'a_email') returning id::text as a_doc \gset
+insert into public.account_docs(account_id,doc_type,document_type,file_name,debtor_name,created_by_email)
+values (:'a_account'::uuid,'test','test','CPCM-SEEDED-A.pdf','CPCM SEEDED A',:'a_email') returning id::text as a_doc \gset
 reset role;
 
 select set_config('request.jwt.claims',json_build_object('sub',:'b_user','role','authenticated','email',:'b_email')::text,true);
@@ -43,8 +43,8 @@ insert into public.payment_plans(account_id,total_amount,starting_balance,remain
 values (:'b_account'::uuid,222.22,222.22,222.22,'Monthly','Active','CPCM SEEDED B',:'b_email') returning id::text as b_plan \gset
 insert into public.payments_ledger(account_id,payment_date,amount,payment_type,payment_method,status,receipt_number,notes,created_by_email)
 values (:'b_account'::uuid,current_date,22.22,'Payment','Test','Completed','CPCM-B-SEEDED','CPCM SEEDED B',:'b_email') returning id::text as b_ledger \gset
-insert into public.account_docs(account_id,doc_title,doc_type,doc_url,notes,created_by_email)
-values (:'b_account'::uuid,'CPCM SEEDED B','test','https://example.invalid/b','CPCM SEEDED B',:'b_email') returning id::text as b_doc \gset
+insert into public.account_docs(account_id,doc_type,document_type,file_name,debtor_name,created_by_email)
+values (:'b_account'::uuid,'test','test','CPCM-SEEDED-B.pdf','CPCM SEEDED B',:'b_email') returning id::text as b_doc \gset
 reset role;
 
 select set_config('cpcm.test_a_plan',:'a_plan',true); select set_config('cpcm.test_b_plan',:'b_plan',true);
