@@ -13719,8 +13719,19 @@ function exportContactIntelligenceCSV(){let calls=filteredContactCalls();let row
     if(currentUser.isClient)hideCollectorApp(true);else if(!ce('clientPortalPage')?.classList.contains('open'))hideCollectorApp(false);
   };
 
+  async function bootstrapAgencyAdminProfile(){
+    try{
+      let rows=await dbFetch('/rpc/cpcm_bootstrap_current_agency_admin_profile',{method:'POST',body:'{}'});
+      let row=Array.isArray(rows)?rows[0]:rows;
+      return row?toCamel(row):null;
+    }catch(e){return null;}
+  }
+
   upsertCurrentUser=async function(){
-    if(!currentUser.email)return null;let requested=String(currentUser.requestedRole||'employee').toLowerCase()==='client'?'client':'employee';
+    if(!currentUser.email)return null;
+    let trustedAdmin=await bootstrapAgencyAdminProfile();
+    if(trustedAdmin)return trustedAdmin;
+    let requested=String(currentUser.requestedRole||'employee').toLowerCase()==='client'?'client':'employee';
     try{
       let existing=await dbFetch('/app_users?organization_id=eq.'+encodeURIComponent(currentOrganizationId)+'&email=eq.'+encodeURIComponent(currentUser.email)+'&select=*').catch(()=>[]);
       if(existing&&existing[0]){
