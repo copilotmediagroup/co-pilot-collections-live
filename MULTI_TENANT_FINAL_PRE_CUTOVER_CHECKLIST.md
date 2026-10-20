@@ -20,11 +20,12 @@
 - Phase 32: staff approval/removal synchronized to tenant membership lifecycle.
 - Phase 33: tenant-safe agency-admin join-code creation/listing/deactivation.
 - Phase 34: platform recruiting public-insert RLS hardening.
+- Phase 35: tenant-qualified ledger receipt and idempotency uniqueness.
 - Ordered DEMO installer: `MULTI_TENANT_DEMO_PENDING_INSTALL_26_33.sql`.
 - Ordered structural/security gates: `MULTI_TENANT_DEMO_PENDING_GATES_26_33.sql`.
 
 ## Remaining before LIVE
-1. With explicit DEMO database authorization, install phases 26-34 and run all bundled structural/security gates.
+1. With explicit DEMO database authorization, install phases 26-35 and run all bundled structural/security gates.
 2. Run Phase 26/28 synthetic lifecycle tests with disposable DEMO auth users.
 3. New-agency smoke: provision agency -> first admin login/bootstrap -> create employee/client join codes -> signup -> approve -> account creation -> assignment -> call/note -> promise/plan -> Messenger -> report/remittance.
 4. Staff lifecycle smoke: deactivate/remove employee and verify tenant resolution/access is blocked; reactivate approved employee and verify access returns.
