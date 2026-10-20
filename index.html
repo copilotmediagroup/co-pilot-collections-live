@@ -13712,7 +13712,7 @@ function exportContactIntelligenceCSV(){let calls=filteredContactCalls();let row
 
   const originalForce=forceCurrentUserRole;
   forceCurrentUserRole=function(profile=null){
-    let role=String(profile?.role||currentUser?.requestedRole||'employee').toLowerCase().trim();
+    let role=String(profile?.role||'employee').toLowerCase().trim();
     if(isAdminEmail(currentUser.email)||isAdminProfile(profile))role='admin';
     currentUser.role=role;currentUser.profile=profile||currentUser.profile||null;currentUser.isAdmin=role==='admin';currentUser.isClient=role==='client';return role;
   };
@@ -13753,7 +13753,7 @@ function exportContactIntelligenceCSV(){let calls=filteredContactCalls();let row
   boot=async function(){
     fillConnection();if(!connectionIsReady()||!token()){hideCollectorApp(false);ce('loginScreen').classList.add('open');return;}
     try{
-      clearLoginError();let user=await getUser();let requested=String(user?.user_metadata?.requested_role||user?.user_metadata?.requestedRole||'employee').toLowerCase();currentUser={email:String(user.email||'').toLowerCase(),isAdmin:isAdminEmail(user.email||''),isClient:false,requestedRole:requested};await loadCurrentOrganization();if(!currentOrganizationId)throw new Error('Your organization is suspended, cancelled, or not assigned. Contact your administrator.');let profile=await upsertCurrentUser();forceCurrentUserRole(profile);
+      clearLoginError();let user=await getUser();let requested='employee';currentUser={email:String(user.email||'').toLowerCase(),isAdmin:false,isClient:false,requestedRole:requested};await loadCurrentOrganization();if(!currentOrganizationId)throw new Error('Your organization is suspended, cancelled, or not assigned. Contact your administrator.');let profile=await upsertCurrentUser();forceCurrentUserRole(profile);
       if(!isUserApproved(profile)){ce('loginScreen').classList.remove('open');ce('pendingScreen').classList.add('open');hideCollectorApp(true);return;}
       ce('pendingScreen').classList.remove('open');ce('loginScreen').classList.remove('open');applyRoleUI();await loadAppBrandSettings(true);await loadPdfLetterSettings(true);
       if(currentUser.isClient){await openClientPortal();return;}
