@@ -45,7 +45,7 @@ begin
  before_bal:=greatest(coalesce(a.current_balance,0),0); after_bal:=greatest(before_bal-amt,0); receipt:='PTP-'||target_promise_id::text;
  insert into public.payments_ledger(organization_id,account_id,amount,payment_amount,payment_date,paid_at,payment_method,status,notes,created_by_email,payment_type,receipt_number,balance_before,balance_after,idempotency_key)
  values(oid,p.account_id,amt,amt,current_date,now(),coalesce(p.payment_method,'Other'),'Completed','Admin marked payment promise paid. '||coalesce(p.notes,''),coalesce(actor_email,p.processed_by_email,p.employee_email,'system'),'Payment',receipt,before_bal,after_bal,receipt)
- on conflict (receipt_number) where receipt_number is not null and btrim(receipt_number)<>'' do nothing returning id into ledger_id;
+ on conflict (organization_id,receipt_number) where receipt_number is not null and btrim(receipt_number)<>'' do nothing returning id into ledger_id;
  if ledger_id is null then select id into ledger_id from public.payments_ledger where organization_id=oid and receipt_number=receipt limit 1; return jsonb_build_object('ok',true,'already_paid',true,'ledger_id',ledger_id,'account_id',p.account_id); end if;
  update public.accounts set current_balance=after_bal,status=case when after_bal<=0 then 'Settled' else status end,disposition=case when after_bal<=0 then 'Settled' else disposition end,updated_at=now() where organization_id=oid and id=p.account_id;
  update public.payment_promises set status='Paid',paid_amount=amt,paid_date=current_date,processed_by_email=coalesce(actor_email,processed_by_email),processed_at=now(),updated_at=now() where organization_id=oid and id=target_promise_id;
