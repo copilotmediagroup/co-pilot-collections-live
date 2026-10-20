@@ -6,6 +6,8 @@ update public.organization_members set is_active=false where auth_user_id=:'a_us
 insert into public.organization_members(organization_id,auth_user_id,role,is_active) values ('10000000-0000-4000-8000-000000000001',:'a_user'::uuid,'client',true) on conflict(organization_id,auth_user_id) do update set role='client',is_active=true;
 update public.app_users set organization_id='10000000-0000-4000-8000-000000000001'::uuid,role='client',is_active=true,is_approved=true,approval_status='approved' where lower(email)=lower(:'a_email');
 with r as (select id,row_number() over(order by id) rn from public.accounts limit 2) update public.accounts a set organization_id='10000000-0000-4000-8000-000000000001'::uuid,assigned_to_email=:'a_email',portfolio=case when r.rn=1 then 'CPCM_ALLOWED_TEST' else 'CPCM_DENIED_TEST' end from r where a.id=r.id;
+-- Seed JWT claims before this fixture INSERT because the tenant-stamp trigger resolves auth.uid().
+select set_config('request.jwt.claims',json_build_object('sub',:'a_user','role','authenticated','email',:'a_email')::text,true);
 insert into public.client_portfolio_assignments(client_email,portfolio_name,organization_id) values (:'a_email','CPCM_ALLOWED_TEST','10000000-0000-4000-8000-000000000001'::uuid) on conflict(organization_id,client_email,portfolio_name) do nothing;
 select id::text allowed_account from public.accounts where organization_id='10000000-0000-4000-8000-000000000001'::uuid and portfolio='CPCM_ALLOWED_TEST' limit 1 \gset
 select id::text denied_account from public.accounts where organization_id='10000000-0000-4000-8000-000000000001'::uuid and portfolio='CPCM_DENIED_TEST' limit 1 \gset
