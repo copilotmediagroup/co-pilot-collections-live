@@ -15105,7 +15105,7 @@ window.setStaffRole=async function(email,role){
  if(!currentUser?.isAdmin)return alert('Admin only');email=String(email||'').toLowerCase();role=String(role||'').toLowerCase();
  if(!['employee','recruiter'].includes(role))return alert('Unsupported role.');
  let label=role==='recruiter'?'Recruiter':'Employee';if(!confirm('Change '+email+' to '+label+'?'))return;
- try{let rows=await dbFetch('/app_users?organization_id=eq.'+encodeURIComponent(currentOrganizationId)+'&email=eq.'+encodeURIComponent(email),{method:'PATCH',body:JSON.stringify({role,updated_at:new Date().toISOString()})});if(!Array.isArray(rows)||!rows.length)throw new Error('Role was not updated.');await loadEmployeeAdminList();alert(email+' is now '+label+'. Their next login will route to the correct dashboard.')}catch(e){alert('Could not change role: '+(e.message||e))}
+ try{await dbFetch('/rpc/cpcm_admin_set_staff_role',{method:'POST',body:JSON.stringify({target_email:email,new_role:role})});await loadEmployeeAdminList();alert(email+' is now '+label+'. Their next login will route to the correct dashboard.')}catch(e){alert('Could not change role: '+(e.message||e))}
 };
 window.recruiterMoveCandidate=async function(id,status){
  if(String(currentUser?.role||'').toLowerCase()!=='recruiter'||!status)return;
