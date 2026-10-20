@@ -169,10 +169,11 @@ async function complianceSnapshot(admin: any, account: any) {
   };
 }
 
-async function insertActivity(admin: any, accountId: string, type: string, text: string, email: string, phone = "") {
+async function insertActivity(admin: any, organizationId: string, accountId: string, type: string, text: string, email: string, phone = "") {
   try {
     await admin.from("activity_logs").insert({
       account_id: accountId,
+      organization_id: organizationId,
       action_type: type,
       action_text: text,
       phone_number: phone || null,
@@ -181,22 +182,23 @@ async function insertActivity(admin: any, accountId: string, type: string, text:
     });
   } catch {
     try {
-      await admin.from("activity_logs").insert({ account_id: accountId, action_type: type, action_text: text, created_by_email: email });
+      await admin.from("activity_logs").insert({ account_id: accountId, organization_id: organizationId, action_type: type, action_text: text, created_by_email: email });
     } catch { /* telemetry must never stop dialing */ }
   }
 }
 
-async function maybeCompleteCampaign(admin: any, campaignId: string) {
+async function maybeCompleteCampaign(admin: any, campaignId: string, organizationId: string) {
   const { count } = await admin.from("voice_broadcast_campaign_accounts")
     .select("id", { count: "exact", head: true })
     .eq("campaign_id", campaignId)
+    .eq("organization_id", organizationId)
     .in("status", ["queued", "retry", "initiating", "ringing", "human", "pressed_1", "transferring", "connected"]);
   if (!count) {
     await admin.from("voice_broadcast_campaigns").update({
       status: "completed",
       completed_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
-    }).eq("id", campaignId).eq("status", "running");
+    }).eq("id", campaignId).eq("organization_id", organizationId).eq("status", "running");
     return true;
   }
   return false;
@@ -219,6 +221,7 @@ async function dispatchBatch(admin: any, actor: any, input: any) {
   const { count: activeCount } = await admin.from("voice_broadcast_calls")
     .select("id", { count: "exact", head: true })
     .eq("campaign_id", campaignId)
+    .eq("organization_id", actor.organizationId)
     .in("status", activeStatuses);
   const maxConcurrent = Math.max(1, Math.min(10, Number(campaign.max_concurrent || 1)));
   const concurrencySlots = Math.max(0, maxConcurrent - Number(activeCount || 0));
@@ -227,6 +230,7 @@ async function dispatchBatch(admin: any, actor: any, input: any) {
   const { count: recentCount } = await admin.from("voice_broadcast_calls")
     .select("id", { count: "exact", head: true })
     .eq("campaign_id", campaignId)
+    .eq("organization_id", actor.organizationId)
     .gte("started_at", minuteAgo);
   const callsPerMinute = Math.max(1, Math.min(60, Number(campaign.calls_per_minute || 6)));
   const rateSlots = Math.max(0, callsPerMinute - Number(recentCount || 0));
@@ -237,6 +241,7 @@ async function dispatchBatch(admin: any, actor: any, input: any) {
   const { data: queued } = await admin.from("voice_broadcast_campaign_accounts")
     .select("*")
     .eq("campaign_id", campaignId)
+    .eq("organization_id", actor.organizationId)
     .in("status", ["queued", "retry"])
     .order("sort_order", { ascending: true })
     .limit(Math.max(25, slots * 5));
@@ -248,7 +253,7 @@ async function dispatchBatch(admin: any, actor: any, input: any) {
     if (launched.length >= slots) break;
     const { data: account } = await admin.from("accounts").select("*").eq("id", candidate.account_id).eq("organization_id", actor.organizationId).maybeSingle();
     if (!account) {
-      await admin.from("voice_broadcast_campaign_accounts").update({ status: "failed", last_error: "Account not found", updated_at: new Date().toISOString() }).eq("id", candidate.id);
+      await admin.from("voice_broadcast_campaign_accounts").update({ status: "failed", last_error: "Account not found", updated_at: new Date().toISOString() }).eq("id", candidate.id).eq("organization_id", actor.organizationId);
       blocked.push({ id: candidate.id, reason: "Account not found" });
       continue;
     }
@@ -271,8 +276,8 @@ async function dispatchBatch(admin: any, actor: any, input: any) {
         last_error: reason,
         compliance_snapshot: effectiveCompliance,
         updated_at: new Date().toISOString(),
-      }).eq("id", candidate.id);
-      await insertActivity(admin, account.id, "Broadcast Compliance Block", `Voice broadcast skipped account: ${reason}.`, actor.email, selectedPhone);
+      }).eq("id", candidate.id).eq("organization_id", actor.organizationId);
+      await insertActivity(admin, actor.organizationId, account.id, "Broadcast Compliance Block", `Voice broadcast skipped account: ${reason}.`, actor.email, selectedPhone);
       blocked.push({ id: candidate.id, reason });
       continue;
     }
@@ -286,10 +291,11 @@ async function dispatchBatch(admin: any, actor: any, input: any) {
       compliance_snapshot: effectiveCompliance,
       last_error: null,
       updated_at: now,
-    }).eq("id", candidate.id).in("status", ["queued", "retry"]).select("*").maybeSingle();
+    }).eq("id", candidate.id).eq("organization_id", actor.organizationId).in("status", ["queued", "retry"]).select("*").maybeSingle();
     if (!claimed) continue;
 
     const { data: call, error: callError } = await admin.from("voice_broadcast_calls").insert({
+      organization_id: actor.organizationId,
       campaign_id: campaign.id,
       campaign_account_id: candidate.id,
       account_id: account.id,
@@ -332,13 +338,13 @@ async function dispatchBatch(admin: any, actor: any, input: any) {
         status: firstText(payload.status, "initiated"),
         provider_payload: payload,
         updated_at: new Date().toISOString(),
-      }).eq("id", call.id);
+      }).eq("id", call.id).eq("organization_id", actor.organizationId);
       await admin.from("voice_broadcast_campaign_accounts").update({
         status: "ringing",
         attempt_count: Number(candidate.attempt_count || 0) + 1,
         updated_at: new Date().toISOString(),
-      }).eq("id", candidate.id);
-      await insertActivity(admin, account.id, "Voice Broadcast Attempt", `Voice broadcast call started to ${selectedPhone}.`, actor.email, selectedPhone);
+      }).eq("id", candidate.id).eq("organization_id", actor.organizationId);
+      await insertActivity(admin, actor.organizationId, account.id, "Voice Broadcast Attempt", `Voice broadcast call started to ${selectedPhone}.`, actor.email, selectedPhone);
       launched.push({ callId: call.id, providerCallSid: providerSid, accountId: account.id, phoneNumber: selectedPhone });
       console.log("[voice-broadcast] Twilio call created", { campaignId, callId: call.id, providerCallSid: providerSid, phoneNumber: selectedPhone });
     } catch (error) {
@@ -352,7 +358,7 @@ async function dispatchBatch(admin: any, actor: any, input: any) {
         finalized_at: new Date().toISOString(),
         provider_payload: { error: message },
         updated_at: new Date().toISOString(),
-      }).eq("id", call.id);
+      }).eq("id", call.id).eq("organization_id", actor.organizationId);
       await admin.from("voice_broadcast_campaign_accounts").update({
         status: retry ? "retry" : "failed",
         attempt_count: attempts,
@@ -360,14 +366,14 @@ async function dispatchBatch(admin: any, actor: any, input: any) {
         last_error: message,
         sort_order: retry ? Date.now() : candidate.sort_order,
         updated_at: new Date().toISOString(),
-      }).eq("id", candidate.id);
-      await insertActivity(admin, account.id, "Voice Broadcast Error", `Twilio could not start the call: ${message}`, actor.email, selectedPhone);
+      }).eq("id", candidate.id).eq("organization_id", actor.organizationId);
+      await insertActivity(admin, actor.organizationId, account.id, "Voice Broadcast Error", `Twilio could not start the call: ${message}`, actor.email, selectedPhone);
       blocked.push({ id: candidate.id, reason: message });
       console.error("[voice-broadcast] Twilio call failed", { campaignId, campaignAccountId: candidate.id, accountId: account.id, phoneNumber: selectedPhone, error: message });
     }
   }
 
-  const completed = await maybeCompleteCampaign(admin, campaignId);
+  const completed = await maybeCompleteCampaign(admin, campaignId, actor.organizationId);
   console.log("[voice-broadcast] dispatch_batch completed", { campaignId, launchedCount: launched.length, blockedCount: blocked.length, campaignComplete: completed });
   const blockedReasons = Array.from(new Set(blocked.map((row: any) => firstText(row?.reason)).filter(Boolean))).slice(0, 5);
   const noCallMessage = blockedReasons.length
@@ -445,7 +451,7 @@ async function campaignControl(admin: any, actor: any, input: any) {
   if (!campaignId || !["start", "pause", "resume", "stop"].includes(command)) {
     throw new Response(JSON.stringify({ error: "A valid campaignId and command are required." }), { status: 400 });
   }
-  const { data: existing } = await admin.from("voice_broadcast_campaigns").select("*").eq("id", campaignId).maybeSingle();
+  const { data: existing } = await admin.from("voice_broadcast_campaigns").select("*").eq("id", campaignId).eq("organization_id", actor.organizationId).maybeSingle();
   if (!existing) throw new Response(JSON.stringify({ error: "Campaign not found." }), { status: 404 });
   if ((command === "start" || command === "resume") && !existing.compliance_confirmed) {
     throw new Response(JSON.stringify({ error: "Confirm the campaign compliance statement before starting." }), { status: 409 });
@@ -456,7 +462,7 @@ async function campaignControl(admin: any, actor: any, input: any) {
   if (command === "pause") Object.assign(patch, { status: "paused", paused_at: now });
   if (command === "resume") Object.assign(patch, { status: "running", paused_at: null });
   if (command === "stop") Object.assign(patch, { status: "stopped", stopped_at: now });
-  const { data, error } = await admin.from("voice_broadcast_campaigns").update(patch).eq("id", campaignId).select("*").single();
+  const { data, error } = await admin.from("voice_broadcast_campaigns").update(patch).eq("id", campaignId).eq("organization_id", actor.organizationId).select("*").single();
   if (error) throw error;
   console.log("[voice-broadcast] campaign control", { campaignId, command, resultingStatus: data?.status, actor: actor?.email || null });
 
@@ -464,6 +470,7 @@ async function campaignControl(admin: any, actor: any, input: any) {
   if (command === "stop") {
     const { data: active } = await admin.from("voice_broadcast_calls").select("id,provider_call_sid,campaign_account_id")
       .eq("campaign_id", campaignId)
+      .eq("organization_id", actor.organizationId)
       .in("status", ["initiated", "ringing", "answered", "human", "gathering", "pressed_1", "transferring", "connected"]);
     for (const call of active || []) {
       if (call.provider_call_sid) {
@@ -472,8 +479,8 @@ async function campaignControl(admin: any, actor: any, input: any) {
           await twilioRequest(`/Calls/${encodeURIComponent(call.provider_call_sid)}.json`, "POST", params);
         } catch { /* still mark canceled locally */ }
       }
-      await admin.from("voice_broadcast_calls").update({ status: "canceled", result: "Campaign Stopped", ended_at: now, finalized_at: now, updated_at: now }).eq("id", call.id);
-      await admin.from("voice_broadcast_campaign_accounts").update({ status: "canceled", last_result: "Campaign Stopped", updated_at: now }).eq("id", call.campaign_account_id);
+      await admin.from("voice_broadcast_calls").update({ status: "canceled", result: "Campaign Stopped", ended_at: now, finalized_at: now, updated_at: now }).eq("id", call.id).eq("organization_id", actor.organizationId);
+      await admin.from("voice_broadcast_campaign_accounts").update({ status: "canceled", last_result: "Campaign Stopped", updated_at: now }).eq("id", call.campaign_account_id).eq("organization_id", actor.organizationId);
       canceled += 1;
     }
   }

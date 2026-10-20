@@ -251,6 +251,7 @@ async function createLiveTransfer(admin: any, callRow: any, campaign: any) {
   if (!callRow?.account_id || !callRow?.id) return;
   const now = new Date();
   await admin.from("voice_broadcast_live_transfers").upsert({
+    organization_id: callRow.organization_id,
     call_id: callRow.id,
     campaign_id: callRow.campaign_id,
     account_id: callRow.account_id,
@@ -276,12 +277,12 @@ async function handleAnswer(req: Request, params: URLSearchParams, admin: any, c
     answered_at: now,
     provider_payload: { ...(callRow.provider_payload || {}), answer: Object.fromEntries(params.entries()) },
     updated_at: now,
-  }).eq("id", callRow.id);
+  }).eq("id", callRow.id).eq("organization_id", callRow.organization_id);
   await admin.from("voice_broadcast_campaign_accounts").update({
     status: humanLike ? "human" : machineLike ? "machine" : "completed",
     last_result: answeredBy,
     updated_at: now,
-  }).eq("id", callRow.campaign_account_id);
+  }).eq("id", callRow.campaign_account_id).eq("organization_id", callRow.organization_id);
 
   if (answeredBy === "fax") {
     await finalizeOutcome(admin, { ...callRow, answered_by: answeredBy }, campaign, "Fax Machine");
@@ -298,24 +299,24 @@ async function handleAnswer(req: Request, params: URLSearchParams, admin: any, c
 
   const message = firstText(campaign.live_message_text, "Please hold while we connect your call.");
   if (campaign.connect_mode === "auto_transfer") {
-    await admin.from("voice_broadcast_calls").update({ status: "transferring", transferred_at: now, updated_at: now }).eq("id", callRow.id);
-    await admin.from("voice_broadcast_campaign_accounts").update({ status: "transferring", updated_at: now }).eq("id", callRow.campaign_account_id);
+    await admin.from("voice_broadcast_calls").update({ status: "transferring", transferred_at: now, updated_at: now }).eq("id", callRow.id).eq("organization_id", callRow.organization_id);
+    await admin.from("voice_broadcast_campaign_accounts").update({ status: "transferring", updated_at: now }).eq("id", callRow.campaign_account_id).eq("organization_id", callRow.organization_id);
     await createLiveTransfer(admin, callRow, campaign);
     return xml(`<Pause length="2"/><Say voice="alice">${xmlEscape(message)}</Say>${dialQueueTwiml(req, campaign, callRow)}`);
   }
 
   const gatherAction = webhookUrl(req, "gather", callRow.id);
-  await admin.from("voice_broadcast_calls").update({ status: "gathering", updated_at: now }).eq("id", callRow.id);
+  await admin.from("voice_broadcast_calls").update({ status: "gathering", updated_at: now }).eq("id", callRow.id).eq("organization_id", callRow.organization_id);
   return xml(`<Pause length="2"/><Gather input="dtmf" numDigits="1" timeout="8" actionOnEmptyResult="true" action="${xmlEscape(gatherAction)}" method="POST"><Say voice="alice">${xmlEscape(message)}</Say></Gather><Say voice="alice">We did not receive a response. Goodbye.</Say><Hangup/>`);
 }
 
 async function handleGather(req: Request, params: URLSearchParams, admin: any, callRow: any, campaign: any) {
   const digits = firstText(params.get("Digits"));
   const now = new Date().toISOString();
-  await admin.from("voice_broadcast_calls").update({ digits: digits || null, updated_at: now }).eq("id", callRow.id);
+  await admin.from("voice_broadcast_calls").update({ digits: digits || null, updated_at: now }).eq("id", callRow.id).eq("organization_id", callRow.organization_id);
   if (digits === "1") {
-    await admin.from("voice_broadcast_calls").update({ status: "transferring", transferred_at: now, updated_at: now }).eq("id", callRow.id);
-    await admin.from("voice_broadcast_campaign_accounts").update({ status: "pressed_1", last_result: "Pressed 1", updated_at: now }).eq("id", callRow.campaign_account_id);
+    await admin.from("voice_broadcast_calls").update({ status: "transferring", transferred_at: now, updated_at: now }).eq("id", callRow.id).eq("organization_id", callRow.organization_id);
+    await admin.from("voice_broadcast_campaign_accounts").update({ status: "pressed_1", last_result: "Pressed 1", updated_at: now }).eq("id", callRow.campaign_account_id).eq("organization_id", callRow.organization_id);
     await createLiveTransfer(admin, callRow, campaign);
     return xml(`<Pause length="1"/><Say voice="alice">Please hold while we connect you.</Say>${dialQueueTwiml(req, campaign, callRow)}`);
   }
@@ -334,16 +335,16 @@ async function handleDialComplete(params: URLSearchParams, admin: any, callRow: 
     duration_seconds: duration,
     provider_parent_call_sid: firstText(params.get("DialCallSid")) || null,
     updated_at: now,
-  }).eq("id", callRow.id);
+  }).eq("id", callRow.id).eq("organization_id", callRow.organization_id);
   await admin.from("voice_broadcast_campaign_accounts").update({
     status: bridged || dialStatus === "completed" ? "connected" : "completed",
     last_result: dialStatus,
     updated_at: now,
-  }).eq("id", callRow.campaign_account_id);
+  }).eq("id", callRow.campaign_account_id).eq("organization_id", callRow.organization_id);
   if (bridged || dialStatus === "completed") {
-    await admin.from("voice_broadcast_live_transfers").update({ status: "connected", updated_at: now }).eq("call_id", callRow.id).eq("status", "waiting");
+    await admin.from("voice_broadcast_live_transfers").update({ status: "connected", updated_at: now }).eq("call_id", callRow.id).eq("organization_id", callRow.organization_id).eq("status", "waiting");
   } else {
-    await admin.from("voice_broadcast_live_transfers").update({ status: "expired", updated_at: now }).eq("call_id", callRow.id).eq("status", "waiting");
+    await admin.from("voice_broadcast_live_transfers").update({ status: "expired", updated_at: now }).eq("call_id", callRow.id).eq("organization_id", callRow.organization_id).eq("status", "waiting");
   }
   const result = bridged || dialStatus === "completed" ? "Transferred to Agent Queue" : "No Agent Available";
   await finalizeOutcome(admin, { ...callRow, duration_seconds: duration }, campaign, result, { dialStatus, bridged, duration_seconds: duration });
@@ -364,14 +365,14 @@ async function handleStatus(params: URLSearchParams, admin: any, callRow: any, c
     ended_at: ["completed", "no-answer", "busy", "failed", "canceled"].includes(providerStatus) ? now : callRow.ended_at,
     provider_payload: { ...(callRow.provider_payload || {}), status: Object.fromEntries(params.entries()) },
     updated_at: now,
-  }).eq("id", callRow.id);
+  }).eq("id", callRow.id).eq("organization_id", callRow.organization_id);
 
   if (providerStatus === "no-answer") await finalizeOutcome(admin, { ...callRow, duration_seconds: duration }, campaign, "No Answer", { status: Object.fromEntries(params.entries()), duration_seconds: duration });
   else if (providerStatus === "busy") await finalizeOutcome(admin, { ...callRow, duration_seconds: duration }, campaign, "Busy", { status: Object.fromEntries(params.entries()), duration_seconds: duration });
   else if (providerStatus === "failed") await finalizeOutcome(admin, { ...callRow, duration_seconds: duration }, campaign, "Failed", { status: Object.fromEntries(params.entries()), duration_seconds: duration });
   else if (providerStatus === "canceled") await finalizeOutcome(admin, { ...callRow, duration_seconds: duration }, campaign, "Canceled", { status: Object.fromEntries(params.entries()), duration_seconds: duration });
   else if (providerStatus === "completed") {
-    const { data: fresh } = await admin.from("voice_broadcast_calls").select("*").eq("id", callRow.id).maybeSingle();
+    const { data: fresh } = await admin.from("voice_broadcast_calls").select("*").eq("id", callRow.id).eq("organization_id", callRow.organization_id).maybeSingle();
     if (fresh && !fresh.finalized_at) await finalizeOutcome(admin, { ...fresh, duration_seconds: duration }, campaign, fresh.result || "Broadcast Completed", { status: Object.fromEntries(params.entries()), duration_seconds: duration });
   }
   return json({ received: true });
