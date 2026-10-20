@@ -331,7 +331,7 @@ serve(async (req) => {
       const br=await fetch("https://api.bland.ai/v1/calls",{method:"POST",headers:{authorization:apiKey,"Content-Type":"application/json"},body:JSON.stringify(providerPayload)});
       const bd=await br.json().catch(()=>({})),callId=String(bd?.call_id??"").trim();
       if(!br.ok||!callId){await fetch(`${supabaseUrl}/rest/v1/ai_call_qa?id=eq.${encodeURIComponent(q.id)}&${orgFilter}`,{method:"PATCH",headers:{...hr,"Content-Type":"application/json"},body:JSON.stringify({status:"failed",summary:String(bd?.message||"Pipeline test queue failed").slice(0,4000),updated_at:new Date().toISOString()})});return json({ok:false,error:bd?.message||"Bland did not queue pipeline test"},502)}
-      await fetch(`${supabaseUrl}/rest/v1/ai_call_qa?id=eq.${encodeURIComponent(q.id)}`,{method:"PATCH",headers:{...hr,"Content-Type":"application/json"},body:JSON.stringify({provider_call_id:callId,status:String(bd?.status||"queued"),updated_at:new Date().toISOString()})});
+      await fetch(`${supabaseUrl}/rest/v1/ai_call_qa?id=eq.${encodeURIComponent(q.id)}&${orgFilter}`,{method:"PATCH",headers:{...hr,"Content-Type":"application/json"},body:JSON.stringify({provider_call_id:callId,status:String(bd?.status||"queued"),updated_at:new Date().toISOString()})});
       return json({ok:true,provider:"bland",mode:"pipeline_test",qa_id:q.id,call_id:callId,status:bd?.status??"queued",destination:"***-***-0894"});
     }
 
