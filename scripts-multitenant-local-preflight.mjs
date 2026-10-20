@@ -9,6 +9,8 @@ pass('no hardcoded owner email',!app.includes('afinch2678@gmail.com'));
 pass('no browser project fallback',!/(coPilotSupabaseUrl|coPilotSupabasePublishableKey)/.test(app));
 pass('join code login present',app.includes('loginJoinCode')&&app.includes('cpcm_join_organization'));
 pass('effective role ignores auth user metadata',!app.includes('user?.user_metadata?.requested_role')&&!app.includes('profile?.role||currentUser?.requestedRole'));
+const p14=fs.readFileSync('MULTI_TENANT_PHASE14_LEGACY_POLICY_CLEANUP.sql','utf8');
+pass('tenant RLS avoids JWT email authorization',!p14.includes("auth.jwt()->>'email'"));
 pass('join code admin UI present',app.includes('openJoinCodeAdmin')&&app.includes('cpcm_admin_create_join_code'));
 const p31=fs.readFileSync('MULTI_TENANT_PHASE31_JOIN_CODE_ONBOARDING.sql','utf8');
 pass('pending membership starts inactive',/values\(oid,uid,join_role,false\)/.test(p31));
