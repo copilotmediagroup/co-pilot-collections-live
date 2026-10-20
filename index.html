@@ -13734,7 +13734,7 @@ function exportContactIntelligenceCSV(){let calls=filteredContactCalls();let row
         dbFetch('/app_users?organization_id=eq.'+encodeURIComponent(currentOrganizationId)+'&email=eq.'+encodeURIComponent(currentUser.email),{method:'PATCH',body:JSON.stringify({last_seen_at:new Date().toISOString(),updated_at:new Date().toISOString()})}).catch(()=>{});
         return profile;
       }
-      let role=requested,row={email:currentUser.email,role,approval_status:'pending',is_approved:false,is_active:false,client_portal_enabled:false,created_at:new Date().toISOString(),updated_at:new Date().toISOString(),last_seen_at:new Date().toISOString()};
+      let row={email:currentUser.email,role:'employee',approval_status:'pending',is_approved:false,is_active:false,client_portal_enabled:false,created_at:new Date().toISOString(),updated_at:new Date().toISOString(),last_seen_at:new Date().toISOString()};
       let rows=await dbFetch('/app_users',{method:'POST',body:JSON.stringify([tenantRow(row)])}).catch(async()=>await dbFetch('/app_users?organization_id=eq.'+encodeURIComponent(currentOrganizationId)+'&email=eq.'+encodeURIComponent(currentUser.email)+'&select=*').catch(()=>[]));return rows&&rows[0]?toCamel(rows[0]):null;
     }catch(err){console.warn('Client-aware profile upsert failed',err);return null;}
   };
