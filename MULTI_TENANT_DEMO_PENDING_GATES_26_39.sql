@@ -1,4 +1,4 @@
--- DEMO ONLY. Ordered structural gates after installing phases 26-37.
+-- DEMO ONLY. Ordered structural gates after installing phases 26-39.
 \i MULTI_TENANT_DEMO_PHASE26_PROVISIONING_GATE.sql
 \i MULTI_TENANT_DEMO_PHASE27_PLATFORM_TENANT_ADMIN_GATE.sql
 \i MULTI_TENANT_DEMO_PHASE28_STATUS_ENFORCEMENT_GATE.sql
