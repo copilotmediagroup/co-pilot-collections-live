@@ -28,6 +28,9 @@ begin
     raise exception 'Organization slug must contain lowercase letters, numbers, and single hyphens only';
   end if;
   if p_admin_user_id is null then raise exception 'Initial admin auth user required'; end if;
+  if exists(select 1 from public.organizations o where o.slug=clean_slug) then
+    raise exception 'Organization slug already exists';
+  end if;
   if not exists(select 1 from auth.users u where u.id=p_admin_user_id) then
     raise exception 'Initial admin auth user does not exist';
   end if;
