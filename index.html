@@ -5216,10 +5216,10 @@ header.topbar{height:58px!important;padding:0 12px!important;grid-template-colum
 <script src="/config.js"></script>
 <script src="/nmi-config.js"></script>
 <script>
-const ADMIN_EMAIL='afinch2678@gmail.com';
-const ADMIN_EMAILS=[ADMIN_EMAIL].map(e=>e.toLowerCase());
-function isAdminEmail(email){return ADMIN_EMAILS.includes(String(email||'').toLowerCase().trim())}
-function isProtectedAdminEmail(email){return isAdminEmail(email)}
+const ADMIN_EMAIL='';
+const ADMIN_EMAILS=[];
+function isAdminEmail(email){return false}
+function isProtectedAdminEmail(email){return false}
 function isAdminProfile(profile){
   if(!profile)return false;
   let role=String(profile.role||profile.userRole||'').toLowerCase();
@@ -10621,7 +10621,7 @@ function renderLeaderboard(start,end){
   const ppMoney = (v)=> (typeof money==='function'?money(v):('$'+(Number(v||0).toFixed(2))));
   const ppMoneyNum = (v)=> (typeof moneyNum==='function'?moneyNum(v):(Number(String(v||'').replace(/[^0-9.-]/g,''))||0));
   const ppToday = ()=> (typeof todayISO==='function'?todayISO():new Date().toISOString().slice(0,10));
-  function ppIsAdmin(){try{return !!(currentUser && (currentUser.isAdmin || String(currentUser.email||'').toLowerCase().trim()==='afinch2678@gmail.com'));}catch(e){return false;}}
+  function ppIsAdmin(){try{return !!(currentUser && (currentUser.isAdmin || false));}catch(e){return false;}}
   function ppStatusText(s){return String(s||'Scheduled').trim()||'Scheduled'}
   function ppDisplayPayStatus(p){
     let s=ppStatusText(p?.status);
@@ -11757,7 +11757,7 @@ function exportContactIntelligenceCSV(){let calls=filteredContactCalls();let row
       var u = window.currentUser || {};
       var email = String(u.email || '').toLowerCase().trim();
       var role = String(u.role || '').toLowerCase().trim();
-      return !!(u && (u.isAdmin || role === 'admin' || email === 'afinch2678@gmail.com' || (typeof window.isAdminEmail === 'function' && window.isAdminEmail(email))));
+      return !!(u && (u.isAdmin || role === 'admin' || (typeof window.isAdminEmail === 'function' && window.isAdminEmail(email))));
     }catch(e){ return false; }
   }
   window.cpPlanAdmin = cpPlanAdmin;
@@ -11847,13 +11847,13 @@ function exportContactIntelligenceCSV(){let calls=filteredContactCalls();let row
 
 /* REPORTS PAGE REBUILD STABLE — full page, no modal stacking, no watcher loops */
 (function(){
-  var ADMIN_EMAIL = 'afinch2678@gmail.com';
+  var ADMIN_EMAIL = '';
 
   function reportsIsAdmin(){
     try{
       var email = String((window.currentUser && window.currentUser.email) || '').toLowerCase().trim();
       var badge = String((document.getElementById('roleBadge') || {}).textContent || '').toLowerCase();
-      return !!(window.currentUser && window.currentUser.isAdmin) || email === ADMIN_EMAIL || badge.indexOf('admin') >= 0;
+      return !!(window.currentUser && window.currentUser.isAdmin) || false || badge.indexOf('admin') >= 0;
     }catch(e){ return false; }
   }
 
@@ -12174,7 +12174,7 @@ function exportContactIntelligenceCSV(){let calls=filteredContactCalls();let row
       var email=String((typeof currentUser!=='undefined'&&currentUser&&currentUser.email)||'').toLowerCase().trim();
       var role=String((typeof currentUser!=='undefined'&&currentUser&&currentUser.role)||'').toLowerCase().trim();
       var badge=(document.getElementById('roleBadge')?.textContent||'').toLowerCase();
-      return email==='afinch2678@gmail.com' || (typeof currentUser!=='undefined'&&currentUser&&currentUser.isAdmin===true) || role==='admin' || badge.includes('admin');
+      return (typeof currentUser!=='undefined'&&currentUser&&currentUser.isAdmin===true) || role==='admin' || badge.includes('admin');
     }catch(e){return false;}
   }
   function esc(v){return String(v==null?'':v).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
@@ -12316,7 +12316,7 @@ function exportContactIntelligenceCSV(){let calls=filteredContactCalls();let row
   function h(v){try{return (typeof esc==='function'?esc(v):String(v==null?'':v).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]}));}catch(e){return String(v||'')}}
   function camel(row){try{return (typeof toCamel==='function')?toCamel(row):row}catch(e){return row||{}}}
   function currentEmail(){try{return String(currentUser&&currentUser.email||'').toLowerCase()}catch(e){return ''}}
-  function isCommAdmin(){try{return !!(currentUser&&(currentUser.isAdmin||String(currentUser.role||'').toLowerCase()==='admin'||currentEmail()==='afinch2678@gmail.com'))}catch(e){return false}}
+  function isCommAdmin(){try{return !!(currentUser&&(currentUser.isAdmin||String(currentUser.role||'').toLowerCase()==='admin'||false))}catch(e){return false}}
   function allAccounts(){try{return Array.isArray(accounts)?accounts:[]}catch(e){return []}}
   function acctById(id){id=String(id||'');return allAccounts().find(function(a){return String(a.id)===id})||null}
   function acctName(a){try{return a?(typeof nameOf==='function'?nameOf(a):(a.fullName||[a.firstName,a.lastName].filter(Boolean).join(' ')||'Account')):'General'}catch(e){return 'Account'}}
@@ -12379,7 +12379,7 @@ function exportContactIntelligenceCSV(){let calls=filteredContactCalls();let row
   var ihState={batches:[],selectedId:'',filtered:[]};
   function h(v){try{return (typeof esc==='function'?esc(v):String(v==null?'':v).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]}));}catch(e){return String(v||'')}}
   function currentEmail(){try{return String(currentUser&&currentUser.email||'').toLowerCase()}catch(e){return ''}}
-  function isImportAdmin(){try{return !!(currentUser&&(currentUser.isAdmin||String(currentUser.role||'').toLowerCase()==='admin'||currentEmail()==='afinch2678@gmail.com'))}catch(e){return false}}
+  function isImportAdmin(){try{return !!(currentUser&&(currentUser.isAdmin||String(currentUser.role||'').toLowerCase()==='admin'||false))}catch(e){return false}}
   function allAccounts(){try{return Array.isArray(accounts)?accounts:[]}catch(e){return []}}
   function raw(a){try{return (typeof rawObj==='function'?rawObj(a):(a.rawData||a.raw_data||{}))||{}}catch(e){return {}}}
   function acctName(a){try{return a?(typeof nameOf==='function'?nameOf(a):(a.fullName||[a.firstName,a.lastName].filter(Boolean).join(' ')||'Account')):'Account'}catch(e){return 'Account'}}
@@ -12450,7 +12450,7 @@ function exportContactIntelligenceCSV(){let calls=filteredContactCalls();let row
       var email=sEmail();
       var role=String(currentUser?.role||'').toLowerCase();
       var badge=String(sEl('roleBadge')?.textContent||'').toLowerCase();
-      return email==='afinch2678@gmail.com' || currentUser?.isAdmin===true || role==='admin' || badge.includes('admin');
+      return currentUser?.isAdmin===true || role==='admin' || badge.includes('admin');
     }catch(e){return false;}
   }
   function sStatusClass(status){
@@ -12805,12 +12805,12 @@ function exportContactIntelligenceCSV(){let calls=filteredContactCalls();let row
 (function(){
   if(window.__coPilotReceiptsLettersPatch)return;
   window.__coPilotReceiptsLettersPatch=true;
-  const DOC_ADMIN_EMAIL='afinch2678@gmail.com';
+  const DOC_ADMIN_EMAIL='';
   function dEl(id){return document.getElementById(id)}
   function dEsc(v){return String(v==null?'':v).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;')}
   function dVal(id){let el=dEl(id);return el?String(el.value||'').trim():''}
   function dEmail(){try{return String((window.currentUser&&currentUser.email)||localStorage.getItem('coPilotUserEmail')||'').toLowerCase().trim()}catch(e){return ''}}
-  function dIsAdmin(){try{return !!(window.currentUser&&(currentUser.isAdmin||currentUser.role==='admin'||String(currentUser.email||'').toLowerCase()===DOC_ADMIN_EMAIL))||dEmail()===DOC_ADMIN_EMAIL}catch(e){return false}}
+  function dIsAdmin(){try{return !!(window.currentUser&&(currentUser.isAdmin||currentUser.role==='admin'||false))||false}catch(e){return false}}
   function dCurrent(){try{return (typeof getCurrent==='function'&&getCurrent()) || (window.accounts||[]).find(a=>String(a.id)===String(window.currentAccountId)) || (window.accounts||[])[0] || null}catch(e){return null}}
   function dName(a){try{return typeof nameOf==='function'?nameOf(a):(a?.fullName||[a?.firstName,a?.middleName,a?.lastName].filter(Boolean).join(' ')||'Unknown Account')}catch(e){return 'Unknown Account'}}
   function dAcct(a){try{return typeof acctNo==='function'?acctNo(a):(a?.accountNumber||a?.clientAccountNumber||a?.accountId||'')}catch(e){return ''}}
@@ -13062,7 +13062,7 @@ function exportContactIntelligenceCSV(){let calls=filteredContactCalls();let row
 (function(){
   if(window.__cpcmProductionStabilityPhase1Loaded) return;
   window.__cpcmProductionStabilityPhase1Loaded = true;
-  window.CPCM_ADMIN_EMAIL = 'afinch2678@gmail.com';
+  window.CPCM_ADMIN_EMAIL = '';
   window.cpcmCurrentEmail = function(){
     try{return String((window.currentUser && window.currentUser.email) || '').toLowerCase().trim();}catch(e){return '';}
   };
@@ -13071,7 +13071,7 @@ function exportContactIntelligenceCSV(){let calls=filteredContactCalls();let row
       var email = window.cpcmCurrentEmail();
       var role = String((window.currentUser && (window.currentUser.role || window.currentUser.userRole)) || '').toLowerCase();
       var badge = String((document.getElementById('roleBadge') || {}).textContent || '').toLowerCase();
-      return email === window.CPCM_ADMIN_EMAIL || !!(window.currentUser && window.currentUser.isAdmin) || role === 'admin' || badge.indexOf('admin') >= 0;
+      return false || !!(window.currentUser && window.currentUser.isAdmin) || role === 'admin' || badge.indexOf('admin') >= 0;
     }catch(e){return false;}
   };
   window.cpcmCloseAllOverlays = function(exceptId){
@@ -13095,7 +13095,7 @@ function exportContactIntelligenceCSV(){let calls=filteredContactCalls();let row
   var tick={tab:'today',type:'all',search:'',emp:'all',tasks:[]};
   function u(){try{return (typeof currentUser!=='undefined'&&currentUser)?currentUser:{}}catch(e){return {}}}
   function email(){return String(u().email||'').toLowerCase().trim()}
-  function admin(){try{return !!(u().isAdmin||email()==='afinch2678@gmail.com'||(typeof isAdminEmail==='function'&&isAdminEmail(email())))}catch(e){return false}}
+  function admin(){try{return !!(u().isAdmin||false||(typeof isAdminEmail==='function'&&isAdminEmail(email())))}catch(e){return false}}
   function accs(){try{return (typeof accounts!=='undefined'&&Array.isArray(accounts))?accounts:[]}catch(e){return []}}
   function cur(){try{return typeof getCurrent==='function'?getCurrent():null}catch(e){return null}}
   function esc(v){return String(v==null?'':v).replace(/[&<>"']/g,function(m){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]})}
@@ -13163,7 +13163,7 @@ function exportContactIntelligenceCSV(){let calls=filteredContactCalls();let row
   function esc(v){return String(v==null?'':v).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
   function lower(v){return String(v==null?'':v).toLowerCase().trim();}
   function email(){try{return lower((typeof currentUser!=='undefined'&&currentUser&&currentUser.email)||'')}catch(e){return ''}}
-  function isAdmin(){try{var e=email(), r=lower((typeof currentUser!=='undefined'&&currentUser&&currentUser.role)||''), badge=lower(document.getElementById('roleBadge')&&document.getElementById('roleBadge').textContent);return e==='afinch2678@gmail.com'||(typeof currentUser!=='undefined'&&currentUser&&currentUser.isAdmin===true)||r==='admin'||badge.indexOf('admin')>=0}catch(x){return false}}
+  function isAdmin(){try{var e=email(), r=lower((typeof currentUser!=='undefined'&&currentUser&&currentUser.role)||''), badge=lower(document.getElementById('roleBadge')&&document.getElementById('roleBadge').textContent);return (typeof currentUser!=='undefined'&&currentUser&&currentUser.isAdmin===true)||r==='admin'||badge.indexOf('admin')>=0}catch(x){return false}}
   function moneyNum(v){var n=Number(String(v==null?'':v).replace(/[^0-9.-]/g,''));return isFinite(n)?n:0}
   function usd(n){n=Number(n||0);return n.toLocaleString(undefined,{style:'currency',currency:'USD'});}
   function dt(v){if(!v)return null;var d=new Date(v);if(isNaN(d))return null;return d}
@@ -13245,7 +13245,7 @@ function exportContactIntelligenceCSV(){let calls=filteredContactCalls();let row
   function curUser(){try{return window.currentUser||window.authUser||window.loggedInUser||null}catch(e){return null}}
   function curEmail(){var u=curUser();return lower((u&&(u.email||u.user_email||u.email_address))||'')}
   function roleText(){try{return lower((document.getElementById('roleBadge')&&document.getElementById('roleBadge').textContent)||document.body.textContent.match(/\bAdmin\b|\bEmployee\b|\bNot logged in\b/)||'')}catch(e){return ''}}
-  function isAdmin(){var u=curUser(), e=curEmail(), r=lower((u&&(u.role||u.user_role||u.account_role))||'');var badge=roleText();return e==='afinch2678@gmail.com'||r==='admin'||(u&&u.isAdmin===true)||badge.indexOf('admin')>=0;}
+  function isAdmin(){var u=curUser(), e=curEmail(), r=lower((u&&(u.role||u.user_role||u.account_role))||'');var badge=roleText();return r==='admin'||(u&&u.isAdmin===true)||badge.indexOf('admin')>=0;}
   function qs(sel){try{return document.querySelector(sel)}catch(e){return null}}
   function qsa(sel){try{return Array.prototype.slice.call(document.querySelectorAll(sel))}catch(e){return []}}
   function visibleTextIncludes(txt){return lower(document.body.innerText||document.body.textContent||'').indexOf(lower(txt))>=0}
@@ -13360,7 +13360,7 @@ function exportContactIntelligenceCSV(){let calls=filteredContactCalls();let row
   function cleanName(v){return String(v||'').replace(/\s+/g,' ').trim()}
   function emailPrefix(email){
     email=lower(email);
-    if(email==='afinch2678@gmail.com')return 'Antonio Finch';
+    if(false)return 'Antonio Finch';
     let p=(email.split('@')[0]||'Team Member').replace(/[._-]+/g,' ').replace(/\d+/g,' ').replace(/\s+/g,' ').trim();
     return p?p.replace(/\b\w/g,function(c){return c.toUpperCase()}):email;
   }
@@ -13395,14 +13395,14 @@ function exportContactIntelligenceCSV(){let calls=filteredContactCalls();let row
   function isAllowedUser(u){
     let email=userEmail(u); if(!email)return false;
     let role=lower(u.role||'employee');
-    let approved=(u.isApproved===true||u.is_approved===true||lower(u.approvalStatus||u.approval_status)==='approved'||role==='admin'||email==='afinch2678@gmail.com');
+    let approved=(u.isApproved===true||u.is_approved===true||lower(u.approvalStatus||u.approval_status)==='approved'||role==='admin'||false);
     let active=!(u.isActive===false||u.is_active===false||lower(u.approvalStatus||u.approval_status)==='removed');
-    return approved && active && (role==='admin'||role==='employee'||email==='afinch2678@gmail.com');
+    return approved && active && (role==='admin'||role==='employee'||false);
   }
   function isStaffEmail(email,u){
     email=lower(email); u=u||findUser(email);
     let role=lower(u&&u.role||'');
-    return email===meEmail() || email==='afinch2678@gmail.com' || role==='admin' || role==='employee';
+    return email===meEmail() || role==='admin' || role==='employee';
   }
   window.buildChatContacts=function(){
     let me=meEmail(), map={};
@@ -14674,7 +14674,7 @@ function exportContactIntelligenceCSV(){let calls=filteredContactCalls();let row
   function h(v){return typeof esc==='function'?esc(v):s(v).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
   function actor(){return typeof currentUser!=='undefined'&&currentUser?currentUser:{}}
   function email(){return low(actor().email)}
-  function admin(){return actor().isAdmin===true||low(actor().role)==='admin'||email()==='afinch2678@gmail.com'}
+  function admin(){return actor().isAdmin===true||low(actor().role)==='admin'||false}
   function phone(v){var d=s(v).replace(/\D/g,'');if(d.length===10)return '+1'+d;if(d.length===11&&d[0]==='1')return '+'+d;if(d.length>=8&&d.length<=15)return '+'+d;return ''}
   function normalizePhone(v){return phone(v)}
   function testHistory(){try{return JSON.parse(localStorage.getItem('cpcm_voice_test_history')||'[]')}catch(e){return []}}
@@ -15356,7 +15356,7 @@ window.openRecruiterApplication=function(){['raName','raPhone','raEmail','raCity
 let recruiterChoice=document.getElementById('recruiterApplyChoiceBtn');if(recruiterChoice)recruiterChoice.addEventListener('click',function(e){e.preventDefault();e.stopPropagation();window.location.href='/recruiter-application.html'});
 window.submitRecruiterApplication=async function(){let g=id=>(document.getElementById(id)?.value||'').trim(),p={full_name:g('raName'),phone:g('raPhone'),email:g('raEmail').toLowerCase(),city:g('raCity'),recruiting_experience_years:Number(g('raRecruitYears')||0),collections_experience_years:Number(g('raCollectionYears')||0),hires_per_month:Number(g('raHires')||0),interview_experience:g('raInterview')==='Yes',equipment_ready:g('raEquipment')==='Yes',availability:g('raAvailability'),hiring_plan:g('raPlan'),notes:g('raNotes')};if(!p.full_name||!p.phone||!p.email||!p.city||g('raRecruitYears')===''||!g('raInterview')||!g('raEquipment')||!p.availability||!p.hiring_plan)return alert('Please complete all required fields.');try{let r=await fetch(url()+'/rest/v1/recruiter_applications',{method:'POST',headers:{apikey:pubKey(),'Content-Type':'application/json',Prefer:'return=minimal'},body:JSON.stringify(p)});if(!r.ok){let x=await r.json().catch(()=>({}));throw new Error(x.message||'Application could not be submitted.')}document.getElementById('recruiterApplicationForm').classList.add('hidden');document.getElementById('recruiterApplicationSuccess').classList.remove('hidden')}catch(e){alert(e.message||e)}};
 function installAdmin(){if(!currentUser?.isAdmin)return;let menu=Array.from(document.querySelectorAll('.topMenu.adminOnly .topMenuDrop')).find(m=>m.querySelector('button[onclick="openJobApplicationsAdmin()"]'));if(menu&&!document.getElementById('recruiterApplicationsMenuBtn')){let b=document.createElement('button');b.id='recruiterApplicationsMenuBtn';b.textContent='Recruiter Applications';b.onclick=function(e){e.preventDefault();e.stopPropagation();window.openRecruiterApplicationsAdmin()};let dash=document.getElementById('recruiterAdminMenuBtn');dash?dash.insertAdjacentElement('beforebegin',b):menu.prepend(b)}}
-window.openRecruiterApplicationsAdmin=async function(){let isAdmin=(typeof window.cpcmIsAdmin==='function'&&window.cpcmIsAdmin())||!!currentUser?.isAdmin||String(currentUser?.email||'').toLowerCase()==='afinch2678@gmail.com';if(!isAdmin)return alert('Admin access required.');if(typeof window.cpcmCloseAllOverlays==='function')window.cpcmCloseAllOverlays('recruiterApplicationsAdminModal');else document.querySelectorAll('.modal.open').forEach(m=>{if(m.id!=='recruiterApplicationsAdminModal')m.classList.remove('open')});let modal=document.getElementById('recruiterApplicationsAdminModal');if(!modal)return alert('Recruiter Applications view could not initialize.');modal.style.setProperty('z-index','100000','important');modal.classList.add('open');await window.loadRecruiterApplicationsAdmin()};
+window.openRecruiterApplicationsAdmin=async function(){let isAdmin=(typeof window.cpcmIsAdmin==='function'&&window.cpcmIsAdmin())||!!currentUser?.isAdmin||false;if(!isAdmin)return alert('Admin access required.');if(typeof window.cpcmCloseAllOverlays==='function')window.cpcmCloseAllOverlays('recruiterApplicationsAdminModal');else document.querySelectorAll('.modal.open').forEach(m=>{if(m.id!=='recruiterApplicationsAdminModal')m.classList.remove('open')});let modal=document.getElementById('recruiterApplicationsAdminModal');if(!modal)return alert('Recruiter Applications view could not initialize.');modal.style.setProperty('z-index','100000','important');modal.classList.add('open');await window.loadRecruiterApplicationsAdmin()};
 window.loadRecruiterApplicationsAdmin=async function(){let box=document.getElementById('recruiterApplicationsAdminBody'),s=document.getElementById('raStatusFilter')?.value||'';if(!box)return;box.innerHTML='<div class="muted">Loading recruiter applications…</div>';try{await ensureFreshToken();let r=await fetch(url()+'/rest/v1/recruiter_applications?select=*&order=created_at.desc'+(s?'&status=eq.'+encodeURIComponent(s):''),{headers:{apikey:pubKey(),Authorization:'Bearer '+token()}});let rows=await r.json().catch(()=>[]);if(!r.ok)throw new Error(rows?.message||rows?.error||'Could not read recruiter applications.');box.innerHTML=rows.length?rows.map(r=>`<div class="recruitAdminCard"><div class="recruitAdminTop"><div><b>${esc(r.full_name)}</b><div class="rdSub">${esc(r.email)} · ${esc(r.phone)} · ${esc(r.city)}</div></div><span class="applicationStatus">${esc(r.status)}</span></div><div class="recruitAdminFacts"><div><b>Recruiting</b><br>${r.recruiting_experience_years} years</div><div><b>Collections</b><br>${r.collections_experience_years} years</div><div><b>Hires/month</b><br>${r.hires_per_month}</div><div><b>Interviews</b><br>${r.interview_experience?'Yes':'No'}</div><div><b>Equipment</b><br>${r.equipment_ready?'Ready':'No'}</div><div><b>Availability</b><br>${esc(r.availability)}</div></div><div class="applicationNotes"><b>30-day hiring plan:</b> ${esc(r.hiring_plan)}</div>${r.notes?`<div class="applicationNotes"><b>Notes:</b> ${esc(r.notes)}</div>`:''}<div class="recruitAdminActions"><button onclick="setRecruiterApplicationStatus('${r.id}','reviewing')">Reviewing</button><button onclick="setRecruiterApplicationStatus('${r.id}','interview')">Interview</button><button onclick="approveRecruiterApplication('${r.id}','${String(r.email).replace(/'/g,"\\'")}')">Approve Recruiter</button><button onclick="setRecruiterApplicationStatus('${r.id}','rejected')">Reject</button></div></div>`).join(''):'<div class="muted">No recruiter applications found.</div>'}catch(e){box.innerHTML='<div class="error">Could not load recruiter applications: '+esc(e.message||e)+'</div>'}};
 window.setRecruiterApplicationStatus=async function(id,status){try{await dbFetch('/recruiter_applications?id=eq.'+encodeURIComponent(id),{method:'PATCH',body:JSON.stringify({status,reviewed_at:new Date().toISOString(),reviewed_by_email:currentUser.email,updated_at:new Date().toISOString()})});await loadRecruiterApplicationsAdmin()}catch(e){alert(e.message||e)}};
 window.approveRecruiterApplication=async function(id,email){if(!confirm('Approve '+email+' as a Recruiter? They must create/sign in to a Ready Collect Go account using this same email.'))return;try{let users=await dbFetch('/app_users?email=eq.'+encodeURIComponent(email)+'&select=*');if(users&&users.length){await dbFetch('/app_users?organization_id=eq.'+encodeURIComponent(currentOrganizationId)+'&email=eq.'+encodeURIComponent(email),{method:'PATCH',body:JSON.stringify({role:'recruiter',approval_status:'approved',is_approved:true,is_active:true,updated_at:new Date().toISOString()})})}await dbFetch('/recruiter_applications?id=eq.'+encodeURIComponent(id),{method:'PATCH',body:JSON.stringify({status:'approved',reviewed_at:new Date().toISOString(),reviewed_by_email:currentUser.email,updated_at:new Date().toISOString()})});await loadRecruiterApplicationsAdmin();alert(users&&users.length?'Recruiter approved. Their next login will open Recruiting Command Center.':'Application approved. Have them create their Ready Collect Go login with '+email+', then approve/assign Recruiter in Staff Access.')}catch(e){alert('Could not approve recruiter: '+(e.message||e))}};
