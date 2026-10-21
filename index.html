@@ -14675,9 +14675,9 @@ function exportContactIntelligenceCSV(){let calls=filteredContactCalls();let row
   }
   async function loadData(){
     var results=await Promise.all([
-      dbFetch('/voice_broadcast_settings?id=eq.default&select=*').catch(function(){return []}),
-      dbFetch('/voice_broadcast_campaigns?select=*&order=created_at.desc&limit=100').catch(function(){return []}),
-      dbFetch('/voice_broadcast_campaign_accounts?select=*&order=created_at.desc&limit=30000').catch(function(){return []}),
+      dbFetch('/voice_broadcast_settings?organization_id=eq.'+encodeURIComponent(currentOrganizationId)+'&id=eq.default&select=*').catch(function(){return []}),
+      dbFetch('/voice_broadcast_campaigns?organization_id=eq.'+encodeURIComponent(currentOrganizationId)+'&select=*&order=created_at.desc&limit=100').catch(function(){return []}),
+      dbFetch('/voice_broadcast_campaign_accounts?organization_id=eq.'+encodeURIComponent(currentOrganizationId)+'&select=*&order=created_at.desc&limit=30000').catch(function(){return []}),
       dbFetch('/voice_broadcast_calls?select=*&order=created_at.desc&limit=1000').catch(function(){return []})
     ]);
     state.settings=results[0]&&results[0][0]?results[0][0]:defaults();state.campaigns=results[1]||[];state.rows=results[2]||[];state.calls=results[3]||[];
