@@ -1,0 +1,13 @@
+import fs from 'node:fs';
+const p='MULTI_TENANT_DEMO_PENDING_INSTALL_26_56.sql';
+const s=fs.readFileSync(p,'utf8');
+const pos=n=>s.indexOf(`\\i MULTI_TENANT_PHASE${n}`);
+const fail=m=>{console.error('FAIL '+m);process.exitCode=1};
+const pass=m=>console.log('PASS '+m);
+[40,41,45,53,55,56].every(n=>pos(n)>=0)?pass('critical phase includes present'):fail('critical phase include missing');
+pos(40)<pos(55)&&pos(55)<pos(41)?pass('Phase55 canonical refresh precedes search_path re-hardening'):fail('Phase55 must be between Phase40 and Phase41');
+pos(55)<pos(45)?pass('Phase45 staff-role hardening remains authoritative after Phase55'):fail('Phase55 can overwrite staff hardening');
+pos(55)<pos(53)?pass('Phase53 client membership sync remains authoritative after Phase55'):fail('Phase55 can overwrite client portal hardening');
+pos(53)<pos(56)?pass('Phase56 destructive workflow hardening remains final'):fail('Phase56 order invalid');
+const includes=(s.match(/^\\i /gm)||[]).length;includes===32?pass('installer still has 32 includes'):fail(`installer include count changed: ${includes}`);
+if(process.exitCode)process.exit(process.exitCode);
