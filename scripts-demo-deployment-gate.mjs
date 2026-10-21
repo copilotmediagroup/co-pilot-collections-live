@@ -1,0 +1,15 @@
+import fs from 'node:fs';
+const html=fs.readFileSync('index.html','utf8');
+const gen=fs.readFileSync('scripts-generate-runtime-config.mjs','utf8');
+const configs=['public/config.js','config.js'].map(p=>fs.readFileSync(p,'utf8'));
+const fail=m=>{console.error('FAIL '+m);process.exitCode=1};
+const pass=m=>console.log('PASS '+m);
+html.includes("function isPublicDemoDeployment(){return deploymentMode()==='demo'}")?pass('explicit demo deployment helper'):fail('demo deployment helper missing');
+const gates=(html.match(/!isUserApproved\(profile\) && !\(isPublicDemoDeployment\(\) && currentOrganizationId\)/g)||[]).length;
+gates>=2?pass('all boot approval gates preserve demo entry'):fail('demo approval bypass missing from a boot gate');
+html.includes("isPublicDemoDeployment() && currentOrganizationId")?pass('demo bypass requires resolved tenant'):fail('demo bypass is not tenant-bound');
+gen.includes('CPCM_DEPLOYMENT_MODE')&&gen.includes("['live','demo']")?pass('deployment generator validates live/demo mode'):fail('deployment mode generator validation missing');
+configs.every(s=>/deploymentMode:\s*["']live["']/.test(s))?pass('checked-in configs default to live'):fail('checked-in config is not fail-closed live');
+const dup=(html.match(/organization_id=eq\.'\+encodeURIComponent\(currentOrganizationId\)\+'\&organization_id=eq\./g)||[]).length;
+dup===0?pass('no duplicate organization filters'):fail('duplicate organization filters remain');
+if(process.exitCode)process.exit(process.exitCode);
