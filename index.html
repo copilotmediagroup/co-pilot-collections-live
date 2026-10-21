@@ -6621,7 +6621,7 @@ async function complianceCheckBeforeCall(a,phone){
   return true;
 }
 async function insertComplianceEvent(accountId,eventType,notes,phone=''){
-  await dbFetch('/compliance_events',{method:'POST',body:JSON.stringify([{account_id:accountId,event_type:eventType,phone_number:phone,notes,created_by_email:currentUser.email}])});
+  await dbFetch('/compliance_events',{method:'POST',body:JSON.stringify([tenantRow({account_id:accountId,event_type:eventType,phone_number:phone,notes,created_by_email:currentUser.email})])});
 }
 async function dialPhone(id,phone){
   let a=accountById(id)||getCurrent();
