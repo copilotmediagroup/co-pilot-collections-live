@@ -7098,7 +7098,7 @@ async function approveAiQaDisposition(callId,suggestions,qaAccountId){
  const dispo=map[item.key];
  if(!confirm('Apply '+dispo+' to '+nameOf(a)+'?\n\nThis is an admin-approved account change.'))return false;
  await selectDisposition(dispo);
- await dbFetch('/ai_call_qa?provider_call_id=eq.'+encodeURIComponent(callId),{method:'PATCH',body:JSON.stringify({classification_reviewed:true,classification_reviewed_at:new Date().toISOString(),updated_at:new Date().toISOString()})}).catch(()=>{});
+ await dbFetch('/ai_call_qa?organization_id=eq.'+encodeURIComponent(currentOrganizationId)+'&provider_call_id=eq.'+encodeURIComponent(callId),{method:'PATCH',body:JSON.stringify({classification_reviewed:true,classification_reviewed_at:new Date().toISOString(),updated_at:new Date().toISOString()})}).catch(()=>{});
  await insertAudit('AI QA Disposition Approved','Admin approved '+dispo+' from AI QA call '+callId,'account',a.id).catch(()=>{});
  alert('Applied: '+dispo+'\n\nCo Pilot’s existing account workflow handled the change.');
  return true;
@@ -7115,7 +7115,7 @@ async function reviewBlandSandboxResult(){
   const suggestions=classifyBlandSandboxTranscript(data);
   const qaRows=await dbFetch('/ai_call_qa?provider_call_id=eq.'+encodeURIComponent(callId)+'&select=account_id&limit=1').catch(()=>[]);
   const qaAccountId=qaRows?.[0]?.account_id||null;
-  await dbFetch('/ai_call_qa?provider_call_id=eq.'+encodeURIComponent(callId),{method:'PATCH',body:JSON.stringify({status:data.status||null,completed:!!data.completed,answered_by:data.answered_by||null,duration_minutes:data.call_length==null?null:Number(data.call_length),price:data.price==null?null:Number(data.price),summary:data.summary||'',transcript:data.transcript||'',suggested_dispositions:suggestions,updated_at:new Date().toISOString()})}).catch(()=>{});
+  await dbFetch('/ai_call_qa?organization_id=eq.'+encodeURIComponent(currentOrganizationId)+'&provider_call_id=eq.'+encodeURIComponent(callId),{method:'PATCH',body:JSON.stringify({status:data.status||null,completed:!!data.completed,answered_by:data.answered_by||null,duration_minutes:data.call_length==null?null:Number(data.call_length),price:data.price==null?null:Number(data.price),summary:data.summary||'',transcript:data.transcript||'',suggested_dispositions:suggestions,updated_at:new Date().toISOString()})}).catch(()=>{});
   const suggestedText=suggestions.length?suggestions.map(x=>'• '+x.label).join('\n'):'• No special disposition detected';
   const report='AI COLLECTOR SANDBOX QA\n\nSUGGESTED DISPOSITIONS — REVIEW ONLY\n'+suggestedText+'\n\nNo account flags were changed.\n\nStatus: '+(data.status||'—')+'\nCompleted: '+(data.completed?'Yes':'No')+'\nAnswered by: '+(data.answered_by||'—')+'\nLength: '+(data.call_length??'—')+' minutes\nCost: '+(data.price==null?'—':'$'+data.price)+'\n\nSUMMARY\n'+(data.summary||'No summary yet.')+'\n\nTRANSCRIPT\n'+(data.transcript||'Transcript not available yet.');
   alert(report.slice(0,15000));
@@ -7140,7 +7140,7 @@ async function editAiCollectorScript(){
  let approve=false;
  if(complete)approve=confirm('Approve this script profile for REAL AI CALL PREFLIGHT?\n\nThis does not enable real dialing. It only allows the preflight gate to pass.\n\nOnly approve language that you have reviewed for your operation.');
  const body={identity_prompt:identity,initial_disclosure:initial,subsequent_disclosure:subsequent,dispute_instruction:dispute,dnc_instruction:dnc,settlement_instruction:settlement,payment_instruction:payment,human_escalation_instruction:human,approved_for_real_calls:approve,approved_by_email:approve?currentUser.email:null,approved_at:approve?new Date().toISOString():null,version:Number(s.version||1)+1,updated_at:new Date().toISOString()};
- await dbFetch('/ai_collector_script_profiles?id=eq.'+encodeURIComponent(s.id),{method:'PATCH',body:JSON.stringify(body)});
+ await dbFetch('/ai_collector_script_profiles?organization_id=eq.'+encodeURIComponent(currentOrganizationId)+'&id=eq.'+encodeURIComponent(s.id),{method:'PATCH',body:JSON.stringify(body)});
  await insertAudit('AI Collector Script Updated','AI script profile version '+body.version+' saved. Approved for preflight: '+(approve?'Yes':'No'),'system',s.id).catch(()=>{});
  alert('AI collector script version '+body.version+' saved.\n\nApproved for real-call preflight: '+(approve?'YES':'NO')+'\nReal AI dialing remains disabled.');
 }
@@ -7180,8 +7180,8 @@ async function configureAiProvider(){
  const callerBody={phone_number:callerDigits?('+1'+callerDigits.slice(-10)):null,display_label:callerDigits?'Configured production caller ID':null,verification_status:callerDigits?'observed_unverified':'unconfigured',enabled_for_real_calls:false,verified_by_email:null,verified_at:null,updated_at:new Date().toISOString()};
  const pathBody={pathway_id:String(pathway||'').trim()||null,pathway_version:'v1',verification_status:String(pathway||'').trim()?'configured_unverified':'unconfigured',enabled_for_real_calls:false,verified_by_email:null,verified_at:null,updated_at:new Date().toISOString()};
  await Promise.all([
-  dbFetch('/ai_caller_id_config?id=eq.true',{method:'PATCH',body:JSON.stringify(callerBody)}),
-  dbFetch('/ai_bland_pathway_config?id=eq.true',{method:'PATCH',body:JSON.stringify(pathBody)})
+  dbFetch('/ai_caller_id_config?organization_id=eq.'+encodeURIComponent(currentOrganizationId)+'&id=eq.true',{method:'PATCH',body:JSON.stringify(callerBody)}),
+  dbFetch('/ai_bland_pathway_config?organization_id=eq.'+encodeURIComponent(currentOrganizationId)+'&id=eq.true',{method:'PATCH',body:JSON.stringify(pathBody)})
  ]);
  await insertAudit('AI Provider Configuration Updated','Caller ID and Bland Pathway configuration saved unverified. No calling was enabled.','system','ai-provider').catch(()=>{});
  alert('AI provider configuration saved.\n\nCaller ID: UNVERIFIED / DISABLED\nPathway: UNVERIFIED / DISABLED\nReal calling remains disabled.');
@@ -9265,7 +9265,7 @@ function paDueLabel(d){if(!d)return 'No date';if(isPastISO(d))return 'Overdue '+
 function paDueClass(d){if(!d)return '';return isPastISO(d)?'alertDueNow':isTodayISO(d)?'alertDueToday':'alertDueSoon'}
 async function createCollectorAlert(row){
  try{
-   await dbFetch('/collector_alerts',{method:'POST',body:JSON.stringify([{account_id:row.accountId||null,alert_type:row.type||'General',severity:row.severity||'info',title:row.title||'Collector Alert',message:row.message||'',due_date:row.dueDate||null,status:'Open',assigned_to_email:row.assignedToEmail||'',created_by_email:currentUser?.email||'',source_table:row.sourceTable||'',source_id:String(row.sourceId||'')}])});
+   await dbFetch('/collector_alerts',{method:'POST',body:JSON.stringify([tenantRow({account_id:row.accountId||null,alert_type:row.type||'General',severity:row.severity||'info',title:row.title||'Collector Alert',message:row.message||'',due_date:row.dueDate||null,status:'Open',assigned_to_email:row.assignedToEmail||'',created_by_email:currentUser?.email||'',source_table:row.sourceTable||'',source_id:String(row.sourceId||'')})])});
  }catch(e){/* optional table not installed yet or duplicate alert */}
 }
 async function fetchManualPromises(){try{return (await dbFetch('/payment_promises?select=*&order=due_date.asc&limit=50000')).map(toCamel)}catch(e){return[]}}
@@ -9309,7 +9309,7 @@ async function refreshCollectorAlertBadge(){if(!currentUser?.email)return;let ma
 async function openCollectorAlerts(){document.getElementById('collectorAlertsModal')?.classList.add('open');collectorAlertData.tab='all';await loadCollectorAlerts(true)}
 function renderCollectorAlerts(tab='all'){collectorAlertData.tab=tab;['All','Broken','Today','Upcoming','High'].forEach(t=>document.getElementById('alertTab'+t)?.classList.toggle('active',tab.toLowerCase()===t.toLowerCase()));let rows=collectorAlertData.alerts||[];let broken=rows.filter(a=>/broken/i.test(a.type));let today=rows.filter(a=>isTodayISO(a.dueDate));let upcoming=rows.filter(a=>/upcoming/i.test(a.type));let high=rows.filter(a=>/high balance/i.test(a.type));let set=(id,v)=>{let el=document.getElementById(id);if(el)el.textContent=String(v)};set('alertStatOpen',rows.length);set('alertStatBroken',broken.length);set('alertStatDueToday',today.length);set('alertStatUpcoming',upcoming.length);set('alertStatHighBalance',high.length);let list=tab==='broken'?broken:tab==='today'?today:tab==='upcoming'?upcoming:tab==='high'?high:rows;let box=document.getElementById('collectorAlertsList');if(box)box.innerHTML=list.map(collectorAlertCard).join('')||'<div class="powerEmpty">No collector alerts for this view.</div>';}
 function collectorAlertCard(a){let sev=paSeverityClass(a.severity);let acct=a.accountName||accountById(a.accountId)&&nameOf(accountById(a.accountId))||'Unknown Account';let acctNoText=a.accountNumber||accountById(a.accountId)&&acctNo(accountById(a.accountId))||'—';return `<div class="alertCard ${sev}"><div class="alertTop"><div><div class="alertTitle">${esc(a.title||a.type||'Collector Alert')}</div><div class="alertMeta"><b>${esc(acct)}</b> • Acct: ${esc(acctNoText)}<br><span class="${paDueClass(a.dueDate)}">${esc(paDueLabel(a.dueDate))}</span> • Assigned: ${esc(a.assignedToEmail||'—')}<br>${esc(a.message||'')}</div></div><span class="alertPill ${sev}">${esc(a.type||'Alert')}</span></div><div class="alertActions">${a.accountId?`<button class="outline" onclick="setAccountFromModal('${a.accountId}','collectorAlertsModal')">Open Account</button>`:''}<button class="green" onclick="resolveCollectorAlert('${esc(String(a.key||paAlertKey(a))).replace(/'/g,'&#39;')}','${esc(String(a.id||'')).replace(/'/g,'&#39;')}')">Clear</button></div></div>`}
-async function resolveCollectorAlert(key,id){if(key)paSetResolvedKey(key);if(id){await dbFetch('/collector_alerts?id=eq.'+encodeURIComponent(id),{method:'PATCH',body:JSON.stringify({status:'Resolved',resolved_at:new Date().toISOString(),resolved_by_email:currentUser?.email||''})}).catch(()=>{});}await loadCollectorAlerts(false)}
+async function resolveCollectorAlert(key,id){if(key)paSetResolvedKey(key);if(id){await dbFetch('/collector_alerts?organization_id=eq.'+encodeURIComponent(currentOrganizationId)+'&id=eq.'+encodeURIComponent(id),{method:'PATCH',body:JSON.stringify({status:'Resolved',resolved_at:new Date().toISOString(),resolved_by_email:currentUser?.email||''})}).catch(()=>{});}await loadCollectorAlerts(false)}
 function exportCollectorAlertsCSV(){let rows=collectorAlertData.alerts||[];let csv=['type,severity,due_date,account,account_number,assigned_to,message'];rows.forEach(a=>csv.push([a.type,a.severity,a.dueDate,a.accountName||accountById(a.accountId)&&nameOf(accountById(a.accountId))||'',a.accountNumber||accountById(a.accountId)&&acctNo(accountById(a.accountId))||'',a.assignedToEmail,a.message].map(v=>`"${String(v??'').replace(/"/g,'""')}"`).join(',')));download('collector_alerts_export.csv',csv.join('\n'),'text/csv')}
 setTimeout(()=>{if(typeof refreshCollectorAlertBadge==='function')refreshCollectorAlertBadge().catch(()=>{})},2500);
 
