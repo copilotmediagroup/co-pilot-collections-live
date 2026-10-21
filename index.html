@@ -10035,24 +10035,6 @@ function extractPhones(text){
 }
 function parseCSV(text){let rows=[],row=[],cell='',q=false;for(let i=0;i<text.length;i++){let ch=text[i],nx=text[i+1];if(ch=='"'&&q&&nx=='"'){cell+='"';i++}else if(ch=='"'){q=!q}else if(ch==','&&!q){row.push(cell);cell=''}else if((ch=='\n'||ch=='\r')&&!q){if(ch=='\r'&&nx=='\n')i++;row.push(cell);rows.push(row);row=[];cell=''}else cell+=ch}if(cell||row.length){row.push(cell);rows.push(row)}return rows}
 
-async function deleteAllRows(table){
- // Fallback delete only. Small ID batches avoid browser/server URL-length failures.
- let total=0;
- while(true){
-   let rows=await dbFetch('/'+table+'?select=id&limit=50');
-   if(!rows || rows.length===0)break;
-   let ids=rows.map(r=>r.id).filter(Boolean);
-   if(ids.length===0)break;
-   await dbFetch('/'+table+'?id=in.('+ids.join(',')+')',{
-     method:'DELETE',
-     headers:{Prefer:'return=minimal'}
-   });
-   total+=ids.length;
-   if(ids.length<50)break;
-   await new Promise(r=>setTimeout(r,20));
- }
- return total;
-}
 
 let archivedWorkspaceAccount=null;
 async function restoreArchivedAccount(a){
