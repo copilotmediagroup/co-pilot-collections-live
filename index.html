@@ -10753,9 +10753,7 @@ function renderLeaderboard(start,end){
     let ok=confirm('Delete this payment plan and its schedule from this account? This cannot be undone.');
     if(!ok)return;
     try{
-      await dbFetch('/payment_plan_payments?organization_id=eq.'+encodeURIComponent(currentOrganizationId)+'&plan_id=eq.'+encodeURIComponent(planId),{method:'DELETE',headers:{Prefer:'return=minimal'}}).catch(()=>{});
-      await dbFetch('/payment_plan_payments?organization_id=eq.'+encodeURIComponent(currentOrganizationId)+'&payment_plan_id=eq.'+encodeURIComponent(planId),{method:'DELETE',headers:{Prefer:'return=minimal'}}).catch(()=>{});
-      await dbFetch('/payment_plans?organization_id=eq.'+encodeURIComponent(currentOrganizationId)+'&id=eq.'+encodeURIComponent(planId),{method:'DELETE',headers:{Prefer:'return=minimal'}});
+      await dbFetch('/rpc/cpcm_admin_delete_payment_plan',{method:'POST',body:JSON.stringify({target_plan_id:planId})});
       try{delete paymentPlanCache[accountId]}catch(e){}
       if(typeof insertActivity==='function')await insertActivity(accountId,'Payment Plan Deleted','Admin deleted the payment plan and schedule.').catch(()=>{});
       if(typeof insertAudit==='function')await insertAudit('Payment Plan Deleted','Deleted payment plan '+planId,'account',accountId).catch(()=>{});
@@ -11760,9 +11758,7 @@ function exportContactIntelligenceCSV(){let calls=filteredContactCalls();let row
       return window.deletePaymentPlan(String(plan.id), String(a.id));
     }
     try{
-      await window.dbFetch('/payment_plan_payments?organization_id=eq.' + encodeURIComponent(currentOrganizationId) + '&plan_id=eq.' + encodeURIComponent(plan.id), {method:'DELETE'}).catch(function(){});
-      await window.dbFetch('/payment_plan_payments?organization_id=eq.' + encodeURIComponent(currentOrganizationId) + '&payment_plan_id=eq.' + encodeURIComponent(plan.id), {method:'DELETE'}).catch(function(){});
-      await window.dbFetch('/payment_plans?organization_id=eq.' + encodeURIComponent(currentOrganizationId) + '&id=eq.' + encodeURIComponent(plan.id), {method:'DELETE'});
+      await window.dbFetch('/rpc/cpcm_admin_delete_payment_plan',{method:'POST',body:JSON.stringify({target_plan_id:plan.id})});
       if(typeof window.sfInsertActivity === 'function') await window.sfInsertActivity(a.id, 'Payment Plan Deleted', 'Admin deleted payment plan.').catch(function(){});
       if(typeof window.loadAccounts === 'function') await window.loadAccounts().catch(function(){});
       if(typeof window.render === 'function') window.render();
@@ -12692,7 +12688,7 @@ function exportContactIntelligenceCSV(){let calls=filteredContactCalls();let row
   async function deleteSettlementOffer(id){
     if(!isSettlementAdmin())return alert('Admin only.');
     if(!confirm('Delete this settlement offer? This cannot be undone.'))return;
-    await dbFetch('/settlements?organization_id=eq.'+encodeURIComponent(currentOrganizationId)+'&id=eq.'+encodeURIComponent(id),{method:'DELETE'});
+    await dbFetch('/rpc/cpcm_admin_delete_settlement',{method:'POST',body:JSON.stringify({target_settlement_id:id})});
     await refreshSettlementApprovalPage(); await renderSettlementAccountCard();
   }
   async function convertApprovedSettlementToPlan(id){
