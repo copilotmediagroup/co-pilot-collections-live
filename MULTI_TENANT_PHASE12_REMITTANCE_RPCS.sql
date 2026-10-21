@@ -5,7 +5,7 @@ language plpgsql
 security definer
 set search_path=public
 as $$
-declare actor text:=lower(coalesce(auth.jwt()->>'email','')); oid uuid:=private.current_organization_id(); result jsonb;
+declare actor text:=public.current_app_email(); oid uuid:=private.current_organization_id(); result jsonb;
 begin
   if not private.is_organization_admin(oid) then raise exception 'agency admin only'; end if;
   select jsonb_build_object(
@@ -42,7 +42,7 @@ security definer
 set search_path=public
 as $$
 declare
-  actor text:=lower(coalesce(auth.jwt()->>'email',''));
+  actor text:=public.current_app_email();
   target text:=lower(trim(coalesce(target_client_email,'')));
   portfolio text:=trim(coalesce(target_portfolio_name,''));
   payer text:=lower(trim(coalesce(new_processor_fee_payer,'client')));
@@ -87,7 +87,7 @@ security definer
 set search_path=public
 as $$
 declare
-  actor text:=lower(coalesce(auth.jwt()->>'email',''));
+  actor text:=public.current_app_email();
   target text:=lower(trim(coalesce(target_client_email,'')));
   portfolio text:=trim(coalesce(target_portfolio_name,''));
   fee_pct numeric:=30;
@@ -195,7 +195,7 @@ security definer
 set search_path=public
 as $$
 declare
-  actor text:=lower(coalesce(auth.jwt()->>'email',''));
+  actor text:=public.current_app_email();
   preview jsonb;
   new_batch public.client_remittance_batches%rowtype;
   item_record record;
@@ -250,7 +250,7 @@ security definer
 set search_path=public
 as $$
 declare
-  actor text:=lower(coalesce(auth.jwt()->>'email',''));
+  actor text:=public.current_app_email();
   action_name text:=lower(trim(coalesce(requested_action,'')));
   current_batch public.client_remittance_batches%rowtype;
 begin
@@ -291,7 +291,7 @@ security definer
 set search_path=public
 as $$
 declare
-  actor text:=lower(coalesce(auth.jwt()->>'email',''));
+  actor text:=public.current_app_email();
   selected_batch public.client_remittance_batches%rowtype;
   oid uuid:=private.current_organization_id(); is_admin boolean:=private.is_organization_admin(oid);
 begin
@@ -313,7 +313,7 @@ security definer
 set search_path=public
 as $$
 declare
-  actor text:=lower(coalesce(auth.jwt()->>'email',''));
+  actor text:=public.current_app_email();
   profile_row public.app_users%rowtype;
 begin
   if actor='' then raise exception 'not authenticated'; end if;

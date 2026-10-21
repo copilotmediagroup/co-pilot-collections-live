@@ -10,7 +10,7 @@ security definer
 set search_path=public
 as $$
 declare
-  actor text:=lower(coalesce(auth.jwt()->>'email',''));
+  actor text:=public.current_app_email();
   oid uuid:=private.current_organization_id();
   target text:=lower(trim(coalesce(target_email,'')));
   action_name text:=lower(trim(coalesce(requested_action,'')));

@@ -1,0 +1,8 @@
+-- Phase 55: canonicalize remaining authenticated actor/self identity RPCs already present in DEMO history.
+begin;
+\i MULTI_TENANT_PHASE10_CLIENT_PORTAL_RPCS.sql
+\i MULTI_TENANT_PHASE11_STAFF_ADMIN_RPC.sql
+\i MULTI_TENANT_PHASE12_REMITTANCE_RPCS.sql
+\i MULTI_TENANT_PHASE17_MESSENGER_STAFF_RPCS.sql
+\i MULTI_TENANT_PHASE32_MEMBERSHIP_LIFECYCLE_SYNC.sql
+commit;

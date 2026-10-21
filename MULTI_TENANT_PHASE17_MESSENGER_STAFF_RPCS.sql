@@ -8,7 +8,7 @@ security definer
 set search_path = public
 as $$
 declare
-  actor_email text := lower(coalesce(auth.jwt() ->> 'email',''));
+  actor_email text := public.current_app_email();
   target text := lower(trim(coalesce(target_email,'')));
   clean text := nullif(trim(coalesce(new_full_name,'')),'');
   oid uuid := private.current_organization_id();

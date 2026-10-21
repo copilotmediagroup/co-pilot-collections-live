@@ -5,7 +5,7 @@ language plpgsql
 security definer
 set search_path=public
 as $$
-declare actor text:=lower(coalesce(auth.jwt()->>'email','')); oid uuid:=private.current_organization_id(); result jsonb;
+declare actor text:=public.current_app_email(); oid uuid:=private.current_organization_id(); result jsonb;
 begin
   if not private.is_organization_admin(oid) then raise exception 'agency admin only'; end if;
   select jsonb_build_object(
@@ -26,7 +26,7 @@ language plpgsql
 security definer
 set search_path=public
 as $$
-declare actor text:=lower(coalesce(auth.jwt()->>'email','')); oid uuid:=private.current_organization_id(); target text:=lower(trim(coalesce(target_email,''))); p text;
+declare actor text:=public.current_app_email(); oid uuid:=private.current_organization_id(); target text:=lower(trim(coalesce(target_email,''))); p text;
 begin
   if not private.is_organization_admin(oid) then raise exception 'agency admin only'; end if;
   if target='' then raise exception 'target_email required'; end if;
@@ -48,7 +48,7 @@ language plpgsql
 security definer
 set search_path=public
 as $$
-declare actor text:=lower(coalesce(auth.jwt()->>'email','')); oid uuid:=private.current_organization_id(); target text:=lower(trim(coalesce(target_email,'')));
+declare actor text:=public.current_app_email(); oid uuid:=private.current_organization_id(); target text:=lower(trim(coalesce(target_email,'')));
 begin
   if not private.is_organization_admin(oid) then raise exception 'agency admin only'; end if;
   update public.app_users set client_portal_enabled=false,approval_status='pending',is_approved=false,is_active=false,updated_at=now() where organization_id=oid and lower(email)=target and lower(role)='client';
@@ -61,7 +61,7 @@ language plpgsql
 security definer
 set search_path=public
 as $$
-declare actor text:=lower(coalesce(auth.jwt()->>'email','')); oid uuid:=private.current_organization_id(); profile_row public.app_users%rowtype; result jsonb;
+declare actor text:=public.current_app_email(); oid uuid:=private.current_organization_id(); profile_row public.app_users%rowtype; result jsonb;
 begin
   if actor='' then raise exception 'not authenticated'; end if;
   select * into profile_row from public.app_users where organization_id=oid and lower(email)=actor limit 1;

@@ -2,7 +2,7 @@
 begin;
 create or replace function public.cpcm_admin_manage_staff_user(target_email text,requested_action text,removal_reason_text text default null)
 returns jsonb language plpgsql security definer set search_path='' as $$
-declare actor text:=lower(coalesce(auth.jwt()->>'email','')); oid uuid:=private.current_organization_id(); target text:=lower(trim(coalesce(target_email,''))); action_name text:=lower(trim(coalesce(requested_action,''))); target_role text; target_uid uuid; released_count integer:=0; result jsonb;
+declare actor text:=public.current_app_email(); oid uuid:=private.current_organization_id(); target text:=lower(trim(coalesce(target_email,''))); action_name text:=lower(trim(coalesce(requested_action,''))); target_role text; target_uid uuid; released_count integer:=0; result jsonb;
 begin
  if not private.is_organization_admin(oid) then raise exception 'agency admin only'; end if;
  if target='' then raise exception 'target_email required'; end if;
