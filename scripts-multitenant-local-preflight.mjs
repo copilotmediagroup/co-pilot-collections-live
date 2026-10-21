@@ -23,5 +23,6 @@ pass('voice broadcast writes tenant ownership',voice.includes('organization_id: 
 pass('voice broadcast mutations tenant-scoped',voice.includes('.eq(\"organization_id\", actor.organizationId)'));
 const nmi38=fs.readFileSync('MULTI_TENANT_PHASE38_NMI_TENANT_IDEMPOTENCY.sql','utf8');
 pass('NMI idempotency tenant-qualified',nmi38.includes('nmi_transactions(organization_id,idempotency_key)'));
+for(const gate of ['scripts-demo-deployment-gate.mjs','scripts-pending-installer-order-gate.mjs']){try{execFileSync(process.execPath,[gate],{stdio:'pipe'});pass(gate,true)}catch(e){pass(gate,false,String(e.stdout||e.stderr||e.message))}}
 try{execFileSync('git',['diff','--check'],{stdio:'pipe'});pass('git diff --check',true)}catch(e){pass('git diff --check',false,String(e.stdout||e.message))}
 if(failed)process.exit(1);
