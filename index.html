@@ -9133,7 +9133,7 @@ async function openPaymentsDashboard(){
 }
 async function loadPaymentsDashboard(){
  let ledger=[],payments=[],plans=[];
- try{ledger=(await dbFetch('/payments_ledger?select=*&order=payment_date.desc,created_at.desc&limit=10000')).map(toCamel)}catch(e){ledger=[]}
+ try{ledger=(await dbFetch('/payments_ledger?organization_id=eq.'+encodeURIComponent(currentOrganizationId)+'&select=*&order=payment_date.desc,created_at.desc&limit=10000')).map(toCamel)}catch(e){ledger=[]}
  try{payments=(await dbFetch('/payment_plan_payments?select=*&order=due_date.asc&limit=10000')).map(toCamel)}catch(e){payments=[]}
  try{plans=(await dbFetch('/payment_plans?select=*&order=created_at.desc&limit=10000')).map(toCamel)}catch(e){plans=[]}
  if(!currentUser.isAdmin){
@@ -11329,7 +11329,7 @@ async function upsertPresence(){
 }
 async function loadPresence(){
   try{
-    chatPresenceData=(await dbFetch('/team_presence?select=*&order=last_seen_at.desc&limit=500')).map(toCamel);
+    chatPresenceData=(await dbFetch('/team_presence?organization_id=eq.'+encodeURIComponent(currentOrganizationId)+'&select=*&order=last_seen_at.desc&limit=500')).map(toCamel);
   }catch(e){
     chatPresenceData=[];
   }
@@ -12442,7 +12442,7 @@ function exportContactIntelligenceCSV(){let calls=filteredContactCalls();let row
   function settlementAccountMap(){var m={};(window.accounts||[]).forEach(function(a){m[String(a.id)]=a});return m;}
   async function settlementFetchAll(){
     if(typeof dbFetch!=='function') return [];
-    try{return (await dbFetch('/settlements?select=*&order=created_at.desc&limit=2000')).map(normalizeSettlement)}catch(e){console.warn('settlements load failed',e);return []}
+    try{return (await dbFetch('/settlements?organization_id=eq.'+encodeURIComponent(currentOrganizationId)+'&select=*&order=created_at.desc&limit=2000')).map(normalizeSettlement)}catch(e){console.warn('settlements load failed',e);return []}
   }
   async function settlementFetchForAccount(accountId){
     if(!accountId || typeof dbFetch!=='function') return [];
