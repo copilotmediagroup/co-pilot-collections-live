@@ -5907,7 +5907,7 @@ async function loadAccounts(){
  }
  try{
    setGlobalBusy(true,'Loading accounts','Refreshing queue and dashboards...');
-   accounts=(await dbFetch('/accounts?select=*&archived_at=is.null&order=created_at.asc&limit=20000')).map(toCamel);
+   accounts=(await dbFetch('/accounts?organization_id=eq.'+encodeURIComponent(currentOrganizationId)+'&select=*&archived_at=is.null&order=created_at.asc&limit=20000')).map(toCamel);
    if(!currentUser.isAdmin)accounts=accounts.filter(a=>(a.assignedToEmail||'').toLowerCase()===currentUser.email);
    if(!currentAccountId){try{let saved=localStorage.getItem('cpcmCurrentAccount:'+String(currentUser.email||'').toLowerCase());if(saved&&accounts.some(a=>String(a.id)===String(saved)))currentAccountId=saved}catch(e){}}
    if(!currentAccountId&&accounts[0])currentAccountId=accounts[0].id;
@@ -6718,7 +6718,7 @@ async function loadHistory(id){
    dbFetch(`/account_notes?account_id=eq.${id}&select=*&order=created_at.desc&limit=100`).catch(()=>[]),
    dbFetch(`/activity_logs?account_id=eq.${id}&select=*&order=created_at.desc&limit=200`).catch(()=>[]),
    dbFetch(`/call_results?account_id=eq.${id}&select=*&order=created_at.desc&limit=100`).catch(()=>[]),
-   dbFetch(`/payments_ledger?account_id=eq.${id}&select=*&order=created_at.desc&limit=100`).catch(()=>[]),
+   dbFetch(`/payments_ledger?organization_id=eq.'+encodeURIComponent(currentOrganizationId)+'&account_id=eq.${id}&select=*&order=created_at.desc&limit=100`).catch(()=>[]),
    dbFetch(`/follow_ups?account_id=eq.${id}&select=*&order=created_at.desc&limit=100`).catch(()=>[])
   ];
   let [notes,acts,calls,pays,fus]=await Promise.all(reqs),events=[];
@@ -7113,7 +7113,7 @@ async function reviewBlandSandboxResult(){
   const data=await res.json().catch(()=>({}));
   if(!res.ok||!data.ok)throw new Error(data.error||('Sandbox lookup returned '+res.status));
   const suggestions=classifyBlandSandboxTranscript(data);
-  const qaRows=await dbFetch('/ai_call_qa?provider_call_id=eq.'+encodeURIComponent(callId)+'&select=account_id&limit=1').catch(()=>[]);
+  const qaRows=await dbFetch('/ai_call_qa?organization_id=eq.'+encodeURIComponent(currentOrganizationId)+'&provider_call_id=eq.'+encodeURIComponent(callId)+'&select=account_id&limit=1').catch(()=>[]);
   const qaAccountId=qaRows?.[0]?.account_id||null;
   await dbFetch('/ai_call_qa?organization_id=eq.'+encodeURIComponent(currentOrganizationId)+'&provider_call_id=eq.'+encodeURIComponent(callId),{method:'PATCH',body:JSON.stringify({status:data.status||null,completed:!!data.completed,answered_by:data.answered_by||null,duration_minutes:data.call_length==null?null:Number(data.call_length),price:data.price==null?null:Number(data.price),summary:data.summary||'',transcript:data.transcript||'',suggested_dispositions:suggestions,updated_at:new Date().toISOString()})}).catch(()=>{});
   const suggestedText=suggestions.length?suggestions.map(x=>'• '+x.label).join('\n'):'• No special disposition detected';
@@ -7125,7 +7125,7 @@ async function reviewBlandSandboxResult(){
 }
 async function editAiCollectorScript(){
  if(!currentUser?.isAdmin)return alert('Admin only');
- let rows=await dbFetch('/ai_collector_script_profiles?profile_name=eq.Default%20AI%20Collector&limit=1').catch(()=>[]);
+ let rows=await dbFetch('/ai_collector_script_profiles?organization_id=eq.'+encodeURIComponent(currentOrganizationId)+'&profile_name=eq.Default%20AI%20Collector&limit=1').catch(()=>[]);
  let s=rows?.[0]; if(!s)return alert('AI script profile is unavailable.');
  const ask=(label,value)=>prompt(label,value??'');
  const identity=ask('IDENTITY VERIFICATION\n\nDo not include debt details here. Edit the instruction:',s.identity_prompt); if(identity===null)return;
@@ -7167,8 +7167,8 @@ async function editAccountCommunicationCompliance(){
 async function configureAiProvider(){
  if(!currentUser?.isAdmin)return alert('Admin only');
  const [callerRows,pathRows]=await Promise.all([
-  dbFetch('/ai_caller_id_config?id=eq.true&limit=1').catch(()=>[]),
-  dbFetch('/ai_bland_pathway_config?id=eq.true&limit=1').catch(()=>[])
+  dbFetch('/ai_caller_id_config?organization_id=eq.'+encodeURIComponent(currentOrganizationId)+'&id=eq.true&limit=1').catch(()=>[]),
+  dbFetch('/ai_bland_pathway_config?organization_id=eq.'+encodeURIComponent(currentOrganizationId)+'&id=eq.true&limit=1').catch(()=>[])
  ]);
  const c=callerRows?.[0]||{},p=pathRows?.[0]||{};
  const caller=prompt('PRODUCTION CALLER ID\n\nEnter the Bland-owned/verified production number when available. Saving it here does NOT verify or enable it.\n\nLeave blank to keep unconfigured:',c.verification_status==='verified'?(c.phone_number||''):'');
@@ -7189,10 +7189,10 @@ async function configureAiProvider(){
 async function checkAiLaunchReadiness(){
  if(!currentUser?.isAdmin)return alert('Admin only');
  const [scripts,runtime,caller,pathway]=await Promise.all([
-  dbFetch('/ai_collector_script_profiles?profile_name=eq.Default%20AI%20Collector&select=version,approved_for_real_calls,approved_by_email,approved_at&limit=1').catch(()=>[]),
+  dbFetch('/ai_collector_script_profiles?organization_id=eq.'+encodeURIComponent(currentOrganizationId)+'&profile_name=eq.Default%20AI%20Collector&select=version,approved_for_real_calls,approved_by_email,approved_at&limit=1').catch(()=>[]),
   dbFetch('/ai_call_runtime_config?id=eq.true&select=real_provider_send_enabled&limit=1').catch(()=>[]),
-  dbFetch('/ai_caller_id_config?id=eq.true&select=phone_number,display_label,verification_status,enabled_for_real_calls&limit=1').catch(()=>[]),
-  dbFetch('/ai_bland_pathway_config?id=eq.true&select=pathway_id,pathway_version,verification_status,enabled_for_real_calls&limit=1').catch(()=>[])
+  dbFetch('/ai_caller_id_config?organization_id=eq.'+encodeURIComponent(currentOrganizationId)+'&id=eq.true&select=phone_number,display_label,verification_status,enabled_for_real_calls&limit=1').catch(()=>[]),
+  dbFetch('/ai_bland_pathway_config?organization_id=eq.'+encodeURIComponent(currentOrganizationId)+'&id=eq.true&select=pathway_id,pathway_version,verification_status,enabled_for_real_calls&limit=1').catch(()=>[])
  ]);
  const s=scripts?.[0]||{},r=runtime?.[0]||{},c=caller?.[0]||{},p=pathway?.[0]||{};
  const line=(ok,label,detail='')=>(ok?'✓ ':'✗ ')+label+(detail?' — '+detail:'');
@@ -8720,7 +8720,7 @@ async function fillPdfFromPaymentPlan(){
 async function fillPdfFromLatestPayment(){
  let a=getCurrent(); if(!a)return;
  try{
-   let rows=(await dbFetch(`/payments_ledger?account_id=eq.${a.id}&select=*&order=payment_date.desc,created_at.desc&limit=1`)).map(toCamel);
+   let rows=(await dbFetch(`/payments_ledger?organization_id=eq.'+encodeURIComponent(currentOrganizationId)+'&account_id=eq.${a.id}&select=*&order=payment_date.desc,created_at.desc&limit=1`)).map(toCamel);
    if(!rows.length)return alert('No payment ledger entry found for this account.');
    let r=rows[0];
    document.getElementById('pdfDocType').value=moneyNum(r.balanceAfter)<=0?'Billing Statement - Paid In Full':'Billing Statement - Payment Plan';
@@ -9046,7 +9046,7 @@ function updateLedgerPreview(){
 async function loadPaymentLedgerForCurrent(){
  let a=getCurrent(); if(!a)return;
  let rows=[];
- try{rows=(await dbFetch(`/payments_ledger?account_id=eq.${a.id}&select=*&order=payment_date.desc,created_at.desc&limit=500`)).map(toCamel)}catch(e){rows=[]}
+ try{rows=(await dbFetch(`/payments_ledger?organization_id=eq.'+encodeURIComponent(currentOrganizationId)+'&account_id=eq.${a.id}&select=*&order=payment_date.desc,created_at.desc&limit=500`)).map(toCamel)}catch(e){rows=[]}
  paymentLedgerData=rows;
  let body=document.getElementById('ledgerHistoryBody'); if(!body)return;
  body.innerHTML=rows.map(r=>`<tr>
@@ -10058,7 +10058,7 @@ async function permanentlyDeleteArchivedPortfolio(){
  if(!currentUser.isAdmin)return alert('Admin only');
  try{
    setGlobalBusy(true,'Archived Portfolios','Loading archived portfolio totals...');
-   let rows=(await dbFetch('/accounts?select=id,portfolio,current_balance&archived_at=not.is.null&order=portfolio.asc&limit=20000')).map(toCamel);
+   let rows=(await dbFetch('/accounts?organization_id=eq.'+encodeURIComponent(currentOrganizationId)+'&select=id,portfolio,current_balance&archived_at=not.is.null&order=portfolio.asc&limit=20000')).map(toCamel);
    if(!rows.length)return alert('There are no archived portfolios.');
    let groups={};
    rows.forEach(a=>{let p=String(a.portfolio||'Unlabeled Portfolio').trim()||'Unlabeled Portfolio';if(!groups[p])groups[p]={name:p,rows:[],balance:0};groups[p].rows.push(a);groups[p].balance+=accountBalance(a)});
@@ -10088,7 +10088,7 @@ async function openArchivedAccounts(){
  if(term===null)return;
  try{
    setGlobalBusy(true,'Archived Accounts','Searching retained account records...');
-   let rows=(await dbFetch('/accounts?select=*&archived_at=not.is.null&order=archived_at.desc&limit=5000')).map(toCamel);
+   let rows=(await dbFetch('/accounts?organization_id=eq.'+encodeURIComponent(currentOrganizationId)+'&select=*&archived_at=not.is.null&order=archived_at.desc&limit=5000')).map(toCamel);
    let q=String(term||'').trim();
    if(q)rows=rows.filter(a=>accountMatchesSearch(a,q)||String(a.portfolio||'').toLowerCase().includes(q.toLowerCase()));
    if(!rows.length)return alert('No archived accounts matched that search.');
@@ -10993,7 +10993,7 @@ async function setTyping(isTyping){
   if(!chatActiveEmail||!currentUser.email)return;
   let row={user_email:currentUser.email,to_email:chatActiveEmail,is_typing:isTyping,updated_at:new Date().toISOString()};
   try{
-    let found=await dbFetch('/team_typing_status?user_email=eq.'+encodeURIComponent(currentUser.email)+'&to_email=eq.'+encodeURIComponent(chatActiveEmail)+'&select=*').catch(()=>[]);
+    let found=await dbFetch('/team_typing_status?organization_id=eq.'+encodeURIComponent(currentOrganizationId)+'&user_email=eq.'+encodeURIComponent(currentUser.email)+'&to_email=eq.'+encodeURIComponent(chatActiveEmail)+'&select=*').catch(()=>[]);
     if(found&&found[0]){
       await dbFetch('/team_typing_status?organization_id=eq.'+encodeURIComponent(currentOrganizationId)+'&id=eq.'+found[0].id,{method:'PATCH',body:JSON.stringify(row)});
     }else{
@@ -11007,7 +11007,7 @@ async function loadTypingStatus(){
   if(!el)return;
   let rows=[];
   try{
-    rows=(await dbFetch('/team_typing_status?to_email=eq.'+encodeURIComponent(currentUser.email)+'&user_email=eq.'+encodeURIComponent(chatActiveEmail)+'&select=*&limit=1')).map(toCamel);
+    rows=(await dbFetch('/team_typing_status?organization_id=eq.'+encodeURIComponent(currentOrganizationId)+'&to_email=eq.'+encodeURIComponent(currentUser.email)+'&user_email=eq.'+encodeURIComponent(chatActiveEmail)+'&select=*&limit=1')).map(toCamel);
   }catch(e){rows=[]}
   let r=rows[0];
   let active=r?.isTyping && (Date.now()-new Date(r.updatedAt||r.updated_at).getTime()<5500);
@@ -11313,7 +11313,7 @@ async function upsertPresence(){
     updated_at:new Date().toISOString()
   };
   try{
-    let rows=await dbFetch('/team_presence?user_email=eq.'+encodeURIComponent(email)+'&select=id').catch(()=>[]);
+    let rows=await dbFetch('/team_presence?organization_id=eq.'+encodeURIComponent(currentOrganizationId)+'&user_email=eq.'+encodeURIComponent(email)+'&select=id').catch(()=>[]);
     if(rows&&rows[0]){
       await dbFetch('/team_presence?organization_id=eq.'+encodeURIComponent(currentOrganizationId)+'&id=eq.'+rows[0].id,{method:'PATCH',body:JSON.stringify(payload)}).catch(()=>{});
     }else{
@@ -12446,7 +12446,7 @@ function exportContactIntelligenceCSV(){let calls=filteredContactCalls();let row
   }
   async function settlementFetchForAccount(accountId){
     if(!accountId || typeof dbFetch!=='function') return [];
-    try{return (await dbFetch('/settlements?account_id=eq.'+encodeURIComponent(accountId)+'&select=*&order=created_at.desc&limit=20')).map(normalizeSettlement)}catch(e){return []}
+    try{return (await dbFetch('/settlements?organization_id=eq.'+encodeURIComponent(currentOrganizationId)+'&account_id=eq.'+encodeURIComponent(accountId)+'&select=*&order=created_at.desc&limit=20')).map(normalizeSettlement)}catch(e){return []}
   }
   async function settlementActivity(accountId,type,text){try{if(typeof insertActivity==='function')await insertActivity(accountId,type,text)}catch(e){} try{if(typeof insertAudit==='function')await insertAudit(type,text,'settlement',String(accountId||''))}catch(e){}}
 
@@ -12973,7 +12973,7 @@ function exportContactIntelligenceCSV(){let calls=filteredContactCalls();let row
     dEl('docRemainingBalance').value=dBalance(a).toFixed(2); dEl('docPaymentAmount').value='0.00'; dEl('docSettlementAmount').value='0.00'; dEl('docInstallmentAmount').value='0.00'; dEl('docFrequency').value='Monthly'; dEl('docNotes').value='';
     let rows=await dFetch('/payment_ledger?account_id=eq.'+encodeURIComponent(a.id)+'&select=*&order=created_at.desc&limit=1'); let pay=dCamel(rows[0]||{});
     if(pay.amount)dEl('docPaymentAmount').value=dMoneyNum(pay.amount).toFixed(2); if(pay.balanceAfter!=null)dEl('docRemainingBalance').value=dMoneyNum(pay.balanceAfter).toFixed(2);
-    let settlements=await dFetch('/settlements?account_id=eq.'+encodeURIComponent(a.id)+'&select=*&order=created_at.desc&limit=1'); let set=dCamel(settlements[0]||{});
+    let settlements=await dFetch('/settlements?organization_id=eq.'+encodeURIComponent(currentOrganizationId)+'&account_id=eq.'+encodeURIComponent(a.id)+'&select=*&order=created_at.desc&limit=1'); let set=dCamel(settlements[0]||{});
     if(set.settlementAmount)dEl('docSettlementAmount').value=dMoneyNum(set.settlementAmount).toFixed(2); if(set.dueDate)dEl('docDueDate').value=String(set.dueDate).slice(0,10); if(set.notes)dEl('docNotes').value=String(set.notes).slice(0,600);
     let plans=await dFetch('/payment_plans?account_id=eq.'+encodeURIComponent(a.id)+'&select=*&order=created_at.desc&limit=1'); let plan=dCamel(plans[0]||{});
     if(plan.paymentAmount||plan.installmentAmount||plan.amount)dEl('docInstallmentAmount').value=dMoneyNum(plan.paymentAmount||plan.installmentAmount||plan.amount).toFixed(2); if(plan.frequency)dEl('docFrequency').value=String(plan.frequency); if(plan.remainingAmount!=null)dEl('docRemainingBalance').value=dMoneyNum(plan.remainingAmount).toFixed(2);
@@ -14450,7 +14450,7 @@ function exportContactIntelligenceCSV(){let calls=filteredContactCalls();let row
   // Replace only the account-ledger renderer; the existing save and dashboard logic remains intact.
   window.loadPaymentLedgerForCurrent=async function(){
     var a=current();if(!a)return;
-    var rows=[];try{rows=(await dbFetch('/payments_ledger?account_id=eq.'+encodeURIComponent(a.id)+'&select=*&order=payment_date.desc,created_at.desc&limit=500')).map(toCamel)}catch(e){rows=[]}
+    var rows=[];try{rows=(await dbFetch('/payments_ledger?organization_id=eq.'+encodeURIComponent(currentOrganizationId)+'&account_id=eq.'+encodeURIComponent(a.id)+'&select=*&order=payment_date.desc,created_at.desc&limit=500')).map(toCamel)}catch(e){rows=[]}
     window.paymentLedgerData=rows;
     var body=byId('ledgerHistoryBody');if(!body)return;
     body.innerHTML=rows.map(function(r){
@@ -15014,7 +15014,7 @@ function exportContactIntelligenceCSV(){let calls=filteredContactCalls();let row
  let startedAt=new Date(Date.now()-2000).toISOString(),seen=new Set(),timer=0,busy=false;
  function ensurePop(){let p=document.getElementById('rcInboundPop');if(p)return p;p=document.createElement('div');p.id='rcInboundPop';p.className='rcInboundPop';document.body.appendChild(p);return p}
  window.closeInboundScreenPop=function(){ensurePop().classList.remove('open')};
- window.openInboundAccount=async function(id){let target=accounts.find(a=>String(a.id)===String(id));if(!target){let rows=await dbFetch('/accounts?select=*&id=eq.'+encodeURIComponent(id)+'&limit=1');if(rows?.[0]){target=toCamel(rows[0]);accounts.unshift(target)}}if(!target)return alert('That debtor account is not available to this user.');let s=document.getElementById('search');if(s)s.value='';let p=document.getElementById('portfolioFilter');if(p)p.value='';let st=document.getElementById('statusFilter');if(st)st.value='';let r=document.getElementById('callRegionFilter');if(r)r.value='';currentAccountId=target.id;try{localStorage.setItem('cpcmCurrentAccount:'+String(currentUser.email||'').toLowerCase(),String(target.id))}catch(e){}render();closeInboundScreenPop();setTimeout(()=>document.querySelector('.center')?.scrollTo?.({top:0,behavior:'smooth'}),30)};
+ window.openInboundAccount=async function(id){let target=accounts.find(a=>String(a.id)===String(id));if(!target){let rows=await dbFetch('/accounts?organization_id=eq.'+encodeURIComponent(currentOrganizationId)+'&select=*&id=eq.'+encodeURIComponent(id)+'&limit=1');if(rows?.[0]){target=toCamel(rows[0]);accounts.unshift(target)}}if(!target)return alert('That debtor account is not available to this user.');let s=document.getElementById('search');if(s)s.value='';let p=document.getElementById('portfolioFilter');if(p)p.value='';let st=document.getElementById('statusFilter');if(st)st.value='';let r=document.getElementById('callRegionFilter');if(r)r.value='';currentAccountId=target.id;try{localStorage.setItem('cpcmCurrentAccount:'+String(currentUser.email||'').toLowerCase(),String(target.id))}catch(e){}render();closeInboundScreenPop();setTimeout(()=>document.querySelector('.center')?.scrollTo?.({top:0,behavior:'smooth'}),30)};
  async function matchesFor(phone){let rows=await dbFetch('/rpc/cpcm_accounts_by_phone',{method:'POST',body:JSON.stringify({p_phone:phone})});return (rows||[]).map(toCamel)}
  function show(call,matches){let p=ensurePop(),number=call.from_number||'',cards='';if(matches.length===1){let a=matches[0];cards='<div class="rcInboundCard"><div class="rcInboundName">'+esc(nameOf(a))+'</div><div class="rcInboundMeta">Account: '+esc(acctNo(a))+'<br>Balance: '+money(accountBalance(a))+' · Creditor: '+esc(creditor(a))+'<br>Status: '+esc(accountStatus(a))+'</div><div class="rcInboundActions"><button class="rcInboundOpen" onclick="openInboundAccount(\''+esc(a.id)+'\')">Open Account</button></div></div>'}else if(matches.length>1){cards='<div class="rcInboundUnknown">Multiple accounts use this number. Choose the correct debtor:</div>'+matches.map(a=>'<button class="rcInboundChoice" onclick="openInboundAccount(\''+esc(a.id)+'\')">'+esc(nameOf(a))+' · '+esc(acctNo(a))+'</button>').join('')}else cards='<div class="rcInboundUnknown">No debtor account matches this incoming number.</div>';p.innerHTML='<div class="rcInboundHead"><div><div class="rcInboundEyebrow">Incoming RingCentral Call</div><div class="rcInboundNumber">'+esc(fmtPhone(number)||number||'Unknown caller')+'</div></div><button class="rcInboundClose" onclick="closeInboundScreenPop()">×</button></div>'+cards;p.classList.add('open')}
  async function poll(){if(busy||!token()||!currentUser?.email)return;busy=true;try{let path='/ringcentral_call_records?select=rc_call_id,session_id,from_number,start_time,telephony_status&direction=eq.Inbound&start_time=gte.'+encodeURIComponent(startedAt)+'&order=start_time.asc&limit=20',rows=await dbFetch(path);for(const call of rows||[]){let k=call.rc_call_id||call.session_id;if(!k||seen.has(k))continue;seen.add(k);show(call,await matchesFor(call.from_number||''))}}catch(e){console.warn('Inbound RingCentral screen-pop poll failed',e)}finally{busy=false}}
