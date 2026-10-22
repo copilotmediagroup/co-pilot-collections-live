@@ -1,0 +1,16 @@
+import fs from 'node:fs';
+const f='MULTI_TENANT_PHASE85_CANCELLATION_EVENT_PROCESSING_BOUNDARY.sql',t=fs.readFileSync(f,'utf8');let failed=false;const c=(n,o)=>{console.log(o?'PASS':'FAIL',n);if(!o)failed=true};
+c('normalized cancellation event rpc',/cpcm_service_apply_normalized_subscription_cancellation_event/.test(t));
+c('service role required',/Service role required/.test(t));
+c('locks event row',/saas_subscription_provider_events where id=p_event_id for update/i.test(t));
+c('received event only',/e\.status <> 'received'/.test(t));
+c('event organization binding',/e\.organization_id <> p_organization_id/.test(t));
+c('demo excluded',/is_demo,false/.test(t));
+c('locks subscription',/organization_subscriptions where organization_id=p_organization_id for update/i.test(t));
+c('requires cancellation request',/Cancellation was not requested/.test(t));
+c('reuses lifecycle service',/cpcm_service_apply_subscription_lifecycle\(p_organization_id,'cancelled'/.test(t));
+c('marks event processed after lifecycle',/update public\.saas_subscription_provider_events set status='processed'/.test(t));
+c('browser revoked',/from public,anon,authenticated/.test(t));
+c('service granted',/to service_role/.test(t));
+c('no provider webhook names invented',!/webhook.*(cancelled|canceled)|subscription\.cancel/i.test(t.replace(/^--.*$/gm,'')));
+if(failed)process.exit(1);
