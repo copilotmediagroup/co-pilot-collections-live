@@ -1,0 +1,11 @@
+import fs from 'node:fs';
+const s=fs.readFileSync('MULTI_TENANT_PHASE82_PROVIDER_EVENT_ORGANIZATION_RESOLUTION.sql','utf8');let bad=0;const c=(n,o)=>{console.log(o?'PASS':'FAIL',n);if(!o)bad++};
+c('resolver rpc',/cpcm_service_resolve_saas_provider_organization/.test(s));
+c('service role required',/auth\.role\(\).*service_role/i.test(s));
+c('requires provider identity',/provider customer or subscription id are required/i.test(s));
+c('matches subscription identity',/provider_subscription_id=sid/.test(s)&&/provider_customer_id=cid/.test(s));
+c('demo excluded',/is_demo,false\)=false/i.test(s));
+c('ambiguous identity blocked',/matched multiple organizations/i.test(s));
+c('no card data',!/pan|cvv|cvc|card_number|payment_token/i.test(s));
+c('browser revoked',/from public,anon,authenticated/i.test(s));
+c('service granted',/to service_role/i.test(s));if(bad)process.exit(1);
