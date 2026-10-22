@@ -1,0 +1,5 @@
+import fs from 'node:fs';
+const sql=fs.readFileSync('MULTI_TENANT_PHASE70_SUBSCRIPTION_MANAGEMENT.sql','utf8');
+const ui=fs.readFileSync('index.html','utf8');
+const checks=[['management rpc',/cpcm_subscription_management/],['tenant membership',/m\.user_id=auth\.uid\(\)/],['usage scoped',/a\.organization_id=o\.id/],['canonical limits',/saas_plan_catalog/],['cancel rpc',/cpcm_request_subscription_cancellation/],['cancel at period end',/cancel_at_period_end=true/],['resume rpc',/cpcm_resume_subscription_renewal/],['admin cancellation',/role_name not in \('agency_admin','admin'\)/],['demo cancel blocked',/Demo organizations do not have subscriptions/],['browser management UI',/openSubscriptionManagement/],['management reads rpc',/cpcm_subscription_management/],['upgrade opens pricing',/Upgrade \/ Change Plan/],['cancel browser rpc',/cpcm_request_subscription_cancellation/],['resume browser rpc',/cpcm_resume_subscription_renewal/]];
+for(const [n,r] of checks){if(!(r.test(sql)||r.test(ui))){console.error('FAIL',n);process.exit(1)}console.log('PASS',n)}
