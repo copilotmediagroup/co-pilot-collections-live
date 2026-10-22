@@ -5290,6 +5290,20 @@ async function currentAuthUserId(){
  let data=await res.json().catch(()=>({}));
  return String(data?.id||'');
 }
+async function resumePendingAgencySubscription(){
+ if(isPublicDemoDeployment()||!token())return false;
+ try{
+  let result=await dbFetch('/rpc/cpcm_complete_verified_agency_signup',{method:'POST',body:'{}'});
+  let row=Array.isArray(result)?result[0]:result;
+  if(!row||!row.organization_id)return false;
+  let state=await dbFetch('/rpc/cpcm_subscription_status',{method:'POST',body:'{}'}).catch(()=>[]),sub=Array.isArray(state)?state[0]:state;
+  if(String(sub?.subscription_status||row.status||'').toLowerCase()==='pending_payment'){
+   currentOrganizationId='';document.getElementById('loginScreen')?.classList.remove('open');hideCollectorApp(true);openSaasPricing();
+   let st=document.getElementById('saasSelectionStatus');if(st)st.textContent='Complete your subscription to activate your agency.';return true;
+  }
+ }catch(e){if(!/No verified agency signup is pending/i.test(String(e?.message||e)))console.warn('Agency signup continuation',e)}
+ return false;
+}
 async function loadCurrentOrganization(){
  if(!token()){currentOrganizationId='';return ''}
  try{
@@ -13746,7 +13760,7 @@ function exportContactIntelligenceCSV(){let calls=filteredContactCalls();let row
   boot=async function(){
     fillConnection();if(!connectionIsReady()||!token()){hideCollectorApp(false);ce('loginScreen').classList.add('open');return;}
     try{
-      clearLoginError();let user=await getUser();let requested='employee';currentUser={email:String(user.email||'').toLowerCase(),isAdmin:false,isClient:false,requestedRole:requested};await loadCurrentOrganization();if(!currentOrganizationId)throw new Error('Your organization is suspended, cancelled, or not assigned. Contact your administrator.');let profile=await upsertCurrentUser();forceCurrentUserRole(profile);
+      clearLoginError();let user=await getUser();let requested='employee';currentUser={email:String(user.email||'').toLowerCase(),isAdmin:false,isClient:false,requestedRole:requested};await loadCurrentOrganization();if(!currentOrganizationId){if(await resumePendingAgencySubscription())return;throw new Error('Your organization is suspended, cancelled, or not assigned. Contact your administrator.');}let profile=await upsertCurrentUser();forceCurrentUserRole(profile);
       if(!isUserApproved(profile) && !(isPublicDemoDeployment() && currentOrganizationId)){ce('loginScreen').classList.remove('open');ce('pendingScreen').classList.add('open');hideCollectorApp(true);return;}
       ce('pendingScreen').classList.remove('open');ce('loginScreen').classList.remove('open');applyRoleUI();await loadAppBrandSettings(true);await loadPdfLetterSettings(true);
       if(currentUser.isClient){await openClientPortal();return;}
