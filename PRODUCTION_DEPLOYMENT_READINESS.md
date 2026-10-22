@@ -2,7 +2,7 @@
 
 ## Current release boundary
 - Feature branch: `feature/multi-tenant-saas`
-- Subscription migrations: Phases 57–94.
+- Subscription migrations: Phases 57–95.
 - Netlify build: `npm run build`, publish `dist`, Node 20.
 - Production runtime mode must be `live`.
 - Public Demo is separate and must not receive this production installer.
@@ -23,7 +23,7 @@ For `saas-subscription-checkout`:
 
 ## Database release order
 1. Confirm the existing production multi-tenant foundation through Phase 56 is present.
-2. Apply `MULTI_TENANT_PRODUCTION_SUBSCRIPTION_INSTALL_57_94.sql` in numeric order.
+2. Apply `MULTI_TENANT_PRODUCTION_SUBSCRIPTION_INSTALL_57_95.sql` in numeric order.
 3. Run the production subscription gate bundle and full multi-tenant preflight before site cutover.
 
 ## NMI recurring subscription boundary

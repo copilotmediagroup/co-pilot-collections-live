@@ -1,0 +1,10 @@
+import fs from 'node:fs';
+const s=fs.readFileSync('MULTI_TENANT_PHASE95_CHECKOUT_PROVIDER_APPROVAL_RECOVERY.sql','utf8');let bad=0;const c=(n,r)=>{const ok=r.test(s);console.log(ok?'PASS':'FAIL',n);if(!ok)bad++};
+c('provider approved state exists',/provider_approved/);
+c('approval recorder service only',/cpcm_service_record_subscription_provider_approval[\s\S]*Service role required/);
+c('provider reference required',/Provider reference required/);
+c('activation requires provider approved',/status not in \('provider_approved','paid'\)/);
+c('provider mismatch blocked',/Provider reference mismatch/);
+c('browser revoked',/revoke all on function public\.cpcm_service_record_subscription_provider_approval\(uuid,text\) from public,anon,authenticated/);
+c('service granted',/grant execute on function public\.cpcm_service_record_subscription_provider_approval\(uuid,text\) to service_role/);
+process.exit(bad?1:0);
