@@ -1,0 +1,13 @@
+import fs from 'node:fs';
+let bad=0;const edge=fs.readFileSync('supabase/functions/saas-subscription-checkout/index.ts','utf8'),html=fs.readFileSync('index.html','utf8');const c=(n,ok)=>{console.log(ok?'PASS':'FAIL',n);if(!ok)bad++};
+c('subscription requests NMI vault storage',edge.includes('customer_vault:{add_to_vault:true}'));
+c('vault id parsed server side',/customer_vault_id\|\|data\?\.customer_id/.test(edge));
+c('masked metadata rpc used',edge.includes('cpcm_service_upsert_saas_payment_method'));
+c('no PAN or CVV stored',!edge.includes('p_card_number')&&!edge.includes('p_cvv'));
+c('provider approval failure returns recovery lock',/approvalError\)return out\(\{success:false,recoveryRequired:true/.test(edge));
+c('activation failure returns recovery lock',/activateError\)return out\(\{success:false,recoveryRequired:true/.test(edge));
+c('frontend preserves recovery flag',html.includes('err.recoveryRequired=Boolean(data.recoveryRequired)'));
+c('frontend invalidates payment context on recovery',/recoveryRequired\)\{recoveryLock=true;window\.cpcmPendingSaasCheckout=null;window\.cpcmSaasPaymentContext=null;cpcmSaasCollectReady=false/.test(html));
+c('frontend locks retry button',html.includes("btn.textContent='Activation Review Required';btn.onclick=null"));
+c('normal finally does not unlock recovery',html.includes('finally{if(btn&&!recoveryLock)btn.disabled=false}'));
+if(bad)process.exit(1);

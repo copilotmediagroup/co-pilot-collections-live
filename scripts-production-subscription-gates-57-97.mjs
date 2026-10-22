@@ -8,6 +8,6 @@ const gates=[
   'scripts-saas-provider-event-identity-binding-gate.mjs',
   'scripts-saas-provider-event-audit-gate.mjs',
   'scripts-saas-checkout-provider-approval-recovery-gate.mjs','scripts-subscription-plan-change-canonical-finalizer-gate.mjs',
-  'scripts-saas-provider-cancellation-gate.mjs','scripts-saas-provider-plan-change-gate.mjs'
+  'scripts-saas-provider-cancellation-gate.mjs','scripts-saas-checkout-vault-recovery-gate.mjs','scripts-saas-provider-plan-change-gate.mjs'
 ];
 let failed=false;for(const gate of gates){const r=spawnSync(process.execPath,[gate],{stdio:'inherit'});if(r.status!==0){console.error('FAILED GATE',gate);failed=true;break}}if(failed)process.exit(1);console.log(`PASS production subscription gate bundle — ${gates.length} gates`);
