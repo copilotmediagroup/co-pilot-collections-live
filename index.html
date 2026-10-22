@@ -8972,7 +8972,7 @@ async function saveGeneratedDocRecord(d,fileName,downloaded){
 async function loadGeneratedDocsForCurrent(){
  let a=getCurrent(); if(!a)return;
  let docs=[];
- try{docs=(await dbFetch(`/account_docs?account_id=eq.${a.id}&select=*&order=created_at.desc&limit=15`)).map(toCamel).filter(d=>String(d.notes||'').includes('document')||String(d.notes||'').includes('PDF'))}catch(e){docs=[]}
+ try{docs=(await dbFetch(`/account_docs?organization_id=eq.${encodeURIComponent(currentOrganizationId)}&account_id=eq.${a.id}&select=*&order=created_at.desc&limit=15`)).map(toCamel).filter(d=>String(d.notes||'').includes('document')||String(d.notes||'').includes('PDF'))}catch(e){docs=[]}
  pdfGeneratedDocsCache=docs;
  let box=document.getElementById('pdfGeneratedList'); if(!box)return;
  box.innerHTML=docs.map(d=>`<div class="pdfSavedItem"><div><div class="pdfSavedTitle">${esc(d.docTitle||'Document')}</div><div class="pdfSavedMeta">${esc(d.docType||'')} • ${esc(String(d.createdAt||'').slice(0,19))}<br>${esc(d.docUrl||d.notes||'')}</div></div><button class="outline" onclick="openAccountDocs()">View Docs</button></div>`).join('')||'<div class="pdfSavedItem"><div class="pdfSavedMeta">No created document records yet.</div></div>';
@@ -9758,7 +9758,7 @@ async function saveAccount(e){e.preventDefault();if(!currentUser.isAdmin)return 
 
 /* POWER DOCS — saved document links plus original source fields */
 async function loadAccountDocs(accountId){
- try{return(await dbFetch(`/account_docs?account_id=eq.${accountId}&select=*&order=created_at.desc&limit=200`)).map(toCamel)}catch(e){return[]}
+ try{return(await dbFetch(`/account_docs?organization_id=eq.${encodeURIComponent(currentOrganizationId)}&account_id=eq.${accountId}&select=*&order=created_at.desc&limit=200`)).map(toCamel)}catch(e){return[]}
 }
 async function openAccountDocs(){
  let a=getCurrent();if(!a)return alert('No account selected.');
