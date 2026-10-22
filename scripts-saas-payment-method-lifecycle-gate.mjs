@@ -1,0 +1,10 @@
+import fs from 'node:fs';
+const t=fs.readFileSync('MULTI_TENANT_PHASE88_PAYMENT_METHOD_LIFECYCLE.sql','utf8');let f=false;const c=(n,x)=>{console.log(x?'PASS':'FAIL',n);if(!x)f=true};
+c('payment method status rpc',/cpcm_service_set_saas_payment_method_status/.test(t));
+c('service role required',/auth\.role\(\).*service_role/.test(t));
+c('only metadata statuses',/not in \('active','expired','removed','unknown'\)/.test(t));
+c('demo protected',/Demo organizations do not have production subscription payment methods/.test(t));
+c('missing metadata rejected',/payment method metadata not found/i.test(t));
+c('masked metadata only',!/\bpan\b|\bcvv\b|payment_token|vault_token|customer_vault_id/i.test(t.replace(/^--.*$/gm,'')));
+c('browser revoked',/revoke all on function[\s\S]*public,anon,authenticated/.test(t));
+c('service granted',/grant execute on function[\s\S]*service_role/.test(t));if(f)process.exit(1);
