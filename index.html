@@ -6586,7 +6586,7 @@ function phoneIsBlocked(a){return complianceRules(a).hard.length>0}
 async function todayCallCountForAccount(id){
   try{
     let start=todayISO()+'T00:00:00';
-    let rows=await dbFetch(`/activity_logs?organization_id=eq.'+encodeURIComponent(currentOrganizationId)+'&account_id=eq.${id}&action_type=eq.Outbound%20Call&created_at=gte.${encodeURIComponent(start)}&select=id&limit=1000`);
+    let rows=await dbFetch(`/activity_logs?organization_id=eq.${encodeURIComponent(currentOrganizationId)}&account_id=eq.${id}&action_type=eq.Outbound%20Call&created_at=gte.${encodeURIComponent(start)}&select=id&limit=1000`);
     return Array.isArray(rows)?rows.length:0;
   }catch(e){return 0}
 }
@@ -6717,11 +6717,11 @@ async function loadHistory(id){
  let box=document.getElementById('activityList');if(!box)return;
  try{
   let reqs=[
-   dbFetch(`/account_notes?organization_id=eq.'+encodeURIComponent(currentOrganizationId)+'&account_id=eq.${id}&select=*&order=created_at.desc&limit=100`).catch(()=>[]),
-   dbFetch(`/activity_logs?organization_id=eq.'+encodeURIComponent(currentOrganizationId)+'&account_id=eq.${id}&select=*&order=created_at.desc&limit=200`).catch(()=>[]),
+   dbFetch(`/account_notes?organization_id=eq.${encodeURIComponent(currentOrganizationId)}&account_id=eq.${id}&select=*&order=created_at.desc&limit=100`).catch(()=>[]),
+   dbFetch(`/activity_logs?organization_id=eq.${encodeURIComponent(currentOrganizationId)}&account_id=eq.${id}&select=*&order=created_at.desc&limit=200`).catch(()=>[]),
    dbFetch(`/call_results?account_id=eq.${id}&select=*&order=created_at.desc&limit=100`).catch(()=>[]),
-   dbFetch(`/payments_ledger?organization_id=eq.'+encodeURIComponent(currentOrganizationId)+'&account_id=eq.${id}&select=*&order=created_at.desc&limit=100`).catch(()=>[]),
-   dbFetch(`/follow_ups?organization_id=eq.'+encodeURIComponent(currentOrganizationId)+'&account_id=eq.${id}&select=*&order=created_at.desc&limit=100`).catch(()=>[])
+   dbFetch(`/payments_ledger?organization_id=eq.${encodeURIComponent(currentOrganizationId)}&account_id=eq.${id}&select=*&order=created_at.desc&limit=100`).catch(()=>[]),
+   dbFetch(`/follow_ups?organization_id=eq.${encodeURIComponent(currentOrganizationId)}&account_id=eq.${id}&select=*&order=created_at.desc&limit=100`).catch(()=>[])
   ];
   let [notes,acts,calls,pays,fus]=await Promise.all(reqs),events=[];
   acts.forEach(x=>events.push({date:x.created_at,type:x.action_type||'Activity',text:x.action_text||'',by:x.created_by_email||''}));
@@ -8722,7 +8722,7 @@ async function fillPdfFromPaymentPlan(){
 async function fillPdfFromLatestPayment(){
  let a=getCurrent(); if(!a)return;
  try{
-   let rows=(await dbFetch(`/payments_ledger?organization_id=eq.'+encodeURIComponent(currentOrganizationId)+'&account_id=eq.${a.id}&select=*&order=payment_date.desc,created_at.desc&limit=1`)).map(toCamel);
+   let rows=(await dbFetch(`/payments_ledger?organization_id=eq.${encodeURIComponent(currentOrganizationId)}&account_id=eq.${a.id}&select=*&order=payment_date.desc,created_at.desc&limit=1`)).map(toCamel);
    if(!rows.length)return alert('No payment ledger entry found for this account.');
    let r=rows[0];
    document.getElementById('pdfDocType').value=moneyNum(r.balanceAfter)<=0?'Billing Statement - Paid In Full':'Billing Statement - Payment Plan';
@@ -9048,7 +9048,7 @@ function updateLedgerPreview(){
 async function loadPaymentLedgerForCurrent(){
  let a=getCurrent(); if(!a)return;
  let rows=[];
- try{rows=(await dbFetch(`/payments_ledger?organization_id=eq.'+encodeURIComponent(currentOrganizationId)+'&account_id=eq.${a.id}&select=*&order=payment_date.desc,created_at.desc&limit=500`)).map(toCamel)}catch(e){rows=[]}
+ try{rows=(await dbFetch(`/payments_ledger?organization_id=eq.${encodeURIComponent(currentOrganizationId)}&account_id=eq.${a.id}&select=*&order=payment_date.desc,created_at.desc&limit=500`)).map(toCamel)}catch(e){rows=[]}
  paymentLedgerData=rows;
  let body=document.getElementById('ledgerHistoryBody'); if(!body)return;
  body.innerHTML=rows.map(r=>`<tr>
@@ -9219,7 +9219,7 @@ async function runBrokenPromiseAutomation(showAlert=false){
  let lastKey='brokenPromiseCheck:'+today+':'+(currentUser.email||'');
  if(!showAlert && sessionStorage.getItem(lastKey))return;
  let rows=[];
- try{rows=(await dbFetch(`/payment_plan_payments?organization_id=eq.'+encodeURIComponent(currentOrganizationId)+'&select=*&due_date=lt.${today}&limit=10000`)).map(toCamel)}catch(e){rows=[]}
+ try{rows=(await dbFetch(`/payment_plan_payments?organization_id=eq.${encodeURIComponent(currentOrganizationId)}&select=*&due_date=lt.${today}&limit=10000`)).map(toCamel)}catch(e){rows=[]}
  rows=rows.filter(p=>!['Paid','Cancelled','Broken Promise'].includes(p.status||'') && moneyNum(p.amountDue)>moneyNum(p.amountPaid));
  if(!currentUser.isAdmin){
    let allowed=new Set(accounts.map(a=>String(a.id)));
@@ -9325,10 +9325,10 @@ async function loadPaymentPlanForAccount(accountId,force=false){
  if(!accountId)return null;
  if(paymentPlanCache[accountId]&&!force)return paymentPlanCache[accountId];
  try{
-   let plans=await dbFetch(`/payment_plans?organization_id=eq.'+encodeURIComponent(currentOrganizationId)+'&account_id=eq.${accountId}&select=*&order=created_at.desc&limit=1`);
+   let plans=await dbFetch(`/payment_plans?organization_id=eq.${encodeURIComponent(currentOrganizationId)}&account_id=eq.${accountId}&select=*&order=created_at.desc&limit=1`);
    if(!plans||!plans[0]){paymentPlanCache[accountId]=null;return null}
    let plan=toCamel(plans[0]);
-   let pays=await dbFetch(`/payment_plan_payments?organization_id=eq.'+encodeURIComponent(currentOrganizationId)+'&plan_id=eq.${plan.id}&select=*&order=due_date.asc`);
+   let pays=await dbFetch(`/payment_plan_payments?organization_id=eq.${encodeURIComponent(currentOrganizationId)}&plan_id=eq.${plan.id}&select=*&order=due_date.asc`);
    plan.payments=(pays||[]).map(toCamel);
    paymentPlanCache[accountId]=plan;
    return plan;
