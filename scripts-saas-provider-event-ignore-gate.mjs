@@ -1,0 +1,14 @@
+import fs from 'node:fs';
+const t=fs.readFileSync('MULTI_TENANT_PHASE91_PROVIDER_EVENT_IGNORE_FINALIZATION.sql','utf8');let bad=false;const c=(n,x)=>{console.log(x?'PASS':'FAIL',n);if(!x)bad=true};
+c('ignore finalizer rpc',/cpcm_service_ignore_claimed_saas_provider_event/.test(t));
+c('service role required',/auth\.role\(\).*service_role/.test(t));
+c('ignore reason required',/Ignore reason required/.test(t));
+c('locks event row',/where id=p_event_id for update/.test(t));
+c('received only',/e\.status <> 'received'/.test(t));
+c('demo protected',/Demo organizations do not process production subscription provider events/.test(t));
+c('marks event ignored',/set status='ignored'/.test(t));
+c('reason persisted',/failure_message=reason/.test(t));
+c('browser revoked',/revoke all on function[\s\S]*public,anon,authenticated/.test(t));
+c('service granted',/grant execute on function[\s\S]*service_role/.test(t));
+c('no provider webhook names invented',!/subscription\.deleted|invoice\.|charge\.|webhook signature/i.test(t));
+if(bad)process.exit(1);
