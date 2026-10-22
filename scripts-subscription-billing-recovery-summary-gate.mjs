@@ -1,0 +1,15 @@
+import fs from 'node:fs';
+const sql=fs.readFileSync('MULTI_TENANT_PHASE89_BILLING_RECOVERY_SUMMARY.sql','utf8');
+const app=fs.readFileSync('index.html','utf8');let fail=false;const c=(n,x)=>{console.log(x?'PASS':'FAIL',n);if(!x)fail=true};
+c('recovery summary rpc',/cpcm_my_billing_recovery_summary/.test(sql));
+c('canonical membership',/m\.auth_user_id=auth\.uid\(\) and m\.is_active=true/.test(sql));
+c('admin required',/Agency admin required/.test(sql));
+c('past due only',/s\.status='past_due'/.test(sql));
+c('demo excluded',/coalesce\(o\.is_demo,false\)=false/.test(sql));
+c('masked payment metadata',/pm\.brand,pm\.last4,pm\.exp_month,pm\.exp_year,pm\.status/.test(sql));
+c('no provider customer id returned',!/provider_customer_id/.test(sql));
+c('browser read only grant',/grant execute[\s\S]*authenticated/.test(sql));
+c('billing UI recovery helper',/loadSaasBillingRecoverySummary/.test(app));
+c('billing UI grace state',/PAST DUE SINCE/.test(app)&&/GRACE ENDS/.test(app));
+c('billing UI no fake payment action',!/onclick="[^"]*(retry|charge|payNow|updatePayment)/i.test(app));
+if(fail)process.exit(1);
