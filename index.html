@@ -5304,6 +5304,16 @@ async function resumePendingAgencySubscription(){
  }catch(e){if(!/No verified agency signup is pending/i.test(String(e?.message||e)))console.warn('Agency signup continuation',e)}
  return false;
 }
+async function handleOrganizationAccessGate(){
+ if(isPublicDemoDeployment()||!token())return false;
+ try{
+  let rows=await dbFetch('/rpc/cpcm_my_organization_access_state',{method:'POST',body:'{}'}),state=Array.isArray(rows)?rows[0]:rows;if(!state||!state.organization_id)return false;
+  let orgStatus=String(state.organization_status||'').toLowerCase(),subStatus=String(state.subscription_status||'').toLowerCase();
+  if(orgStatus==='pending_payment'||subStatus==='pending_payment'){document.getElementById('loginScreen')?.classList.remove('open');hideCollectorApp(true);openSaasPricing();let st=document.getElementById('saasSelectionStatus');if(st)st.textContent='Complete your subscription to activate '+String(state.organization_name||'your agency')+'.';return true}
+  let message=orgStatus==='past_due'||subStatus==='past_due'?'Your agency subscription is past due. Billing must be brought current before operational access can resume.':orgStatus==='suspended'?'This agency is suspended. Contact Co Pilot support for account review.':orgStatus==='cancelled'||subStatus==='cancelled'?'This agency subscription is cancelled. Reactivate the subscription before operational access can resume.':'Your agency is not currently active. Contact Co Pilot support.';
+  showLoginError(message);document.getElementById('pendingScreen')?.classList.remove('open');document.getElementById('loginScreen')?.classList.add('open');hideCollectorApp(true);return true;
+ }catch(e){console.warn('Organization access state',e);return false}
+}
 async function loadCurrentOrganization(){
  if(!token()){currentOrganizationId='';return ''}
  try{
@@ -13760,7 +13770,7 @@ function exportContactIntelligenceCSV(){let calls=filteredContactCalls();let row
   boot=async function(){
     fillConnection();if(!connectionIsReady()||!token()){hideCollectorApp(false);ce('loginScreen').classList.add('open');return;}
     try{
-      clearLoginError();let user=await getUser();let requested='employee';currentUser={email:String(user.email||'').toLowerCase(),isAdmin:false,isClient:false,requestedRole:requested};await loadCurrentOrganization();if(!currentOrganizationId){if(await resumePendingAgencySubscription())return;throw new Error('Your organization is suspended, cancelled, or not assigned. Contact your administrator.');}let profile=await upsertCurrentUser();forceCurrentUserRole(profile);
+      clearLoginError();let user=await getUser();let requested='employee';currentUser={email:String(user.email||'').toLowerCase(),isAdmin:false,isClient:false,requestedRole:requested};await loadCurrentOrganization();if(!currentOrganizationId){if(await resumePendingAgencySubscription())return;if(await handleOrganizationAccessGate())return;throw new Error('No active organization is assigned to this login. Contact your administrator.');}let profile=await upsertCurrentUser();forceCurrentUserRole(profile);
       if(!isUserApproved(profile) && !(isPublicDemoDeployment() && currentOrganizationId)){ce('loginScreen').classList.remove('open');ce('pendingScreen').classList.add('open');hideCollectorApp(true);return;}
       ce('pendingScreen').classList.remove('open');ce('loginScreen').classList.remove('open');applyRoleUI();await loadAppBrandSettings(true);await loadPdfLetterSettings(true);
       if(currentUser.isClient){await openClientPortal();return;}
