@@ -1,0 +1,14 @@
+import fs from 'node:fs';
+const t=fs.readFileSync('MULTI_TENANT_PHASE90_PROVIDER_EVENT_FAILURE_FINALIZATION.sql','utf8');let bad=false;const c=(n,x)=>{console.log(x?'PASS':'FAIL',n);if(!x)bad=true};
+c('failure finalizer rpc',/cpcm_service_fail_claimed_saas_provider_event/.test(t));
+c('service role required',/Service role required/.test(t));
+c('failure message required',/Failure message required/.test(t));
+c('locks event row',/for update/i.test(t));
+c('received only',/e\.status <> 'received'/.test(t));
+c('demo protected',/Demo organizations do not process production subscription provider events/.test(t));
+c('marks event failed',/set status='failed'/.test(t));
+c('diagnostic persisted',/failure_message=msg/.test(t));
+c('browser revoked',/revoke all on function[\s\S]*public,anon,authenticated/.test(t));
+c('service granted',/grant execute on function[\s\S]*service_role/.test(t));
+c('no provider webhook names invented',!/(charge\.succeeded|invoice\.paid|subscription\.updated|payment_intent)/i.test(t));
+if(bad)process.exit(1);
