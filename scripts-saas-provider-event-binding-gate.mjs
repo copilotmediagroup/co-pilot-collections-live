@@ -1,0 +1,14 @@
+import fs from 'node:fs';
+const t=fs.readFileSync('MULTI_TENANT_PHASE92_PROVIDER_EVENT_BINDING.sql','utf8');let bad=false;const c=(n,r)=>{const ok=r.test(t);console.log(ok?'PASS':'FAIL',n);if(!ok)bad=true};
+c('binding rpc',/cpcm_service_bind_saas_provider_event_organization/);
+c('service role required',/Service role required/);
+c('organization required',/Organization required/);
+c('organization existence checked',/Organization not found/);
+c('locks event row',/where id=p_event_id for update/i);
+c('received only',/Only received provider events can be bound/);
+c('cross tenant rebind blocked',/already bound to another organization/);
+c('demo protected',/Demo organizations do not process production subscription provider events/);
+c('browser revoked',/revoke all on function[\s\S]*public,anon,authenticated/i);
+c('service granted',/grant execute on function[\s\S]*service_role/i);
+c('no provider webhook names invented',!/(chargebee|stripe|subscription\.renewed|webhook_signature)/i.test(t)?/.*/:/__FAIL__/);
+if(bad)process.exit(1);
