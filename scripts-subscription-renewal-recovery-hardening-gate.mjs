@@ -1,0 +1,13 @@
+import fs from 'node:fs';
+const t=fs.readFileSync('MULTI_TENANT_PHASE86_RENEWAL_RECOVERY_HARDENING.sql','utf8');let failed=false;const c=(n,x)=>{console.log(x?'PASS':'FAIL',n);if(!x)failed=true};
+c('renewal rpc replaced',/cpcm_service_record_subscription_renewal/.test(t));
+c('service role required',/service_role/.test(t));
+c('demo protected',/org_demo.*raise exception/s.test(t));
+c('active or past due only',/s\.status in \('active','past_due'\)/.test(t));
+c('success clears past due',/past_due_since=case when p_success then null/.test(t));
+c('success clears grace',/grace_period_ends_at=case when p_success then null/.test(t));
+c('success activates subscription',/status=case when p_success then 'active' else 'past_due' end/.test(t));
+c('organization synchronized',/update public\.organizations o set status=case when p_success then 'active' else 'past_due' end/.test(t));
+c('browser revoked',/revoke all on function[\s\S]*authenticated/.test(t));
+c('service granted',/grant execute on function[\s\S]*service_role/.test(t));
+if(failed)process.exit(1);
