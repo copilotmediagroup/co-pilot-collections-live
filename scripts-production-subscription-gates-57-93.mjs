@@ -1,0 +1,10 @@
+import {spawnSync} from 'node:child_process';
+const gates=[
+'scripts-subscription-access-gate.mjs','scripts-agency-signup-gate.mjs','scripts-subscription-billing-state-gate.mjs','scripts-subscription-webhook-rpc-gate.mjs','scripts-saas-plan-catalog-gate.mjs','scripts-subscription-selection-gate.mjs','scripts-saas-checkout-intent-gate.mjs','scripts-saas-checkout-audit-gate.mjs','scripts-saas-subscription-edge-gate.mjs','scripts-verified-agency-signup-gate.mjs','scripts-organization-access-state-gate.mjs','scripts-saas-subscription-activation-gate.mjs','scripts-saas-capacity-enforcement-gate.mjs','scripts-subscription-management-gate.mjs','scripts-subscription-lifecycle-service-gate.mjs','scripts-subscription-plan-change-safety-gate.mjs','scripts-subscription-recovery-gate.mjs','scripts-subscription-grace-policy-gate.mjs','scripts-subscription-plan-change-lifecycle-gate.mjs','scripts-subscription-plan-change-browser-gate.mjs','scripts-subscription-plan-change-provider-claim-gate.mjs','scripts-saas-provider-event-idempotency-gate.mjs','scripts-subscription-past-due-recovery-gate.mjs','scripts-saas-payment-method-metadata-gate.mjs','scripts-subscription-plan-change-handoff-gate.mjs','scripts-saas-provider-organization-resolution-gate.mjs','scripts-saas-provider-event-processing-boundary-gate.mjs','scripts-saas-plan-change-event-processing-gate.mjs','scripts-saas-cancellation-event-processing-gate.mjs','scripts-subscription-renewal-recovery-hardening-gate.mjs','scripts-subscription-canonical-membership-gate.mjs','scripts-saas-payment-method-lifecycle-gate.mjs',
+  'scripts-subscription-billing-recovery-summary-gate.mjs',
+  'scripts-saas-provider-event-failure-gate.mjs',
+  'scripts-saas-provider-event-ignore-gate.mjs',
+  'scripts-saas-provider-event-binding-gate.mjs',
+  'scripts-saas-provider-event-identity-binding-gate.mjs'
+];
+let failed=false;for(const gate of gates){const r=spawnSync(process.execPath,[gate],{stdio:'inherit'});if(r.status!==0){console.error('FAILED GATE',gate);failed=true;break}}if(failed)process.exit(1);console.log(`PASS production subscription gate bundle — ${gates.length} gates`);
