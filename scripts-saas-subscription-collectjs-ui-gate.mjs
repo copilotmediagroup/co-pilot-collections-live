@@ -1,0 +1,10 @@
+import fs from 'node:fs';
+const s=fs.readFileSync('index.html','utf8'); let bad=0; const check=(n,r)=>{const ok=r.test(s);console.log(ok?'PASS':'FAIL',n);if(!ok)bad++};
+check('dedicated SaaS hosted card mounts',/id="saasCcNumber"[\s\S]*id="saasCcExp"[\s\S]*id="saasCvv"/);
+check('SaaS Collect.js uses public tokenization key',/function saasNmiPublicKey\(\)[\s\S]*publicTokenizationKey/);
+check('SaaS Collect.js callback configured',/callback:'cpcmSaasCollectCallback'/);
+check('single-use token sent to SaaS edge function',/functions\/v1\/saas-subscription-checkout[\s\S]*checkoutId,paymentToken/);
+check('browser does not send subscription amount to edge',/async function invokeSaasSubscriptionCheckout\(checkoutId,paymentToken\)/);
+check('activation waits for edge success',/Subscription activated successfully/);
+check('raw card fields absent from SaaS request',/body:JSON\.stringify\(\{checkoutId,paymentToken\}\)/);
+if(bad)process.exit(1);
