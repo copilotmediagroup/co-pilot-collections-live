@@ -1,0 +1,13 @@
+import fs from 'node:fs'; let failed=false; const pass=(n,o)=>{console.log(`${o?'PASS':'FAIL'} ${n}`);if(!o)failed=true};
+const sql=fs.readFileSync('MULTI_TENANT_PHASE76_PLAN_CHANGE_BROWSER_WORKFLOW.sql','utf8'); const app=fs.readFileSync('index.html','utf8');
+pass('pending request reader',sql.includes('cpcm_my_pending_subscription_plan_change'));
+pass('tenant scoped reader',sql.includes('r.organization_id=org'));
+pass('admin required',sql.includes("role_name not in ('agency_admin','admin')"));
+pass('cancel request RPC',sql.includes('cpcm_cancel_subscription_plan_change_request'));
+pass('only requested cancellable',sql.includes("r.status='requested'"));
+pass('browser cannot touch provider pending',!sql.includes("r.status in ('requested','provider_pending')") || sql.includes("where r.id=p_request_id and r.organization_id=org and r.status='requested'"));
+pass('plan change creates durable request',app.includes("/rpc/cpcm_create_subscription_plan_change_request"));
+pass('pending UI helper',app.includes('loadPendingPlanChange'));
+pass('cancel pending UI',app.includes('cancelPendingPlanChange'));
+pass('no direct plan mutation in UI',!app.includes("/rpc/cpcm_service_finalize_subscription_plan_change"));
+if(failed)process.exit(1);

@@ -9,7 +9,7 @@ const checks=[
  ['demo protected',/Demo organizations do not have production subscriptions/i.test(sql)],
  ['browser revoked',/from public,anon,authenticated/i.test(sql)],
  ['plan change mode',/saasPlanChangeMode/i.test(app)],
- ['plan change safety rpc used',/cpcm_request_subscription_plan_change/.test(app)],
+ ['plan change safety rpc used',/cpcm_create_subscription_plan_change_request/.test(app)],
  ['management opens change mode',/openSaasPricing\(true\)/.test(app)],
- ['active change does not use signup selection',/if\(saasPlanChangeMode\)[\s\S]{0,900}cpcm_request_subscription_plan_change/.test(app)]
+ ['active change does not use signup selection',/if\(saasPlanChangeMode\)[\s\S]{0,900}cpcm_create_subscription_plan_change_request/.test(app)]
 ];let bad=0;for(const [n,ok] of checks){console.log(ok?'PASS':'FAIL',n);if(!ok)bad++}if(bad)process.exit(1);
