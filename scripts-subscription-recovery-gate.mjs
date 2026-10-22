@@ -1,0 +1,4 @@
+import fs from 'node:fs';
+const s=fs.readFileSync('MULTI_TENANT_PHASE73_SUBSCRIPTION_RECOVERY.sql','utf8');
+const checks=[['renewal rpc',/cpcm_service_record_subscription_renewal/],['service role',/auth\.role\(\).*service_role/],['failed renewal past due',/when p_success then 'active' else 'past_due'/],['past due timestamp',/past_due_since=case when p_success then null else coalesce/],['successful renewal clears past due',/when p_success then null/],['period end cancellation rpc',/cpcm_service_finalize_due_subscription_cancellations/],['only due cancellations',/cancel_at_period_end=true[\s\S]*current_period_end<=p_as_of/],['browser revoked',/revoke all on function public\.cpcm_service_record_subscription_renewal[\s\S]*authenticated/],['demo protected',/Demo organizations do not have production subscriptions/]];
+let bad=0;for(const [n,r] of checks){let ok=r.test(s);console.log(ok?'PASS':'FAIL',n);if(!ok)bad++}if(bad)process.exit(1);
