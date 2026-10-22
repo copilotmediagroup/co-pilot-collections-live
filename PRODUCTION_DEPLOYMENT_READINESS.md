@@ -31,7 +31,9 @@ The SaaS checkout uses NMI's documented v5 Subscriptions API at `/api/v5/subscri
 
 Production credentials remain secrets and must be configured only at release time. No LIVE charge or deployment is performed by readiness validation.
 
+The plan-change processor uses NMI v5 `PUT /api/v5/subscriptions/{subscription_id}` with the stored provider subscription ID and canonical server-side plan price/cadence. Local plan state is finalized only after the provider update succeeds.
+
 ## Netlify cutover
 After the database migration and Edge Function configuration are verified, run one final production build, then deploy the production branch/site in one controlled release. Smoke-test login, new agency signup, pending-payment routing, subscription/billing page, tenant isolation, employee invite/login, account creation limits, and admin access immediately after deployment.
 
-- `CPCM_SUBSCRIPTION_LIFECYCLE_SECRET` — server-only secret used by the scheduled provider-first subscription cancellation processor.
+- `CPCM_SUBSCRIPTION_LIFECYCLE_SECRET` — server-only secret used by provider-first subscription lifecycle processors (cancellation and plan changes).

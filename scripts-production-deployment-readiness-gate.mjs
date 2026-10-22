@@ -3,6 +3,7 @@ let failed=false; const pass=(n,ok)=>{console.log(ok?'PASS':'FAIL',n);if(!ok)fai
 const netlify=fs.readFileSync('netlify.toml','utf8');
 const gen=fs.readFileSync('scripts-generate-runtime-config.mjs','utf8');
 const edge=fs.readFileSync('supabase/functions/saas-subscription-checkout/index.ts','utf8');
+const planEdge=fs.readFileSync('supabase/functions/saas-subscription-plan-change/index.ts','utf8');
 const installer=fs.readFileSync('MULTI_TENANT_PRODUCTION_SUBSCRIPTION_INSTALL_57_97.sql','utf8');
 const pub=fs.readFileSync('public/config.js','utf8');
 pass('netlify builds production dist',/command\s*=\s*"npm run build"/.test(netlify)&&/publish\s*=\s*"dist"/.test(netlify));
@@ -11,12 +12,13 @@ pass('runtime config supports explicit live mode',/CPCM_DEPLOYMENT_MODE/.test(ge
 pass('runtime config requires Supabase URL and publishable key',/CPCM_SUPABASE_URL/.test(gen)&&/CPCM_SUPABASE_PUBLISHABLE_KEY/.test(gen));
 pass('tracked production config is live',/deploymentMode:\s*["']live["']/.test(pub));
 pass('subscription installer is production-only',/Production-only/i.test(installer)&&/DO NOT run.*Demo/i.test(installer));
-pass('subscription installer reaches phase96',/MULTI_TENANT_PHASE94_PROVIDER_EVENT_AUDIT_READER\.sql/.test(installer));
+pass('subscription installer reaches phase97',/MULTI_TENANT_PHASE97_PROVIDER_CANCELLATION_HANDOFF\.sql/.test(installer));
 pass('checkout requires authenticated JWT',/Authentication required/.test(edge)&&/auth\.getUser\(jwt\)/.test(edge));
 pass('checkout requires service secret',/SUPABASE_SERVICE_ROLE_KEY/.test(edge)||/SUPABASE_SECRET_KEYS/.test(edge));
 pass('checkout uses verified NMI v5 subscriptions endpoint',/gateway\("\/api\/v5\/subscriptions"/.test(edge));
 pass('checkout sends token only inside payment details',/payment_details:\{payment_token:paymentToken\}/.test(edge));
 pass('checkout derives recurring amount and cadence server-side',/plan_amount:Number\(\(Number\(c.amount_cents\)\/100\)\.toFixed\(2\)\)/.test(edge)&&/monthFrequency=interval==="annual"\?12:1/.test(edge));
+pass('provider-first plan changes use NMI v5 update',/method:"PUT"/.test(planEdge)&&/\/api\/v5\/subscriptions\//.test(planEdge)&&/cpcm_service_finalize_subscription_plan_change/.test(planEdge));
 pass('no NMI private key literal in edge source',!/(NMI_PRIVATE_API_KEY\s*[=:]\s*["'][^"']{8,})/.test(edge));
 if(failed) process.exit(1);
 console.log('\nREADY-CODE: application/build/database gates and verified NMI v5 recurring subscription boundary are deployable; LIVE credentials and production cutover still require explicit release approval.');

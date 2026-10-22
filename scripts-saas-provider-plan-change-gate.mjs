@@ -1,0 +1,16 @@
+import fs from 'node:fs';
+const s=fs.readFileSync('supabase/functions/saas-subscription-plan-change/index.ts','utf8');let bad=0;const c=(n,r)=>{const ok=r.test(s);console.log(ok?'PASS':'FAIL',n);if(!ok)bad++};
+c('lifecycle secret required',/CPCM_SUBSCRIPTION_LIFECYCLE_SECRET/);
+c('claims durable plan change',/cpcm_service_claim_subscription_plan_change/);
+c('loads canonical provider handoff',/cpcm_service_get_subscription_plan_change_handoff/);
+c('requires stored provider subscription id',/provider_subscription_id/);
+c('uses official v5 update endpoint',/\/api\/v5\/subscriptions\//);
+c('uses PUT',/method:"PUT"/);
+c('canonical amount becomes plan amount',/amount\/100/);
+c('monthly annual cadence',/annual"\?12:1/);
+c('until cancelled retained',/plan_payments:0/);
+c('finalizes local plan only after provider response',/if\(!r\.ok\)[\s\S]*p_success:false[\s\S]*p_success:true/);
+c('provider success recovery is explicit',/recoveryRequired:true/);
+c('private key server only',/NMI_PRIVATE_API_KEY/);
+if (s.includes('payment_token') || s.includes('ccnumber') || s.includes('cvv')) { console.log('FAIL no card data'); bad++; } else console.log('PASS no card data');
+if(bad)process.exit(1);
