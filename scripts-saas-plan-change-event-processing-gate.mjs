@@ -1,0 +1,18 @@
+import fs from 'node:fs';
+const sql=fs.readFileSync('MULTI_TENANT_PHASE84_PLAN_CHANGE_EVENT_PROCESSING_BOUNDARY.sql','utf8');
+let failed=false;const check=(n,o)=>{console.log(o?'PASS':'FAIL',n);if(!o)failed=true};
+check('normalized plan change event rpc',/cpcm_service_apply_normalized_plan_change_provider_event/.test(sql));
+check('service role required',/Service role required/.test(sql));
+check('locks event row',/saas_subscription_provider_events where id=p_event_id for update/i.test(sql));
+check('received event only',/e\.status <> 'received'/.test(sql));
+check('event organization binding',/Provider event organization mismatch/.test(sql));
+check('locks plan request',/subscription_plan_change_requests where id=p_request_id for update/i.test(sql));
+check('request organization binding',/Plan change request organization mismatch/.test(sql));
+check('provider pending required',/r\.status <> 'provider_pending'/.test(sql));
+check('demo excluded',/Demo organizations do not process production provider events/.test(sql));
+check('reuses plan change finalizer',/cpcm_service_finalize_subscription_plan_change\(p_request_id,p_success/.test(sql));
+check('marks event processed after finalizer',/update public\.saas_subscription_provider_events set status='processed'/.test(sql));
+check('browser revoked',/from public,anon,authenticated/.test(sql));
+check('service granted',/to service_role/.test(sql));
+check('no provider webhook names invented',!/(charge\.succeeded|invoice\.paid|subscription\.updated|webhook signature)/i.test(sql));
+if(failed)process.exit(1);
