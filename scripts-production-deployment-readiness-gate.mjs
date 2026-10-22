@@ -3,7 +3,7 @@ let failed=false; const pass=(n,ok)=>{console.log(ok?'PASS':'FAIL',n);if(!ok)fai
 const netlify=fs.readFileSync('netlify.toml','utf8');
 const gen=fs.readFileSync('scripts-generate-runtime-config.mjs','utf8');
 const edge=fs.readFileSync('supabase/functions/saas-subscription-checkout/index.ts','utf8');
-const installer=fs.readFileSync('MULTI_TENANT_PRODUCTION_SUBSCRIPTION_INSTALL_57_95.sql','utf8');
+const installer=fs.readFileSync('MULTI_TENANT_PRODUCTION_SUBSCRIPTION_INSTALL_57_96.sql','utf8');
 const pub=fs.readFileSync('public/config.js','utf8');
 pass('netlify builds production dist',/command\s*=\s*"npm run build"/.test(netlify)&&/publish\s*=\s*"dist"/.test(netlify));
 pass('netlify pins node 20',/NODE_VERSION\s*=\s*"20"/.test(netlify));
@@ -11,7 +11,7 @@ pass('runtime config supports explicit live mode',/CPCM_DEPLOYMENT_MODE/.test(ge
 pass('runtime config requires Supabase URL and publishable key',/CPCM_SUPABASE_URL/.test(gen)&&/CPCM_SUPABASE_PUBLISHABLE_KEY/.test(gen));
 pass('tracked production config is live',/deploymentMode:\s*["']live["']/.test(pub));
 pass('subscription installer is production-only',/Production-only/i.test(installer)&&/DO NOT run.*Demo/i.test(installer));
-pass('subscription installer reaches phase95',/MULTI_TENANT_PHASE94_PROVIDER_EVENT_AUDIT_READER\.sql/.test(installer));
+pass('subscription installer reaches phase96',/MULTI_TENANT_PHASE94_PROVIDER_EVENT_AUDIT_READER\.sql/.test(installer));
 pass('checkout requires authenticated JWT',/Authentication required/.test(edge)&&/auth\.getUser\(jwt\)/.test(edge));
 pass('checkout requires service secret',/SUPABASE_SERVICE_ROLE_KEY/.test(edge)||/SUPABASE_SECRET_KEYS/.test(edge));
 pass('checkout uses verified NMI v5 subscriptions endpoint',/gateway\("\/api\/v5\/subscriptions"/.test(edge));

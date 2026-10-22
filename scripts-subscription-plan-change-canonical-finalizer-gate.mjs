@@ -1,0 +1,15 @@
+import fs from 'node:fs';
+const s=fs.readFileSync('MULTI_TENANT_PHASE96_PLAN_CHANGE_CANONICAL_MEMBERSHIP.sql','utf8'); let bad=0; const c=(n,ok)=>{console.log(ok?'PASS':'FAIL',n);if(!ok)bad++};
+c('finalizer replaced',/create or replace function public\.cpcm_service_finalize_subscription_plan_change/.test(s));
+c('service role required',/service_role/.test(s));
+c('canonical active membership',/m\.is_active=true/.test(s));
+c('no legacy membership status',!/m\.status='active'/.test(s));
+c('capacity rechecked',/active_users>lim_users or account_count>lim_accounts/.test(s));
+c('demo protected',/is_demo/.test(s));
+c('request row locked',/where id=p_request_id for update/.test(s));
+c('provider pending supported',/provider_pending/.test(s));
+c('subscription synchronized',/organization_subscriptions/.test(s)&&/billing_interval=r\.requested_billing_interval/.test(s));
+c('organization plan synchronized',/organizations o set plan=r\.requested_plan/.test(s));
+c('browser revoked',/from public,anon,authenticated/.test(s));
+c('service granted',/to service_role/.test(s));
+process.exit(bad?1:0);
