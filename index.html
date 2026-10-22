@@ -5860,7 +5860,7 @@ async function loadAppUsers(){
    try{
      rows=await dbFetch('/rpc/cpcm_staff_directory',{method:'POST',body:'{}'});
    }catch(rpcErr){
-     rows=await dbFetch('/app_users?select=*&order=email.asc');
+     rows=await dbFetch('/app_users?organization_id=eq.'+encodeURIComponent(currentOrganizationId)+'&select=*&order=email.asc');
    }
    appUsers=(rows||[]).map(toCamel);
  }catch(err){
@@ -11323,7 +11323,7 @@ async function upsertPresence(){
     }
   }catch(e){}
   try{
-    await dbFetch('/app_users?email=eq.'+encodeURIComponent(email),{
+    await dbFetch('/app_users?organization_id=eq.'+encodeURIComponent(currentOrganizationId)+'&email=eq.'+encodeURIComponent(email),{
       method:'PATCH',
       body:JSON.stringify({last_seen_at:new Date().toISOString(),updated_at:new Date().toISOString(),is_active:true})
     }).catch(()=>{});
@@ -15067,7 +15067,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 (function(){
 const priorLoadAppUsers=loadAppUsers;
 loadAppUsers=async function(){
- if(currentUser?.isAdmin){try{let rows=await dbFetch('/app_users?select=*&order=email.asc');appUsers=(rows||[]).map(toCamel);return}catch(e){console.warn('Admin direct staff load failed; using directory RPC',e)}}
+ if(currentUser?.isAdmin){try{let rows=await dbFetch('/app_users?organization_id=eq.'+encodeURIComponent(currentOrganizationId)+'&select=*&order=email.asc');appUsers=(rows||[]).map(toCamel);return}catch(e){console.warn('Admin direct staff load failed; using directory RPC',e)}}
  return priorLoadAppUsers.apply(this,arguments);
 };
 window.setStaffRole=async function(email,role){
