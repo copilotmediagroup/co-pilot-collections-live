@@ -1,0 +1,14 @@
+import fs from 'node:fs';
+const sql=fs.readFileSync('MULTI_TENANT_PHASE97_PROVIDER_CANCELLATION_HANDOFF.sql','utf8'),edge=fs.readFileSync('supabase/functions/saas-subscription-cancellation/index.ts','utf8');let bad=0;const c=(n,ok)=>{console.log(ok?'PASS':'FAIL',n);if(!ok)bad++};
+c('due cancellation handoff exists',/cpcm_service_due_subscription_cancellation_handoff/.test(sql));
+c('handoff service only',/Service role required/.test(sql));
+c('handoff excludes demo',/is_demo,false\)\s*=\s*false/.test(sql));
+c('handoff requires provider subscription id',/provider_subscription_id/.test(sql)&&/is not null/.test(sql));
+c('provider cancellation finalizer exists',/cpcm_service_finalize_provider_subscription_cancellation/.test(sql));
+c('finalizer matches provider identity',/s\.provider_subscription_id=clean_provider_id/.test(sql));
+c('unsafe local finalizer retired',/Provider-first cancellation required/.test(sql));
+c('edge uses official v5 delete endpoint',/\/api\/v5\/subscriptions\//.test(edge)&&/method:"DELETE"/.test(edge));
+c('edge protected by lifecycle secret',/CPCM_SUBSCRIPTION_LIFECYCLE_SECRET/.test(edge)&&/x-cpcm-lifecycle-secret/.test(edge));
+c('edge finalizes only after provider delete',edge.indexOf('await deleteNmiSubscription')<edge.indexOf('cpcm_service_finalize_provider_subscription_cancellation'));
+c('private key server env only',/Deno\.env\.get\("NMI_PRIVATE_API_KEY"\)/.test(edge));
+if(bad)process.exit(1);

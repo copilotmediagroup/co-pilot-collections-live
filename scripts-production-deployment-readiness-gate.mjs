@@ -3,7 +3,7 @@ let failed=false; const pass=(n,ok)=>{console.log(ok?'PASS':'FAIL',n);if(!ok)fai
 const netlify=fs.readFileSync('netlify.toml','utf8');
 const gen=fs.readFileSync('scripts-generate-runtime-config.mjs','utf8');
 const edge=fs.readFileSync('supabase/functions/saas-subscription-checkout/index.ts','utf8');
-const installer=fs.readFileSync('MULTI_TENANT_PRODUCTION_SUBSCRIPTION_INSTALL_57_96.sql','utf8');
+const installer=fs.readFileSync('MULTI_TENANT_PRODUCTION_SUBSCRIPTION_INSTALL_57_97.sql','utf8');
 const pub=fs.readFileSync('public/config.js','utf8');
 pass('netlify builds production dist',/command\s*=\s*"npm run build"/.test(netlify)&&/publish\s*=\s*"dist"/.test(netlify));
 pass('netlify pins node 20',/NODE_VERSION\s*=\s*"20"/.test(netlify));
