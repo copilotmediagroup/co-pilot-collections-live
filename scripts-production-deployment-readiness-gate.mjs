@@ -14,8 +14,9 @@ pass('subscription installer is production-only',/Production-only/i.test(install
 pass('subscription installer reaches phase94',/MULTI_TENANT_PHASE94_PROVIDER_EVENT_AUDIT_READER\.sql/.test(installer));
 pass('checkout requires authenticated JWT',/Authentication required/.test(edge)&&/auth\.getUser\(jwt\)/.test(edge));
 pass('checkout requires service secret',/SUPABASE_SERVICE_ROLE_KEY/.test(edge)||/SUPABASE_SECRET_KEYS/.test(edge));
-pass('checkout refuses unconfigured recurring billing',/NMI_SAAS_RECURRING_ENDPOINT/.test(edge)&&/configurationRequired:true/.test(edge)&&/No charge was attempted/.test(edge));
-pass('checkout documents unverified NMI recurring contract',/deliberately stops short of inventing an NMI recurring API contract/.test(edge));
+pass('checkout uses verified NMI v5 subscriptions endpoint',/gateway\("\/api\/v5\/subscriptions"/.test(edge));
+pass('checkout sends token only inside payment details',/payment_details:\{payment_token:paymentToken\}/.test(edge));
+pass('checkout derives recurring amount and cadence server-side',/plan_amount:Number\(\(Number\(c.amount_cents\)\/100\)\.toFixed\(2\)\)/.test(edge)&&/monthFrequency=interval==="annual"\?12:1/.test(edge));
 pass('no NMI private key literal in edge source',!/(NMI_PRIVATE_API_KEY\s*[=:]\s*["'][^"']{8,})/.test(edge));
 if(failed) process.exit(1);
-console.log('\nREADY-CODE: application/build/database gates are deployable; recurring SaaS charging remains BLOCKED pending verified NMI contract.');
+console.log('\nREADY-CODE: application/build/database gates and verified NMI v5 recurring subscription boundary are deployable; LIVE credentials and production cutover still require explicit release approval.');

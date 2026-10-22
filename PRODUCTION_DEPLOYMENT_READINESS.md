@@ -19,18 +19,17 @@ For `saas-subscription-checkout`:
 - `SUPABASE_URL`
 - `SUPABASE_SERVICE_ROLE_KEY` (or the existing supported `SUPABASE_SECRET_KEYS` mechanism)
 - `NMI_PRIVATE_API_KEY`
-- `NMI_API_BASE` if the merchant account requires a non-default base
-- `NMI_SAAS_RECURRING_ENDPOINT` **only after the exact merchant recurring API contract is verified**
+- `NMI_API_BASE` only if overriding the production default (`https://secure.nmi.com`)
 
 ## Database release order
 1. Confirm the existing production multi-tenant foundation through Phase 56 is present.
 2. Apply `MULTI_TENANT_PRODUCTION_SUBSCRIPTION_INSTALL_57_94.sql` in numeric order.
 3. Run the production subscription gate bundle and full multi-tenant preflight before site cutover.
 
-## Release blocker
-Real SaaS subscription charging is intentionally not release-ready until the exact Easy Pay Direct/NMI recurring API endpoint, authentication requirements, request fields, response fields, and vault/recurring identifiers are verified against the merchant account documentation.
+## NMI recurring subscription boundary
+The SaaS checkout uses NMI's documented v5 Subscriptions API at `/api/v5/subscriptions`. The browser supplies a one-time Collect.js `payment_token`; the Edge Function supplies the canonical server-side plan amount, monthly/annual cadence, start date, and until-cancelled payment count. Raw card number/CVV are not sent through the application server.
 
-The current checkout function fails closed when `NMI_SAAS_RECURRING_ENDPOINT` is absent and reports that no charge was attempted. Do not guess this contract and do not enable real subscription checkout until verified.
+Production credentials remain secrets and must be configured only at release time. No LIVE charge or deployment is performed by readiness validation.
 
 ## Netlify cutover
 After the database migration and Edge Function configuration are verified, run one final production build, then deploy the production branch/site in one controlled release. Smoke-test login, new agency signup, pending-payment routing, subscription/billing page, tenant isolation, employee invite/login, account creation limits, and admin access immediately after deployment.
