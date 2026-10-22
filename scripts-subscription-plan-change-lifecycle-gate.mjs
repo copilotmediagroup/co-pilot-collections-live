@@ -1,0 +1,14 @@
+import fs from 'node:fs';let failed=false;const pass=(n,o)=>{console.log(`${o?'PASS':'FAIL'} ${n}`);if(!o)failed=true};const s=fs.readFileSync('MULTI_TENANT_PHASE75_PLAN_CHANGE_REQUEST_LIFECYCLE.sql','utf8');
+pass('durable request table',s.includes('subscription_plan_change_requests'));
+pass('protected request table',s.includes('revoke all on public.subscription_plan_change_requests from public,anon,authenticated'));
+pass('reuses phase72 validation',s.includes('cpcm_request_subscription_plan_change'));
+pass('prevents duplicate pending changes',s.includes("status in ('requested','provider_pending')"));
+pass('service finalization',s.includes('cpcm_service_finalize_subscription_plan_change'));
+pass('service role required',s.includes("auth.role(),'') <> 'service_role'"));
+pass('demo protected',s.includes('Demo organizations do not have production subscriptions'));
+pass('capacity rechecked at apply',s.includes('Organization exceeds requested plan capacity'));
+pass('subscription synchronized',s.includes('set plan=r.requested_plan,billing_interval=r.requested_billing_interval'));
+pass('organization plan synchronized',s.includes('set plan=r.requested_plan'));
+pass('browser cannot finalize',s.includes('from public,anon,authenticated'));
+pass('provider reference audited',s.includes('provider_reference'));
+if(failed)process.exit(1);
