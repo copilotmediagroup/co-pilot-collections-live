@@ -6719,7 +6719,7 @@ async function loadHistory(id){
   let reqs=[
    dbFetch(`/account_notes?organization_id=eq.${encodeURIComponent(currentOrganizationId)}&account_id=eq.${id}&select=*&order=created_at.desc&limit=100`).catch(()=>[]),
    dbFetch(`/activity_logs?organization_id=eq.${encodeURIComponent(currentOrganizationId)}&account_id=eq.${id}&select=*&order=created_at.desc&limit=200`).catch(()=>[]),
-   dbFetch(`/call_results?account_id=eq.${id}&select=*&order=created_at.desc&limit=100`).catch(()=>[]),
+   dbFetch(`/call_results?organization_id=eq.${encodeURIComponent(currentOrganizationId)}&account_id=eq.${id}&select=*&order=created_at.desc&limit=100`).catch(()=>[]),
    dbFetch(`/payments_ledger?organization_id=eq.${encodeURIComponent(currentOrganizationId)}&account_id=eq.${id}&select=*&order=created_at.desc&limit=100`).catch(()=>[]),
    dbFetch(`/follow_ups?organization_id=eq.${encodeURIComponent(currentOrganizationId)}&account_id=eq.${id}&select=*&order=created_at.desc&limit=100`).catch(()=>[])
   ];
@@ -7600,7 +7600,7 @@ async function saveFollowUp(){
 
    let saved=await dbFetch('/follow_ups',{
      method:'POST',
-     body:JSON.stringify([row])
+     body:JSON.stringify([tenantRow(row)])
    });
 
    setStatus('Follow-up saved. Updating account history...','busy');
@@ -11948,9 +11948,9 @@ function exportContactIntelligenceCSV(){let calls=filteredContactCalls();let row
   async function loadReportsData(){
     var accs = Array.isArray(window.accounts) ? window.accounts.slice() : [];
     var results = await Promise.all([
-      safeTable('/payments_ledger?select=*&limit=50000&order=created_at.desc'),
+      safeTable('/payments_ledger?organization_id=eq.'+encodeURIComponent(currentOrganizationId)+'&select=*&limit=50000&order=created_at.desc'),
       safeTable('/payment_promises?organization_id=eq.'+encodeURIComponent(currentOrganizationId)+'&select=*&limit=50000&order=created_at.desc'),
-      safeTable('/call_results?select=*&limit=50000&order=created_at.desc'),
+      safeTable('/call_results?organization_id=eq.'+encodeURIComponent(currentOrganizationId)+'&select=*&limit=50000&order=created_at.desc'),
       safeTable('/payment_plans?organization_id=eq.'+encodeURIComponent(currentOrganizationId)+'&select=*&limit=50000&order=created_at.desc'),
       safeTable('/account_notes?organization_id=eq.'+encodeURIComponent(currentOrganizationId)+'&select=*&limit=50000&order=created_at.desc')
     ]);
@@ -13085,7 +13085,7 @@ function exportContactIntelligenceCSV(){let calls=filteredContactCalls();let row
   async function loadTasks(){
     if(!accs().length && typeof loadAccounts==='function') await loadAccounts().catch(function(){});
     var map=mapAccounts(), list=[];
-    var rows=await Promise.all([sf('/follow_ups?organization_id=eq.'+encodeURIComponent(currentOrganizationId)+'&select=*&order=due_date.asc&limit=20000'),sf('/payment_plan_payments?organization_id=eq.'+encodeURIComponent(currentOrganizationId)+'&select=*&order=due_date.asc&limit=20000'),sf('/payment_promises?organization_id=eq.'+encodeURIComponent(currentOrganizationId)+'&select=*&order=due_date.asc&limit=20000'),sf('/settlements?select=*&order=created_at.desc&limit=10000'),sf('/disputes?select=*&order=created_at.desc&limit=10000')]);
+    var rows=await Promise.all([sf('/follow_ups?organization_id=eq.'+encodeURIComponent(currentOrganizationId)+'&select=*&order=due_date.asc&limit=20000'),sf('/payment_plan_payments?organization_id=eq.'+encodeURIComponent(currentOrganizationId)+'&select=*&order=due_date.asc&limit=20000'),sf('/payment_promises?organization_id=eq.'+encodeURIComponent(currentOrganizationId)+'&select=*&order=due_date.asc&limit=20000'),sf('/settlements?organization_id=eq.'+encodeURIComponent(currentOrganizationId)+'&select=*&order=created_at.desc&limit=10000'),sf('/disputes?organization_id=eq.'+encodeURIComponent(currentOrganizationId)+'&select=*&order=created_at.desc&limit=10000')]);
     rows[0].forEach(function(r){if(closed(r.status))return;pushTask(list,{source:'follow_ups',sourceId:r.id,accountId:aid(r),type:/call/i.test(r.followUpType||'')?'Callback':'Follow-Up',title:r.followUpType||'Follow-Up',description:r.reason||r.notes||'Scheduled follow-up',dueDate:r.dueDate,status:r.status,assignedTo:assigned(r,map[String(aid(r))]),raw:r},map)});
     rows[1].forEach(function(r){if(closed(r.status))return;var due=iso(r.dueDate||r.paymentDate);var amt=num(r.amountDue||r.amount||r.paymentAmount);pushTask(list,{source:'payment_plan_payments',sourceId:r.id,accountId:aid(r),type:due&&due<today()?'Broken Payment Plan':'Payment Plan Due',title:'Payment Plan Due',description:'Installment due '+label(due)+' for '+money(amt),dueDate:due,status:r.status||'Scheduled',amount:amt,raw:r},map)});
     rows[2].forEach(function(r){if(closed(r.status))return;var due=iso(r.dueDate||r.promiseDate);var amt=num(r.paymentAmount||r.promiseAmount||r.amount);pushTask(list,{source:'payment_promises',sourceId:r.id,accountId:aid(r),type:due&&due<today()?'Broken Promise':'Promise Due',title:due&&due<today()?'Broken Promise':'Promise Due',description:'Promise due '+label(due)+' for '+money(amt),dueDate:due,status:r.status||'Open',amount:amt,raw:r},map)});
