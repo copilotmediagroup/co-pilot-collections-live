@@ -3786,6 +3786,7 @@ header.topbar{height:58px!important;padding:0 12px!important;grid-template-colum
         <button id="loginBtn" onclick="login()">Login</button>
         <button id="signupBtn" class="gray" onclick="signup()">Request Access</button>
       </div>
+      <button id="agencySignupBtn" type="button" class="gray" style="width:100%;margin-top:8px" onclick="openAgencySignup()">Create Agency Account</button>
       <button type="button" class="forgotPasswordLink" onclick="requestPasswordReset()">Forgot password?</button>
       <button class="applyLaunch" onclick="openJobApplication()">Apply to Join Our Collection Team</button>
       <div class="applyIntro">Experienced collectors · Atlanta area · Day & evening shifts</div>
@@ -4363,6 +4364,14 @@ header.topbar{height:58px!important;padding:0 12px!important;grid-template-colum
         <tbody id="qaHealthBody"><tr><td colspan="4">Click Run Health Check.</td></tr></tbody>
       </table>
     </div>
+  </div>
+</div></div>
+
+<div id="agencySignupModal" class="modal"><div class="modalbox" style="max-width:620px">
+  <div class="modalhead"><h2>Create Agency Account</h2><button class="gray" onclick="closeModal('agencySignupModal')">Close</button></div>
+  <div class="modalbody"><div class="notice">Create the company owner login first. Your agency will remain locked until its subscription is activated.</div>
+    <div class="formgrid"><div><label>Agency / Business Name</label><input id="agencySignupName" autocomplete="organization" placeholder="ABC Collections"></div><div><label>Owner / Admin Name</label><input id="agencySignupAdminName" autocomplete="name" placeholder="Your name"></div><div><label>Business Email</label><input id="agencySignupEmail" type="email" autocomplete="email" placeholder="owner@agency.com"></div><div><label>Phone</label><input id="agencySignupPhone" autocomplete="tel" placeholder="(555) 555-5555"></div><div><label>Password</label><input id="agencySignupPassword" type="password" autocomplete="new-password" placeholder="At least 8 characters"></div><div><label>Confirm Password</label><input id="agencySignupPassword2" type="password" autocomplete="new-password" placeholder="Repeat password"></div></div>
+    <div id="agencySignupStatus" class="loginStatus" style="margin-top:12px"></div><div style="display:flex;justify-content:flex-end;gap:8px;margin-top:14px"><button class="gray" onclick="closeModal('agencySignupModal')">Cancel</button><button id="agencySignupSubmit" onclick="submitAgencySignup()">Continue to Subscription</button></div>
   </div>
 </div></div>
 
@@ -5242,6 +5251,9 @@ const reverse=Object.fromEntries(Object.entries(map).map(([k,v])=>[v,k]));
 function cfg(){return window.CO_PILOT_SUPABASE_CONFIG||{}}
 function deploymentMode(){return String(cfg().deploymentMode||'live').trim().toLowerCase()}
 function isPublicDemoDeployment(){return deploymentMode()==='demo'}
+function openAgencySignup(){if(isPublicDemoDeployment())return alert('Agency signup is available on the production service.');document.getElementById('agencySignupModal')?.classList.add('open')}
+function agencySlug(name){return String(name||'').toLowerCase().trim().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'').slice(0,48)}
+async function submitAgencySignup(){let btn=document.getElementById('agencySignupSubmit'),status=document.getElementById('agencySignupStatus');try{if(isPublicDemoDeployment())throw new Error('Agency signup is disabled in the public demo.');let name=val('agencySignupName').trim(),adminName=val('agencySignupAdminName').trim(),email=val('agencySignupEmail').toLowerCase().trim(),phone=val('agencySignupPhone').trim(),password=val('agencySignupPassword'),password2=val('agencySignupPassword2');if(!name||!adminName||!email||!password)throw new Error('Enter the agency name, admin name, email, and password.');if(password.length<8)throw new Error('Password must be at least 8 characters.');if(password!==password2)throw new Error('Passwords do not match.');let slug=agencySlug(name);if(!slug)throw new Error('Enter a valid agency name.');if(btn)btn.disabled=true;if(status)status.textContent='Creating secure agency signup...';let data=await authFetch('/auth/v1/signup',{email,password,data:{requested_role:'agency_admin',agency_name:name,admin_name:adminName,phone}});if(!data.access_token){if(status)status.textContent='Check your email to verify the account, then return here to finish agency setup.';return;}storeSession(data);currentUser={email,isAdmin:false,isClient:false,requestedRole:'agency_admin'};let authUserId=await currentAuthUserId();if(!authUserId)throw new Error('Could not verify the new admin identity.');let result=await dbFetch('/rpc/cpcm_request_agency_signup',{method:'POST',body:JSON.stringify({p_name:name,p_slug:slug,p_admin_name:adminName,p_phone:phone})});let row=Array.isArray(result)?result[0]:result;if(!row||!row.organization_id)throw new Error('Agency signup was not created.');currentOrganizationId='';if(status)status.textContent='Agency created. Subscription activation is required before software access.';setTimeout(()=>{closeModal('agencySignupModal');clearSession();showLoginError('Agency account created. Complete subscription activation to unlock the software, then log in.');},900)}catch(e){if(status)status.textContent=e.message||String(e)}finally{if(btn)btn.disabled=false}}
 function url(){return String(cfg().url||'').replace(/\/$/,'')}
 function pubKey(){return String(cfg().publishableKey||'')}
 function token(){return localStorage.getItem(TOKEN_KEY)||''}
