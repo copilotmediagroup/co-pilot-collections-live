@@ -23,7 +23,7 @@ For `saas-subscription-checkout`:
 
 ## Database release order
 1. Confirm the existing production multi-tenant foundation through Phase 56 is present.
-2. Apply `MULTI_TENANT_PRODUCTION_SUBSCRIPTION_INSTALL_57_97.sql` in numeric order.
+2. Apply `MULTI_TENANT_PRODUCTION_SUBSCRIPTION_INSTALL_57_98.sql` in numeric order.
 3. Run the production subscription gate bundle and full multi-tenant preflight before site cutover.
 
 ## NMI recurring subscription boundary
