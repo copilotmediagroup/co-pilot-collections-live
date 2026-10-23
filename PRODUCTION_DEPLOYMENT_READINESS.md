@@ -37,3 +37,6 @@ The plan-change processor uses NMI v5 `PUT /api/v5/subscriptions/{subscription_i
 After the database migration and Edge Function configuration are verified, run one final production build, then deploy the production branch/site in one controlled release. Smoke-test login, new agency signup, pending-payment routing, subscription/billing page, tenant isolation, employee invite/login, account creation limits, and admin access immediately after deployment.
 
 - `CPCM_SUBSCRIPTION_LIFECYCLE_SECRET` — server-only secret used by provider-first subscription lifecycle processors (cancellation and plan changes).
+
+## Cancellation scheduler
+After the cancellation Edge Function is deployed, create Vault secrets `cpcm_project_url` and `cpcm_subscription_lifecycle_secret`, then apply `PRODUCTION_SUBSCRIPTION_CANCELLATION_CRON.sql`. It invokes the provider-first cancellation processor every 15 minutes so end-of-period cancellations do not depend on an agency admin being online. Do not place either secret directly in SQL or browser code.
