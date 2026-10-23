@@ -1,6 +1,7 @@
 import fs from 'node:fs';
-const s=fs.readFileSync('supabase/functions/saas-subscription-plan-change/index.ts','utf8');let bad=0;const c=(n,r)=>{const ok=r.test(s);console.log(ok?'PASS':'FAIL',n);if(!ok)bad++};
-c('lifecycle secret required',/CPCM_SUBSCRIPTION_LIFECYCLE_SECRET/);
+const s=fs.readFileSync('supabase/functions/saas-subscription-plan-change/index.ts','utf8');let bad=0;const c=(n,r)=>{const ok=typeof r==='function'?r(s):r.test(s);console.log(ok?'PASS':'FAIL',n);if(!ok)bad++};
+c('authenticated agency admin boundary',s=>s.includes('admin.auth.getUser(jwt)'));
+c('caller owns pending request',/cpcm_my_pending_subscription_plan_change/);
 c('claims durable plan change',/cpcm_service_claim_subscription_plan_change/);
 c('loads canonical provider handoff',/cpcm_service_get_subscription_plan_change_handoff/);
 c('requires stored provider subscription id',/provider_subscription_id/);
