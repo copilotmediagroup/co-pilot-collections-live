@@ -1,0 +1,13 @@
+import fs from 'node:fs';const sql=fs.readFileSync('MULTI_TENANT_PHASE99_CHECKOUT_RECOVERY_HANDOFF.sql','utf8'),checkout=fs.readFileSync('supabase/functions/saas-subscription-checkout/index.ts','utf8'),edge=fs.readFileSync('supabase/functions/saas-subscription-checkout-recovery/index.ts','utf8');let bad=0;const c=(n,ok)=>{console.log(ok?'PASS':'FAIL',n);if(!ok)bad++};
+c('approval stores provider customer id',/provider_customer_id/.test(sql)&&checkout.includes('p_provider_customer_id:customerId||null'));
+c('approval stores provider subscription id',/provider_subscription_id/.test(sql)&&checkout.includes('p_provider_subscription_id:subscriptionId'));
+c('approval stores period end',/provider_period_end/.test(sql)&&checkout.includes('p_provider_period_end:periodEnd'));
+c('approval stores billing anchor',/provider_billing_day/.test(sql)&&checkout.includes('p_provider_billing_day:start.getUTCDate()'));
+c('recovery reader service only',/cpcm_service_provider_approved_checkout_recovery[\s\S]*Service role required/.test(sql));
+c('recovery only provider approved',/status='provider_approved'/.test(sql));
+c('recovery excludes demo',/is_demo,false\)=false/.test(sql));
+c('recovery edge lifecycle protected',edge.includes('CPCM_SUBSCRIPTION_LIFECYCLE_SECRET')&&edge.includes('x-cpcm-lifecycle-secret'));
+c('recovery reuses activation rpc',edge.includes('cpcm_service_activate_paid_subscription'));
+c('recovery never calls NMI',!edge.includes('NMI_PRIVATE_API_KEY')&&!edge.includes('/api/v5/subscriptions'));
+c('recovery contains no payment token',!edge.includes('payment_token')&&!sql.includes('payment_token'));
+if(bad)process.exit(1);

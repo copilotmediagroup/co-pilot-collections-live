@@ -40,3 +40,6 @@ After the database migration and Edge Function configuration are verified, run o
 
 ## Cancellation scheduler
 After the cancellation Edge Function is deployed, create Vault secrets `cpcm_project_url` and `cpcm_subscription_lifecycle_secret`, then apply `PRODUCTION_SUBSCRIPTION_CANCELLATION_CRON.sql`. It invokes the provider-first cancellation processor every 15 minutes so end-of-period cancellations do not depend on an agency admin being online. Do not place either secret directly in SQL or browser code.
+
+### Phase 99 checkout recovery
+Provider-approved subscription checkouts persist only safe provider identifiers, period timing, and billing anchor metadata before local activation. A lifecycle-secret-protected recovery processor can finish local activation without resubmitting card data or creating another NMI subscription.
