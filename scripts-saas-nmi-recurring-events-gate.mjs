@@ -1,5 +1,8 @@
 import fs from 'node:fs';const e=fs.readFileSync('supabase/functions/saas-subscription-provider-events/index.ts','utf8');let bad=0;const c=(n,ok)=>{console.log(ok?'PASS':'FAIL',n);if(!ok)bad++};
-c('webhook requires dedicated secret',e.includes('CPCM_NMI_WEBHOOK_SECRET')&&e.includes('x-cpcm-nmi-webhook-secret'));
+c('webhook verifies official signature header',/webhook-signature/.test(e)&&/verifyNmiWebhook/.test(e));
+c('webhook uses raw body for signature',/raw=await req\.text\(\)/.test(e)&&/m\[1\]\+"\."\+raw/.test(e));
+c('webhook signing key is server only',/CPCM_NMI_WEBHOOK_SIGNING_KEY/.test(e));
+c('custom caller secret header removed',!/x-cpcm-nmi-webhook-secret/.test(e));
 c('generic recurring updates are not guessed as payment outcomes',!e.includes('p_outcome:"renewal_succeeded"')); 
 c('official recurring delete event normalized',e.includes('recurring.subscription.delete'));
 c('provider event id required',e.includes('Provider event id and type are required'));
