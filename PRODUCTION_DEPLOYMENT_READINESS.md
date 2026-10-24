@@ -49,3 +49,8 @@ After the checkout-recovery Edge Function is deployed and the existing Vault sec
 
 ## NMI recurring event intake
 Deploy `saas-subscription-provider-events` with `CPCM_NMI_WEBHOOK_SIGNING_KEY` set to the signing key shown for the webhook in the NMI Merchant Portal. The receiver validates NMI’s `Webhook-Signature` HMAC-SHA256 over the exact raw request body before parsing or processing the event. The intake claims provider event IDs idempotently, resolves tenants only from stored NMI identities, processes the documented subscription-delete event through the cancellation boundary, and records other recurring events without guessing that a generic subscription update means a successful payment.
+
+## Final subscription release manifest
+Deploy the four SaaS lifecycle Edge Functions before production cutover: `saas-subscription-checkout`, `saas-subscription-plan-change`, `saas-subscription-cancellation`, and `saas-subscription-checkout-recovery`, plus `saas-subscription-provider-events` for signed NMI recurring events. Configure `NMI_PRIVATE_API_KEY` only for provider-mutating functions, `CPCM_SUBSCRIPTION_LIFECYCLE_SECRET` for scheduled lifecycle processors, and `CPCM_NMI_WEBHOOK_SIGNING_KEY` for recurring-event signature verification. Apply both production cron SQL files only after their target Edge Functions and Vault secrets are present.
+
+NMI webhook deliveries can be retried, so the recurring-event intake must retain its provider event-id idempotency ledger. The endpoint must return success only after the event has been safely finalized or intentionally ignored.
