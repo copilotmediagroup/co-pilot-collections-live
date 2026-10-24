@@ -1,0 +1,15 @@
+import fs from 'node:fs';const e=fs.readFileSync('supabase/functions/saas-subscription-provider-events/index.ts','utf8');let bad=0;const c=(n,ok)=>{console.log(ok?'PASS':'FAIL',n);if(!ok)bad++};
+c('webhook requires dedicated secret',e.includes('CPCM_NMI_WEBHOOK_SECRET')&&e.includes('x-cpcm-nmi-webhook-secret'));
+c('generic recurring updates are not guessed as payment outcomes',!e.includes('p_outcome:"renewal_succeeded"')); 
+c('official recurring delete event normalized',e.includes('recurring.subscription.delete'));
+c('provider event id required',e.includes('Provider event id and type are required'));
+c('idempotency ledger claim used',e.includes('cpcm_service_claim_saas_provider_event'));
+c('duplicate events short circuit',e.includes('duplicate:true'));
+c('provider identity safely bound',e.includes('cpcm_service_resolve_and_bind_saas_provider_event'));
+c('delete uses cancellation boundary only',e.includes('cpcm_service_apply_normalized_subscription_cancellation_event')); 
+c('cancellation uses normalized boundary',e.includes('cpcm_service_apply_normalized_subscription_cancellation_event'));
+c('unsupported event ignored',e.includes('cpcm_service_ignore_claimed_saas_provider_event'));
+c('processing failure finalized',e.includes('cpcm_service_fail_claimed_saas_provider_event'));
+c('no NMI private API key needed',!e.includes('NMI_PRIVATE_API_KEY'));
+c('no card data fields',!/(ccnumber|ccexp|cvv|payment_token)/i.test(e));
+if(bad)process.exit(1);

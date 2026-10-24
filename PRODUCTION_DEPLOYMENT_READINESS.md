@@ -46,3 +46,6 @@ Provider-approved subscription checkouts persist only safe provider identifiers,
 
 ## Phase 99 recovery scheduler
 After the checkout-recovery Edge Function is deployed and the existing Vault secrets are present, apply `PRODUCTION_SUBSCRIPTION_CHECKOUT_RECOVERY_CRON.sql`. It checks provider-approved/local-incomplete checkouts every 10 minutes and retries only local activation; it does not call NMI or resubmit payment credentials.
+
+## NMI recurring event intake
+Deploy `saas-subscription-provider-events` with a dedicated `CPCM_NMI_WEBHOOK_SECRET` and configure the NMI recurring-event callback to send that secret as `x-cpcm-nmi-webhook-secret`. The intake claims provider event IDs idempotently, resolves tenants only from stored NMI identities, processes the documented subscription-delete event through the cancellation boundary, and records other recurring events without guessing that a generic subscription update means a successful payment.
