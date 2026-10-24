@@ -2,7 +2,7 @@
 
 ## Current release boundary
 - Feature branch: `feature/multi-tenant-saas`
-- Subscription migrations: Phases 57–95.
+- Subscription migrations: Phases 57–99.
 - Netlify build: `npm run build`, publish `dist`, Node 20.
 - Production runtime mode must be `live`.
 - Public Demo is separate and must not receive this production installer.
@@ -23,7 +23,7 @@ For `saas-subscription-checkout`:
 
 ## Database release order
 1. Confirm the existing production multi-tenant foundation through Phase 56 is present.
-2. Apply `MULTI_TENANT_PRODUCTION_SUBSCRIPTION_INSTALL_57_98.sql` in numeric order.
+2. Apply `MULTI_TENANT_PRODUCTION_SUBSCRIPTION_INSTALL_57_99.sql` in numeric order.
 3. Run the production subscription gate bundle and full multi-tenant preflight before site cutover.
 
 ## NMI recurring subscription boundary
@@ -43,3 +43,6 @@ After the cancellation Edge Function is deployed, create Vault secrets `cpcm_pro
 
 ### Phase 99 checkout recovery
 Provider-approved subscription checkouts persist only safe provider identifiers, period timing, and billing anchor metadata before local activation. A lifecycle-secret-protected recovery processor can finish local activation without resubmitting card data or creating another NMI subscription.
+
+## Phase 99 recovery scheduler
+After the checkout-recovery Edge Function is deployed and the existing Vault secrets are present, apply `PRODUCTION_SUBSCRIPTION_CHECKOUT_RECOVERY_CRON.sql`. It checks provider-approved/local-incomplete checkouts every 10 minutes and retries only local activation; it does not call NMI or resubmit payment credentials.

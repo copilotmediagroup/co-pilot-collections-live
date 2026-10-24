@@ -1,0 +1,12 @@
+import fs from 'node:fs';
+const s=fs.readFileSync('PRODUCTION_SUBSCRIPTION_CHECKOUT_RECOVERY_CRON.sql','utf8');let bad=0;const c=(n,r)=>{const ok=typeof r==='boolean'?r:r.test(s);console.log(ok?'PASS':'FAIL',n);if(!ok)bad++};
+c('cron extension enabled',/create extension if not exists pg_cron/);
+c('pg_net enabled',/create extension if not exists pg_net/);
+c('runs every 10 minutes',/'\*\/10 \* \* \* \*'/);
+c('invokes checkout recovery edge',/functions\/v1\/saas-subscription-checkout-recovery/);
+c('project URL comes from Vault',/name='cpcm_project_url'/);
+c('lifecycle secret comes from Vault',/name='cpcm_subscription_lifecycle_secret'/);
+c('lifecycle header supplied',/x-cpcm-lifecycle-secret/);
+c('no literal project URL',!s.includes('supabase.co/functions'));
+c('no literal secret',!s.includes('CPCM_SUBSCRIPTION_LIFECYCLE_SECRET'));
+if(bad)process.exit(1);
