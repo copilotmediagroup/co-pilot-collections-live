@@ -9,4 +9,6 @@ c('release manifest requires webhook signing key',d.includes('CPCM_NMI_WEBHOOK_S
 c('cancellation cron exists',fs.existsSync('PRODUCTION_SUBSCRIPTION_CANCELLATION_CRON.sql'));
 c('checkout recovery cron exists',fs.existsSync('PRODUCTION_SUBSCRIPTION_CHECKOUT_RECOVERY_CRON.sql'));
 c('webhook intake retains idempotency claim',fs.readFileSync('supabase/functions/saas-subscription-provider-events/index.ts','utf8').includes('cpcm_service_claim_saas_provider_event'));
+const cfg=fs.readFileSync('supabase/config.toml','utf8');
+for(const f of ['saas-subscription-cancellation','saas-subscription-checkout-recovery','saas-subscription-provider-events']) c('gateway JWT disabled for signed/service lifecycle function '+f,cfg.includes('[functions.'+f+']\nverify_jwt = false'));
 if(bad)process.exit(1);

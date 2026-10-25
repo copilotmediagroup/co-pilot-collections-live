@@ -54,3 +54,6 @@ Deploy `saas-subscription-provider-events` with `CPCM_NMI_WEBHOOK_SIGNING_KEY` s
 Deploy the four SaaS lifecycle Edge Functions before production cutover: `saas-subscription-checkout`, `saas-subscription-plan-change`, `saas-subscription-cancellation`, and `saas-subscription-checkout-recovery`, plus `saas-subscription-provider-events` for signed NMI recurring events. Configure `NMI_PRIVATE_API_KEY` only for provider-mutating functions, `CPCM_SUBSCRIPTION_LIFECYCLE_SECRET` for scheduled lifecycle processors, and `CPCM_NMI_WEBHOOK_SIGNING_KEY` for recurring-event signature verification. Apply both production cron SQL files only after their target Edge Functions and Vault secrets are present.
 
 NMI webhook deliveries can be retried, so the recurring-event intake must retain its provider event-id idempotency ledger. The endpoint must return success only after the event has been safely finalized or intentionally ignored.
+
+## Gateway JWT configuration
+NMI webhook intake and lifecycle-secret cron processors are intentionally configured with `verify_jwt = false` in `supabase/config.toml`. They still authenticate inside function code: provider events verify the NMI webhook signature, while cancellation and checkout recovery require the server-only lifecycle secret. Browser-facing checkout and plan-change functions retain their user-JWT boundary.

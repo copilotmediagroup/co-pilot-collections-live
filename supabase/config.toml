@@ -30,3 +30,12 @@ verify_jwt = false
 
 [functions.bland-conversation-outcome]
 verify_jwt = false
+
+[functions.saas-subscription-cancellation]
+verify_jwt = false
+
+[functions.saas-subscription-checkout-recovery]
+verify_jwt = false
+
+[functions.saas-subscription-provider-events]
+verify_jwt = false
