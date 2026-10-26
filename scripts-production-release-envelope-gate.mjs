@@ -21,7 +21,8 @@ const requiredStatic=[
   'scripts-production-subscription-release-manifest-gate.mjs',
   'scripts-production-subscription-installer-gate.mjs',
   'scripts-production-deployment-readiness-gate.mjs',
-  'scripts-production-rollback-plan-gate.mjs'
+  'scripts-production-rollback-plan-gate.mjs',
+  'scripts-production-release-evidence-gate.mjs'
 ];
 for(const f of requiredStatic) if(!fs.existsSync(f)) fail.push('missing release gate: '+f);
 for(const phrase of [
@@ -43,6 +44,7 @@ for(const artifact of [
   'MULTI_TENANT_PRODUCTION_SUBSCRIPTION_INSTALL_57_101.sql'
 ]) if(!cutover.includes(artifact)||!fs.existsSync(artifact)) fail.push('canonical cutover artifact missing/unlisted: '+artifact);
 if(!cutover.includes('PRODUCTION_CUTOVER_ROLLBACK_PLAN.md')||!fs.existsSync('PRODUCTION_CUTOVER_ROLLBACK_PLAN.md')) fail.push('canonical rollback plan missing/unlinked');
+if(!cutover.includes('PRODUCTION_RELEASE_EVIDENCE_TEMPLATE.md')||!fs.existsSync('PRODUCTION_RELEASE_EVIDENCE_TEMPLATE.md')) fail.push('canonical release evidence template missing/unlinked');
 if(!checklist.includes('PRODUCTION_CUTOVER_SEQUENCE.md')) fail.push('final checklist must defer to canonical production cutover sequence');
 if(!sequenceGate.includes('explicit owner authorization')) fail.push('sequence gate must enforce explicit owner authorization');
 if(fail.length){ console.error(fail.map(x=>'FAIL '+x).join('\n')); process.exit(1); }
