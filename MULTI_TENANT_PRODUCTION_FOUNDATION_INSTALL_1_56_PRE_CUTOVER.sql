@@ -9,7 +9,8 @@
 \ir MULTI_TENANT_PHASE4_SINGLETON_CONFIG_KEYS.sql
 \ir MULTI_TENANT_PHASE5_RPC_TENANT_BINDING.sql
 \ir MULTI_TENANT_PHASE6_RINGCENTRAL_TENANT_OWNERSHIP.sql
-\ir MULTI_TENANT_PHASE7_ISOLATION_ASSERTIONS.sql
+-- Phase 7 is a STAGING/DISPOSABLE JWT isolation procedure and is intentionally NOT executed on LIVE.
+-- Its structural precheck is represented by the production readiness gate; A/B behavioral proof must be completed before Phase 8.
 \ir MULTI_TENANT_PHASE9_RPC_GUARDRAILS.sql
 \ir MULTI_TENANT_PHASE10_CLIENT_PORTAL_RPCS.sql
 \ir MULTI_TENANT_PHASE11_STAFF_ADMIN_RPC.sql
