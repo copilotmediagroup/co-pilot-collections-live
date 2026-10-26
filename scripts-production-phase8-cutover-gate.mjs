@@ -12,6 +12,8 @@ if(!/^begin;/mi.test(phase8)||!/^commit;/mi.test(phase8)) fail.push('canonical P
 if(!/BEGIN READ ONLY;/i.test(post)||!/ROLLBACK;/i.test(post)) fail.push('post-Phase8 gate must be read-only and rollback');
 if(!post.includes("column_default IS NOT NULL")) fail.push('post-Phase8 gate must verify defaults are absent');
 if(!post.includes("permissive='RESTRICTIVE'")) fail.push('post-Phase8 gate must verify restrictive tenant fences');
+for(const policy of ['cpcm_tenant_select','cpcm_tenant_insert','cpcm_tenant_update','cpcm_tenant_delete']) if(!post.includes(policy)) fail.push(`post-Phase8 gate must require ${policy}`);
+if(!/FOREACH\s+p\s+IN\s+ARRAY/i.test(post)) fail.push('post-Phase8 gate must verify each restrictive tenant policy independently');
 if(/\b(?:insert\s+into|update\s+|delete\s+from|alter\s+table|create\s+(?:table|policy|function|trigger|index)|drop\s+(?:table|policy|function|trigger|index)|truncate\s+)/i.test(post.replace(/--.*$/gm,''))) fail.push('post-Phase8 gate contains mutation SQL');
 if(fail.length){console.error(fail.map(x=>'FAIL '+x).join('\n'));process.exit(1)}
 console.log('PASS production Phase 8 cutover gate — isolated installer, explicit behavioral/owner holds, read-only post-cutover verification');

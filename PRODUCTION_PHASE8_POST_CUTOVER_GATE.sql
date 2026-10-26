@@ -4,6 +4,7 @@ BEGIN READ ONLY;
 DO $$
 DECLARE
   t text;
+  p text;
   leftovers text[] := ARRAY[]::text[];
   missing_fences text[] := ARRAY[]::text[];
   tenant_tables text[] := ARRAY[
@@ -21,19 +22,20 @@ BEGIN
       IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name=t AND column_name='organization_id' AND column_default IS NOT NULL) THEN
         leftovers:=array_append(leftovers,t);
       END IF;
-      IF NOT EXISTS (
-        SELECT 1 FROM pg_policies
-         WHERE schemaname='public' AND tablename=t
-           AND policyname IN ('cpcm_tenant_select','cpcm_tenant_insert','cpcm_tenant_update','cpcm_tenant_delete')
-           AND permissive='RESTRICTIVE'
-      ) THEN
-        missing_fences:=array_append(missing_fences,t);
-      END IF;
+      FOREACH p IN ARRAY ARRAY['cpcm_tenant_select','cpcm_tenant_insert','cpcm_tenant_update','cpcm_tenant_delete'] LOOP
+        IF NOT EXISTS (
+          SELECT 1 FROM pg_policies
+           WHERE schemaname='public' AND tablename=t
+             AND policyname=p AND permissive='RESTRICTIVE'
+        ) THEN
+          missing_fences:=array_append(missing_fences,t||':'||p);
+        END IF;
+      END LOOP;
     END IF;
   END LOOP;
   IF cardinality(leftovers)>0 THEN RAISE EXCEPTION 'PHASE 8 POST-CUTOVER BLOCKED: organization_id defaults remain on %',array_to_string(leftovers,', '); END IF;
   IF cardinality(missing_fences)>0 THEN RAISE EXCEPTION 'PHASE 8 POST-CUTOVER BLOCKED: restrictive tenant fence missing on %',array_to_string(missing_fences,', '); END IF;
-  RAISE NOTICE 'PHASE 8 POST-CUTOVER STRUCTURE PASSED: legacy defaults removed and restrictive tenant fences present.';
+  RAISE NOTICE 'PHASE 8 POST-CUTOVER STRUCTURE PASSED: legacy defaults removed and all four restrictive tenant fences present on every tenant table.';
 END $$;
 ROLLBACK;
 \echo 'PHASE 8 POST-CUTOVER GATE PASSED.'
