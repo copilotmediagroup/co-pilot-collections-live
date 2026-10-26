@@ -18,7 +18,8 @@
 \ir MULTI_TENANT_PHASE12_REMITTANCE_RPCS.sql
 \ir MULTI_TENANT_PHASE13_COMMISSIONS_PAYMENT_APPROVALS.sql
 -- Phase 14 is held with Phase 2: it removes legacy policies only after restrictive tenant fences exist.
-\ir MULTI_TENANT_PHASE15_RECRUITING_CLASSIFICATION.sql
+-- Phase 15 is a recruiting cutover migration and assumes legacy recruiter tables/policies exist.
+-- Hold it until the LIVE compatibility gate proves those prerequisites immediately before cutover.
 \ir MULTI_TENANT_PHASE17_MESSENGER_STAFF_RPCS.sql
 \ir MULTI_TENANT_PHASE18_CALL_ACTIVITY_RPCS.sql
 \ir MULTI_TENANT_PHASE19_NMI_FINALIZATION_RPCS.sql
