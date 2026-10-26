@@ -1,14 +1,15 @@
 import fs from 'node:fs';
 let bad=0;const c=(n,ok)=>{console.log(ok?'PASS':'FAIL',n);if(!ok)bad++};
 const d=fs.readFileSync('PRODUCTION_DEPLOYMENT_READINESS.md','utf8');
-const funcs=['saas-subscription-checkout','saas-subscription-plan-change','saas-subscription-cancellation','saas-subscription-checkout-recovery','saas-subscription-provider-events'];
+const funcs=['saas-subscription-checkout','saas-subscription-plan-change','saas-subscription-cancellation','saas-subscription-checkout-recovery','saas-subscription-plan-change-recovery','saas-subscription-provider-events'];
 for(const f of funcs)c('release manifest includes '+f,d.includes(f)&&fs.existsSync('supabase/functions/'+f+'/index.ts'));
 c('release manifest requires NMI private key',d.includes('NMI_PRIVATE_API_KEY'));
 c('release manifest requires lifecycle secret',d.includes('CPCM_SUBSCRIPTION_LIFECYCLE_SECRET'));
 c('release manifest requires webhook signing key',d.includes('CPCM_NMI_WEBHOOK_SIGNING_KEY'));
 c('cancellation cron exists',fs.existsSync('PRODUCTION_SUBSCRIPTION_CANCELLATION_CRON.sql'));
 c('checkout recovery cron exists',fs.existsSync('PRODUCTION_SUBSCRIPTION_CHECKOUT_RECOVERY_CRON.sql'));
+c('plan change recovery cron exists',fs.existsSync('PRODUCTION_SUBSCRIPTION_PLAN_CHANGE_RECOVERY_CRON.sql'));
 c('webhook intake retains idempotency claim',fs.readFileSync('supabase/functions/saas-subscription-provider-events/index.ts','utf8').includes('cpcm_service_claim_saas_provider_event'));
 const cfg=fs.readFileSync('supabase/config.toml','utf8');
-for(const f of ['saas-subscription-cancellation','saas-subscription-checkout-recovery','saas-subscription-provider-events']) c('gateway JWT disabled for signed/service lifecycle function '+f,cfg.includes('[functions.'+f+']\nverify_jwt = false'));
+for(const f of ['saas-subscription-cancellation','saas-subscription-checkout-recovery','saas-subscription-plan-change-recovery','saas-subscription-provider-events']) c('gateway JWT disabled for signed/service lifecycle function '+f,cfg.includes('[functions.'+f+']\nverify_jwt = false'));
 if(bad)process.exit(1);

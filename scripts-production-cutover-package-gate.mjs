@@ -1,0 +1,15 @@
+import fs from 'node:fs';
+let bad=0;const c=(n,ok)=>{console.log(ok?'PASS':'FAIL',n);if(!ok)bad++};
+const doc=fs.readFileSync('PRODUCTION_DEPLOYMENT_READINESS.md','utf8');
+const cfg=fs.readFileSync('supabase/config.toml','utf8');
+const funcs=['saas-subscription-checkout','saas-subscription-plan-change','saas-subscription-cancellation','saas-subscription-checkout-recovery','saas-subscription-plan-change-recovery','saas-subscription-provider-events'];
+const crons=['PRODUCTION_SUBSCRIPTION_CANCELLATION_CRON.sql','PRODUCTION_SUBSCRIPTION_CHECKOUT_RECOVERY_CRON.sql','PRODUCTION_SUBSCRIPTION_PLAN_CHANGE_RECOVERY_CRON.sql'];
+c('canonical installer is phase101',doc.includes('MULTI_TENANT_PRODUCTION_SUBSCRIPTION_INSTALL_57_101.sql')&&fs.existsSync('MULTI_TENANT_PRODUCTION_SUBSCRIPTION_INSTALL_57_101.sql'));
+for(const f of funcs)c('cutover includes '+f,doc.includes('`'+f+'`')&&fs.existsSync('supabase/functions/'+f+'/index.ts'));
+for(const f of crons)c('cutover includes '+f,doc.includes('`'+f+'`')&&fs.existsSync(f));
+for(const f of ['saas-subscription-cancellation','saas-subscription-checkout-recovery','saas-subscription-plan-change-recovery','saas-subscription-provider-events'])c('gateway config present '+f,cfg.includes('[functions.'+f+']\nverify_jwt = false'));
+c('cutover documents three cron files',/three production cron SQL files/i.test(doc));
+c('cutover documents lifecycle secret recovery scope',/cancellation, checkout recovery, and plan-change recovery/i.test(doc));
+c('cutover documents webhook signing secret',doc.includes('CPCM_NMI_WEBHOOK_SIGNING_KEY'));
+c('cutover documents controlled smoke test',/controlled production smoke test/i.test(doc));
+if(bad)process.exit(1);
