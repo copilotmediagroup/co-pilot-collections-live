@@ -2,7 +2,7 @@
 
 ## Current release boundary
 - Feature branch: `feature/multi-tenant-saas`
-- Subscription migrations: Phases 57–100.
+- Subscription migrations: Phases 57–101.
 - Netlify build: `npm run build`, publish `dist`, Node 20.
 - Production runtime mode must be `live`.
 - Public Demo is separate and must not receive this production installer.
@@ -23,7 +23,7 @@ For `saas-subscription-checkout`:
 
 ## Database release order
 1. Confirm the existing production multi-tenant foundation through Phase 56 is present.
-2. Apply `MULTI_TENANT_PRODUCTION_SUBSCRIPTION_INSTALL_57_100.sql` in numeric order.
+2. Apply `MULTI_TENANT_PRODUCTION_SUBSCRIPTION_INSTALL_57_101.sql` in numeric order.
 3. Run the production subscription gate bundle and full multi-tenant preflight before site cutover.
 
 ## NMI recurring subscription boundary
@@ -59,3 +59,6 @@ NMI webhook deliveries can be retried, so the recurring-event intake must retain
 NMI webhook intake and lifecycle-secret cron processors are intentionally configured with `verify_jwt = false` in `supabase/config.toml`. They still authenticate inside function code: provider events verify the NMI webhook signature, while cancellation and checkout recovery require the server-only lifecycle secret. Browser-facing checkout and plan-change functions retain their user-JWT boundary.
 
 - Phase 100 atomically finalizes provider-approved checkout activation, recurring billing anchor, organization activation, and paid checkout state in one database transaction. Checkout and recovery processors use this canonical finalizer so a partial anchor write cannot strand a paid checkout.
+
+## Phase 101 plan-change recovery
+After NMI accepts a plan change, the provider reference is persisted before local finalization. If local finalization fails, `saas-subscription-plan-change-recovery` retries only the local canonical finalizer and never calls NMI again. Deploy it with the lifecycle secret, then apply `PRODUCTION_SUBSCRIPTION_PLAN_CHANGE_RECOVERY_CRON.sql`; the scheduler uses the existing Vault project URL and lifecycle secret.

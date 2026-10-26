@@ -39,3 +39,6 @@ verify_jwt = false
 
 [functions.saas-subscription-provider-events]
 verify_jwt = false
+
+[functions.saas-subscription-plan-change-recovery]
+verify_jwt = false
