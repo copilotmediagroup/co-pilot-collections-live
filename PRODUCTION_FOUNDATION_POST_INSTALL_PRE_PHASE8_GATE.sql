@@ -44,17 +44,17 @@ BEGIN
     RAISE EXCEPTION 'POST-FOUNDATION STRUCTURAL GATE BLOCKED: legacy organization defaults are already absent; Phase 8 state is ambiguous';
   END IF;
 
-  -- Phase 2 is intentionally held from the pre-cutover installer. Restrictive tenant
+  -- The production tenant-fence stage is intentionally held from the pre-cutover foundation. Restrictive tenant
   -- policies must therefore NOT be mistaken as already proven by this structural gate.
   IF EXISTS (
     SELECT 1 FROM pg_policies
      WHERE schemaname='public'
        AND policyname IN ('cpcm_tenant_select','cpcm_tenant_insert','cpcm_tenant_update','cpcm_tenant_delete')
   ) THEN
-    RAISE EXCEPTION 'POST-FOUNDATION STRUCTURAL GATE BLOCKED: tenant fence policies already exist although Phase 2 is held; investigate partial cutover state';
+    RAISE EXCEPTION 'POST-FOUNDATION STRUCTURAL GATE BLOCKED: tenant fence policies already exist before the production tenant-fence stage; investigate partial cutover state';
   END IF;
 
-  RAISE NOTICE 'POST-FOUNDATION STRUCTURE PASSED. HOLD PHASE 8: run separate Phase 2 tenant-fence installation and Agency A/B behavioral isolation proof first.';
+  RAISE NOTICE 'POST-FOUNDATION STRUCTURE PASSED. HOLD PHASE 8: run the separate production tenant-fence stage and Agency A/B behavioral isolation proof first.';
 END $$;
 ROLLBACK;
 \echo 'POST-FOUNDATION STRUCTURAL GATE PASSED — PHASE 8 REMAINS HOLD.'

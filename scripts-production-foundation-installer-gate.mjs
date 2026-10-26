@@ -4,14 +4,14 @@ const s=fs.readFileSync(file,'utf8');
 const refs=[...s.matchAll(/^\\ir (.+)$/gm)].map(m=>m[1]);
 const fail=[];
 if(!s.includes('\\set ON_ERROR_STOP on')) fail.push('ON_ERROR_STOP missing');
-if(refs.length!==48) fail.push(`expected 51 LIVE SQL includes, got ${refs.length}`);
+if(refs.length!==48) fail.push(`expected 48 LIVE SQL includes, got ${refs.length}`);
 for(const r of refs) if(!fs.existsSync(r)) fail.push(`missing ${r}`);
 if(refs.some(r=>/DEMO/.test(r))) fail.push('demo SQL included');
 if(refs.some(r=>/STAGING_BUNDLE/.test(r))) fail.push('staging bundle included');
 if(refs.some(r=>/PHASE8_REMOVE_LEGACY_DEFAULTS/.test(r))) fail.push('phase8 included before isolation');
 if(refs.some(r=>/PHASE16_STAGING_READINESS/.test(r))) fail.push('phase16 staging readiness included in LIVE installer');
 if(refs.some(r=>/PHASE39/.test(r))) fail.push('phase39 mutation unexpectedly included');
-if(refs.includes('MULTI_TENANT_PHASE25_ACCOUNT_ROLE_POLICIES.sql')) fail.push('phase25 account-role policies depend on Phase 2 tenant fence');
+if(refs.includes('MULTI_TENANT_PHASE25_ACCOUNT_ROLE_POLICIES.sql')) fail.push('phase25 account-role policies require the separate production tenant-fence stage');
 for(let n=1;n<=56;n++){ if(n===2||n===7||n===8||n===14||n===15||n===16||n===39||n===49) continue; if(!refs.some(r=>r.startsWith(`MULTI_TENANT_PHASE${n}_`))) fail.push(`phase ${n} absent`); }
 if(!refs.includes('MULTI_TENANT_PHASE25_TRUSTED_TENANT_STAMP.sql')) fail.push('phase25 trusted tenant stamp absent');
 if(fail.length){console.error(fail.map(x=>'FAIL '+x).join('\n'));process.exit(1)}

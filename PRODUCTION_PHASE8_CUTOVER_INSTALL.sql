@@ -3,7 +3,7 @@
 -- NEVER run this as part of the foundation installer.
 -- Required before execution:
 --   1) production foundation post-install gate passed;
---   2) Phase 2 tenant fences installed and structurally verified;
+--   2) production tenant fence installed and structurally verified;
 --   3) Agency A/B behavioral isolation proof passed for SELECT/INSERT/UPDATE/DELETE;
 --   4) collector/client intra-tenant access still works;
 --   5) platform-admin cross-tenant control is verified;

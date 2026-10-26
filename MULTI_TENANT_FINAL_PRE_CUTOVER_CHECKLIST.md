@@ -1,40 +1,43 @@
-# Co Pilot Collections — Final Pre-Cutover Checklist
+# Co Pilot Collections — Final Production Pre-Cutover Checklist
 
-## Already green on DEMO
-- Phase 8 organization-default removal.
-- Tenant A/B isolation: agency admin, collector, client, extended data.
-- Seeded financial/document isolation.
-- Broad RLS policy audit and legacy admin-policy repair.
-- High-impact RPC security and final function privilege audit through the previously installed tenant phases.
-- Frontend tenant stamping for inserts, row mutations, and bulk account mutations.
-- Service-role tenant binding for Voice Broadcast, Bland AI, RingCentral, and NMI reviewed/hardened.
-- Legacy owner-email frontend privilege removed.
+This checklist is subordinate to `PRODUCTION_CUTOVER_SEQUENCE.md`. It records the current production release contract; old DEMO completion state is not authorization for LIVE.
 
-## Built locally and awaiting DEMO installation/gates
-- Phase 26: platform tenant provisioning.
-- Phase 27: platform organization lifecycle administration.
-- Phase 28: suspended/cancelled organization enforcement.
-- Phase 29: browser-safe current-organization resolver.
-- Phase 30: trusted first agency-admin app profile bootstrap.
-- Phase 31: employee/client join-code onboarding; no admin self-promotion.
-- Phase 32: staff approval/removal synchronized to tenant membership lifecycle.
-- Phase 33: tenant-safe agency-admin join-code creation/listing/deactivation.
-- Phase 34: platform recruiting public-insert RLS hardening.
-- Phase 35: tenant-qualified ledger receipt and idempotency uniqueness.
-- Phase 36: identity-neutral platform-admin bootstrap; no hardcoded owner email.
-- Phase 37: RPC-only join-code secrets with stronger invitation entropy.
-- Ordered DEMO installer: `MULTI_TENANT_DEMO_PENDING_INSTALL_26_56.sql`.
-- Ordered structural/security gates: `MULTI_TENANT_DEMO_PENDING_GATES_26_56.sql`.
+## Code preparation already green
+- 48-file pre-cutover production foundation is isolated from tenant-fence, recruiting cutover, Phase 8, and subscription cutover stages.
+- Foundation SQL is explicitly transactional and guarded by fail-closed pre/post structural checks.
+- Recruiting remains platform-global and has separate pre-cutover compatibility, install, and post-cutover gates.
+- Production tenant fence is separate, transactional, and requires all four restrictive policies: SELECT, INSERT, UPDATE, DELETE.
+- Post-fence feature policies (Phase 14, Phase 25 account-role, Phase 49) are isolated behind the production tenant fence and independently verified.
+- Agency A/B behavioral isolation proof is rollback-only and tests reciprocal cross-tenant SELECT/INSERT/UPDATE/DELETE denial, own-tenant access, tenant stamping, and Platform Admin control.
+- Production writer audit verifies foundation SQL and Edge Function tenant writes carry/derive explicit tenant context before Phase 8 may remove legacy defaults.
+- Phase 8 is isolated and its read-only post gate requires legacy defaults removed plus all four restrictive tenant policies on every present tenant table.
+- Subscription release is isolated to phases 57-101, six subscription Edge Functions, three Vault-backed cron jobs, and controlled provider smoke tests.
+- Application deployment remains after database/subscription cutover verification.
 
-## Remaining before LIVE
-1. With explicit DEMO database authorization, install phases 26-56 and run all bundled structural/security gates.
-2. Run Phase 26/28 synthetic lifecycle tests with disposable DEMO auth users.
-3. New-agency smoke: provision agency -> first admin login/bootstrap -> create employee/client join codes -> signup -> approve -> account creation -> assignment -> call/note -> promise/plan -> Messenger -> report/remittance.
-4. Staff lifecycle smoke: deactivate/remove employee and verify tenant resolution/access is blocked; reactivate approved employee and verify access returns.
-5. Cross-tenant negative smoke with the newly provisioned agency, including join-code misuse attempts.
-6. Final production build and source/security scans.
-7. Freeze LIVE migration order and rollback/checkpoint instructions.
-8. Only with explicit owner authorization: apply proven migrations/functions to LIVE, configure deployment environment, deploy app, then post-deploy smoke.
+## LIVE execution order — explicit owner authorization required
+1. Run `PRODUCTION_FOUNDATION_PRE_MUTATION_COMPATIBILITY.sql` read-only against LIVE and stop on any mismatch or partial-foundation state.
+2. Apply `MULTI_TENANT_PRODUCTION_FOUNDATION_INSTALL_1_56_PRE_CUTOVER.sql` and run `PRODUCTION_FOUNDATION_POST_INSTALL_PRE_PHASE8_GATE.sql`.
+3. Run recruiting pre-cutover compatibility; only on PASS apply `PRODUCTION_RECRUITING_CUTOVER_INSTALL.sql`, then run its post-cutover gate.
+4. Apply `PRODUCTION_TENANT_FENCE_INSTALL.sql`, then run `PRODUCTION_TENANT_FENCE_POST_INSTALL_GATE.sql`.
+5. Apply `PRODUCTION_POST_FENCE_POLICY_INSTALL.sql`, then run `PRODUCTION_POST_FENCE_POLICY_GATE.sql`.
+6. Run `PRODUCTION_TENANT_ISOLATION_PROOF.sql`; it must PASS and ROLLBACK.
+7. Run `scripts-production-writer-tenant-context-gate.mjs`; it must PASS before Phase 8.
+8. Apply `PRODUCTION_PHASE8_CUTOVER_INSTALL.sql`, then run `PRODUCTION_PHASE8_POST_CUTOVER_GATE.sql`.
+9. Apply `MULTI_TENANT_PRODUCTION_SUBSCRIPTION_INSTALL_57_101.sql`.
+10. Deploy the six production subscription Edge Functions and configure only server-side production secrets.
+11. Install the three production subscription cron jobs using Vault-backed configuration.
+12. Run controlled subscription smoke tests without duplicate provider mutation.
+13. Build/deploy the LIVE application only after database and subscription gates are green.
+14. Run post-deploy role/access, new-agency provisioning, onboarding, account workflow, messaging, reporting/remittance, and cross-tenant negative smoke tests.
 
-## Cutover rule
-No LIVE Supabase mutation, GitHub push, main merge, or Netlify deploy until explicitly authorized.
+## Mandatory stop rules
+- Never skip or waive a failed gate.
+- Never run the draft `MULTI_TENANT_PHASE2_TENANT_FENCE_DRAFT.sql` against LIVE; use the canonical production tenant-fence installer.
+- Never run Phase 8 before tenant-fence structure, post-fence policy verification, rollback-only Agency A/B isolation, and production writer audit all pass.
+- Never install subscription phases before the tenant cutover is verified.
+- Never use DEMO/staging installers against LIVE.
+- Never expose service-role, NMI private, lifecycle, or webhook-signing secrets to browser/runtime configuration.
+- Never perform LIVE mutation, Edge Function/cron deployment, main merge, Netlify production deploy, or a real charge without explicit owner authorization.
+
+## Current authorization state
+Preparation may continue locally and on the feature branch. LIVE execution has **not** been authorized by a bare `Continue` instruction.
