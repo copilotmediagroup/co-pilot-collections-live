@@ -21,6 +21,7 @@ const gates = [
   'scripts-production-subscription-release-manifest-gate.mjs',
   'scripts-production-subscription-installer-gate.mjs',
   'scripts-production-subscription-phase-range-gate.mjs',
+  'scripts-production-runtime-config-integrity-gate.mjs',
   'scripts-production-deployment-readiness-gate.mjs',
   'scripts-production-rollback-plan-gate.mjs',
   'scripts-production-release-evidence-gate.mjs',
