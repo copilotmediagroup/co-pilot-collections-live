@@ -6,11 +6,11 @@ const sh=(...args)=>execFileSync('git',args,{encoding:'utf8'}).trim();
 const branch=sh('rev-parse','--abbrev-ref','HEAD');
 const head=sh('rev-parse','HEAD');
 const status=sh('status','--porcelain');
-const selfChanges=status.split('\n').filter(Boolean).filter(line=>!line.endsWith(' PRODUCTION_CUTOVER_SEQUENCE.md')&&!line.endsWith(' scripts-production-release-envelope-gate.mjs')&&!line.endsWith(' scripts-production-release-candidate-gate.mjs')); 
+const changes=status.split('\n').filter(Boolean);
 let remote='';
 try { remote=sh('rev-parse',`origin/${branch}`); } catch { fail.push(`origin/${branch} is unavailable`); }
 if(branch!=='feature/multi-tenant-saas') fail.push(`unexpected release-preparation branch: ${branch}`);
-if(selfChanges.length) fail.push('working tree contains unrelated changes');
+if(changes.length) fail.push('working tree is not clean');
 if(remote && head!==remote) fail.push('local HEAD does not exactly match origin feature branch');
 const pkg=JSON.parse(fs.readFileSync('package.json','utf8'));
 if(pkg.scripts?.['release:verify']!=='npm run release:preflight && node scripts-production-subscription-gates-57-97.mjs && node scripts-multitenant-local-preflight.mjs && npm run build') fail.push('release:verify command drifted');

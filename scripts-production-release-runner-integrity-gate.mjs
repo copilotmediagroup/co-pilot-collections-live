@@ -21,9 +21,11 @@ if(new Set(runnerGates).size!==runnerGates.length) fail.push('release preflight 
 if(runnerGates.includes(runnerFile)) fail.push('release preflight must not recursively invoke itself');
 if(runnerGates.includes('scripts-production-release-runner-integrity-gate.mjs')) fail.push('release preflight must not invoke runner integrity gate recursively');
 
-const expected=[...envelopeGates.filter(x=>x!==runnerFile && x!=='scripts-production-release-runner-integrity-gate.mjs'),'scripts-production-release-envelope-gate.mjs'];
+const postVerifyOnly=new Set(['scripts-production-release-candidate-gate.mjs','scripts-production-release-candidate-strict-clean-gate.mjs']);
+const expected=[...envelopeGates.filter(x=>x!==runnerFile && x!=='scripts-production-release-runner-integrity-gate.mjs' && !postVerifyOnly.has(x)),'scripts-production-release-envelope-gate.mjs'];
 for(const gate of expected) if(!runnerGates.includes(gate)) fail.push('release preflight missing envelope gate: '+gate);
 for(const gate of runnerGates) if(!expected.includes(gate)) fail.push('release preflight contains untracked gate: '+gate);
+for(const gate of postVerifyOnly) if(runnerGates.includes(gate)) fail.push('release preflight must not run post-verify clean-tree candidate gate: '+gate);
 
 for(const forbidden of ['psql ','supabase db','supabase functions deploy','netlify deploy','git merge','git push origin main','curl ','NMI_PRIVATE_API_KEY']) {
   if(runner.toLowerCase().includes(forbidden.toLowerCase())) fail.push('release preflight contains forbidden LIVE/deploy/provider action: '+forbidden);
