@@ -1,3 +1,4 @@
+begin;
 -- Co Pilot Collections — Multi-Tenant SaaS Conversion, Phase 19
 -- Service-role NMI finalization is bound to the organization stored on the trusted transaction row.
 
@@ -276,4 +277,4 @@ revoke all on function public.cpcm_nmi_finalize_sale(uuid,text,text,jsonb,text,t
 revoke all on function public.cpcm_nmi_apply_adjustment(uuid,text,text,jsonb,text,text,text) from public, anon, authenticated;
 grant execute on function public.cpcm_nmi_finalize_sale(uuid,text,text,jsonb,text,text,text,text,text) to service_role;
 grant execute on function public.cpcm_nmi_apply_adjustment(uuid,text,text,jsonb,text,text,text) to service_role;
-
+commit;

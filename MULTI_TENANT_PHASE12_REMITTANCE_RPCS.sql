@@ -1,3 +1,4 @@
+begin;
 -- Phase 12: tenant-safe remittance/fee RPC overrides. NON-PRODUCTION FIRST.
 create or replace function public.cpcm_admin_remittance_snapshot()
 returns jsonb
@@ -359,3 +360,4 @@ grant execute on function public.cpcm_remittance_batch_detail(uuid) to authentic
 grant execute on function public.cpcm_client_remittance_snapshot() to authenticated;
 
 notify pgrst,'reload schema';
+commit;

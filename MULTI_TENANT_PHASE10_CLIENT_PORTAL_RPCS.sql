@@ -1,3 +1,4 @@
+begin;
 -- Phase 10 tenant-safe client portal RPC overrides. NON-PRODUCTION FIRST.
 create or replace function public.cpcm_admin_client_portal_snapshot()
 returns jsonb
@@ -117,3 +118,4 @@ notify pgrst,'reload schema';
 
 
 -- R6 STAFF APPROVAL ACTIONS FIX (also provided as a separate incremental SQL file)
+commit;

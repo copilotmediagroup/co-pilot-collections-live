@@ -1,3 +1,4 @@
+begin;
 -- Co Pilot Collections — Multi-Tenant SaaS Conversion, Phase 18
 -- Tenant-bind call-attempt RPCs to the authenticated user's agency and trusted account ownership.
 
@@ -224,4 +225,4 @@ revoke all on function public.cpcm_record_call_attempt(uuid,text,text,text,text)
 grant execute on function public.cpcm_record_call_attempt(uuid,text,text,text,text) to authenticated;
 revoke all on function public.cpcm_complete_call_attempt(uuid,text,text,text,text,text,text,integer,text,boolean,boolean,boolean,boolean,boolean,timestamptz,numeric,text,text) from public,anon;
 grant execute on function public.cpcm_complete_call_attempt(uuid,text,text,text,text,text,text,integer,text,boolean,boolean,boolean,boolean,boolean,timestamptz,numeric,text,text) to authenticated;
-
+commit;

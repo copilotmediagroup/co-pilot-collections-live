@@ -1,3 +1,4 @@
+begin;
 -- Co Pilot Collections — Multi-Tenant SaaS Conversion, Phase 22
 -- Tenant-bind destructive archive deletion and Clear Accounts operations.
 
@@ -49,3 +50,4 @@ begin
 end; $$;
 revoke all on function public.admin_clear_accounts() from public,anon;
 grant execute on function public.admin_clear_accounts() to authenticated;
+commit;

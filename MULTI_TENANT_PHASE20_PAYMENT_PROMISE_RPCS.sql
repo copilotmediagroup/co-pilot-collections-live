@@ -1,3 +1,4 @@
+begin;
 -- Co Pilot Collections — Multi-Tenant SaaS Conversion, Phase 20
 -- Tenant-bind payment promise creation and paid transition. SECURITY INVOKER + RLS remain active.
 
@@ -88,3 +89,4 @@ begin
  insert into public.collector_alerts(organization_id,account_id,alert_type,severity,title,message,due_date,status,assigned_to_email,created_by_email,source_table,source_id) values(oid,p.account_id,'Broken Promise','critical','Broken promise needs follow-up','Missed manual payment promise of '||amt::text||' requires follow-up.',current_date,'Open',coalesce(assignee,p.employee_email,actor_email,''),coalesce(actor_email,'system'),'payment_promises',p.id::text) on conflict (organization_id,source_table,source_id,alert_type) where status='Open' and source_id is not null and btrim(source_id)<>'' do nothing;
  return jsonb_build_object('ok',true,'flagged',true,'account_id',p.account_id,'amount',amt);
 end; $$;
+commit;

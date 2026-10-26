@@ -1,3 +1,4 @@
+begin;
 -- Co Pilot Collections — Multi-Tenant SaaS Conversion, Phase 23
 -- Replace legacy owner-email authorization helpers used by older RLS policies.
 
@@ -40,3 +41,4 @@ revoke all on function public.can_access_account(uuid) from public,anon;
 grant execute on function public.is_app_admin() to authenticated;
 grant execute on function public.is_approved_app_user() to authenticated;
 grant execute on function public.can_access_account(uuid) to authenticated;
+commit;

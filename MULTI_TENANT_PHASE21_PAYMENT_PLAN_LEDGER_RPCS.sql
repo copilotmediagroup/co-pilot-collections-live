@@ -1,3 +1,4 @@
+begin;
 -- Co Pilot Collections — Multi-Tenant SaaS Conversion, Phase 21
 -- Tenant-bind payment-plan creation, scheduled payment transitions, and manual ledger posting.
 
@@ -64,3 +65,4 @@ begin
  if total_applied>0 then new_remaining:=greatest(coalesce(pl.remaining_amount,pl.total_amount,pl.balance,0)-total_applied,0); update public.payment_plans set remaining_amount=new_remaining,status=case when new_remaining<=0 then 'Paid' else 'Active' end,updated_at=now() where organization_id=oid and id=pl.id; end if;
  return jsonb_build_object('ok',true,'plan_id',pl.id,'applied',applied,'total_applied',total_applied);
 end; $$;
+commit;

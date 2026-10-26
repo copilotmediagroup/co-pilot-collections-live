@@ -1,3 +1,4 @@
+begin;
 -- Co Pilot Collections — Multi-Tenant SaaS Conversion, Phase 17
 -- Tenant-safe Messenger staff naming and directory RPCs.
 
@@ -54,3 +55,4 @@ $$;
 revoke all on function public.cpcm_staff_directory() from public,anon;
 grant execute on function public.cpcm_staff_directory() to authenticated;
 notify pgrst,'reload schema';
+commit;
