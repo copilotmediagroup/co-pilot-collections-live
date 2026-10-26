@@ -52,10 +52,11 @@ SELECT id::text AS b_account FROM public.accounts WHERE organization_id='2000000
   \quit 4
 \endif
 
--- Trigger probe mirrors tenant-owned insert stamping without inserting a real business row.
-CREATE TEMPORARY TABLE cpcm_production_stamp_probe(id uuid primary key default gen_random_uuid(),organization_id uuid not null);
-CREATE TRIGGER cpcm_stamp_organization BEFORE INSERT ON cpcm_production_stamp_probe FOR EACH ROW EXECUTE FUNCTION private.stamp_current_organization();
-GRANT INSERT,SELECT ON cpcm_production_stamp_probe TO authenticated;
+-- Prove INSERT isolation on a real tenant table without leaving business data behind.
+-- First disable only the tenant-stamp trigger transactionally so the restrictive INSERT policy itself
+-- must reject Agency A forging Agency B. The trigger is re-enabled immediately after the negative probe.
+ALTER TABLE public.team_messages DISABLE TRIGGER cpcm_stamp_organization;
+GRANT INSERT,SELECT ON public.team_messages TO authenticated;
 SELECT set_config('cpcm.test_a_account',:'a_account',true);
 SELECT set_config('cpcm.test_b_account',:'b_account',true);
 
@@ -69,8 +70,23 @@ BEGIN
   UPDATE public.accounts SET status=status WHERE id=current_setting('cpcm.test_b_account')::uuid; GET DIAGNOSTICS n=ROW_COUNT; IF n<>0 THEN RAISE EXCEPTION 'FAIL A UPDATE B'; END IF;
   DELETE FROM public.accounts WHERE id=current_setting('cpcm.test_b_account')::uuid; GET DIAGNOSTICS n=ROW_COUNT; IF n<>0 THEN RAISE EXCEPTION 'FAIL A DELETE B'; END IF;
   SELECT count(*) INTO n FROM public.accounts WHERE id=current_setting('cpcm.test_a_account')::uuid; IF n<>1 THEN RAISE EXCEPTION 'FAIL A own-row access'; END IF;
+  BEGIN
+    INSERT INTO public.team_messages(organization_id,from_email,to_email,subject,body,created_by_email)
+    VALUES ('20000000-0000-4000-8000-000000000002'::uuid,:'a_email',:'a_email','CPCM isolation probe','rollback-only restrictive INSERT probe',:'a_email');
+    RAISE EXCEPTION 'FAIL A INSERT B: restrictive insert fence allowed forged Agency B row';
+  EXCEPTION WHEN insufficient_privilege THEN
+    NULL; -- expected RLS WITH CHECK rejection (SQLSTATE 42501)
+  END;
 END $a$;
-INSERT INTO cpcm_production_stamp_probe(organization_id) VALUES ('20000000-0000-4000-8000-000000000002') RETURNING organization_id::text AS stamped_org \gset
+
+RESET ROLE;
+ALTER TABLE public.team_messages ENABLE TRIGGER cpcm_stamp_organization;
+SET LOCAL ROLE authenticated;
+SELECT set_config('request.jwt.claims',json_build_object('sub',:'a_user','role','authenticated','email',:'a_email')::text,true);
+-- With the canonical trigger restored, a forged B id must be stamped to Agency A on the real table.
+INSERT INTO public.team_messages(organization_id,from_email,to_email,subject,body,created_by_email)
+VALUES ('20000000-0000-4000-8000-000000000002'::uuid,:'a_email',:'a_email','CPCM isolation probe','rollback-only tenant stamp probe',:'a_email')
+RETURNING id::text AS stamp_message,organization_id::text AS stamped_org \gset
 SELECT (:'stamped_org'='10000000-0000-4000-8000-000000000001') AS stamped_ok \gset
 \if :stamped_ok
 \else
@@ -101,4 +117,4 @@ BEGIN
 END $p$;
 RESET ROLE;
 ROLLBACK;
-\echo 'PASS production Agency A/B isolation proof — reciprocal SELECT/UPDATE/DELETE fence, forged-tenant stamping, own-row access and platform-admin control verified; all changes rolled back.'
+\echo 'PASS production Agency A/B isolation proof — reciprocal SELECT/UPDATE/DELETE fence, restrictive cross-tenant INSERT rejection, real-table forged-tenant stamping, own-row access and platform-admin control verified; all changes rolled back.'
