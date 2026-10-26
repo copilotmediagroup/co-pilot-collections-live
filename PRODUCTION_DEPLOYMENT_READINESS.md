@@ -2,7 +2,7 @@
 
 ## Current release boundary
 - Feature branch: `feature/multi-tenant-saas`
-- Subscription migrations: Phases 57–99.
+- Subscription migrations: Phases 57–100.
 - Netlify build: `npm run build`, publish `dist`, Node 20.
 - Production runtime mode must be `live`.
 - Public Demo is separate and must not receive this production installer.
@@ -36,7 +36,7 @@ The plan-change processor uses NMI v5 `PUT /api/v5/subscriptions/{subscription_i
 ## Netlify cutover
 After the database migration and Edge Function configuration are verified, run one final production build, then deploy the production branch/site in one controlled release. Smoke-test login, new agency signup, pending-payment routing, subscription/billing page, tenant isolation, employee invite/login, account creation limits, and admin access immediately after deployment.
 
-- `CPCM_SUBSCRIPTION_LIFECYCLE_SECRET` — server-only secret used by provider-first subscription lifecycle processors (cancellation and plan changes).
+- `CPCM_SUBSCRIPTION_LIFECYCLE_SECRET` — server-only secret used by scheduled subscription lifecycle processors (cancellation and checkout recovery). Plan changes are initiated by an authenticated agency admin and do not use this shared lifecycle secret.
 
 ## Cancellation scheduler
 After the cancellation Edge Function is deployed, create Vault secrets `cpcm_project_url` and `cpcm_subscription_lifecycle_secret`, then apply `PRODUCTION_SUBSCRIPTION_CANCELLATION_CRON.sql`. It invokes the provider-first cancellation processor every 15 minutes so end-of-period cancellations do not depend on an agency admin being online. Do not place either secret directly in SQL or browser code.
