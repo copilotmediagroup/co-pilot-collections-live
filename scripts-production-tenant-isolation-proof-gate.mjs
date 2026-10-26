@@ -6,6 +6,7 @@ for(const x of ['BEGIN;','ROLLBACK;','SET LOCAL ROLE authenticated','cpcm_tenant
 if(!s.includes("SELECT id::text AS a_user")||!s.includes("SELECT id::text AS b_user")) fail.push('must use existing auth users, not create production auth identities');
 if(/insert\s+into\s+auth\.users/i.test(s)) fail.push('must never create auth users');
 if(/CREATE TEMPORARY TABLE cpcm_production_stamp_probe/i.test(s)) fail.push('production proof must exercise INSERT on a real fenced tenant table, not only a temporary probe');
+if(!/tg\.tgname='cpcm_stamp_organization'/i.test(s)||!/tg\.tgenabled <> 'D'/i.test(s)||!/pn\.nspname='private'/i.test(s)||!/p\.proname='stamp_current_organization'/i.test(s)) fail.push('proof must fail closed unless the enabled team_messages trigger is bound to private.stamp_current_organization');
 if(!/ALTER TABLE public\.team_messages DISABLE TRIGGER cpcm_stamp_organization/i.test(s)||!/ALTER TABLE public\.team_messages ENABLE TRIGGER cpcm_stamp_organization/i.test(s)) fail.push('restrictive INSERT policy probe must transactionally bypass then restore tenant stamping');
 if(!/INSERT INTO public\.team_messages\(organization_id/i.test(s)) fail.push('production proof must exercise real team_messages INSERT path');
 if(!/EXCEPTION WHEN insufficient_privilege/i.test(s)) fail.push('cross-tenant INSERT probe must require RLS rejection');

@@ -17,6 +17,26 @@ BEGIN
       END IF;
     END LOOP;
   END LOOP;
+
+  -- The INSERT proof below temporarily disables exactly the canonical tenant-stamp trigger.
+  -- Fail closed before ALTER TRIGGER if the binding is missing, disabled, or points elsewhere.
+  IF NOT EXISTS (
+    SELECT 1
+    FROM pg_trigger tg
+    JOIN pg_class c ON c.oid=tg.tgrelid
+    JOIN pg_namespace n ON n.oid=c.relnamespace
+    JOIN pg_proc p ON p.oid=tg.tgfoid
+    JOIN pg_namespace pn ON pn.oid=p.pronamespace
+    WHERE n.nspname='public'
+      AND c.relname='team_messages'
+      AND tg.tgname='cpcm_stamp_organization'
+      AND NOT tg.tgisinternal
+      AND tg.tgenabled <> 'D'
+      AND pn.nspname='private'
+      AND p.proname='stamp_current_organization'
+  ) THEN
+    RAISE EXCEPTION 'ISOLATION BLOCKED: public.team_messages.cpcm_stamp_organization must be enabled and bound to private.stamp_current_organization()';
+  END IF;
 END $pre$;
 
 -- Use two existing auth identities, but all membership/data changes are rolled back.
