@@ -1,12 +1,12 @@
 import fs from 'node:fs';
-const manifest='MULTI_TENANT_PRODUCTION_SUBSCRIPTION_INSTALL_57_97.sql';
+const manifest='MULTI_TENANT_PRODUCTION_SUBSCRIPTION_INSTALL_57_101.sql';
 const text=fs.readFileSync(manifest,'utf8');
 let failed=false; const check=(name,ok)=>{console.log(ok?'PASS':'FAIL',name);if(!ok)failed=true};
 const includes=[...text.matchAll(/^\\ir\s+(MULTI_TENANT_PHASE(\d+)[^\s]+\.sql)$/gm)].map(m=>({file:m[1],phase:Number(m[2])}));
 check('production-only warning',/Production-only/i.test(text)&&/DO NOT run.*Demo/i.test(text));
-check('41 subscription phases included',includes.length===41);
+check('45 subscription phases included',includes.length===45);
 check('starts at phase57',includes[0]?.phase===57);
-check('ends at phase97',includes.at(-1)?.phase===97);
+check('ends at phase101',includes.at(-1)?.phase===101);
 check('strict numeric order',includes.every((x,i)=>x.phase===57+i));
 check('all include files exist',includes.every(x=>fs.existsSync(x.file)));
 check('no demo installer nesting',!/MULTI_TENANT_DEMO_PENDING_INSTALL/i.test(text));

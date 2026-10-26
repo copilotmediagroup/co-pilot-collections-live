@@ -10,7 +10,7 @@
     "start": "vite --host 0.0.0.0",
     "build:config": "node scripts-generate-runtime-config.mjs",
     "release:preflight": "node scripts-production-release-preflight.mjs",
-    "release:verify": "npm run release:preflight && node scripts-production-subscription-gates-57-97.mjs && node scripts-multitenant-local-preflight.mjs && npm run build"
+    "release:verify": "npm run release:preflight && node scripts-production-subscription-gates-57-101.mjs && node scripts-multitenant-local-preflight.mjs && npm run build"
   },
   "devDependencies": {
     "vite": "^5.4.21"

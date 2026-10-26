@@ -4,7 +4,7 @@ const fail=[];
 const pre=p.scripts?.['release:preflight']||'';
 const verify=p.scripts?.['release:verify']||'';
 if(pre!=='node scripts-production-release-preflight.mjs') fail.push('release:preflight must run only the local/static production preflight');
-for(const x of ['npm run release:preflight','node scripts-production-subscription-gates-57-97.mjs','node scripts-multitenant-local-preflight.mjs','npm run build']) if(!verify.includes(x)) fail.push('release:verify missing: '+x);
+for(const x of ['npm run release:preflight','node scripts-production-subscription-gates-57-101.mjs','node scripts-multitenant-local-preflight.mjs','npm run build']) if(!verify.includes(x)) fail.push('release:verify missing: '+x);
 for(const forbidden of ['supabase db','supabase functions deploy','psql ','netlify deploy','git merge','git push origin main','curl ','NMI_PRIVATE_API_KEY']) {
   if((pre+'\n'+verify).toLowerCase().includes(forbidden.toLowerCase())) fail.push('release command contains forbidden LIVE/deploy/provider action: '+forbidden);
 }

@@ -13,7 +13,7 @@ if(branch!=='feature/multi-tenant-saas') fail.push(`unexpected release-preparati
 if(changes.length) fail.push('working tree is not clean');
 if(remote && head!==remote) fail.push('local HEAD does not exactly match origin feature branch');
 const pkg=JSON.parse(fs.readFileSync('package.json','utf8'));
-if(pkg.scripts?.['release:verify']!=='npm run release:preflight && node scripts-production-subscription-gates-57-97.mjs && node scripts-multitenant-local-preflight.mjs && npm run build') fail.push('release:verify command drifted');
+if(pkg.scripts?.['release:verify']!=='npm run release:preflight && node scripts-production-subscription-gates-57-101.mjs && node scripts-multitenant-local-preflight.mjs && npm run build') fail.push('release:verify command drifted');
 const seq=fs.readFileSync('PRODUCTION_CUTOVER_SEQUENCE.md','utf8');
 for(const x of ['npm run release:verify','Record/pin the exact release commit SHA','working tree is clean','local HEAD matches the remote feature branch']) if(!seq.includes(x)) fail.push(`cutover release-candidate rule missing: ${x}`);
 if(fail.length){console.error(fail.map(x=>'FAIL '+x).join('\n'));process.exit(1)}
