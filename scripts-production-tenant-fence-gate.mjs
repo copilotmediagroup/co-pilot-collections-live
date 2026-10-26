@@ -1,0 +1,16 @@
+import fs from 'node:fs';
+const install=fs.readFileSync('PRODUCTION_TENANT_FENCE_INSTALL.sql','utf8');
+const post=fs.readFileSync('PRODUCTION_TENANT_FENCE_POST_INSTALL_GATE.sql','utf8');
+const foundation=fs.readFileSync('MULTI_TENANT_PRODUCTION_FOUNDATION_INSTALL_1_56_PRE_CUTOVER.sql','utf8');
+const phase8=fs.readFileSync('PRODUCTION_PHASE8_CUTOVER_INSTALL.sql','utf8');
+const fail=(m)=>{console.error('FAIL '+m);process.exit(1)};
+if(!/^\\set ON_ERROR_STOP on/m.test(install)||!/^BEGIN;/m.test(install)||!/^COMMIT;/m.test(install)) fail('tenant-fence installer must be fail-fast and transactional');
+for(const p of ['cpcm_tenant_select','cpcm_tenant_insert','cpcm_tenant_update','cpcm_tenant_delete']) if(!install.includes(`create policy ${p}`)||!install.includes('as restrictive')) fail(`missing restrictive ${p}`);
+if(!install.includes('create trigger cpcm_stamp_organization')) fail('tenant stamp trigger missing');
+if(!install.includes("current_user in ('postgres','service_role','supabase_admin')")) fail('trusted backend tenant-stamp behavior missing');
+if(/alter column organization_id drop default/i.test(install)) fail('tenant-fence stage must retain legacy defaults');
+if(foundation.includes('PRODUCTION_TENANT_FENCE_INSTALL.sql')||foundation.includes('MULTI_TENANT_PHASE2_TENANT_FENCE_DRAFT.sql')) fail('tenant fence must remain outside pre-cutover foundation');
+if(!phase8.includes('Agency A/B behavioral isolation proof')||!phase8.includes('explicit owner authorization')) fail('Phase 8 must retain behavioral isolation and owner-authorization holds');
+if(!/BEGIN READ ONLY;/i.test(post)||!/ROLLBACK;/i.test(post)) fail('post-install gate must be read-only');
+if(!post.includes("permissive='RESTRICTIVE'")||!post.includes('legacy_default_missing_before_phase8')) fail('post-install gate must prove restrictive fences and retained defaults');
+console.log('PASS production tenant-fence gate — canonical restrictive fence is isolated, transactional, structurally verified, and Phase 8 remains held');
