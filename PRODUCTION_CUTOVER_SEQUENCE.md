@@ -17,23 +17,24 @@ This is the canonical LIVE release order. Preparation and verification may be co
 8. Apply `PRODUCTION_POST_FENCE_POLICY_INSTALL.sql` for Phase 14, Phase 25 account-role policies, and Phase 49.
 9. Run `PRODUCTION_POST_FENCE_POLICY_GATE.sql` read-only.
 10. Run `PRODUCTION_TENANT_ISOLATION_PROOF.sql`. This proof is rollback-only and must pass reciprocal Agency A/B isolation, tenant stamping, own-row access, and platform-admin control.
+11. Run `node scripts-production-writer-tenant-context-gate.mjs`. It must prove production foundation SQL and Edge Function writes explicitly carry or derive tenant context before defaults are removed.
 
 ## Stage C — Remove legacy tenant defaults
-11. Only after Stage B proof passes, apply `PRODUCTION_PHASE8_CUTOVER_INSTALL.sql`.
-12. Run `PRODUCTION_PHASE8_POST_CUTOVER_GATE.sql` read-only.
+12. Only after Stage B proof and writer audit pass, apply `PRODUCTION_PHASE8_CUTOVER_INSTALL.sql`.
+13. Run `PRODUCTION_PHASE8_POST_CUTOVER_GATE.sql` read-only.
 
 ## Stage D — SaaS subscriptions
-13. Apply `MULTI_TENANT_PRODUCTION_SUBSCRIPTION_INSTALL_57_101.sql`.
-14. Deploy the six production subscription Edge Functions listed in the release manifest/readiness documentation.
-15. Configure required production secrets, including NMI private API key, lifecycle secret, and webhook signing key. Never place them in browser/runtime config.
-16. Install the three production subscription cron jobs using their Vault-backed configuration.
-17. Run controlled subscription smoke tests: signup/pending-payment, checkout/activation, renewal failure/grace, cancellation, plan change, and recovery without duplicate provider mutation.
+14. Apply `MULTI_TENANT_PRODUCTION_SUBSCRIPTION_INSTALL_57_101.sql`.
+15. Deploy the six production subscription Edge Functions listed in the release manifest/readiness documentation.
+16. Configure required production secrets, including NMI private API key, lifecycle secret, and webhook signing key. Never place them in browser/runtime config.
+17. Install the three production subscription cron jobs using their Vault-backed configuration.
+18. Run controlled subscription smoke tests: signup/pending-payment, checkout/activation, renewal failure/grace, cancellation, plan change, and recovery without duplicate provider mutation.
 
 ## Stage E — Application release
-18. Build the production app with explicit LIVE runtime configuration.
-19. Deploy the application only after database and subscription gates are green.
-20. Run post-deploy role/access smoke tests for Platform Admin, Agency Admin, Recruiter, Collector/Employee, and Client.
-21. Verify new-agency provisioning, employee/client onboarding, account workflow, messaging, reporting/remittance, and cross-tenant negative access.
+19. Build the production app with explicit LIVE runtime configuration.
+20. Deploy the application only after database and subscription gates are green.
+21. Run post-deploy role/access smoke tests for Platform Admin, Agency Admin, Recruiter, Collector/Employee, and Client.
+22. Verify new-agency provisioning, employee/client onboarding, account workflow, messaging, reporting/remittance, and cross-tenant negative access.
 
 ## Stop rules
 - Never skip a failed gate.
