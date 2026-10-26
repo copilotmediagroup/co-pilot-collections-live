@@ -5,6 +5,12 @@ This is the canonical LIVE release order. Preparation and verification may be co
 Rollback/recovery companion: `PRODUCTION_CUTOVER_ROLLBACK_PLAN.md`. Verify its pre-mutation recovery-point requirements before Stage A.
 Release evidence template: `PRODUCTION_RELEASE_EVIDENCE_TEMPLATE.md`. Use it for every authorized LIVE stage without recording secrets or payment data.
 
+## Release candidate freeze — before any LIVE authorization
+1. Run `npm run release:verify` from `feature/multi-tenant-saas`.
+2. Confirm the working tree is clean and local HEAD matches the remote feature branch.
+3. Record/pin the exact release commit SHA in `PRODUCTION_RELEASE_EVIDENCE_TEMPLATE.md`; every authorized LIVE artifact and deployment must come from that SHA.
+4. If code, SQL, Edge Functions, cron, release gates, or runtime configuration change after the SHA is pinned, the candidate is invalid: rerun `npm run release:verify` and pin the new SHA before requesting LIVE authorization.
+
 ## Stage 0 — Pre-mutation compatibility
 1. Run `PRODUCTION_FOUNDATION_PRE_MUTATION_COMPATIBILITY.sql` read-only against LIVE.
 2. Stop on any prerequisite or partial-foundation failure. Reconcile before continuing.

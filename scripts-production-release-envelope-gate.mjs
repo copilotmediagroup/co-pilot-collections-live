@@ -24,6 +24,7 @@ const requiredStatic=[
   'scripts-production-rollback-plan-gate.mjs',
   'scripts-production-release-preflight.mjs',
   'scripts-production-release-runner-integrity-gate.mjs',
+  'scripts-production-release-candidate-gate.mjs',
   'scripts-production-release-evidence-gate.mjs'
 ];
 for(const f of requiredStatic) if(!fs.existsSync(f)) fail.push('missing release gate: '+f);
