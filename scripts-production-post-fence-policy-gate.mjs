@@ -10,6 +10,8 @@ if(JSON.stringify(includes)!==JSON.stringify(expected)) fail.push('post-fence in
 for(const f of expected){ if(foundation.includes(f)) fail.push(`${f} must remain outside pre-fence foundation`); }
 if(!/BEGIN READ ONLY;/i.test(verify)||!/ROLLBACK;/i.test(verify)) fail.push('verification gate must be read-only and rollback');
 if(!verify.includes("permissive='RESTRICTIVE'")) fail.push('verification must prove restrictive tenant fence');
+for(const policy of ['cpcm_tenant_select','cpcm_tenant_insert','cpcm_tenant_update','cpcm_tenant_delete']) if(!verify.includes(policy)) fail.push('verification must require '+policy);
+if(!/FOREACH\s+p\s+IN\s+ARRAY/i.test(verify)) fail.push('verification must check each restrictive tenant policy independently');
 if(!verify.includes('PHASE 8 REMAINS HOLD')) fail.push('verification must keep Phase 8 held for behavioral proof');
 if(!phase8.includes('Agency A/B behavioral isolation proof')) fail.push('Phase 8 must still require behavioral isolation proof');
 if(/\b(?:insert\s+into|update\s+|delete\s+from|alter\s+table|create\s+(?:table|policy|function|trigger|index)|drop\s+(?:table|policy|function|trigger|index)|truncate\s+)/i.test(verify.replace(/--.*$/gm,''))) fail.push('verification gate contains mutation SQL');
