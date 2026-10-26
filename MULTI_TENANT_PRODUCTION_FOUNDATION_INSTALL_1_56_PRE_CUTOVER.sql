@@ -51,7 +51,8 @@
 \ir MULTI_TENANT_PHASE46_RPC_EXECUTE_LOCKDOWN.sql
 \ir MULTI_TENANT_PHASE47_LEGACY_DEFINER_HARDENING.sql
 \ir MULTI_TENANT_PHASE48_IDENTITY_HELPER_HARDENING.sql
-\ir MULTI_TENANT_PHASE49_CANONICAL_ACTOR_IDENTITY.sql
+-- Phase 49 policy rewrite is held with Phase 14 because its employee commission policy assumes the Phase 2 restrictive tenant fence.
+-- The canonical actor RPC work in later phases remains independently included.
 \ir MULTI_TENANT_PHASE50_IMPORT_BATCH_DELETE_RPC.sql
 \ir MULTI_TENANT_PHASE51_APP_USER_INSERT_GUARD.sql
 \ir MULTI_TENANT_PHASE52_ROLE_CONSISTENCY_GUARD.sql
