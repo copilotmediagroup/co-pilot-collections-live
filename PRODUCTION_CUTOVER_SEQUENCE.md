@@ -2,6 +2,8 @@
 
 This is the canonical LIVE release order. Preparation and verification may be committed to the feature branch without changing LIVE. Every LIVE mutation/deployment step requires explicit owner authorization.
 
+Rollback/recovery companion: `PRODUCTION_CUTOVER_ROLLBACK_PLAN.md`. Verify its pre-mutation recovery-point requirements before Stage A.
+
 ## Stage 0 — Pre-mutation compatibility
 1. Run `PRODUCTION_FOUNDATION_PRE_MUTATION_COMPATIBILITY.sql` read-only against LIVE.
 2. Stop on any prerequisite or partial-foundation failure. Reconcile before continuing.
