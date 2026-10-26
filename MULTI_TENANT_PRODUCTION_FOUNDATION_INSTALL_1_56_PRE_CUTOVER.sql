@@ -1,11 +1,11 @@
 \set ON_ERROR_STOP on
 -- Co Pilot Collections — production multi-tenant foundation PRE-CUTOVER installer
 -- Phase 8 REMOVE_LEGACY_DEFAULTS is intentionally excluded until Agency A/B isolation passes.
--- Phase 16 and Phase 7 are staging/readiness assertions and are intentionally excluded from LIVE execution.
+-- Phase 2, Phase 7 and Phase 16 are staging/readiness artifacts and are intentionally excluded from LIVE execution.
+-- Phase 3 contains required tenant-aware uniqueness mutations plus a commented staging harness; only its transactional mutation section executes.
 -- Phase 39 is a runtime/source gate and has no production DB mutation.
 
 \ir MULTI_TENANT_PHASE1_FOUNDATION.sql
-\ir MULTI_TENANT_PHASE2_TENANT_FENCE_DRAFT.sql
 \ir MULTI_TENANT_PHASE3_TENANT_KEYS_AND_TEST_HARNESS.sql
 \ir MULTI_TENANT_PHASE4_SINGLETON_CONFIG_KEYS.sql
 \ir MULTI_TENANT_PHASE5_RPC_TENANT_BINDING.sql
