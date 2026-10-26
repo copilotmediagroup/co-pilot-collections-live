@@ -23,7 +23,7 @@ For `saas-subscription-checkout`:
 
 ## Database release order
 1. Confirm the existing production multi-tenant foundation through Phase 56 is present.
-2. Apply `MULTI_TENANT_PRODUCTION_SUBSCRIPTION_INSTALL_57_99.sql` in numeric order.
+2. Apply `MULTI_TENANT_PRODUCTION_SUBSCRIPTION_INSTALL_57_100.sql` in numeric order.
 3. Run the production subscription gate bundle and full multi-tenant preflight before site cutover.
 
 ## NMI recurring subscription boundary
@@ -57,3 +57,5 @@ NMI webhook deliveries can be retried, so the recurring-event intake must retain
 
 ## Gateway JWT configuration
 NMI webhook intake and lifecycle-secret cron processors are intentionally configured with `verify_jwt = false` in `supabase/config.toml`. They still authenticate inside function code: provider events verify the NMI webhook signature, while cancellation and checkout recovery require the server-only lifecycle secret. Browser-facing checkout and plan-change functions retain their user-JWT boundary.
+
+- Phase 100 atomically finalizes provider-approved checkout activation, recurring billing anchor, organization activation, and paid checkout state in one database transaction. Checkout and recovery processors use this canonical finalizer so a partial anchor write cannot strand a paid checkout.

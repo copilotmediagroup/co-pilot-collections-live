@@ -10,7 +10,7 @@ const checks=[
  ['demo cannot activate',sql.includes('coalesce(is_demo,false)=false')],
  ['subscription row becomes active',sql.includes("c.organization_id,c.plan_code,'active'")],
  ['billing interval comes from checkout',sql.includes('c.billing_interval')],
- ['edge calls activation after approval',edge.includes('cpcm_service_activate_paid_subscription')],
+ ['edge calls activation after approval',edge.includes('cpcm_service_activate_provider_approved_subscription')],
  ['edge returns active only after activation',edge.includes('subscriptionStatus:"active"')],
  ['browser cannot call activation',sql.includes('from public,anon,authenticated')]
 ];let bad=0;for(const [n,ok] of checks){console.log(ok?'PASS':'FAIL',n);if(!ok)bad++}process.exit(bad?1:0);

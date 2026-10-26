@@ -7,7 +7,7 @@ c('recovery reader service only',/cpcm_service_provider_approved_checkout_recove
 c('recovery only provider approved',/status='provider_approved'/.test(sql));
 c('recovery excludes demo',/is_demo,false\)=false/.test(sql));
 c('recovery edge lifecycle protected',edge.includes('CPCM_SUBSCRIPTION_LIFECYCLE_SECRET')&&edge.includes('x-cpcm-lifecycle-secret'));
-c('recovery reuses activation rpc',edge.includes('cpcm_service_activate_paid_subscription'));
+c('recovery reuses activation rpc',edge.includes('cpcm_service_activate_provider_approved_subscription'));
 c('recovery never calls NMI',!edge.includes('NMI_PRIVATE_API_KEY')&&!edge.includes('/api/v5/subscriptions'));
 c('recovery contains no payment token',!edge.includes('payment_token')&&!sql.includes('payment_token'));
 if(bad)process.exit(1);
