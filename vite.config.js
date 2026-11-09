@@ -17,6 +17,7 @@ export default defineConfig({
     rollupOptions: {
       input: {
         main: resolve(process.cwd(), 'index.html'),
+        pricing: resolve(process.cwd(), 'pricing.html'),
         changePassword: resolve(process.cwd(), 'change-password.html'),
         recruiterApplication: resolve(process.cwd(), 'recruiter-application.html'),
         recruiterApplicationsAdmin: resolve(process.cwd(), 'recruiter-applications-admin.html'),
